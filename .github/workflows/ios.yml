@@ -67,7 +67,11 @@ jobs:
             -clonedSourcePackagesDirPath "$SPM_DIR" \
             -skipPackagePluginValidation -skipMacroValidation \
             CODE_SIGNING_ALLOWED=NO build 2>&1 | tee "$RUNNER_TEMP/build.log" | grep -E "error:|BUILD (SUCCEEDED|FAILED)" || true
-          grep -q "BUILD SUCCEEDED" "$RUNNER_TEMP/build.log"
+          if ! grep -q "BUILD SUCCEEDED" "$RUNNER_TEMP/build.log"; then
+            grep -n -A6 -E "error:|Could not resolve|because|requires|conflict" "$RUNNER_TEMP/build.log" | head -150 || true
+            tail -n 80 "$RUNNER_TEMP/build.log"
+            exit 1
+          fi
 
       - name: Upload build log
         if: always()
@@ -139,7 +143,12 @@ jobs:
             DEVELOPMENT_TEAM="$DEVELOPMENT_TEAM" \
             CURRENT_PROJECT_VERSION="$BUILD_NUMBER" \
             archive 2>&1 | tee "$RUNNER_TEMP/archive.log" | grep -E "error:|ARCHIVE (SUCCEEDED|FAILED)" || true
-          grep -q "ARCHIVE SUCCEEDED" "$RUNNER_TEMP/archive.log"
+          if ! grep -q "ARCHIVE SUCCEEDED" "$RUNNER_TEMP/archive.log"; then
+            echo "----- archive.log (errors and last lines) -----"
+            grep -n -A6 -E "error:|Could not resolve|because|requires|conflict" "$RUNNER_TEMP/archive.log" | head -150 || true
+            tail -n 80 "$RUNNER_TEMP/archive.log"
+            exit 1
+          fi
 
       - name: Export & upload to App Store Connect
         run: |
