@@ -1,0 +1,42 @@
+[
+  {
+    "id": "afasy",
+    "name": "مشاري العفاسي",
+    "source": "https://cdn.aladhan.com/audio/adhans/a9.mp3",
+    "start": 1.0,
+    "duration": 19.65,
+    "type": "مقتطف تكبيرات الأذان؛ ليس الأذان كاملًا"
+  },
+  {
+    "id": "nafees",
+    "name": "أحمد النفيس",
+    "source": "https://cdn.aladhan.com/audio/adhans/a1.mp3",
+    "start": 9.2,
+    "duration": 17.2,
+    "type": "مقتطف تكبيرات الأذان؛ ليس الأذان كاملًا"
+  },
+  {
+    "id": "mansour",
+    "name": "منصور الزهراني",
+    "source": "https://cdn.aladhan.com/audio/adhans/a11-mansour-al-zahrani.mp3",
+    "start": 0,
+    "duration": 13.1,
+    "type": "مقتطف تكبيرات الأذان؛ ليس الأذان كاملًا"
+  },
+  {
+    "id": "mustafa",
+    "name": "مصطفى أوزجان",
+    "source": "https://cdn.aladhan.com/audio/adhans/a2.mp3",
+    "start": 0,
+    "duration": 21.7,
+    "type": "مقتطف قصير من الأذان؛ ليس الأذان كاملًا"
+  },
+  {
+    "id": "ali_mulla",
+    "name": "علي أحمد الملا",
+    "source": "https://archive.org/download/alfirdwsiy1433_gm35856583568358356356858ail/%D8%B9%D9%84%D9%8A%20%D8%A3%D8%AD%D9%85%D8%AF%20%D9%85%D9%84%D8%A7%20-%20%D8%A7%D8%B3%D8%AA%D9%85%D8%A7%D8%B9%20%D9%88%D8%AA%D8%AD%D9%85%D9%8A%D9%84%20%D8%A7%D9%84%D9%82%D8%B1%D8%A2%D9%86%20%D8%A7%D9%84%D9%83%D8%B1%D9%8A%D9%85%20-%20%D8%AA%D9%8A%20%D9%81%D9%8A%20%D9%82%D8%B1%D8%A2%D9%86.MP3",
+    "start": 0,
+    "duration": 23.1,
+    "type": "مقتطف قصير من الأذان؛ ليس الأذان كاملًا"
+  }
+]

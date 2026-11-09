@@ -1,0 +1,17 @@
+.listening-tafsir{max-width:520px;margin:22px auto 0;text-align:right;color:var(--muted);font-family:var(--ui-font,AppArabic),sans-serif}
+.listening-tafsir-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:10px;color:var(--gold)}
+.listening-tafsir button{background:none;border:0;font-family:inherit;color:var(--gold);cursor:pointer;padding:8px 0;min-height:36px}
+.listening-tafsir-heading button{font-size:10px;flex-shrink:0}
+.listening-tafsir-preview{font-size:13px;line-height:1.95;margin:4px 0;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden}
+.listening-tafsir-more{font-size:11px;display:block;margin:0 auto}
+.tafsir-collapsed .listening-tafsir-preview,.tafsir-collapsed .listening-tafsir-more{display:none}
+.listening-tafsir-sheet #sheet-content{overflow-y:auto;overscroll-behavior:contain;min-height:0;padding:0 22px 24px}
+.listening-tafsir-reference{font-size:12px;color:var(--gold);margin:8px 0 15px}
+.listening-tafsir-full{font:18px/2.1 var(--ui-font,AppArabic),sans-serif;white-space:pre-line;color:var(--ink);overflow-wrap:break-word}
+.listening-tafsir-return-note{font-size:12px;color:var(--muted);line-height:1.9;margin-top:22px}
+.listening-tafsir-return{display:block;width:100%;min-height:48px}
+@media(max-height:500px){.listening-tafsir{margin-top:12px}.listening-tafsir-preview{font-size:12px;-webkit-line-clamp:2}.listening-tafsir-full{font-size:16px}}
+/* A bounded dialog with one scroll container; the header stays outside it. */
+.listening-tafsir-sheet.feature-sheet{display:flex;flex-direction:column;box-sizing:border-box;height:min(88vh,780px);height:min(88dvh,780px);max-height:calc(100vh - 12px);max-height:calc(100dvh - 12px);bottom:0;padding:0;overflow:hidden;touch-action:pan-y}
+.listening-tafsir-sheet>.sheet-title{flex:0 0 auto;margin:0;padding:16px 20px}
+.listening-tafsir-sheet>#sheet-content{flex:1 1 0;min-height:0;overflow-x:hidden;overflow-y:auto;touch-action:pan-y;overscroll-behavior-y:contain;-webkit-overflow-scrolling:touch;box-sizing:border-box;padding:0 22px max(24px,var(--app-safe-bottom,0px))}

@@ -1,0 +1,35 @@
+{
+  "version": "3.1.27",
+  "code": 177,
+  "filename": "Mushafi-3.1.27.apk",
+  "size": 119641402,
+  "sha256": "197f6709dc31f9f45c0499f9d2e61c6502c1269cba83719b3c28e99850cd6f17",
+  "key": "releases/Mushafi-3.1.27.apk",
+  "minimumAndroid": "6.0",
+  "feature": "Accessibility: system font scaling, contrast, touch targets and dialog focus",
+  "validation": [
+    "Axe WCAG A/AA: nine representative screens × light/dark, zero detected violations",
+    "Visible controls at least 44×44 CSS pixels in audited screens",
+    "Thirty 200% font-size simulations: six screens × five languages, no horizontal page overflow",
+    "Modal focus, background isolation, Tab/Shift+Tab, Escape, original and nested trigger restoration passed",
+    "All sixty book pages at four viewport sizes; welcome languages and native safe-area regression passed",
+    "Release build, original signing certificate and exact packaged accessibility assets verified",
+    "Public APK verified byte-for-byte with full three-part download; previous release download retained"
+  ],
+  "limitations": [
+    "No connected Android device or emulator: actual TalkBack, Android font rendering and large display-size settings remain unverified",
+    "Axe cannot fully assess contrast on gradients; reported contrast improvement is for solid light-theme palette colors",
+    "Fixed Quran/book page typography remains controlled by reader fitting and reader settings"
+  ],
+  "publication": {
+    "commit": "9a8592280b849ee61c667f18cbb679f1555253c8",
+    "versionId": "appgprj_6aeacba839208191859bee126a2cd9df~appgver_82d3d0fc2f1c8191998a0cd5297dd774",
+    "deploymentId": "appgdep_6aef6d6a607c81918f9eb724fcb14073",
+    "environmentRevision": 50,
+    "url": "https://mushafi.mohammedasif241.chatgpt.site/download/Mushafi-3.1.27.apk",
+    "status": "published and publicly verified",
+    "FCMAnnouncementAccepted": true,
+    "fullDownloadVerified": true,
+    "temporaryRoutesClosed": true
+  }
+}

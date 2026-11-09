@@ -1,0 +1,20 @@
+'use strict';
+function automaticLocationState(){try{return JSON.parse(window.AndroidReader?.automaticLocationSnapshot?.()||'{}')}catch(e){return {}}}
+function automaticLocationLabel(){const s=automaticLocationState();return !s.permission?'الموقع يحتاج السماح':!s.providers?'خدمة الموقع متوقفة':s.error?'تعذر تحديث الموقع':s.hasFix?(Number.isFinite(s.fixedAt)&&Date.now()-s.fixedAt>300000?'جارٍ تحديث الموقع · آخر موقع محفوظ':'الموقع يتحدّث تلقائيًا'):'جارٍ تحديد موقعك تلقائيًا'}
+function requestAutomaticLocationPermission(){const s=automaticLocationState();if(s.permission&&!s.providers&&window.AndroidReader?.openLocationSettings)AndroidReader.openLocationSettings();else if(window.AndroidReader?.requestPrayerLocation)AndroidReader.requestPrayerLocation();else showSmallNotice('تحديد الموقع التلقائي غير متاح على هذا الجهاز')}
+function renderAutomaticLocationStatus(){const box=document.getElementById('automatic-location-status');if(!box)return;const s=automaticLocationState(),saved=readPrayerData().settings;if(s.permission&&s.providers&&!s.error){box.innerHTML='';box.hidden=true;return}box.hidden=false;box.innerHTML='<strong>'+esc(automaticLocationLabel())+'</strong><p>تتجدّد مواقيت الصلاة والطقس والقبلة عند تغيّر موقعك أثناء استخدام التطبيق، وعند العودة إليه. لا تحتاج اختيار المدينة أو حفظ الإحداثيات.</p>'+(!s.permission||!s.providers?'<button class="action" onclick="requestAutomaticLocationPermission()">'+(!s.permission?'السماح بالموقع':'تفعيل خدمة الموقع')+'</button>':'')+(s.error?'<small>'+esc(s.error)+'</small>':'')+(saved.confirmed?'<small>عند تعذر التحديث تُستخدم آخر إحداثيات محفوظة.</small>':'')}
+let automaticLocationSignature='';
+window.onAutomaticLocationChanged=function(){const data=readPrayerData(true),s=data.settings,auto=automaticLocationState(),signature=[s.latitude,s.longitude,s.timezone,s.confirmed,auto.permission,auto.providers,auto.hasFix,Number.isFinite(auto.fixedAt)&&Date.now()-auto.fixedAt>300000,auto.error].join('|'),changed=signature!==automaticLocationSignature;automaticLocationSignature=signature;
+ if(view==='onboarding'&&onboardingState){if(auto.hasFix&&auto.permission&&onboardingState.step===1){Object.assign(onboardingState.settings,{latitude:s.latitude,longitude:s.longitude,timezone:s.timezone,city:s.city,confirmed:s.confirmed});onboardingPersist();if(changed&&!onboardingGps)renderWelcome()}return;}
+ if(view==='qibla'){const button=document.getElementById('qibla-location-button');if(button){button.hidden=!!auto.permission&&!!auto.providers;button.onclick=requestAutomaticLocationPermission;}if(!s.confirmed)qiblaText('qibla-status',automaticLocationLabel())}
+ if(view==='prayer-settings'){renderAutomaticLocationStatus();return}
+ if(!changed)return;
+ if(view==='home'){refreshPrayerHomeCard();renderHomeWeather();let note=document.getElementById('home-automatic-location');if(!note){note=document.createElement('p');note.id='home-automatic-location';note.className='automatic-location-note';document.getElementById('home-prayer-widget')?.append(note)}note.textContent=automaticLocationLabel()+(s.confirmed&&(!auto.permission||!auto.providers||auto.error)?' · آخر موقع محفوظ':'');}
+ else if(view==='qibla'&&qiblaState&&s.confirmed){qiblaState.note=(!auto.permission||!auto.providers||auto.error)?'يُستخدم آخر موقع محفوظ؛ سيتجدد عند توفر الموقع.':'يتحدّث موقع الصلاة والطقس والقبلة تلقائيًا.';if(!qiblaState.coords||qiblaState.coords.latitude!==s.latitude||qiblaState.coords.longitude!==s.longitude)qiblaSetLocation(s.latitude,s.longitude,s.city);else qiblaRenderState();}
+ else if(view==='prayer')renderPrayerPage(true);
+ else if(view==='prayer-settings')renderAutomaticLocationStatus();
+};
+// Account serialization filters automatic coordinates inside cloudCapture, even
+// before the first screen starts. Device coordinates remain the local source.
+const automaticHome=home;home=function(){automaticHome();automaticLocationSignature='';onAutomaticLocationChanged()};
+const automaticQibla=openQibla;openQibla=function(){automaticQibla();automaticLocationSignature='';onAutomaticLocationChanged()};

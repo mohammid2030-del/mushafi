@@ -1,0 +1,1 @@
+PASS: automatic existing-account restore, immediate property/setItem journal, two-device 19→17, merged ack without dialogs, deletions, reader safety, edit during upload and account isolation/logout

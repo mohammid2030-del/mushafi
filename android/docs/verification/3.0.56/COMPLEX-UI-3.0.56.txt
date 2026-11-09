@@ -1,0 +1,1 @@
+PASS: nine reciters; official Maher replaces source and keeps portrait; four new readers have no photo; all four reader cards dispatch correctly; 114 chapters each, Arabic/English and four viewports; native play dispatch; immediate 15-minute ayah/tafsir seek preview and ACK; full tafsir pause/resume at same position; source attribution; reading anchor preserved.

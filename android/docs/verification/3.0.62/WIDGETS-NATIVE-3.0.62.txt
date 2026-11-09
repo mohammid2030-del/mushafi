@@ -1,0 +1,1 @@
+PASS: native widgets shrink/expand with actual host bounds even with stale options; artwork and timer/footer remain inside; Arabic-host counter glyphs match Western ASCII pixels; system 12/24 clocks, three providers, languages/themes, configuration save/cancel and data preserved.

@@ -1,0 +1,1 @@
+PASS: final signed AAB verified with JDK jarsigner; package checks also verify all AAB assets against source and APK certificate continuity.

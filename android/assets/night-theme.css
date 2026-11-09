@@ -1,0 +1,122 @@
+/* Official night identity: obsidian, charcoal glass, ivory and the icon's gold.
+   This sheet is loaded last in both app and independent startup presentation. */
+body.dark{
+ --bg:#101013;--paper:#1b1b20;--ink:#f4efe6;--muted:#b8b1a6;--line:#3b3832;
+ --gold:#e6cf9a;--gold-bright:#f6e5b9;--gold-deep:#9d8150;
+ --green:var(--gold);--soft-green:rgba(230,207,154,.10);
+ --night-raised:#242429;--night-input:#141417;--night-danger:#eca79c;
+ --night-gold-surface:linear-gradient(135deg,rgba(230,207,154,.14),rgba(157,129,80,.055));
+ --night-primary:linear-gradient(135deg,#f0ddb0,#d8bb81);
+ --shadow:0 12px 36px rgba(0,0,0,.24);
+ --glass-card:linear-gradient(135deg,rgba(43,42,46,.80),rgba(26,26,30,.76));
+ --glass-film:linear-gradient(135deg,rgba(73,66,52,.36),rgba(40,38,35,.42));
+ --glass-panel:rgba(27,27,32,.98);--glass-edge:rgba(231,216,185,.15);
+ --glass-shadow:inset 0 1px 0 rgba(255,245,224,.045),0 8px 28px rgba(0,0,0,.20);
+ --glass-active:var(--night-gold-surface);--glass-divider:rgba(230,207,154,.13);
+ --charity-glass:var(--glass-card);--charity-edge:var(--glass-edge);--charity-shadow:var(--glass-shadow);
+ color-scheme:dark;color:var(--ink);background-color:var(--bg)
+}
+body.dark:not(.reading){background-color:var(--bg);background-image:radial-gradient(ellipse at 12% 0%,rgba(230,207,154,.065),transparent 48%),radial-gradient(ellipse at 100% 90%,rgba(104,96,83,.045),transparent 55%)}
+body.dark::before{opacity:.045;filter:grayscale(1) sepia(.4)}
+body.dark ::selection{background:rgba(230,207,154,.28);color:#fff7e8}
+body.dark :is(h1,h2,h3,h4){color:var(--ink)}
+body.dark :is(.overline,.text-link,.section-heading>span,.ui-icon){color:var(--gold)}
+body.dark :is(a,a:visited){color:var(--gold)}
+body.dark :is(.section-heading p,.small-note,.muted,.empty p){color:var(--muted)}
+/* Cards and the navigation share one material, with warm elevation rather than petrol. */
+body.dark :is(.content-card,.reading-hero,.ward-preview,.info-card,.juz-card,.ayah-result,.category-tile,.devotion-list-item,.devotion-paper,.library-card,.verse-note,.azkar-feature,.azkar-routine,.azkar-category-list,.cloud-profile,.cloud-choice-details,.khatma-hero,.khatma-summary article,.prayer-setup-card,.prayer-table,.prayer-duha-card,.prayer-night-card,.prayer-settings-card,.surah-reader-card,.surah-mode-card,.welcome-card,.welcome-mini,.welcome-city-panel,.welcome-review-card,.welcome-voice,.welcome-reader,.theme-picker button,.sebha-tap,.tafsir-ayah,.tafsir-range,.muslim-result,.muslim-full-hadith,.friday-guide-list article,.friday-guide-intro){background:var(--glass-card);border-color:var(--glass-edge);box-shadow:var(--glass-shadow);color:var(--ink)}
+body.dark :is(.ward-stat-grid>div,.azkar-tools button,.day-routines button,.khatma-presets>button,.khatma-choice,.welcome-city-list,.welcome-iqama-strip,.welcome-review,.welcome-settings,.routine-reader-grade){background:var(--glass-card);border-color:var(--glass-edge);color:var(--ink)}
+body.dark :is(.round-action,.menu-symbol,.index-number,.info-symbol,.azkar-category-icon,.azkar-item-index,.surah-reader-emblem,.welcome-orbit-badge,.welcome-secondary,.welcome-play,.welcome-language-toggle,.welcome-mode-options,.devotion-font-controls button,.quick-grid button>.ui-icon,.reader-action,.listen-icon-button){background:var(--glass-film);border-color:var(--glass-edge);box-shadow:inset 0 1px 0 rgba(255,245,224,.04);color:var(--gold)}
+body.dark>nav.glass-nav{background:rgba(24,24,28,.96);border-color:rgba(230,207,154,.17);box-shadow:inset 0 1px 0 rgba(255,245,224,.045),0 14px 40px rgba(0,0,0,.38);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+body.dark .glass-nav-indicator{background:var(--night-gold-surface);border-color:rgba(230,207,154,.27);box-shadow:inset 0 1px 0 rgba(255,239,208,.06),0 3px 14px rgba(0,0,0,.15)}
+body.dark>nav.glass-nav>button{color:var(--muted)}
+body.dark>nav.glass-nav>button:is(.active,.nav-preview),body.dark>nav.glass-nav>button:is(.active,.nav-preview) .ui-icon{color:var(--gold-bright)}
+body.dark>nav.glass-nav>button:not(.active):not(.nav-preview) .ui-icon{color:#b7afa0}
+/* Every application-owned menu, dialog, picker, toolbar and floating player. */
+body.dark :is(.feature-sheet,.verse-sheet,.verse-toolbar,.reader-top,.reader-bottom,.dhikr-toolbar,.devotion-reader-controls,.dhikr-reader-footer,.full-surah-mini,.audio-indicator,.reciter-picker,.home-recitation-dialog,.first-tour-card){background:var(--glass-panel);border-color:var(--glass-edge);box-shadow:0 20px 65px rgba(0,0,0,.42),inset 0 1px 0 rgba(255,246,224,.04);color:var(--ink)}
+body.dark :is(.sheet-overlay,.reciter-picker-overlay,.home-recitation-overlay){background:rgba(4,4,6,.72);backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px)}
+body.dark .first-tour-shade{background:rgba(4,4,6,.76)}
+body.dark .first-tour-ring{border-color:var(--gold);box-shadow:0 0 0 5px rgba(230,207,154,.10)}
+body.dark .first-tour-arrow{color:var(--gold)}
+body.dark :is(.reciter-trigger,.reciter-picker-option,.home-audio-reader,.home-audio-selected,.adhan-picker,.adhan-picker-options,.adhan-picker-options button,.welcome-plan-picker,.inline-sequence-options button,.recitation-view-switch,.recitation-mode-trigger,.recitation-mode-list button){background:var(--glass-card);border-color:var(--glass-edge);color:var(--ink)}
+body.dark :is(.reciter-picker-option.selected,.home-audio-reader.selected,.adhan-picker-options button[aria-pressed=true],.recitation-mode-list button[aria-pressed=true],.inline-sequence-options button[aria-pressed=true],.welcome-choice.selected,.welcome-secondary.selected,.welcome-city-option.selected,.welcome-mode-options button[aria-pressed=true],.app-segments button.selected,.index-tabs button.active,.prayer-date-tabs .selected,.theme-picker button.selected,.khatma-choice.selected,.khatma-presets>button.selected){background:var(--night-gold-surface);border-color:rgba(230,207,154,.5);color:var(--gold-bright)}
+body.dark :is(.reciter-picker-option.selected,.home-audio-reader.selected,.adhan-picker-options button[aria-pressed=true]) .ui-icon{color:var(--gold-bright)}
+body.dark :is(.app-segments,.index-tabs,.prayer-date-tabs){background:rgba(16,16,19,.55);border-color:var(--glass-edge)}
+/* Forms and all states: charcoal fields, champagne focus, readable placeholders. */
+body.dark :is(input:not([type=range]):not([type=checkbox]):not([type=radio]),select,textarea,.search-field){background:var(--night-input);color:var(--ink);border-color:rgba(230,207,154,.22);accent-color:var(--gold)}
+body.dark :is(.prayer-field input,.prayer-field select,.prayer-number input,.prayer-coordinates input,.welcome-field input,.welcome-field select){background:var(--night-input);color:var(--ink);border-color:rgba(230,207,154,.22)}
+body.dark :is(input,textarea)::placeholder{color:#a59e92;opacity:1}
+body.dark select option{background:#202024;color:var(--ink)}
+body.dark :is(input,select,textarea):focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+body.dark input:-webkit-autofill{-webkit-text-fill-color:var(--ink);box-shadow:0 0 0 1000px var(--night-input) inset;caret-color:var(--gold)}
+body.dark :is(input[type=checkbox],input[type=radio],input[type=range],progress){accent-color:var(--gold)}
+body.dark :is(.prayer-switch,.welcome-progress i,.app-progress,.azkar-feature-progress,.azkar-mini-progress){background:rgba(230,207,154,.13);border-color:var(--glass-edge)}
+body.dark :is(.prayer-toggle input:checked+.prayer-switch,.welcome-progress i.done,.app-progress>span,.azkar-feature-progress>span,.azkar-mini-progress>i){background:var(--gold)}
+body.dark .prayer-toggle input:checked+.prayer-switch:after{background:#272219}
+body.dark progress::-webkit-progress-bar{background:rgba(230,207,154,.13);border-radius:8px}
+body.dark progress::-webkit-progress-value{background:var(--night-primary);border-radius:8px}
+body.dark progress::-moz-progress-bar{background:var(--gold)}
+body.dark :is(button:disabled,input:disabled,select:disabled){opacity:.48}
+/* Primary actions are gold with dark labels; secondary actions remain quiet glass. */
+body.dark :is(.primary,.welcome-primary,.welcome-gps,.welcome-google,.khatma-continue,.routine-start,.routine-reset,.reader-bottom .listen-now,.full-surah-buttons>.full-surah-toggle){background:var(--night-primary)!important;color:#211b12!important;border-color:rgba(246,229,185,.45)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.2),0 6px 22px rgba(0,0,0,.20)}
+body.dark :is(.primary,.welcome-primary,.welcome-gps,.welcome-google,.khatma-continue,.routine-start,.routine-reset,.reader-bottom .listen-now,.full-surah-toggle) :is(.ui-icon,span,strong,small){color:inherit!important}
+body.dark :is(.hero-continue.primary,.azkar-feature-bottom button){background:var(--night-gold-surface)!important;border-color:rgba(230,207,154,.3)!important;color:var(--gold-bright)!important;box-shadow:none}
+body.dark .cloud-google-button{background:#252529;color:var(--ink);border-color:rgba(230,207,154,.23)}
+body.dark :is(.cloud-avatar,.cloud-state-dot.online){background:var(--night-gold-surface);color:var(--gold)}
+body.dark .cloud-state-dot.online{background:var(--gold)}
+body.dark :is(.cloud-error,.prayer-warning,.prayer-status-note.needs-attention,.khatma-status.late,.khatma-progress-title>span){color:var(--gold)}
+body.dark :is(.error,.learn-answer.incorrect,#khatma-plan-error){color:var(--night-danger);border-color:rgba(236,167,156,.45)}
+body.dark .learn-answer.incorrect{background:rgba(236,167,156,.08)}
+body.dark .learn-answer.correct{background:var(--night-gold-surface);border-color:var(--gold);color:var(--gold-bright)}
+/* Welcome, onboarding choices, GPS/location and the independent startup page. */
+body.dark.welcome-modern,.launch-dark body{background-color:var(--bg)}
+body.dark .welcome-shell{background:radial-gradient(ellipse at 50% 8%,rgba(230,207,154,.055),transparent 65%)}
+body.dark .welcome-footer{background:rgba(16,16,19,.97);border-color:var(--glass-edge);box-shadow:0 -8px 28px rgba(0,0,0,.15)}
+body.dark .welcome-signature-ring{border-color:rgba(230,207,154,.13);background:radial-gradient(circle,rgba(230,207,154,.035),transparent 70%)}
+body.dark :is(.welcome-loading,.welcome-location-details,.welcome-account-card){background:transparent;color:var(--ink)}
+body.dark .welcome-loading h1{color:var(--ink)}
+body.dark .welcome-loading :is(p,small){color:var(--muted)}
+body.dark .welcome-location-selected{background:var(--night-gold-surface);border-color:rgba(230,207,154,.25);color:var(--ink)}
+/* Listening, tafsir, reciter portraits and full-screen controls. */
+body.dark .home-recitation-card{background:var(--glass-card);border-color:rgba(230,207,154,.22);box-shadow:var(--glass-shadow)}
+body.dark .home-recitation-copy::before{background:linear-gradient(0deg,rgba(24,24,28,.98),rgba(24,24,28,.80) 60%,transparent)}
+body.dark :is(.surah-reader-portrait,.adhan-portrait,.recitation-ghost>.surah-reader-portrait){background:rgba(230,207,154,.055);border-color:var(--glass-edge)}
+body.dark :is(.recitation-portrait-halo,.recitation-portrait-art){border-color:rgba(230,207,154,.18)}
+body.dark :is(.listen-controls,.listening-tafsir-card,.tafsir-translation,.listening-tafsir-preview,.listening-tafsir-full){background:var(--glass-card);border-color:var(--glass-edge);color:var(--ink)}
+body.dark .full-surah-verse-text{color:var(--ink)}
+body.dark .recitation-view-switch button[aria-pressed=true]{background:var(--night-gold-surface);color:var(--gold-bright)}
+/* Prayer cards and charity collections keep their own hierarchy, one palette. */
+body.dark :is(.prayer-countdown,.prayer-countdown.is-iqama){background:var(--glass-card);border-color:var(--glass-edge);color:var(--ink)}
+body.dark :is(.prayer-hero-top small,.prayer-hero-center p,.prayer-hero-bottom,.azkar-feature p,.azkar-feature-label,.khatma-hero p,.khatma-hero>small,.khatma-status,.khatma-progress-title small){color:var(--muted)}
+body.dark #home-prayer-widget .prayer-countdown{background:transparent;border:0;box-shadow:none}
+body.dark .prayer-time-row.is-current{background:var(--night-gold-surface);border-color:rgba(230,207,154,.25)}
+body.dark .prayer-time-row.is-sunrise{background:rgba(230,207,154,.025)}
+body.dark :is(.charity-collection,.charity-collection.blue,.charity-collection.gold){--collection-accent:var(--gold);--collection-tint:rgba(230,207,154,.075);background:var(--glass-card);border-color:var(--glass-edge);box-shadow:var(--glass-shadow)}
+body.dark :is(.home-charity-card,.charity-hero,.charity-intention,.charity-how,.charity-platform){background:var(--glass-card);border-color:var(--glass-edge);box-shadow:var(--glass-shadow)}
+body.dark :is(.charity-collection-icon,.charity-route-icon){color:var(--gold);border-color:var(--glass-edge)}
+/* Reading changes colors only; the source Quran text, fonts and page geometry stay intact. */
+body.dark.reading{background:#101013;color:#f4ecd9}
+body.dark .mushaf-reader{--rule:#b49b70;--soft:#b8afa0;color:#f4ecd9}
+body.dark .qword.playing,body.dark.follow-surah .qword.playing{color:#fff0c9;background:rgba(230,207,154,.18)!important;box-shadow:0 2px 0 rgba(230,207,154,.55)}
+body.dark .qword.selected{background:rgba(230,207,154,.17);color:#fff0c9}
+@media(prefers-reduced-transparency:reduce){body.dark{--glass-card:#202024;--glass-film:#2a2823;--glass-panel:#1b1b20}body.dark>nav.glass-nav{background:#1b1b20}}
+@media(prefers-contrast:more){body.dark{--ink:#fff9ed;--muted:#d4cbbd;--glass-edge:rgba(230,207,154,.4);--line:#756750}}
+/* Night-only fallback for every remaining native select; existing custom pickers remain intact. */
+body.dark select[data-night-select="1"]{display:none!important}
+.night-select-trigger{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;min-width:0;min-height:52px;padding:12px 15px;border:1px solid var(--glass-edge);border-radius:15px;background:var(--night-input);color:var(--ink);font:inherit;text-align:start;cursor:pointer}
+.night-select-trigger>span{min-width:0;overflow-wrap:anywhere}.night-select-trigger>.ui-icon{width:18px;height:18px;flex:0 0 18px;transform:rotate(-90deg)}
+.night-select-overlay{position:fixed;inset:0;z-index:1400;display:flex;align-items:flex-end;justify-content:center;padding:16px 14px max(16px,var(--app-safe-bottom,0px));background:rgba(4,4,6,.76);backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);overscroll-behavior:contain}
+.night-select-dialog{display:flex;flex-direction:column;width:min(100%,560px);max-height:84vh;max-height:84dvh;padding:18px;border:1px solid rgba(230,207,154,.23);border-radius:26px;background:#1b1b20;color:#f4efe6;box-shadow:0 24px 70px rgba(0,0,0,.48);animation:reciter-sheet-in .2s ease-out}
+.night-select-heading{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:12px}.night-select-heading h2{margin:0;font-size:18px;font-weight:500;line-height:1.8}.night-select-heading .icon{flex:0 0 40px;width:40px;height:40px;padding:8px;background:var(--glass-film);border-color:var(--glass-edge)}
+.night-select-options{display:grid;gap:7px;overflow:auto;min-height:0;overscroll-behavior:contain;padding:3px;scrollbar-color:var(--gold) transparent;scrollbar-width:thin}.night-select-option{display:flex;align-items:center;justify-content:space-between;gap:14px;min-height:52px;padding:12px 14px;text-align:start;font:14px/1.8 var(--ui-font,AppArabic),sans-serif;color:var(--ink);background:#232327;border:1px solid var(--glass-edge);border-radius:15px;cursor:pointer}.night-select-option>span{min-width:0;overflow-wrap:anywhere}.night-select-option>i{flex:0 0 20px;width:20px;height:20px;color:var(--gold)}.night-select-option[aria-selected=true]{background:var(--night-gold-surface);border-color:rgba(230,207,154,.55);color:var(--gold-bright)}
+.night-select-dialog [hidden]{display:none!important}.night-select-dialog .search-field{margin:0 0 12px}.night-select-dialog .search-field input{min-height:42px}
+@media(min-width:700px){.night-select-overlay{align-items:center}}
+@media(prefers-reduced-motion:reduce){.night-select-dialog{animation:none}}
+/* Completion, translation and Quran action controls also retain strong contrast. */
+body.dark :is(.dhikr-counter.complete,.selection-actions button:first-child,.tafsir-navigation button:nth-child(2),.verse-sheet .save,.reader-controls .reader-secondary-actions .listen-now){background:var(--night-primary)!important;color:#211b12!important;border-color:rgba(246,229,185,.45)!important}
+body.dark :is(.dhikr-counter.complete,.selection-actions button:first-child,.tafsir-navigation button:nth-child(2),.verse-sheet .save,.reader-controls .reader-secondary-actions .listen-now) .ui-icon{color:inherit!important}
+body.dark .reader-language-switch button[aria-pressed=true]{background:var(--night-gold-surface)!important;color:var(--gold-bright)!important;border-color:rgba(230,207,154,.4)!important}
+.night-select-dialog .search-field:focus-within{border-color:var(--gold);box-shadow:0 0 0 2px rgba(230,207,154,.10)}
+.night-select-dialog .search-field input{flex:1;width:0;min-width:0;background:transparent!important;border:0!important;outline:0!important;box-shadow:none!important;padding:8px 0;color:var(--ink)}
+
+.cloud-apple-button{background:#fff;color:#000;border-color:#fff}

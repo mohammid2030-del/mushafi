@@ -1,0 +1,249 @@
+{
+  "schema": 1,
+  "checkedAt": "2026-10-30",
+  "routes": {
+    "ehsan-projects": {
+      "title": "مشاريع إحسان",
+      "provider": "ehsan",
+      "url": "https://ehsan.sa/projects"
+    },
+    "ehsan-projects-education": {
+      "title": "المشاريع التعليمية",
+      "provider": "ehsan",
+      "url": "https://ehsan.sa/projects?projectType=Education"
+    },
+    "ehsan-projects-feeding": {
+      "title": "المشاريع الغذائية",
+      "provider": "ehsan",
+      "url": "https://ehsan.sa/projects?projectType=Feeding"
+    },
+    "ehsan-projects-housing": {
+      "title": "المشاريع السكنية",
+      "provider": "ehsan",
+      "url": "https://ehsan.sa/projects?projectType=Housing"
+    },
+    "ehsan-projects-health": {
+      "title": "المشاريع الصحية",
+      "provider": "ehsan",
+      "url": "https://ehsan.sa/projects?projectType=Health"
+    },
+    "ehsan-projects-religious": {
+      "title": "المشاريع الدينية",
+      "provider": "ehsan",
+      "url": "https://ehsan.sa/projects?projectType=Religious"
+    },
+    "ehsan-projects-social": {
+      "title": "المشاريع الاجتماعية",
+      "provider": "ehsan",
+      "url": "https://ehsan.sa/projects?projectType=Social"
+    },
+    "ehsan-projects-environmental": {
+      "title": "المشاريع البيئية",
+      "provider": "ehsan",
+      "url": "https://ehsan.sa/projects?projectType=Environmental"
+    },
+    "ehsan-projects-technical": {
+      "title": "المشاريع التقنية",
+      "provider": "ehsan",
+      "url": "https://ehsan.sa/projects?projectType=Technical"
+    },
+    "ehsan-orphans": {
+      "title": "كفالة الأيتام",
+      "provider": "ehsan",
+      "url": "https://ehsan.sa/orphans"
+    },
+    "ehsan-mosques": {
+      "title": "العناية بالمساجد",
+      "provider": "ehsan",
+      "url": "https://ehsan.sa/mosques"
+    },
+    "ehsan-housing": {
+      "title": "مشاريع الإسكان",
+      "provider": "ehsan",
+      "url": "https://ehsan.sa/housing"
+    },
+    "ehsan-waqf": {
+      "title": "وقف إحسان",
+      "provider": "ehsan",
+      "url": "https://ehsan.sa/waqf"
+    },
+    "ehsan-gift": {
+      "title": "هدية إحسان",
+      "provider": "ehsan",
+      "url": "https://ehsan.sa/gift"
+    },
+    "ehsan-zakat": {
+      "title": "الزكاة",
+      "provider": "ehsan",
+      "url": "https://ehsan.sa/zakat"
+    },
+    "ehsan-relief": {
+      "title": "الإغاثة",
+      "provider": "ehsan",
+      "url": "https://ehsan.sa/rescue"
+    },
+    "ehsan-judicial": {
+      "title": "تيسرت",
+      "provider": "ehsan",
+      "url": "https://ehsan.sa/tyassarat/judicialbills"
+    },
+    "ehsan-prisoners": {
+      "title": "فرجت",
+      "provider": "ehsan",
+      "url": "https://ehsan.sa/forijat"
+    },
+    "ehsan-recurring": {
+      "title": "التبرع الدوري",
+      "provider": "ehsan",
+      "url": "https://ehsan.sa/periodicdonation"
+    },
+    "ehsan-adahi": {
+      "title": "الأضاحي",
+      "provider": "ehsan",
+      "url": "https://ehsan.sa/adahi"
+    },
+    "ehsan-waqf-1": {
+      "title": "وقف رعاية الأيتام",
+      "provider": "ehsan",
+      "url": "https://ehsan.sa/waqf?p=1"
+    },
+    "ehsan-waqf-2": {
+      "title": "وقف سقيا الماء",
+      "provider": "ehsan",
+      "url": "https://ehsan.sa/waqf?p=2"
+    },
+    "ehsan-waqf-3": {
+      "title": "وقف رعاية المرضى",
+      "provider": "ehsan",
+      "url": "https://ehsan.sa/waqf?p=3"
+    },
+    "ehsan-waqf-4": {
+      "title": "وقف خدمة بيوت الله",
+      "provider": "ehsan",
+      "url": "https://ehsan.sa/waqf?p=4"
+    },
+    "ehsan-waqf-5": {
+      "title": "وقف طباعة المصاحف",
+      "provider": "ehsan",
+      "url": "https://ehsan.sa/waqf?p=5"
+    },
+    "ehsan-waqf-6": {
+      "title": "وقف الدعم الغذائي",
+      "provider": "ehsan",
+      "url": "https://ehsan.sa/waqf?p=6"
+    },
+    "ehsan-waqf-7": {
+      "title": "وقف إعانة المعسرين",
+      "provider": "ehsan",
+      "url": "https://ehsan.sa/waqf?p=7"
+    },
+    "ehsan-waqf-8": {
+      "title": "وقف خدمة ضيوف الرحمن",
+      "provider": "ehsan",
+      "url": "https://ehsan.sa/waqf?p=8"
+    },
+    "ehsan-waqf-9": {
+      "title": "وقف إسكان الأسر",
+      "provider": "ehsan",
+      "url": "https://ehsan.sa/waqf?p=9"
+    },
+    "ehsan-waqf-10": {
+      "title": "وقف رعاية تعليمية",
+      "provider": "ehsan",
+      "url": "https://ehsan.sa/waqf?p=10"
+    },
+    "waqfy-endowments": {
+      "title": "المنتجات الوقفية",
+      "provider": "waqfy",
+      "url": "https://waqfy.sa/product-donation-list"
+    },
+    "ehsan-campaigns": {
+      "title": "الحملات",
+      "provider": "ehsan",
+      "url": "https://ehsan.sa/donationcampaign"
+    },
+    "ehsan-expiation": {
+      "title": "الكفارات",
+      "provider": "ehsan",
+      "url": "https://ehsan.sa/subsidy"
+    },
+    "ehsan-purification": {
+      "title": "تطهير الأسهم",
+      "provider": "ehsan",
+      "url": "https://ehsan.sa/stockspurification"
+    },
+    "ehsan-sms": {
+      "title": "التبرع بالرسائل",
+      "provider": "ehsan",
+      "url": "https://ehsan.sa/smsdonation"
+    },
+    "ehsan-gheras": {
+      "title": "غراس",
+      "provider": "ehsan",
+      "url": "https://ehsan.sa/home/gheras"
+    }
+  },
+  "categories": {
+    "water": [
+      "ehsan-waqf-2"
+    ],
+    "orphans": [
+      "ehsan-orphans"
+    ],
+    "quran": [
+      "ehsan-projects-religious",
+      "ehsan-waqf-5"
+    ],
+    "mosques": [
+      "ehsan-mosques"
+    ],
+    "health": [
+      "ehsan-projects-health"
+    ],
+    "food": [
+      "ehsan-projects-feeding"
+    ],
+    "endowments": [
+      "ehsan-waqf",
+      "waqfy-endowments"
+    ]
+  },
+  "projectTypes": [
+    "ehsan-projects-education",
+    "ehsan-projects-feeding",
+    "ehsan-projects-housing",
+    "ehsan-projects-health",
+    "ehsan-projects-religious",
+    "ehsan-projects-social",
+    "ehsan-projects-environmental",
+    "ehsan-projects-technical"
+  ],
+  "services": [
+    "ehsan-projects",
+    "ehsan-housing",
+    "ehsan-judicial",
+    "ehsan-prisoners",
+    "ehsan-relief",
+    "ehsan-zakat",
+    "ehsan-gift",
+    "ehsan-recurring",
+    "ehsan-adahi",
+    "ehsan-campaigns",
+    "ehsan-expiation",
+    "ehsan-purification",
+    "ehsan-sms",
+    "ehsan-gheras"
+  ],
+  "waqfTypes": [
+    "ehsan-waqf-1",
+    "ehsan-waqf-2",
+    "ehsan-waqf-3",
+    "ehsan-waqf-4",
+    "ehsan-waqf-5",
+    "ehsan-waqf-6",
+    "ehsan-waqf-7",
+    "ehsan-waqf-8",
+    "ehsan-waqf-9",
+    "ehsan-waqf-10"
+  ]
+}

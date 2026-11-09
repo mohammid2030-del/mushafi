@@ -1,0 +1,95 @@
+{
+  "installedPublicRelease": "3.1.29",
+  "fullSurahPrimary": {
+    "reachableSampleReaders": [
+      2,
+      6,
+      7,
+      3,
+      1005
+    ],
+    "connectionFailure503Readers": [
+      133,
+      1001,
+      1002,
+      1003,
+      1004
+    ],
+    "sample": "Fatiha, GET Range bytes=0-127 per reader"
+  },
+  "versePrimarySamples": [
+    {
+      "reader": "7",
+      "name": "مشاري راشد العفاسي",
+      "engine": "verse",
+      "status": 206,
+      "bytes": 128
+    },
+    {
+      "reader": "6",
+      "name": "محمود خليل الحصري",
+      "engine": "verse",
+      "status": 206,
+      "bytes": 128
+    },
+    {
+      "reader": "2",
+      "name": "عبد الباسط عبد الصمد — مرتل",
+      "engine": "verse",
+      "status": 206,
+      "bytes": 128
+    },
+    {
+      "reader": "133",
+      "name": "ماهر المعيقلي",
+      "engine": "verse",
+      "status": 206,
+      "bytes": 128
+    },
+    {
+      "reader": "3",
+      "name": "عبدالرحمن السديس",
+      "engine": "verse",
+      "status": 206,
+      "bytes": 128
+    },
+    {
+      "reader": "1001",
+      "name": "علي الحذيفي",
+      "engine": "verse",
+      "status": 206,
+      "bytes": 128
+    },
+    {
+      "reader": "1002",
+      "name": "محمد أيوب",
+      "engine": "verse-archive",
+      "status": 503,
+      "reason": "upstream connect error or disconnect/reset before headers. reset reason: remote connection failure"
+    },
+    {
+      "reader": "1003",
+      "name": "خالد المهنا",
+      "engine": "verse-archive",
+      "status": 503,
+      "reason": "upstream connect error or disconnect/reset before headers. reset reason: remote connection failure"
+    },
+    {
+      "reader": "1004",
+      "name": "إبراهيم الأخضر",
+      "engine": "verse-archive",
+      "status": 503,
+      "reason": "upstream connect error or disconnect/reset before headers. reset reason: remote connection failure"
+    },
+    {
+      "reader": "1005",
+      "name": "أحمد النفيس",
+      "engine": "verse",
+      "status": "No verified verse recording offered"
+    }
+  ],
+  "sharedUnavailableOrigin": "https://download.qurancomplex.gov.sa",
+  "observedError": "upstream connect error or disconnect/reset before headers. reset reason: remote connection failure",
+  "existingFallbackScope": "Standalone full-surah startup at position zero only; matched ayah playback deliberately retains verified source",
+  "limitation": "Observed from execution environment; not a physical Android test or proof of worldwide provider outage"
+}

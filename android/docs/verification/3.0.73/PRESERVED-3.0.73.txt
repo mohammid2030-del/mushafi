@@ -1,0 +1,1 @@
+PASS: Quran/reader/tafsir/fonts/audio, in-app donation browser and all official route data remain byte-identical to 3.0.72. UI-only charity collection redesign.

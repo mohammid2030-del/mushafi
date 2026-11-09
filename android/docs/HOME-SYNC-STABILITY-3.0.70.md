@@ -1,0 +1,7 @@
+# 3.0.70 (120): keep recitation chooser open during sync
+
+Reproduced on 3.0.69: open home recitation, choose reader, call the actual cloudApply(cloudCapture()). Apply returned true but homeRecitationSession changed from chapters to closed. Account application refreshes home while view=home; enterSection then closes the home modal. Saving surahReader can trigger account synchronization, exposing this refresh during selection.
+
+The home module wraps home() only when cloudApplying and its recitation session is active. Account data still validates/applies and runtime preferences/theme refresh normally; it flags one pending home UI refresh instead of rebuilding/navigation. Reader/chapter/mode DOM, active reader, input text/focus and scroll remain intact. On explicit close, the pending home UI refresh runs after clearing the session; focus targets the newly rendered home card. Ordinary home navigation and sync refresh without a chooser are unchanged. Cloud merge/protocol/native code are unchanged.
+
+New regression calls actual cloudApply during readers, chapters and mode, including three asynchronous account updates with changed preferences/lastPage. It verifies account data applied while chooser DOM, reader and input/focus persist, then home is rebuilt only on close and the card remains visible/inert restored. Tests cover Arabic/English light/dark. Stepwise native Back, full-screen player/seek/ayah/tafsir flow and existing two-device cloud sync suite pass. Seven release data gates, signing continuity and APK/AAB source parity pass.

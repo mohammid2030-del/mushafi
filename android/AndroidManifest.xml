@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Reconstructed for Mushafi 3.1.31 from the Java sources, resources, debug overlay and docs.
+  Namespace/applicationId come from build.gradle (no package attribute here, per AGP 8).
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Network: recitations, weather, prayer source, challenge service, Firebase, update metadata -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <!-- JobInfo.setRequiredNetworkType (AppUpdateCheckJob, CloudSyncJobService) -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <!-- Prayer times / qibla / automatic location (MainActivity, AutomaticLocation) -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
+    <!-- Prayer, iqama, khatma, daily reminder and update notifications (API 33+) -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+
+    <!-- setAlarmClock / setExactAndAllowWhileIdle + ACTION_REQUEST_SCHEDULE_EXACT_ALARM (API 31+) -->
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <!-- Re-arm prayer/khatma/reminder alarms and update jobs (setPersisted) after reboot -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+    <!-- SurahPlaybackService + AdhanPlaybackService -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
+    <!-- MediaPlayer.setWakeMode(PARTIAL_WAKE_LOCK) in AdhanPlaybackService -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
+    <!-- In-app sideload updater (AppUpdateController → ACTION_INSTALL_PACKAGE).
+         Remove this permission and the updater for a Google Play build. -->
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+
+    <!-- Qibla compass sensors are optional so the app still installs on devices without them -->
+    <uses-feature android:name="android.hardware.sensor.compass" android:required="false" />
+    <uses-feature android:name="android.hardware.sensor.accelerometer" android:required="false" />
+    <uses-feature android:name="android.hardware.location" android:required="false" />
+    <uses-feature android:name="android.hardware.location.gps" android:required="false" />
+    <uses-feature android:name="android.hardware.location.network" android:required="false" />
+
+    <application
+        android:label="@string/widget_name"
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher"
+        android:theme="@style/MushafiBaseTheme"
+        android:supportsRtl="true"
+        android:allowBackup="false"
+        android:fullBackupContent="false"
+        android:usesCleartextTraffic="false"
+        android:enableOnBackInvokedCallback="true">
+
+        <!-- Main WebView shell. Handles config changes itself so the WebView is never recreated. -->
+        <activity
+            android:name="com.mushafi.app.MainActivity"
+            android:exported="true"
+            android:launchMode="singleTop"
+            android:theme="@style/MushafiLaunchTheme"
+            android:windowSoftInputMode="adjustResize"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboard|keyboardHidden|navigation|uiMode|density|fontScale|locale|layoutDirection">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- In-app charity page, started only by MainActivity with a validated route id -->
+        <activity
+            android:name="com.mushafi.app.CharityBrowserActivity"
+            android:exported="false"
+            android:theme="@style/MushafiBaseTheme"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|uiMode|keyboardHidden" />
+
+        <!-- Widget configuration + gallery. Exported because the launcher starts it;
+             the activity itself verifies it owns the widget id. -->
+        <activity
+            android:name="com.mushafi.app.WidgetSettingsActivity"
+            android:exported="true"
+            android:theme="@style/MushafiDarkSurfaceTheme"
+            android:taskAffinity=""
+            android:excludeFromRecents="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
+            </intent-filter>
+        </activity>
+
+        <!-- Full-surah recitation with MediaSession -->
+        <service
+            android:name="com.mushafi.app.SurahPlaybackService"
+            android:exported="false"
+            android:foregroundServiceType="mediaPlayback" />
+
+        <!-- Adhan audio started from the prayer alarm -->
+        <service
+            android:name="com.mushafi.app.AdhanPlaybackService"
+            android:exported="false"
+            android:foregroundServiceType="mediaPlayback" />
+
+        <!-- Persisted JobScheduler jobs -->
+        <service
+            android:name="com.mushafi.app.AppUpdateCheckJob"
+            android:exported="true"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
+        <service
+            android:name="com.mushafi.app.CloudSyncJobService"
+            android:exported="true"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
+
+        <!-- Data-only FCM pushes announcing a new release -->
+        <service
+            android:name="com.mushafi.app.AppUpdateMessagingService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
+        <!-- Prayer alarms: delivery + re-scheduling after boot, update, clock and exact-alarm changes -->
+        <receiver
+            android:name="com.mushafi.app.PrayerAlarmReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.mushafi.app.PRAYER_EVENT" />
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+                <action android:name="android.intent.action.TIME_SET" />
+                <action android:name="android.intent.action.TIMEZONE_CHANGED" />
+                <action android:name="android.app.action.SCHEDULE_EXACT_ALARM_PERMISSION_STATE_CHANGED" />
+            </intent-filter>
+        </receiver>
+
+        <receiver
+            android:name="com.mushafi.app.DailyReminderReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.mushafi.app.DAILY_REMINDER" />
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+                <action android:name="android.intent.action.TIME_SET" />
+                <action android:name="android.intent.action.TIMEZONE_CHANGED" />
+                <action android:name="android.app.action.SCHEDULE_EXACT_ALARM_PERMISSION_STATE_CHANGED" />
+            </intent-filter>
+        </receiver>
+
+        <receiver
+            android:name="com.mushafi.app.KhatmaAlarmReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.mushafi.app.KHATMA_EVENT" />
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+                <action android:name="android.intent.action.TIME_SET" />
+                <action android:name="android.intent.action.TIMEZONE_CHANGED" />
+                <action android:name="android.app.action.SCHEDULE_EXACT_ALARM_PERMISSION_STATE_CHANGED" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Stop button on the adhan notification; must not start a new foreground service -->
+        <receiver
+            android:name="com.mushafi.app.AdhanStopReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.mushafi.app.STOP_ADHAN" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Queue the immediate update check after boot, install and notification-permission changes -->
+        <receiver
+            android:name="com.mushafi.app.AppUpdateReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+                <action android:name="android.app.action.APP_BLOCK_STATE_CHANGED" />
+                <action android:name="android.app.action.NOTIFICATION_CHANNEL_BLOCK_STATE_CHANGED" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Base widget receiver: target of the WIDGET_REFRESH alarm and clock changes
+             (it has no appwidget-provider metadata, so it never appears in the widget picker) -->
+        <receiver
+            android:name="com.mushafi.app.MushafiWidget"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.mushafi.app.WIDGET_REFRESH" />
+                <action android:name="android.intent.action.TIME_SET" />
+                <action android:name="android.intent.action.TIMEZONE_CHANGED" />
+                <action android:name="android.intent.action.DATE_CHANGED" />
+                <action android:name="android.intent.action.LOCALE_CHANGED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Home-screen widgets -->
+        <receiver
+            android:name="com.mushafi.app.MushafiWidget$Prayer"
+            android:label="@string/widget_prayer"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_prayer" />
+        </receiver>
+
+        <receiver
+            android:name="com.mushafi.app.MushafiWidget$Date"
+            android:label="@string/widget_date"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_date" />
+        </receiver>
+
+        <receiver
+            android:name="com.mushafi.app.MushafiWidget$Daily"
+            android:label="@string/widget_daily"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_daily" />
+        </receiver>
+
+        <!-- Hands the verified update APK in cache/updates/ to the system installer -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.updates"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/app_update_paths" />
+        </provider>
+
+    </application>
+</manifest>

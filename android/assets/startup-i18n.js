@@ -1,0 +1,3 @@
+const launchLanguage=(new URLSearchParams(location.search).get('lang')||navigator.language||'ar').split('-')[0];
+document.documentElement.lang=launchLanguage;document.documentElement.dir=['ar','ur'].includes(launchLanguage)?'rtl':'ltr';
+function launchLocalize(){const dict=(window.STARTUP_TRANSLATIONS||{})[launchLanguage]||{};const walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);let node;while(node=walker.nextNode()){if(node.parentElement.closest('script,style'))continue;const key=node.nodeValue.trim();if(dict[key])node.nodeValue=dict[key]}document.querySelectorAll('[aria-label]').forEach(el=>{const key=el.getAttribute('aria-label');if(dict[key])el.setAttribute('aria-label',dict[key])})}

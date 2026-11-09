@@ -1,0 +1,1 @@
+<resources><style name="WidgetCountdown"><item name="android:fontFamily">@font/widget_countdown_latin</item><item name="android:textLocale">en-US</item><item name="android:textDirection">ltr</item></style></resources>

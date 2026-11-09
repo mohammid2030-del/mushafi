@@ -1,0 +1,1 @@
+PASS: 626 Quran, reader, tafsir, font and native/JS audio files byte-identical to 3.0.71. Donation-only implementation.

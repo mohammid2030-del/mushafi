@@ -1,0 +1,46 @@
+{
+  "version": "3.1.22",
+  "versionCode": 172,
+  "feature": "Rotating multilingual welcome and immediate language picker",
+  "languages": [
+    "ar",
+    "en",
+    "ur",
+    "bn",
+    "tr"
+  ],
+  "rotationMs": 3000,
+  "pause": "Hidden document, open sheet; interval removed on later intro pages and section exit",
+  "selection": "Explicit selection only; language persisted with existing uiSetLanguage/native preference integration",
+  "validation": [
+    "Five-language 3-second sequence without changing app locale",
+    "Picker pauses rotation; all five selections applied and persisted",
+    "Phone, compact phone, landscape and tablet widths; footer visible and no horizontal overflow",
+    "Light and dark previews",
+    "Timer cleaned up when moving away from first intro page",
+    "Native release assembly: 60 tasks successful",
+    "Original signing certificate verified",
+    "Exact welcome source and styles verified inside signed APK"
+  ],
+  "publication": {
+    "commit": "fdc744a41eec1ef1ecd41b23873f3814488b3280",
+    "versionId": "appgprj_6aeacba839208191859bee126a2cd9df~appgver_70331bea95908191a54bf34084148bbf",
+    "deploymentId": "appgdep_6aeda4253b648191b95113a977201b18",
+    "environmentRevision": 42,
+    "url": "https://mushafi.mohammedasif241.chatgpt.site/download/Mushafi-3.1.22.apk",
+    "status": "published and publicly verified",
+    "FCMAnnouncementAccepted": true,
+    "fullDownloadVerified": true,
+    "temporaryRoutesClosed": true
+  },
+  "apk": {
+    "version": "3.1.22",
+    "code": 172,
+    "filename": "Mushafi-3.1.22.apk",
+    "size": 119627462,
+    "sha256": "40b860b9fd4e97a992b28ddee3086027e4fb430f96d90a70ab055cc593684ed4",
+    "key": "releases/Mushafi-3.1.22.apk",
+    "minimumAndroid": "6.0"
+  },
+  "timestamp": "2026-11-06T09:56:51.909049+00:00"
+}

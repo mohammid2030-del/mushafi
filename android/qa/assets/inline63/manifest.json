@@ -1,0 +1,82 @@
+{
+  "1004_1_1": {
+    "reader": 1004,
+    "key": "1:1",
+    "entry": [
+      137,
+      72194,
+      95832,
+      1314163524,
+      8,
+      "0c6e3913b6856f0e26eb9a9d3b842fdfdf9cfec46c70c0c7a8f0674dce116a8f"
+    ],
+    "archiveSize": 1276378123,
+    "sha256": "0c6e3913b6856f0e26eb9a9d3b842fdfdf9cfec46c70c0c7a8f0674dce116a8f"
+  },
+  "1003_1_1": {
+    "reader": 1003,
+    "key": "1:1",
+    "entry": [
+      109,
+      71055,
+      96136,
+      1950099829,
+      8,
+      "aa55e6ac88a0c284e7f9d856338a0bdb7a2aebb48b6f5041bd7c2f6621a87512"
+    ],
+    "archiveSize": 1120110331,
+    "sha256": "aa55e6ac88a0c284e7f9d856338a0bdb7a2aebb48b6f5041bd7c2f6621a87512"
+  },
+  "1002_1_1": {
+    "reader": 1002,
+    "key": "1:1",
+    "entry": [
+      107,
+      55763,
+      78528,
+      703172529,
+      8,
+      "a0fae8e92cd2fe44cf5c887f8beb4e9a0983e32ab25c6992f9d4c7d17f56675e"
+    ],
+    "archiveSize": 961236527,
+    "sha256": "a0fae8e92cd2fe44cf5c887f8beb4e9a0983e32ab25c6992f9d4c7d17f56675e"
+  },
+  "1003_9_127": {
+    "reader": 1003,
+    "key": "9:127",
+    "entry": [
+      358854642,
+      265055,
+      295216,
+      3730618835,
+      8,
+      "e8a169e2a07f89d7ff0e671adddacc9f3df5c7c87082d0d21b531ef1bb6a34fa"
+    ],
+    "archiveSize": 1120110331,
+    "sha256": "e8a169e2a07f89d7ff0e671adddacc9f3df5c7c87082d0d21b531ef1bb6a34fa"
+  },
+  "3_1_1": {
+    "reader": 3,
+    "key": "1:1",
+    "url": "https://everyayah.com/data/Abdurrahmaan_As-Sudais_192kbps/001001.mp3",
+    "sha256": "1245979941c5185dddd9ef8dca457eedd9bd9b3989780850fb0e04adce7af12e"
+  },
+  "1001_1_1": {
+    "reader": 1001,
+    "key": "1:1",
+    "url": "https://everyayah.com/data/Hudhaify_128kbps/001001.mp3",
+    "sha256": "ce4af17fb70ce3c08ebe45b008fc7fa9670b8bd2cb75c89fcdef9fd82441d1bc"
+  },
+  "1001_9_127": {
+    "reader": 1001,
+    "key": "9:127",
+    "url": "https://everyayah.com/data/Hudhaify_128kbps/009127.mp3",
+    "sha256": "7e3b821a6fd186a5e4439ddcff903a412db0f64f4e2d1ccb08065a2696007b63"
+  },
+  "3_9_127": {
+    "reader": 3,
+    "key": "9:127",
+    "url": "https://everyayah.com/data/Abdurrahmaan_As-Sudais_192kbps/009127.mp3",
+    "sha256": "70e6ab6bb872d8d225179d71decee4a48cfccae1db93ceaa662b407eccc2a247"
+  }
+}

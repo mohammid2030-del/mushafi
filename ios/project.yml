@@ -1,0 +1,101 @@
+# Mushafi iOS — generated into Mushafi.xcodeproj by XcodeGen (on GitHub's Macs; no local Mac needed).
+# The UI is NOT duplicated here: ../android/assets is bundled as-is, so iPhone, iPad
+# and Android always ship the exact same HTML/CSS/JS from the same commit.
+name: Mushafi
+options:
+  bundleIdPrefix: com.mohammedasif
+  deploymentTarget:
+    iOS: "16.0"
+  createIntermediateGroups: true
+  developmentLanguage: ar
+
+settings:
+  base:
+    # Kept in step with android/build.gradle (versionName / versionCode) by scripts/sync-version.sh
+    MARKETING_VERSION: "3.1.31"
+    CURRENT_PROJECT_VERSION: "181"
+    SWIFT_VERSION: "5.0"
+    IPHONEOS_DEPLOYMENT_TARGET: "16.0"
+    CODE_SIGN_STYLE: Automatic
+
+packages:
+  Firebase:
+    url: https://github.com/firebase/firebase-ios-sdk
+    from: "13.0.0"
+  GoogleSignIn:
+    url: https://github.com/google/GoogleSignIn-iOS
+    from: "9.0.0"
+
+targets:
+  Mushafi:
+    type: application
+    platform: iOS
+    sources:
+      - path: Mushafi
+        excludes:
+          - "**/*.md"
+      - path: Shared
+      # Shared web UI (the same folder Android packages). Copied into the app as "assets/".
+      - path: ../android/assets
+        type: folder
+        buildPhase: resources
+    dependencies:
+      - package: Firebase
+        product: FirebaseAuth
+      - package: Firebase
+        product: FirebaseFirestore
+      - package: GoogleSignIn
+        product: GoogleSignIn
+      - target: MushafiWidgets
+        embed: true
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.mohammedasif.mushafi
+        PRODUCT_NAME: Mushafi
+        INFOPLIST_FILE: Mushafi/Info.plist
+        CODE_SIGN_ENTITLEMENTS: Mushafi/Mushafi.entitlements
+        TARGETED_DEVICE_FAMILY: "1,2"
+        SUPPORTS_MACCATALYST: NO
+        SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD: NO
+        SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD: NO
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+        ENABLE_USER_SCRIPT_SANDBOXING: NO
+        LOCALIZATION_PREFERS_STRING_CATALOGS: NO
+        OTHER_LDFLAGS: "$(inherited) -ObjC"
+
+  MushafiWidgets:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: Widgets
+        excludes:
+          - "**/*.md"
+      - path: Shared
+      # Only the small data files the widgets read.
+      - path: ../android/assets/adhan.min.js
+        buildPhase: resources
+      - path: ../android/assets/widget-adhkar.json
+        buildPhase: resources
+      - path: ../android/assets/locales
+        type: folder
+        buildPhase: resources
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.mohammedasif.mushafi.widgets
+        PRODUCT_NAME: MushafiWidgets
+        INFOPLIST_FILE: Widgets/Info.plist
+        CODE_SIGN_ENTITLEMENTS: Widgets/MushafiWidgets.entitlements
+        TARGETED_DEVICE_FAMILY: "1,2"
+        SKIP_INSTALL: YES
+        APPLICATION_EXTENSION_API_ONLY: YES
+        LOCALIZATION_PREFERS_STRING_CATALOGS: NO
+
+schemes:
+  Mushafi:
+    build:
+      targets:
+        Mushafi: all
+        MushafiWidgets: all
+    archive:
+      config: Release

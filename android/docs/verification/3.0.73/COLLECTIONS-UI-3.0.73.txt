@@ -1,0 +1,1 @@
+PASS: old seven-card menu removed; three themed collections with counts 16/8/11, all 36 destination IDs reachable including Waqfy alternative; AR/EN light/dark, four viewports, reduced motion, open/close and provider sheet Back preserving collection, home/More origin and reading anchor.

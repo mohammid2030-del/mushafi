@@ -1,0 +1,7 @@
+# One system app icon — 3.0.98 (148)
+
+Ordinary daily, prayer/iqama and khatma notifications now use the required system small icon only. Removed the explicitly added large app-logo bitmap, including both android.largeIcon and android.largeIcon.big recovered extras. Official launcher, in-app artwork and small icon resources/colors are unchanged. Media reciter art remains media content; no extra application logo is added to media notifications.
+
+Revision changed from official-fixed-v1 to official-system-only-v2. Existing notifications are recovered in place, preserving ID/tag, title/body, timestamp, tap intent and actions; setOnlyAlertOnce prevents a second alert. Migration runs after package replacement, app launch and configuration changes. Already-clean reminders are not reposted. A bad notification does not prevent other notifications from being migrated. A matching revision does not skip a mistakenly reintroduced large logo.
+
+Validation: ten JVM policy cases compiled against the actual Android SDK; release Java and Android instrumentation sources compile; existing native instrumentation assertions updated for null framework/legacy large-icon fields and removed extras while retaining reciter covers and notification contents/actions. Signed release and asset/signing parity checked. No physical Samsung device/emulator was available to run the notification rendering instrumentation; Android controls the exact placement of its system icon.

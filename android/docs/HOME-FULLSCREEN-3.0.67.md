@@ -1,0 +1,5 @@
+# 3.0.67 (117): full-screen listen-only from home
+
+Home reader, chapter and mode selection remain in the themed home modal. Choosing listen-only closes that modal and delegates directly to the original fullSurahPlayerHome implementation used by More, including all layout, typography, transport, timed control visibility, ayah and tafsir behavior. Home origin is retained for header Back, Android Back and Stop, returning to the home chapter modal and its saved scroll. The mini player reopens the full-screen player. Explicit navigation to other sections clears the home origin.
+
+Arabic/English and both themes verified, with nine readers/chapter search, original native playback dispatch, 15-minute ayah/tafsir seek and full-tafsir pause/resume. Full-screen CSS active and modal absent during listening; header Back and Android Back restore home flow; mini reopening and explicit Mushaf tested. Existing full-surah regression also passes. No native engine, audio source, timing or Quran text changes. Release signing and APK/AAB source asset parity are checked by packaging.

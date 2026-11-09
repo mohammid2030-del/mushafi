@@ -1,0 +1,99 @@
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.11.1/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+> Task :preBuild UP-TO-DATE
+> Task :preReleaseBuild UP-TO-DATE
+> Task :mergeReleaseJniLibFolders UP-TO-DATE
+> Task :mergeReleaseNativeLibs UP-TO-DATE
+> Task :stripReleaseDebugSymbols UP-TO-DATE
+> Task :extractReleaseNativeSymbolTables UP-TO-DATE
+> Task :mergeReleaseNativeDebugMetadata NO-SOURCE
+> Task :checkReleaseDuplicateClasses UP-TO-DATE
+> Task :javaPreCompileRelease UP-TO-DATE
+> Task :checkReleaseAarMetadata UP-TO-DATE
+> Task :generateReleaseResValues UP-TO-DATE
+> Task :mapReleaseSourceSetPaths UP-TO-DATE
+> Task :generateReleaseResources UP-TO-DATE
+> Task :mergeReleaseResources UP-TO-DATE
+> Task :packageReleaseResources UP-TO-DATE
+> Task :parseReleaseLocalResources UP-TO-DATE
+> Task :createReleaseCompatibleScreenManifests
+> Task :extractDeepLinksRelease UP-TO-DATE
+
+> Task :processReleaseMainManifest
+package="com.mushafi.app" found in source AndroidManifest.xml: /workspace/mushafi/AndroidManifest.xml.
+Setting the namespace via the package attribute in the source AndroidManifest.xml is no longer supported, and the value is ignored.
+Recommendation: remove package="com.mushafi.app" from the source AndroidManifest.xml: /workspace/mushafi/AndroidManifest.xml.
+
+> Task :processReleaseManifest
+> Task :desugarReleaseFileDependencies UP-TO-DATE
+> Task :mergeReleaseStartupProfile UP-TO-DATE
+> Task :processReleaseManifestForPackage
+> Task :mergeExtDexRelease UP-TO-DATE
+> Task :mergeReleaseArtProfile UP-TO-DATE
+> Task :mergeReleaseShaders UP-TO-DATE
+> Task :compileReleaseShaders NO-SOURCE
+> Task :generateReleaseAssets UP-TO-DATE
+> Task :processReleaseResources
+> Task :mergeReleaseAssets
+
+> Task :compileReleaseJavaWithJavac
+Java compiler version 21 has deprecated support for compiling with source/target version 8.
+Try one of the following options:
+    1. [Recommended] Use Java toolchain with a lower language version
+    2. Set a higher source/target version
+    3. Use a lower version of the JDK running the build (if you're not using Java toolchain)
+For more details on how to configure these settings, see https://developer.android.com/build/jdks.
+To suppress this warning, set android.javaCompile.suppressSourceTargetDeprecationWarning=true in gradle.properties.
+warning: [options] source value 8 is obsolete and will be removed in a future release
+warning: [options] target value 8 is obsolete and will be removed in a future release
+warning: [options] To suppress warnings about obsolete options, use -Xlint:-options.
+Note: /workspace/mushafi/src/com/mushafi/app/MainActivity.java uses or overrides a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+3 warnings
+
+> Task :dexBuilderRelease
+> Task :mergeReleaseGlobalSynthetics UP-TO-DATE
+> Task :compressReleaseAssets
+> Task :extractReleaseVersionControlInfo UP-TO-DATE
+> Task :extractProguardFiles UP-TO-DATE
+> Task :mergeDexRelease
+> Task :generateReleaseLintVitalReportModel
+> Task :compileReleaseArtProfile
+> Task :processReleaseJavaRes NO-SOURCE
+> Task :mergeReleaseJavaResource UP-TO-DATE
+> Task :optimizeReleaseResources
+> Task :collectReleaseDependencies UP-TO-DATE
+> Task :sdkReleaseDependencyData UP-TO-DATE
+> Task :validateSigningRelease UP-TO-DATE
+> Task :writeReleaseAppMetadata UP-TO-DATE
+> Task :writeReleaseSigningConfigVersions UP-TO-DATE
+> Task :verifyAdhkarEnglish
+> Task :verifyAdhkarPronunciation
+> Task :verifyComplexRecitations
+> Task :verifyEnglishMeanings
+
+> Task :lintVitalAnalyzeRelease
+e: file:///workspace/.gradle-mushafi/caches/8.11.1/transforms/635a519de04623612db2abf82c324975/transformed/firebase-auth-24.2.0/jars/classes.jar!/META-INF/java.com.google.android.gmscore.integ.client.firebase-auth-api_firebase-auth-api.kotlin_module Module was compiled with an incompatible version of Kotlin. The binary version of its metadata is 2.3.0, expected version is 2.1.0.
+
+> Task :verifyInlineReaders
+> Task :verifyUiLocales
+> Task :verifyWidgetTexts
+> Task :processApplicationManifestReleaseForBundle
+> Task :bundleReleaseResources
+> Task :buildReleasePreBundle
+> Task :configureReleaseDependencies UP-TO-DATE
+> Task :parseReleaseIntegrityConfig UP-TO-DATE
+> Task :lintVitalReportRelease
+> Task :lintVitalRelease
+> Task :packageReleaseBundle
+> Task :packageRelease
+> Task :createReleaseApkListingFileRedirect
+> Task :assembleRelease
+> Task :signReleaseBundle
+> Task :produceReleaseBundleIdeListingFile
+> Task :createReleaseBundleListingFileRedirect UP-TO-DATE
+> Task :bundleRelease
+[Incubating] Problems report is available at: file:///workspace/mushafi/gradle-build/reports/problems/problems-report.html
+
+BUILD SUCCESSFUL in 53s
+62 actionable tasks: 31 executed, 31 up-to-date

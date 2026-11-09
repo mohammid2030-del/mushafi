@@ -1,0 +1,1 @@
+PASS: seven canonical full Quran verses and three existing Arabic/English adhkar with exact references. Quran, English meanings, listening typography, audio and timing data unchanged from 3.0.58.

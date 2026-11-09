@@ -1,0 +1,449 @@
+{
+  "version": "3.1.29",
+  "scope": [
+    "full-surah audio",
+    "inline Quran ayah",
+    "khatma inline ayah",
+    "reciter switching and section navigation"
+  ],
+  "primaryProviderSamples": [
+    {
+      "reader": 2,
+      "chapter": 1,
+      "url": "https://download.quranicaudio.com/qdc/abdul_baset/murattal/1.mp3",
+      "status": 200,
+      "mime": "audio/mpeg",
+      "seconds": 41.795918,
+      "codec": "mp3",
+      "expectedSeconds": 0.0,
+      "ok": true,
+      "elapsedSeconds": 2.49
+    },
+    {
+      "reader": 2,
+      "chapter": 2,
+      "url": "https://download.quranicaudio.com/qdc/abdul_baset/murattal/2.mp3",
+      "status": 206,
+      "mime": "audio/mpeg",
+      "ok": true,
+      "elapsedSeconds": 2.41
+    },
+    {
+      "reader": 2,
+      "chapter": 114,
+      "url": "https://download.quranicaudio.com/qdc/abdul_baset/murattal/114.mp3",
+      "status": 206,
+      "mime": "audio/mpeg",
+      "ok": true,
+      "elapsedSeconds": 0.51
+    },
+    {
+      "reader": 6,
+      "chapter": 1,
+      "url": "https://download.quranicaudio.com/qdc/khalil_al_husary/murattal/1.mp3",
+      "status": 200,
+      "mime": "audio/mpeg",
+      "seconds": 48.222041,
+      "codec": "mp3",
+      "expectedSeconds": 0.0,
+      "ok": true,
+      "elapsedSeconds": 1.2
+    },
+    {
+      "reader": 6,
+      "chapter": 2,
+      "url": "https://download.quranicaudio.com/qdc/khalil_al_husary/murattal/2.mp3",
+      "status": 206,
+      "mime": "audio/mpeg",
+      "ok": true,
+      "elapsedSeconds": 0.55
+    },
+    {
+      "reader": 6,
+      "chapter": 114,
+      "url": "https://download.quranicaudio.com/qdc/khalil_al_husary/murattal/114.mp3",
+      "status": 206,
+      "mime": "audio/mpeg",
+      "ok": true,
+      "elapsedSeconds": 0.44
+    },
+    {
+      "reader": 7,
+      "chapter": 1,
+      "url": "https://download.quranicaudio.com/qdc/mishari_al_afasy/murattal/1.mp3",
+      "status": 200,
+      "mime": "audio/mpeg",
+      "seconds": 46.497959,
+      "codec": "mp3",
+      "expectedSeconds": 0.0,
+      "ok": true,
+      "elapsedSeconds": 2.96
+    },
+    {
+      "reader": 7,
+      "chapter": 2,
+      "url": "https://download.quranicaudio.com/qdc/mishari_al_afasy/murattal/2.mp3",
+      "status": 206,
+      "mime": "audio/mpeg",
+      "ok": true,
+      "elapsedSeconds": 0.5
+    },
+    {
+      "reader": 7,
+      "chapter": 114,
+      "url": "https://download.quranicaudio.com/qdc/mishari_al_afasy/murattal/114.mp3",
+      "status": 206,
+      "mime": "audio/mpeg",
+      "ok": true,
+      "elapsedSeconds": 2.01
+    },
+    {
+      "reader": 133,
+      "chapter": 1,
+      "url": "https://download.qurancomplex.gov.sa/new-sounds/muaiqly-08/hafs/sura/10-001D00-A08.mp3",
+      "ok": false,
+      "error": "HTTP Error 503: Service Unavailable",
+      "elapsedSeconds": 1.25
+    },
+    {
+      "reader": 133,
+      "chapter": 2,
+      "url": "https://download.qurancomplex.gov.sa/new-sounds/muaiqly-08/hafs/sura/10-002D00-A08.mp3",
+      "ok": false,
+      "error": "HTTP Error 503: Service Unavailable",
+      "elapsedSeconds": 0.92
+    },
+    {
+      "reader": 133,
+      "chapter": 114,
+      "url": "https://download.qurancomplex.gov.sa/new-sounds/muaiqly-08/hafs/sura/10-114D00-A08.mp3",
+      "ok": false,
+      "error": "HTTP Error 503: Service Unavailable",
+      "elapsedSeconds": 0.84
+    },
+    {
+      "reader": 3,
+      "chapter": 1,
+      "url": "https://download.quranicaudio.com/qdc/abdurrahmaan_as_sudais/murattal/1.mp3",
+      "status": 200,
+      "mime": "audio/mpeg",
+      "seconds": 34.925714,
+      "codec": "mp3",
+      "expectedSeconds": 0.0,
+      "ok": true,
+      "elapsedSeconds": 0.8
+    },
+    {
+      "reader": 3,
+      "chapter": 2,
+      "url": "https://download.quranicaudio.com/qdc/abdurrahmaan_as_sudais/murattal/2.mp3",
+      "status": 206,
+      "mime": "audio/mpeg",
+      "ok": true,
+      "elapsedSeconds": 0.3
+    },
+    {
+      "reader": 3,
+      "chapter": 114,
+      "url": "https://download.quranicaudio.com/qdc/abdurrahmaan_as_sudais/murattal/114.mp3",
+      "status": 206,
+      "mime": "audio/mpeg",
+      "ok": true,
+      "elapsedSeconds": 0.5
+    },
+    {
+      "reader": 1001,
+      "chapter": 1,
+      "url": "https://download.qurancomplex.gov.sa/new-sounds/huthify-01/hafs/sura/10-001D00-A01.mp3",
+      "ok": false,
+      "error": "HTTP Error 503: Service Unavailable",
+      "elapsedSeconds": 0.97
+    },
+    {
+      "reader": 1001,
+      "chapter": 2,
+      "url": "https://download.qurancomplex.gov.sa/new-sounds/huthify-01/hafs/sura/10-002D00-A01.mp3",
+      "ok": false,
+      "error": "HTTP Error 503: Service Unavailable",
+      "elapsedSeconds": 0.8
+    },
+    {
+      "reader": 1001,
+      "chapter": 114,
+      "url": "https://download.qurancomplex.gov.sa/new-sounds/huthify-01/hafs/sura/10-114D00-A01.mp3",
+      "ok": false,
+      "error": "HTTP Error 503: Service Unavailable",
+      "elapsedSeconds": 0.79
+    },
+    {
+      "reader": 1002,
+      "chapter": 1,
+      "url": "https://download.qurancomplex.gov.sa/new-sounds/ayyoub/hafs/sura/10-001D00-A03.mp3",
+      "ok": false,
+      "error": "HTTP Error 503: Service Unavailable",
+      "elapsedSeconds": 1.28
+    },
+    {
+      "reader": 1002,
+      "chapter": 2,
+      "url": "https://download.qurancomplex.gov.sa/new-sounds/ayyoub/hafs/sura/10-002D00-A03.mp3",
+      "ok": false,
+      "error": "HTTP Error 503: Service Unavailable",
+      "elapsedSeconds": 0.47
+    },
+    {
+      "reader": 1002,
+      "chapter": 114,
+      "url": "https://download.qurancomplex.gov.sa/new-sounds/ayyoub/hafs/sura/10-114D00-A03.mp3",
+      "ok": false,
+      "error": "HTTP Error 503: Service Unavailable",
+      "elapsedSeconds": 0.5
+    },
+    {
+      "reader": 1003,
+      "chapter": 1,
+      "url": "https://download.qurancomplex.gov.sa/new-sounds/muhanna/hafs/sura/10-001D00-A06.mp3",
+      "ok": false,
+      "error": "HTTP Error 503: Service Unavailable",
+      "elapsedSeconds": 0.5
+    },
+    {
+      "reader": 1003,
+      "chapter": 2,
+      "url": "https://download.qurancomplex.gov.sa/new-sounds/muhanna/hafs/sura/10-002D00-A06.mp3",
+      "ok": false,
+      "error": "HTTP Error 503: Service Unavailable",
+      "elapsedSeconds": 0.5
+    },
+    {
+      "reader": 1003,
+      "chapter": 114,
+      "url": "https://download.qurancomplex.gov.sa/new-sounds/muhanna/hafs/sura/10-114D00-A06.mp3",
+      "ok": false,
+      "error": "HTTP Error 503: Service Unavailable",
+      "elapsedSeconds": 0.5
+    },
+    {
+      "reader": 1004,
+      "chapter": 1,
+      "url": "https://download.qurancomplex.gov.sa/new-sounds/akhdar/hafs/sura/10-001D00-A02.mp3",
+      "ok": false,
+      "error": "HTTP Error 503: Service Unavailable",
+      "elapsedSeconds": 0.56
+    },
+    {
+      "reader": 1004,
+      "chapter": 2,
+      "url": "https://download.qurancomplex.gov.sa/new-sounds/akhdar/hafs/sura/10-002D00-A02.mp3",
+      "ok": false,
+      "error": "HTTP Error 503: Service Unavailable",
+      "elapsedSeconds": 0.56
+    },
+    {
+      "reader": 1004,
+      "chapter": 114,
+      "url": "https://download.qurancomplex.gov.sa/new-sounds/akhdar/hafs/sura/10-114D00-A02.mp3",
+      "ok": false,
+      "error": "HTTP Error 503: Service Unavailable",
+      "elapsedSeconds": 0.55
+    },
+    {
+      "reader": 1005,
+      "chapter": 1,
+      "url": "https://cdn.mp3quran.net/audio/ahmad-nufais/r1/001.mp3",
+      "status": 200,
+      "mime": "audio/mpeg",
+      "seconds": 48.3265,
+      "codec": "mp3",
+      "expectedSeconds": 48.326,
+      "ok": true,
+      "elapsedSeconds": 0.35
+    },
+    {
+      "reader": 1005,
+      "chapter": 2,
+      "url": "https://cdn.mp3quran.net/audio/ahmad-nufais/r1/002.mp3",
+      "status": 206,
+      "mime": "audio/mpeg",
+      "ok": true,
+      "elapsedSeconds": 0.69
+    },
+    {
+      "reader": 1005,
+      "chapter": 114,
+      "url": "https://cdn.mp3quran.net/audio/ahmad-nufais/r1/114.mp3",
+      "status": 206,
+      "mime": "audio/mpeg",
+      "ok": true,
+      "elapsedSeconds": 0.53
+    }
+  ],
+  "fallbackDecodeSamples": [
+    {
+      "reader": "133",
+      "codec": "mp3",
+      "seconds": 38.076378,
+      "url": "https://cdn.mp3quran.net/audio/maher-muaiqly/r1/001.mp3"
+    },
+    {
+      "reader": "1001",
+      "codec": "mp3",
+      "seconds": 62.992,
+      "url": "https://cdn.mp3quran.net/audio/ali-hudhaifi/r1/001.mp3"
+    },
+    {
+      "reader": "1002",
+      "codec": "mp3",
+      "seconds": 59.036756,
+      "url": "https://cdn.mp3quran.net/audio/muhammad-ayyub/r1/001.mp3"
+    },
+    {
+      "reader": "1003",
+      "codec": "mp3",
+      "seconds": 61.173333,
+      "url": "https://cdn.mp3quran.net/audio/khalid-mohanna/r1/001.mp3"
+    },
+    {
+      "reader": "1004",
+      "codec": "mp3",
+      "seconds": 61.121667,
+      "url": "https://cdn.mp3quran.net/audio/ibrahim-akhdar/r1/001.mp3"
+    }
+  ],
+  "fallbackRangeSamples": {
+    "count": 15,
+    "passed": 15,
+    "chapters": [
+      1,
+      2,
+      114
+    ],
+    "reciters": [
+      133,
+      1001,
+      1002,
+      1003,
+      1004
+    ]
+  },
+  "browserMediaTests": "Authentic Fatiha MP3 fixtures: ten reciters play/pause/resume/stop; inline close stops audio and preserves Quran/khatma checkpoint",
+  "browserFlowTests": "Supported verse options; old native request IDs ignored; pending-source pause/resume and close/restart; all ten session commands; untimed-source UI; failed-source reload; obsolete play rejection",
+  "nativeChecks": [
+    "release compiled",
+    "fallback routing policy JVM checks",
+    "6236 sequential/single boundaries and 124720 random chapter starts"
+  ],
+  "limits": [
+    "Original publisher endpoint returned upstream connection failure for five readers from this execution environment; this does not establish every device is affected",
+    "Fallback only for standalone full-surah startup at position zero; no timestamp/position transfer or fallback for individual verse requests",
+    "Actual Android MediaPlayer, audio focus interruptions and screen-locked playback have not been instrumented on a physical device"
+  ],
+  "primaryRecordingPolicy": "Original URLs, timings and waveform evidence remain unchanged; only separately validated fallbackUrl fields added",
+  "directVerseProviderSamples": [
+    {
+      "reader": 7,
+      "key": "1:1",
+      "ok": true,
+      "status": 206,
+      "mime": "audio/mpeg"
+    },
+    {
+      "reader": 7,
+      "key": "2:255",
+      "ok": true,
+      "status": 206,
+      "mime": "audio/mpeg"
+    },
+    {
+      "reader": 6,
+      "key": "1:1",
+      "ok": true,
+      "status": 206,
+      "mime": "audio/mpeg"
+    },
+    {
+      "reader": 6,
+      "key": "2:255",
+      "ok": true,
+      "status": 206,
+      "mime": "audio/mpeg"
+    },
+    {
+      "reader": 2,
+      "key": "1:1",
+      "ok": true,
+      "status": 206,
+      "mime": "audio/mpeg"
+    },
+    {
+      "reader": 2,
+      "key": "2:255",
+      "ok": true,
+      "status": 206,
+      "mime": "audio/mpeg"
+    },
+    {
+      "reader": 133,
+      "key": "1:1",
+      "ok": true,
+      "status": 206,
+      "mime": "audio/mpeg"
+    },
+    {
+      "reader": 133,
+      "key": "2:255",
+      "ok": true,
+      "status": 206,
+      "mime": "audio/mpeg"
+    },
+    {
+      "reader": 3,
+      "key": "1:1",
+      "ok": true,
+      "status": 206,
+      "mime": "audio/mpeg"
+    },
+    {
+      "reader": 3,
+      "key": "2:255",
+      "ok": true,
+      "status": 206,
+      "mime": "audio/mpeg"
+    },
+    {
+      "reader": 1001,
+      "key": "1:1",
+      "ok": true,
+      "status": 206,
+      "mime": "audio/mpeg"
+    },
+    {
+      "reader": 1001,
+      "key": "2:255",
+      "ok": true,
+      "status": 206,
+      "mime": "audio/mpeg"
+    }
+  ],
+  "publication": {
+    "status": "published and publicly verified",
+    "commit": "2176c3bd09aefd21fddbd2b98c17c56144a22741",
+    "versionId": "appgprj_6aeacba839208191859bee126a2cd9df~appgver_ea6ae028a8448191bd43c89a74c76fb8",
+    "deploymentId": "appgdep_6aef77e52310819193d1a80655a84645",
+    "environmentRevision": 54,
+    "url": "https://mushafi.mohammedasif241.chatgpt.site/download/Mushafi-3.1.29.apk",
+    "FCMAnnouncementAccepted": true,
+    "fullDownloadVerified": true,
+    "temporaryRoutesClosed": true
+  },
+  "signedArtifact": {
+    "version": "3.1.29",
+    "code": 179,
+    "filename": "Mushafi-3.1.29.apk",
+    "size": 119644550,
+    "sha256": "e5bb9ab9fc1972a99b29438790efbffee0b709fda24a7fe6f17a2eea97b99311",
+    "key": "releases/Mushafi-3.1.29.apk",
+    "minimumAndroid": "6.0"
+  },
+  "browserHomeFlow": "Passed actual home reader/chapter/listen entry, back to home, section navigation and mini-player play/pause/resume/stop"
+}

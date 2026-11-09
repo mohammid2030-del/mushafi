@@ -1,0 +1,39 @@
+{
+  "version": "3.1.28",
+  "code": 178,
+  "filename": "Mushafi-3.1.28.apk",
+  "size": 119641388,
+  "sha256": "d223225d6265f39df81748687f3b2f9a0cd8de47e61ee6056b747849e0ef3d80",
+  "key": "releases/Mushafi-3.1.28.apk",
+  "minimumAndroid": "6.0",
+  "feature": "Fix navigation locked after audio recitation and nested dialogs",
+  "rootCause": "Home recitation and night selectors duplicated modal background isolation; accessibility cleanup re-applied saved inert=true values after the component had released them.",
+  "fix": [
+    "Centralize home recitation and night selector isolation in accessibility.js",
+    "Restore only isolation acquired by the accessibility manager; retain external changes to pre-existing locks",
+    "Repair focus after dynamic dialog content hides or removes the focused control"
+  ],
+  "validation": [
+    "Pre-fix regression reproduced app.inert and nav.inert stuck true after recitation close",
+    "Real pointer clicks: recitation close followed by each of five navigation tabs in light and dark passed",
+    "Reader/chapter/mode back flow, Escape and Android back dispatcher passed",
+    "Nested night select and parent sheet close release all background isolation",
+    "External inert/aria-hidden release remains released; unchanged pre-existing isolation preserved",
+    "Dialog keyboard and focus checks, nine-screen accessibility audit, welcome languages and safe-area regression passed",
+    "Signed release build passed; final modified assets match APK"
+  ],
+  "limitations": [
+    "Browser tests exercised Android back JavaScript dispatcher; no connected Android device for physical-device validation"
+  ],
+  "publication": {
+    "status": "published and publicly verified",
+    "commit": "95e132467073ad650d6cf5d5019a6aaedb6b4e5c",
+    "versionId": "appgprj_6aeacba839208191859bee126a2cd9df~appgver_3034f184f6e48191859d2789e6574a9d",
+    "deploymentId": "appgdep_6aef70cddd64819196ff2aa76ce073f5",
+    "environmentRevision": 52,
+    "url": "https://mushafi.mohammedasif241.chatgpt.site/download/Mushafi-3.1.28.apk",
+    "FCMAnnouncementAccepted": true,
+    "fullDownloadVerified": true,
+    "temporaryRoutesClosed": true
+  }
+}

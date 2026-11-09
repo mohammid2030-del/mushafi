@@ -1,0 +1,1 @@
+PASS: all nine inline reciters in Arabic/English; selected 9:127 plays exactly three times for every reader without advancing; pause/resume/close and page/reading anchor preserved; backup/cloud reader choices accept all nine and reject unknown IDs.

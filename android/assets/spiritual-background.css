@@ -1,0 +1,9 @@
+/* Seamless full-surface, offline Islamic geometry; stationary and absent from Quran pages. */
+body{isolation:isolate}
+body:not(.reading){min-height:100vh;min-height:100dvh;background-repeat:no-repeat;background-color:var(--bg);background-image:radial-gradient(ellipse at 0% 0%,rgba(181,147,83,.07),transparent 55%),radial-gradient(ellipse at 100% 95%,rgba(75,120,91,.05),transparent 55%)}
+body.dark:not(.reading){background-image:radial-gradient(ellipse at 0% 0%,rgba(181,147,83,.045),transparent 55%),radial-gradient(ellipse at 100% 95%,rgba(45,99,74,.1),transparent 60%)}
+body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background-image:url('islamic-geometry.svg');background-size:240px 240px;background-position:-100px -60px;opacity:.14}
+body.dark::before{opacity:.11}
+body.reading::before{display:none}
+body:not(.reading)>header.app-header{background:transparent}
+@media(min-width:850px){body::before{background-size:280px 280px;background-position:-110px -80px}}

@@ -1,0 +1,31 @@
+{
+  "entries": [
+    {
+      "id": "morning-tasbih",
+      "ar": "سُبْحَانَ اللَّهِ وَبِحَمْدِه",
+      "en": "Glory be to Allah, and praise be to Him.",
+      "referenceAr": "صحيح مسلم ٢٦٩٢",
+      "referenceEn": "Sahih Muslim 2692",
+      "titleAr": "التسبيح والتحميد",
+      "titleEn": "Glorifying and praising Allah"
+    },
+    {
+      "id": "muslim-2726a",
+      "ar": "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ عَدَدَ خَلْقِهِ وَرِضَا نَفْسِهِ وَزِنَةَ عَرْشِهِ وَمِدَادَ كَلِمَاتِهِ",
+      "en": "Glory be to Allah, and praise be to Him, as many times as His creation, as much as pleases Him, as weighty as His Throne, and as abundant as the ink of His words.",
+      "referenceAr": "صحيح مسلم ٢٧٢٦a",
+      "referenceEn": "Sahih Muslim 2726a",
+      "titleAr": "تسبيح جويرية",
+      "titleEn": "Juwayriyah's glorification"
+    },
+    {
+      "id": "audit-meeting",
+      "ar": "سُبْحَانَكَ اللَّهُمَّ وَبِحَمْدِكَ أَشْهَدُ أَنْ لاَ إِلَهَ إِلاَّ أَنْتَ أَسْتَغْفِرُكَ وَأَتُوبُ إِلَيْكَ",
+      "en": "Glory be to You, O Allah, and praise be to You. I bear witness that there is no god but You. I seek Your forgiveness and turn to You in repentance.",
+      "referenceAr": "جامع الترمذي ٣٤٣٣",
+      "referenceEn": "Jami' al-Tirmidhi 3433",
+      "titleAr": "كفارة المجلس",
+      "titleEn": "At the end of a gathering"
+    }
+  ]
+}

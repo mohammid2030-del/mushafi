@@ -1,0 +1,45 @@
+{
+  "version": "3.1.25",
+  "versionCode": 175,
+  "status": "owner preview only; not publicly released",
+  "publicVersionUnchanged": "3.1.24",
+  "paymentsEnabled": false,
+  "automaticPromptsEnabled": false,
+  "activationRequired": "Merchant account and a verified checkout integration supporting the selected amount in SAR",
+  "amountsSAR": [
+    10,
+    50,
+    100,
+    "custom 1–10000, maximum two decimals"
+  ],
+  "defaultAmountSAR": 50,
+  "paymentMethodDisplay": "Digital wallet; no wallet brand availability claimed before provider setup",
+  "promptCadenceWhenActivated": "first, fourth, seventh, ... foreground entry; same-entry dedup; activation key stable across releases",
+  "entryIdentity": "Native foreground entry counter; external Activity flows excluded; configuration recreation suppressed",
+  "languages": [
+    "ar",
+    "en",
+    "ur",
+    "bn",
+    "tr"
+  ],
+  "tests": [
+    "Five locales and four viewport sizes: no horizontal overflow or header overlap",
+    "Preset and Arabic, Persian, Bengali and Latin custom amount parsing",
+    "Unconfigured checkout stays disabled and never displays automatically",
+    "Configured test fixture: actual first/fourth/seventh automatic prompts and same-entry dedup",
+    "Test checkout receives SAR and integer minor units; double-click guard; no payment confirmation invented",
+    "Native release build and original signing certificate verified",
+    "Exact UI sources and native entry counter verified inside candidate APK"
+  ],
+  "artifact": "/tmp/Mushafi-Support-Preview-3.1.25.apk",
+  "bytes": 119637557,
+  "sha256": "8e0883e15962e02d01f2601db15cfa4378236b13eff0ceafe0c1e766d800c156",
+  "published": false,
+  "nextPublicVersionCodeMustExceed": 175,
+  "timestamp": "2026-11-06T11:51:29.984470+00:00",
+  "limitations": [
+    "No payment provider account or payment link supplied",
+    "No Android device connected for lifecycle instrumentation"
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "status": "publisher-timing-rejected",
+  "release": "3.0.89",
+  "url": "https://cdn.mp3quran.net/audio/ahmad-nufais/r1/002.mp3",
+  "fixture": "qa/assets/nafees-baqarah-head.mp3",
+  "range": "bytes=0-2097151",
+  "sha256": "864a1275937bd7b0a5b478d950c3d2b8f3190df003ad86037fe0c0a3da685503",
+  "observation": "Publisher verse 1 starts at 59720ms. The recording already recites the chapter opening before this point. A diagnostic mono downmix ASR recognizes istiadhah/basmalah in the first eight seconds and later verses before 59s. This diagnostic is not an alignment proof and does not generate shipped timestamps.",
+  "resolution": "All 114 chapters play original complete files from zero, without publisher cuts or ayah labels. Every isolated verse for reader1005 is unavailable until a matching verified timeline exists. Other nine readers unchanged."
+}

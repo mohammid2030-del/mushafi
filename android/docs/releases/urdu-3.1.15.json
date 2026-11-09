@@ -1,0 +1,17 @@
+{
+  "version": "3.1.15",
+  "code": 165,
+  "catalogEntries": 2820,
+  "baseCatalogEntries": 2506,
+  "quranEdition": "ur.jalandhry",
+  "translator": "فتح محمد جالندھری",
+  "source": "https://api.alquran.cloud/v1/quran/ur.jalandhry",
+  "sourceArchive": "docs/sources/ur.jalandhry.json",
+  "verses": 6236,
+  "tests": [
+    "Urdu browser: light/dark, 7 sections, persistence, Quran Arabic integrity, Urdu meanings, Urdu and numeral surah search, Arabic/English/Urdu switching, welcome picker",
+    "Gradle verifyUiLocales and verifyUrduMeanings; assembleRelease",
+    "APK signature verification",
+    "Public feed including Urdu notes, full APK byte comparison, range download and legacy links"
+  ]
+}

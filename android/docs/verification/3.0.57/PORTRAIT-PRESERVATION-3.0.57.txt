@@ -1,0 +1,1 @@
+PASS: original audio catalog, all verse timings, Quran, tafsir, adhkar, fonts and older portraits byte-identical to 3.0.56. Four supplied transparent portraits added; only avatar mapping/framing and app version changed in existing assets.

@@ -1,0 +1,9 @@
+# Full-player shuffle starts — 3.0.84
+
+Cause: random policy sampled any of 6235 other verses, then sought to that verse's timestamp in the full-surah MP3. A long apparent jump (for example 18 minutes) was a random interior verse, not a random surah start.
+
+Random now uniformly chooses another available chapter, always verse 1 and transport position 0. The same reciter stays selected, with no immediate chapter repeat. Explicit verse-1 playback in native service and browser transport starts at zero, including any introductory audio. Later verse seeks retain exact timeline positions.
+
+Selecting random during an active verse arms one verse-boundary transition. Once the new random chapter starts it plays to completion before choosing another chapter. Reapplying the same mode does not rearm a first-verse jump. Manual playback clears the pending boundary; continuous and single behavior remain unchanged. Native service owns background boundaries independently of WebView; browser fallback implements the same full-player behavior. Inline ayah playback uses the updated next-key policy (first verse of another chapter), preserving its repeat and page-position behavior.
+
+Validation: JVM sequence test covers all 6236 sequential/single boundaries, 124720 random picks to other chapter starts, and paused/seeking gates with pending true/false. Browser policy suite resets a mocked stale 18-minute position to zero over six random targets, verifies first verse does not trigger a second random jump, and confirms end-of-track shuffle starts at zero. Existing player-mode suite passes native command dispatch, verse/tafsir display, inline transitions and 32 AR/EN light/dark viewport layouts. Seven release gates, signing and APK/AAB parity checked. No actual-device background playback test performed.

@@ -1,0 +1,4 @@
+{"status":200,"url":"https://ehsan.sa/waqf?p=2","selected":"2"}
+{"status":200,"url":"https://ehsan.sa/waqf?p=5","selected":"5"}
+{"status":200,"url":"https://ehsan.sa/projects?projectType=Health","selected":"Health"}
+{"status":200,"url":"https://ehsan.sa/projects?projectType=Feeding","selected":"Feeding"}

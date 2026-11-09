@@ -1,0 +1,4 @@
+.automatic-location-status{padding:20px 4px;border-bottom:1px solid var(--line);margin-bottom:22px}.automatic-location-status>strong{font-size:16px}.automatic-location-status>p{font-size:14px;line-height:1.9}.automatic-location-status>small{display:block;font-size:12px;line-height:1.8;color:var(--muted);margin-top:10px}.automatic-location-note{font-size:11px;color:var(--muted);margin:8px 4px 18px;line-height:1.8}
+.automatic-location-status[hidden]{display:none!important}
+
+.qibla-location-button[hidden]{display:none!important}

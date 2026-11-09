@@ -1,0 +1,1 @@
+PASS: charity home placement, More entry and Back origins, three collections, canonical Arabic/English quote and reading anchor preserved.

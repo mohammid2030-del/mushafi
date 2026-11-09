@@ -1,0 +1,44 @@
+{
+  "readers": {
+    "3": {
+      "source": "https://everyayah.com/data/Abdurrahmaan_As-Sudais_192kbps/",
+      "listingSha256": "bc03cd4aaf5384e3054adbac68b31724a9a3eef14de7162e675c46e82213885f",
+      "count": 6236
+    },
+    "1001": {
+      "source": "https://everyayah.com/data/Hudhaify_128kbps/",
+      "listingSha256": "209e6c2f2d0da912a889368f7488225eb99cb8ad47b926c99100213c838d1b7e",
+      "count": 6236
+    },
+    "1002": {
+      "source": "https://qurancomplex.gov.sa/quran-audio-hafs-ayyoub/",
+      "archive": "https://download.qurancomplex.gov.sa/new-sounds/ayyoub/hafs/ayyoub-ayat.zip",
+      "archiveSize": 961236527,
+      "centralSha256": "e0776b7ab1c0d954ee6aebf96f1c0a1803ed13daff592c6289f76c864262e57d",
+      "count": 6236,
+      "validation": "All individual clip SHA256 values from previously verified publisher waveform evidence. Only the documented Muhanna 110/109 label anomaly is normalized."
+    },
+    "1003": {
+      "source": "https://qurancomplex.gov.sa/quran-audio-hafs-muhanna/",
+      "archive": "https://download.qurancomplex.gov.sa/new-sounds/muhanna/hafs/muhanna-ayat.zip",
+      "archiveSize": 1120110331,
+      "centralSha256": "443ee14ba45e97b6e6712da6b2d75363770b7328cd439963e5421af8bf461bc2",
+      "count": 6236,
+      "validation": "All individual clip SHA256 values from previously verified publisher waveform evidence. Only the documented Muhanna 110/109 label anomaly is normalized."
+    },
+    "1004": {
+      "source": "https://qurancomplex.gov.sa/quran-audio-hafs-akhdar/",
+      "archive": "https://download.qurancomplex.gov.sa/new-sounds/akhdar/hafs/akhdar-ayat.zip",
+      "archiveSize": 1276378123,
+      "centralSha256": "b52508afd3349d5775beec64f62dba4887ab280525d60ea5ec9f2f63d04ff19a",
+      "count": 6236,
+      "validation": "All individual clip SHA256 values from previously verified publisher waveform evidence. Only the documented Muhanna 110/109 label anomaly is normalized."
+    }
+  },
+  "preserved": {
+    "7": "19b866605dd66eb09a9cebd1e95290252475eae6d6833b49b595b6c18767bd67",
+    "6": "f6a04e9769cf64c384a75da1d2bfe7d317e77ffc17a551a9574d1af67b84cf84",
+    "2": "1609ff9022532de544d856fbbb87ee62c11bd76b48ce7761c7ebc77e8595c0c0",
+    "133": "91885642295ec7b0fdbbc4bd29d59ff68b7bc78e15a996ab64b1ef62ddd337ec"
+  }
+}

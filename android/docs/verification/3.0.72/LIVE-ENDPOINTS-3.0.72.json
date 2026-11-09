@@ -1,0 +1,74 @@
+[
+  {
+    "id": "ehsan-orphans",
+    "requested": "https://ehsan.sa/orphans",
+    "final": "https://ehsan.sa/orphans",
+    "status": 200,
+    "title": "كفالة الأيتام - منصة إحسان",
+    "selectedProjectType": null
+  },
+  {
+    "id": "ehsan-mosques",
+    "requested": "https://ehsan.sa/mosques",
+    "final": "https://ehsan.sa/mosques",
+    "status": 200,
+    "title": "المساجد - منصة إحسان",
+    "selectedProjectType": null
+  },
+  {
+    "id": "ehsan-housing",
+    "requested": "https://ehsan.sa/housing",
+    "final": "https://ehsan.sa/housing",
+    "status": 200,
+    "title": "مشاريع الإسكان - منصة إحسان",
+    "selectedProjectType": null
+  },
+  {
+    "id": "ehsan-projects-health",
+    "requested": "https://ehsan.sa/projects?projectType=Health",
+    "final": "https://ehsan.sa/projects?projectType=Health",
+    "status": 200,
+    "title": "المشاريع - منصة إحسان",
+    "selectedProjectType": "Health"
+  },
+  {
+    "id": "ehsan-projects-feeding",
+    "requested": "https://ehsan.sa/projects?projectType=Feeding",
+    "final": "https://ehsan.sa/projects?projectType=Feeding",
+    "status": 200,
+    "title": "المشاريع - منصة إحسان",
+    "selectedProjectType": "Feeding"
+  },
+  {
+    "id": "ehsan-waqf-2",
+    "requested": "https://ehsan.sa/waqf?p=2",
+    "final": "https://ehsan.sa/waqf?p=2",
+    "status": 200,
+    "title": "صندوق إحسان الوقفي - منصة إحسان",
+    "selectedProjectType": null
+  },
+  {
+    "id": "ehsan-waqf-5",
+    "requested": "https://ehsan.sa/waqf?p=5",
+    "final": "https://ehsan.sa/waqf?p=5",
+    "status": 200,
+    "title": "صندوق إحسان الوقفي - منصة إحسان",
+    "selectedProjectType": null
+  },
+  {
+    "id": "ehsan-gift",
+    "requested": "https://ehsan.sa/gift",
+    "final": "https://ehsan.sa/gift",
+    "status": 200,
+    "title": "هدية إحسان - منصة إحسان",
+    "selectedProjectType": null
+  },
+  {
+    "id": "waqfy-endowments",
+    "requested": "https://waqfy.sa/product-donation-list",
+    "final": "https://waqfy.sa/product-donation-list/",
+    "status": 200,
+    "title": "منصة وقفي Waqfy | المنتجات الوقفية",
+    "selectedProjectType": null
+  }
+]

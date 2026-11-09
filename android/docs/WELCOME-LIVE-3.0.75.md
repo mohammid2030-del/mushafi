@@ -1,0 +1,5 @@
+# Welcome live broadcasts 3.0.75 (125)
+
+The shared feature overview now includes a seventh full-width tile for live Makkah and Madinah broadcasts, using the existing broadcast symbol and describing the official channels and internet requirement. It appears in the introduction and in the setup feature review, including the optional More tour. Arabic/English copy and light/dark styling follow the existing welcome design. It does not start playback or leave setup.
+
+Validation: test-welcome-live.cjs checks both placements, seven feature tiles, channel/internet copy, scrolling, footer containment and horizontal overflow across Arabic/English, light/dark and four viewports. The existing welcome74 regression checks all four stories, nine reciter portraits, draft and Back handling, safe replay and Asr iqama migration. Android release gates, signing and APK/AAB asset parity are checked during packaging. Actual native phone visual inspection is not claimed. Live playback and Quran assets are unchanged.

@@ -1,0 +1,1 @@
+PASS: 626 Quran text, pages, reader, fonts, translation, tafsir and all audio/player assets/native engines are byte-identical to 3.0.70. Charity references existing bundled verse data/helper without modifying them.

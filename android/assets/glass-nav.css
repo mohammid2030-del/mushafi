@@ -1,0 +1,21 @@
+body>nav.glass-nav{min-height:77px;padding:6px;gap:3px;border-radius:27px;background:rgba(255,254,249,.68);border:1px solid rgba(255,255,255,.65);box-shadow:0 12px 35px rgba(28,48,35,.11),0 2px 7px rgba(28,48,35,.04),inset 0 1px 0 rgba(255,255,255,.68);-webkit-backdrop-filter:blur(26px) saturate(155%);backdrop-filter:blur(26px) saturate(155%);isolation:isolate;touch-action:pan-y;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent;overflow:hidden}
+body.dark>nav.glass-nav{background:rgba(24,43,34,.64);border-color:rgba(218,231,211,.15);box-shadow:0 14px 38px rgba(0,0,0,.28),0 2px 7px rgba(0,0,0,.12),inset 0 1px 0 rgba(240,246,228,.09)}
+.glass-nav-indicator{position:absolute;left:0;top:6px;display:block;z-index:0;border-radius:20px;pointer-events:none;background:linear-gradient(140deg,rgba(45,99,71,.14),rgba(58,101,69,.07));border:1px solid rgba(57,103,72,.1);box-shadow:inset 0 1px 0 rgba(255,255,255,.65),0 3px 9px rgba(26,62,40,.04);will-change:transform;transition:transform 290ms cubic-bezier(.2,.85,.25,1),width 220ms ease,height 220ms ease;opacity:1}
+body.dark .glass-nav-indicator{background:linear-gradient(140deg,rgba(107,143,92,.24),rgba(53,94,65,.26));border-color:rgba(209,190,129,.13);box-shadow:inset 0 1px 0 rgba(231,237,211,.09),0 3px 12px rgba(0,0,0,.08)}
+body>nav.glass-nav>button{position:relative;z-index:1;min-height:61px;gap:5px;padding:8px 3px;border-radius:20px;color:var(--muted);background:transparent;border:0;transition:color 160ms ease;touch-action:pan-y}
+body>nav.glass-nav>button.active,body>nav.glass-nav>button.nav-preview{background:transparent;color:var(--ink)}
+body>nav.glass-nav>button .ui-icon{width:22px;height:22px;transition:transform 210ms cubic-bezier(.2,.8,.25,1),color 160ms ease;transform-origin:center}
+body>nav.glass-nav>button>span{transition:transform 180ms ease,color 160ms ease;white-space:nowrap;line-height:1.5;font-size:10px}
+body>nav.glass-nav>button.active .ui-icon,body>nav.glass-nav>button.nav-preview .ui-icon{color:var(--green);transform:translateY(-1px) scale(1.06)}
+body.dark>nav.glass-nav>button.active .ui-icon,body.dark>nav.glass-nav>button.nav-preview .ui-icon{color:var(--gold)}
+body>nav.glass-nav>button.nav-pressed .ui-icon{transform:translateY(0) scale(.94)}body>nav.glass-nav>button.nav-pressed>span{transform:scale(.97)}
+body>nav.glass-nav.nav-scrubbing .glass-nav-indicator{transition:none!important}body>nav.glass-nav.nav-scrubbing>button.active:not(.nav-preview){color:var(--muted)}body>nav.glass-nav.nav-scrubbing>button.active:not(.nav-preview) .ui-icon{color:var(--muted);transform:none}
+body>nav.glass-nav>button:focus-visible{outline:2px solid var(--gold);outline-offset:-4px}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){body>nav.glass-nav{background:rgba(255,254,249,.96)}body.dark>nav.glass-nav{background:rgba(24,43,34,.96)}}
+body.reduce-motion>nav.glass-nav .glass-nav-indicator,body.reduce-motion>nav.glass-nav>button,body.reduce-motion>nav.glass-nav>button .ui-icon,body.reduce-motion>nav.glass-nav>button>span{transition:none!important}
+@media(prefers-reduced-motion:reduce){body>nav.glass-nav .glass-nav-indicator,body>nav.glass-nav>button,body>nav.glass-nav>button .ui-icon,body>nav.glass-nav>button>span{transition:none!important}}
+@media(max-width:370px){body>nav.glass-nav{left:10px;right:10px;padding:5px;gap:2px;min-height:73px;border-radius:25px}body>nav.glass-nav>button{min-height:61px;gap:4px}body>nav.glass-nav>button>span{font-size:9px}}
+.glass-nav-indicator[hidden]{display:none}
+
+/* Keep the bar on a stable compositor layer; only the selection moves. */
+body>nav.glass-nav{height:77px;min-height:77px;max-height:77px;transform:translateZ(0);-webkit-backface-visibility:hidden;backface-visibility:hidden;will-change:transform}body>nav.glass-nav>button{height:100%;min-height:0;padding-top:6px;padding-bottom:6px}body>nav.glass-nav>button .ui-icon,body>nav.glass-nav>button.active .ui-icon,body>nav.glass-nav>button.nav-preview .ui-icon,body>nav.glass-nav>button.nav-pressed .ui-icon,body>nav.glass-nav>button.nav-pressed>span{transform:none}body>nav.glass-nav>button .ui-icon,body>nav.glass-nav>button>span{transition:color 160ms ease}@media(max-width:370px){body>nav.glass-nav{height:73px;min-height:73px;max-height:73px}}

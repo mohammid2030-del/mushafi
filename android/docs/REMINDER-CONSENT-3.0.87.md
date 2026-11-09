@@ -1,0 +1,9 @@
+# One welcome consent, no reminder menu — 3.0.87
+
+Removed the More entry, reminder-settings sheet, per-type switches, readiness section and obsolete WebView status/save APIs. Daily/Friday times and sourced content are unchanged. Welcome now briefly explains that allowing notifications enables prayer, remembrance, dua and Friday reminders automatically.
+
+DailyReminderScheduler uses one device-local consent instead of seven flags. New installs default off until welcome consent / notification approval. Onboarding commit saves the yes/no choice; refusal cancels reminder notices and pending scheduling. Android notification permission is still enforced, including for the in-app Friday guide. Granting notification permission enables the bundle. A recorded false→true OS permission transition for enrolled users is treated as renewed approval.
+
+Existing completed users initialize from notification permission without another prompt; explicit stored refusal survives initialization. Known 3.0.86 scheduler state (next alarm, sent history or old reminder toggle) migrates on native scheduling so already-approved reminders survive an update before WebView opens. Old per-type values no longer suppress individual reminders. Fresh Friday visit counters alone do not count as legacy approval.
+
+Validation: new consent UI test passes welcome yes/no propagation, no separate More entry/function, no initialization before fresh welcome, and existing-user initialization without a new prompt. Updated daily-reminder suite passes all 22 rotation slots, local dua details, Friday 1/4/7/noon policy, notification deep link, AR/EN light/dark three viewports and preserved reading anchor. Existing welcome resume test passes. Native release compilation/gates, signing and APK/AAB parity checked. Actual-device alarm delivery has not been physically tested.

@@ -1,0 +1,1 @@
+PASS: actual intermediate layout frames on hide, portrait/tablet/landscape, interrupted hide/show settles correctly, no duplicate verse, reduced motion respected

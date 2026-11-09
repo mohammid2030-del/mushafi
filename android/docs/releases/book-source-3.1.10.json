@@ -1,0 +1,25 @@
+{
+  "id": "hina_saal_alinsan",
+  "title": "حين سأل الإنسان: من خلقني؟",
+  "pages": 60,
+  "source": "user-supplied book_complete_app_package.zip",
+  "archiveSha256": "61898309fab485c4f7e94a5133f6c6864bc3c21aef3a78339ec5b2f16c26096d",
+  "jsonSha256": "c5319ab0c8d1f86c82664f76ad60588fab0989830e7abe8de1dc5032323f5388",
+  "contentPreserved": true,
+  "readerFeatures": [
+    "Overview from book opening and original supplied poster",
+    "60 original source pages, 6 sections; content protected from UI translation",
+    "Independent local book saves, page bookmark and page/scroll checkpoint",
+    "Curved page-strip renderer shared with Quran visuals, separate state",
+    "Touch vertical text scrolling plus horizontal page turn",
+    "Reader keeps screen awake without switching native immersive system bars"
+  ],
+  "verification": [
+    "All 60 DOM page texts match supplied JSON exactly in Arabic and English UI",
+    "Four theme/locale cases preserve checkpoint after reload and manual bookmarks",
+    "Native back, previous/next bounds, contents60 and 320/393/820/1180 widths passed",
+    "Quran page/verse and old learning progress remain unchanged",
+    "Curved animation single-commit, short-swipe cancellation and resize abort passed",
+    "Actual browser touch: vertical scroll and horizontal single-page turn passed"
+  ]
+}

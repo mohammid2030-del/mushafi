@@ -1,0 +1,1 @@
+PASS: exact window.handleNativeBack used by Android returns true and steps mode -> chapters -> readers -> home in AR/EN light/dark; full-screen Back -> home chapters -> home readers -> home without exit; playback/page/scroll preserved; internal arrow still steps; bare-home back returns false.

@@ -1,0 +1,29 @@
+{
+ "order": [
+  "94:5",
+  "94:6",
+  "112:1",
+  "112:2",
+  "103:1",
+  "108:1",
+  "93:5"
+ ],
+ "ar": {
+  "94:5": "فَإِنَّ مَعَ ٱلْعُسْرِ يُسْرًا",
+  "94:6": "إِنَّ مَعَ ٱلْعُسْرِ يُسْرًا",
+  "112:1": "قُلْ هُوَ ٱللَّهُ أَحَدٌ",
+  "112:2": "ٱللَّهُ ٱلصَّمَدُ",
+  "103:1": "وَٱلْعَصْرِ",
+  "108:1": "إِنَّآ أَعْطَيْنَـٰكَ ٱلْكَوْثَرَ",
+  "93:5": "وَلَسَوْفَ يُعْطِيكَ رَبُّكَ فَتَرْضَىٰٓ"
+ },
+ "en": {
+  "94:5": "For indeed, with hardship [will be] ease.",
+  "94:6": "Indeed, with hardship [will be] ease.",
+  "112:1": "Say, \"He is Allah, [who is] One,",
+  "112:2": "Allah, the Eternal Refuge.",
+  "103:1": "By time,",
+  "108:1": "Indeed, We have granted you, [O Muhammad], al-Kawthar.",
+  "93:5": "And your Lord is going to give you, and you will be satisfied."
+ }
+}

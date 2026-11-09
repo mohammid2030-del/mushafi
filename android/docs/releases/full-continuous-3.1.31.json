@@ -1,0 +1,34 @@
+{
+  "version": "3.1.31",
+  "code": 181,
+  "filename": "Mushafi-3.1.31.apk",
+  "size": 117810009,
+  "sha256": "8ee6b008b0208af6f6738561322d8ed3fea0a3507e556558f034e7d7e4bb3e81",
+  "key": "releases/Mushafi-3.1.31.apk",
+  "minimumAndroid": "6.0",
+  "change": "Full-surah recitation always completes its verses; isolate ayah practice and migrate old single-ayah mode",
+  "validation": [
+    "Real MP3 Fatiha playback for all ten reciters passes beyond the first ayah and completes before queueing chapter 2",
+    "Old stored single mode becomes continuous in full player and is stored independently from practice preferences",
+    "Full player no longer offers verse-only mode",
+    "Native constructor, mode changes and play intents normalize verse-only mode to continuous",
+    "Random mode changes wait until the current chapter completes",
+    "Primary verse clip, triple-repeat and khatma cursor regression passed",
+    "Audio request ordering and source retry regression passed",
+    "Native release build and signed artifact passed"
+  ],
+  "limitations": [
+    "Native MediaPlayer and notification resume not instrumented on a physical Android device; shared native mode policy exercised as a JVM unit test"
+  ],
+  "publication": {
+    "status": "published and publicly verified",
+    "commit": "3814d57cad5776ec77c2ec98c1694325df53b66f",
+    "versionId": "appgprj_6aeacba839208191859bee126a2cd9df~appgver_5659b89cf4308191bcc38fcdc8d3ba53",
+    "deploymentId": "appgdep_6aefa7087cac8191ae64fc07c16d13df",
+    "environmentRevision": 58,
+    "url": "https://mushafi.mohammedasif241.chatgpt.site/download/Mushafi-3.1.31.apk",
+    "FCMAnnouncementAccepted": true,
+    "fullDownloadVerified": true,
+    "temporaryRoutesClosed": true
+  }
+}

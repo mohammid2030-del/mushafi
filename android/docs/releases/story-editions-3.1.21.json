@@ -1,0 +1,39 @@
+{
+  "version": "3.1.21",
+  "versionCode": 171,
+  "feature": "Offline story reading editions follow app language",
+  "bookId": "hina_saal_alinsan",
+  "languages": [
+    "ar",
+    "en",
+    "ur",
+    "bn",
+    "tr"
+  ],
+  "originalSourceSha256": "c5319ab0c8d1f86c82664f76ad60588fab0989830e7abe8de1dc5032323f5388",
+  "pagesPerEdition": 60,
+  "translation": {
+    "method": "Machine-assisted Arabic-to-target translation with a protected character glossary; no independent human review claimed",
+    "provider": [
+      "Google Translate",
+      "Bengali completion: AI4Bharat IndicTrans2 en-indic distilled 200M (MIT), local CTranslate2 inference via English reading edition"
+    ],
+    "quranQuotations": "Original Arabic retained verbatim, protected from translation",
+    "notice": "Localized disclosure shown in book details",
+    "localModelRepository": "adalat-ai/ct2-rotary-indictrans2-en-indic-dist-200M",
+    "weightsBundledInApp": false,
+    "literaryReview": "Selected semantic samples reviewed; full independent literary or scholarly review not claimed"
+  },
+  "readingState": "Existing canonical page, saved flag and bookmark shared across languages; original Arabic book unchanged",
+  "validation": [
+    "All page numbers and paragraph boundaries preserved",
+    "Original source SHA-256 pinned",
+    "Quran quote equality per page",
+    "Full-page browser layout at phone, compact phone, landscape and tablet sizes",
+    "Native signed release assembly"
+  ],
+  "limitations": [
+    "Translations are reading aids and have not received independent literary or scholarly review",
+    "No physical Android device was connected for on-device verification"
+  ]
+}

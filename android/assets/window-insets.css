@@ -1,0 +1,19 @@
+/* Scroll the real document behind transparent system bars. Safe spacing belongs to controls, not the native viewport. */
+:root{--native-safe-top:0px;--native-safe-bottom:0px;--app-safe-top:max(env(safe-area-inset-top,0px),var(--native-safe-top));--app-safe-bottom:max(env(safe-area-inset-bottom,0px),var(--native-safe-bottom))}
+body:not(.reading):not(.story-reading):not(.onboarding-mode):not(.devotion-mode):not(.listening-screen){padding-top:var(--app-safe-top);padding-bottom:var(--app-safe-bottom);box-sizing:border-box}
+body.reading,body.story-reading{--app-safe-top:0px;--app-safe-bottom:0px}
+body>nav.glass-nav{bottom:calc(8px + var(--app-safe-bottom))}
+body.onboarding-mode .welcome-shell{padding-top:var(--app-safe-top);box-sizing:border-box}
+body.devotion-mode .dhikr-reader{padding-top:var(--app-safe-top);padding-bottom:var(--app-safe-bottom);box-sizing:border-box}
+body.listening-screen .full-surah-player{padding-top:calc(18px + var(--app-safe-top));padding-bottom:calc(18px + var(--app-safe-bottom))}
+.feature-sheet{padding-bottom:calc(26px + var(--app-safe-bottom));max-height:calc(88vh - var(--app-safe-top));max-height:calc(88dvh - var(--app-safe-top));box-sizing:border-box}
+.reciter-picker-overlay,.home-recitation-overlay,.night-select-overlay{padding-top:calc(20px + var(--app-safe-top));box-sizing:border-box}
+.reciter-picker-overlay>*,.home-recitation-overlay>*,.night-select-overlay>*{max-height:calc(100vh - var(--app-safe-top) - var(--app-safe-bottom) - 40px);max-height:calc(100dvh - var(--app-safe-top) - var(--app-safe-bottom) - 40px)}
+body .full-surah-mini{bottom:calc(99px + var(--app-safe-bottom))}
+body .audio-indicator{bottom:calc(97px + var(--app-safe-bottom))}
+body.devotion-mode.has-active-audio .audio-indicator{bottom:calc(10px + var(--app-safe-bottom))}
+body .devotion-reader-controls{bottom:calc(97px + var(--app-safe-bottom))}
+body.has-active-audio.devotion-mode .devotion-reader-controls{bottom:calc(161px + var(--app-safe-bottom))}
+body .undo-toast{bottom:calc(80px + var(--app-safe-bottom))}
+body.onboarding-mode .welcome-footer{padding-bottom:max(12px,var(--app-safe-bottom))}
+@media(orientation:landscape) and (max-height:500px){body.onboarding-mode .welcome-footer{padding-bottom:max(6px,var(--app-safe-bottom))}}

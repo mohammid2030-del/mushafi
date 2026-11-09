@@ -1,0 +1,8 @@
+html[lang=en]{--ui-font:system-ui,AppArabic}
+html[lang=ar]{--ui-font:AppArabic}
+
+@font-face{font-family:UiBengali;src:url('fonts/noto-sans-bengali-400.ttf') format('truetype');font-weight:400;font-style:normal;font-display:swap}@font-face{font-family:UiBengali;src:url('fonts/noto-sans-bengali-600.ttf') format('truetype');font-weight:600;font-style:normal;font-display:swap}html[lang=bn]{--ui-font:UiBengali,system-ui,AppArabic}
+
+@font-face{font-family:UiBengali;src:url('fonts/noto-sans-bengali-600.ttf') format('truetype');font-weight:500;font-style:normal;font-display:swap}@font-face{font-family:UiBengali;src:url('fonts/noto-sans-bengali-600.ttf') format('truetype');font-weight:700;font-style:normal;font-display:swap}
+
+html[lang=tr]{--ui-font:system-ui,AppArabic}

@@ -1,0 +1,9 @@
+package com.mushafi.qa;
+import com.mushafi.app.*;import org.json.*;import java.lang.reflect.*;import java.util.*;
+final class TimelineChecks {
+ static void run(SurahPlaybackService s,JSONObject catalog)throws Exception{
+ Class<?> type=SurahPlaybackService.class;Field rows=type.getDeclaredField("timings"),chapter=type.getDeclaredField("chapter"),position=type.getDeclaredField("position"),key=type.getDeclaredField("key");for(Field f:new Field[]{rows,chapter,position,key})f.setAccessible(true);Method update=type.getDeclaredMethod("updateKey");update.setAccessible(true);Object oldRows=rows.get(s),oldKey=key.get(s);int oldChapter=chapter.getInt(s),oldPosition=position.getInt(s),count=0;
+ try{Iterator<String> readers=catalog.keys();while(readers.hasNext()){JSONObject chapters=catalog.getJSONObject(readers.next()).getJSONObject("chapters");for(int c=1;c<=114;c++){JSONArray times=chapters.getJSONObject(String.valueOf(c)).getJSONArray("timings");rows.set(s,times);chapter.setInt(s,c);for(int n=times.length()-1;n>=0;n--){JSONArray row=times.getJSONArray(n);String expected=c+":"+row.getInt(0);int start=row.getInt(1);position.setInt(s,start);update.invoke(s);if(!expected.equals(key.get(s)))throw new Exception("start "+expected);int end=n+1<times.length()?times.getJSONArray(n+1).getInt(1):row.getInt(2);if(end<=start)throw new Exception("invalid timeline "+expected);position.setInt(s,end-1);update.invoke(s);if(!expected.equals(key.get(s)))throw new Exception("boundary "+expected);count++;}if(times.getJSONArray(0).getInt(1)>0){position.setInt(s,times.getJSONArray(0).getInt(1)-1);update.invoke(s);if(!key.get(s).equals(""))throw new Exception("prelude");}}}if(count!=24944)throw new Exception("unexpected verse total "+count);
+ }finally{rows.set(s,oldRows);key.set(s,oldKey);chapter.setInt(s,oldChapter);position.setInt(s,oldPosition);}
+ }
+}

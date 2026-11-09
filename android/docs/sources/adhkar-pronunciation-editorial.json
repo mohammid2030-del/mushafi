@@ -1,0 +1,1490 @@
+{
+  "schema": 1,
+  "language": "en",
+  "kind": "pronunciation-guide",
+  "method": "Editorial Latin-script approximation of the exact bundled Arabic. Not a replacement for learning from accurate recitation; no claim of tajwid completeness or independent scholarly certification.",
+  "basmala": "Bismillaahir-Rahmaanir-Raheem.",
+  "entries": {
+    "routine-kursi": {
+      "arabicSha256": "c826c8de989a783d07855b47df70889895bfae4e99f2dbd39fdae5e2911f11d2",
+      "blocks": [
+        {
+          "basmala": false,
+          "verses": [
+            {
+              "key": "2:255",
+              "text": "Allaahu laa ilaaha illaa huwal-Hayyul-Qayyoom. Laa ta'khudhuhu sinatun wa laa nawm. Lahu maa fis-samaawaati wa maa fil-ard. Man dhal-ladhee yashfa'u 'indahu illaa bi idhnih. Ya'lamu maa bayna aydeehim wa maa khalfahum, wa laa yuheetoona bishay'in min 'ilmihi illaa bimaa shaa'. Wasi'a kursiyyuhus-samaawaati wal-ard, wa laa ya'ooduhu hifdhuhumaa, wa huwal-'Aliyyul-'Adheem."
+            }
+          ]
+        }
+      ],
+      "text": "[2:255] Allaahu laa ilaaha illaa huwal-Hayyul-Qayyoom. Laa ta'khudhuhu sinatun wa laa nawm. Lahu maa fis-samaawaati wa maa fil-ard. Man dhal-ladhee yashfa'u 'indahu illaa bi idhnih. Ya'lamu maa bayna aydeehim wa maa khalfahum, wa laa yuheetoona bishay'in min 'ilmihi illaa bimaa shaa'. Wasi'a kursiyyuhus-samaawaati wal-ard, wa laa ya'ooduhu hifdhuhumaa, wa huwal-'Aliyyul-'Adheem."
+    },
+    "surah-112": {
+      "arabicSha256": "37447359d456392ecb36baaca092479a6ec08d6e5c89385742d83e901dc08943",
+      "blocks": [
+        {
+          "basmala": true,
+          "verses": [
+            {
+              "key": "112:1",
+              "text": "Qul huwallaahu ahad."
+            },
+            {
+              "key": "112:2",
+              "text": "Allaahus-samad."
+            },
+            {
+              "key": "112:3",
+              "text": "Lam yalid wa lam yoolad."
+            },
+            {
+              "key": "112:4",
+              "text": "Wa lam yakun lahu kufuwan ahad."
+            }
+          ]
+        }
+      ],
+      "text": "Bismillaahir-Rahmaanir-Raheem.\n[112:1] Qul huwallaahu ahad.\n[112:2] Allaahus-samad.\n[112:3] Lam yalid wa lam yoolad.\n[112:4] Wa lam yakun lahu kufuwan ahad."
+    },
+    "surah-113": {
+      "arabicSha256": "355ce482a7f3f87cb7061794c3b9fbcfb8d1c830b28b293d835bab530186dd66",
+      "blocks": [
+        {
+          "basmala": true,
+          "verses": [
+            {
+              "key": "113:1",
+              "text": "Qul a'oodhu birabbil-falaq."
+            },
+            {
+              "key": "113:2",
+              "text": "Min sharri maa khalaq."
+            },
+            {
+              "key": "113:3",
+              "text": "Wa min sharri ghaasiqin idhaa waqab."
+            },
+            {
+              "key": "113:4",
+              "text": "Wa min sharrin-naffaathaati fil-'uqad."
+            },
+            {
+              "key": "113:5",
+              "text": "Wa min sharri haasidin idhaa hasad."
+            }
+          ]
+        }
+      ],
+      "text": "Bismillaahir-Rahmaanir-Raheem.\n[113:1] Qul a'oodhu birabbil-falaq.\n[113:2] Min sharri maa khalaq.\n[113:3] Wa min sharri ghaasiqin idhaa waqab.\n[113:4] Wa min sharrin-naffaathaati fil-'uqad.\n[113:5] Wa min sharri haasidin idhaa hasad."
+    },
+    "surah-114": {
+      "arabicSha256": "dbe8bd9fb168c7f74898b4ce2da84cd24af7053425009f78a1ee352419570338",
+      "blocks": [
+        {
+          "basmala": true,
+          "verses": [
+            {
+              "key": "114:1",
+              "text": "Qul a'oodhu birabbin-naas."
+            },
+            {
+              "key": "114:2",
+              "text": "Malikin-naas."
+            },
+            {
+              "key": "114:3",
+              "text": "Ilaahin-naas."
+            },
+            {
+              "key": "114:4",
+              "text": "Min sharril-waswaasil-khannaas."
+            },
+            {
+              "key": "114:5",
+              "text": "Alladhee yuwaswisu fee sudoorin-naas."
+            },
+            {
+              "key": "114:6",
+              "text": "Minal-jinnati wan-naas."
+            }
+          ]
+        }
+      ],
+      "text": "Bismillaahir-Rahmaanir-Raheem.\n[114:1] Qul a'oodhu birabbin-naas.\n[114:2] Malikin-naas.\n[114:3] Ilaahin-naas.\n[114:4] Min sharril-waswaasil-khannaas.\n[114:5] Alladhee yuwaswisu fee sudoorin-naas.\n[114:6] Minal-jinnati wan-naas."
+    },
+    "morning-king": {
+      "arabicSha256": "e7d4bdd999312652a757e7e350cfff1e14bb5ee3b5a698c02df841d5fc658c0d",
+      "text": "Asbahnaa wa asbahal-mulku lillaah, wal-hamdu lillaah. Laa ilaaha illallaahu wahdahu laa shareeka lah, lahul-mulku wa lahul-hamd, wa huwa 'alaa kulli shay'in qadeer. Rabbi as'aluka khayra maa fee haadhal-yawmi wa khayra maa ba'dah, wa a'oodhu bika min sharri maa fee haadhal-yawmi wa sharri maa ba'dah. Rabbi a'oodhu bika minal-kasali wa soo'il-kibar. Rabbi a'oodhu bika min 'adhaabin fin-naari wa 'adhaabin fil-qabr."
+    },
+    "evening-king": {
+      "arabicSha256": "d2ad5239139421f2398d8ce8df826fbf7f3d9ee69805dc0ab5eb322950d15516",
+      "text": "Amsaynaa wa amsal-mulku lillaah, wal-hamdu lillaah. Laa ilaaha illallaahu wahdahu laa shareeka lah, lahul-mulku wa lahul-hamd, wa huwa 'alaa kulli shay'in qadeer. Rabbi as'aluka khayra maa fee haadhihil-laylati wa khayra maa ba'dahaa, wa a'oodhu bika min sharri maa fee haadhihil-laylati wa sharri maa ba'dahaa. Rabbi a'oodhu bika minal-kasali wa soo'il-kibar. Rabbi a'oodhu bika min 'adhaabin fin-naari wa 'adhaabin fil-qabr."
+    },
+    "morning-life": {
+      "arabicSha256": "3856c995e9b2ca38ad0ee3db2755286e08eb91b14717ab7223e9a5eb0c4ef1eb",
+      "text": "Allaahumma bika asbahnaa, wa bika amsaynaa, wa bika nahyaa, wa bika namootu, wa ilaykan-nushoor."
+    },
+    "evening-life": {
+      "arabicSha256": "414b11db40051fda620a7ae8338473f95e3eeb2e84860ae1f4168ee7e862a5df",
+      "text": "Allaahumma bika amsaynaa, wa bika asbahnaa, wa bika nahyaa, wa bika namootu, wa ilaykal-maseer."
+    },
+    "sayyid": {
+      "arabicSha256": "ee192996323bdea977b23cc8e73879e3454733d92116ab88c581f21d8ca25232",
+      "text": "Allaahumma anta rabbee, laa ilaaha illaa ant. Khalaqtanee wa ana 'abduk, wa ana 'alaa 'ahdika wa wa'dika mastata't. A'oodhu bika min sharri maa sana't. Aboo'u laka bini'matika 'alayya, wa aboo'u laka bidhanbee, faghfir lee, fa innahu laa yaghfirudh-dhunooba illaa ant."
+    },
+    "routine-afiya": {
+      "arabicSha256": "d5858892094785faf711e2c7cab64cdfd4fb706a363bdc006a36016429790176",
+      "text": "Allaahumma innee as'alukal-'aafiyata fid-dunyaa wal-aakhirah. Allaahumma innee as'alukal-'afwa wal-'aafiyata fee deenee wa dunyaaya wa ahlee wa maalee. Allaahummastur 'awraatee, wa aamin raw'aatee. Allaahummahfadhnee min bayni yadayya, wa min khalfee, wa 'an yameenee, wa 'an shimaalee, wa min fawqee, wa a'oodhu bi'adhamatika an ughtaala min tahtee."
+    },
+    "routine-body": {
+      "arabicSha256": "e795306d9dad447a5fb0bfbf4a8962f1dffa4fc5679d7ce90f3f0d1b6f306c3f",
+      "text": "Allaahumma 'aafinee fee badanee. Allaahumma 'aafinee fee sam'ee. Allaahumma 'aafinee fee basaree. Laa ilaaha illaa ant."
+    },
+    "routine-poverty": {
+      "arabicSha256": "7c09113f13002b54ef1cec0ad5ef9c6ceac55d34040ec605c7a21f3206e53df6",
+      "text": "Allaahumma innee a'oodhu bika minal-kufri wal-faqr, wa a'oodhu bika min 'adhaabil-qabr. Laa ilaaha illaa ant."
+    },
+    "morning-fater": {
+      "arabicSha256": "17d6d9e44297c05268392f0d5b9891487a359d967315c8d744b70bdfa2f067a7",
+      "text": "Allaahumma faatiras-samaawaati wal-ard, 'aalimal-ghaybi wash-shahaadah, rabba kulli shay'in wa maleekah. Ashhadu an laa ilaaha illaa ant. A'oodhu bika min sharri nafsee, wa sharrish-shaytaani wa shirkih, wa an aqtarifa 'alaa nafsee soo'an aw ajurrahu ilaa Muslim."
+    },
+    "protection": {
+      "arabicSha256": "11e4592ac3caf3d5485a59b622c15b29261664528eea8aea01cd8dab19cd5e7e",
+      "text": "Bismillaahil-ladhee laa yadurru ma'asmihi shay'un fil-ardi wa laa fis-samaa', wa huwas-samee'ul-'aleem."
+    },
+    "routine-ridha": {
+      "arabicSha256": "f5578d12704a31bf76880f7f5766ee1e6e12fd6259a74df34d56d82db715690f",
+      "text": "Radeetu billaahi rabban, wa bil-Islaami deenan, wa bi-Muhammadin sallallaahu 'alayhi wa sallama nabiyyaa."
+    },
+    "routine-witness-morning": {
+      "arabicSha256": "b9083026c02a0b3350ee8dc9cb8203c60c650efdc8980b397a9c66a19e710cba",
+      "text": "Allaahumma innee asbahtu ushhiduka, wa ushhidu hamalata 'arshika, wa malaa'ikataka, wa jamee'a khalqika, bi annaka antallaahu laa ilaaha illaa anta wahdaka laa shareeka lak, wa anna Muhammadan 'abduka wa rasooluk."
+    },
+    "routine-witness-evening": {
+      "arabicSha256": "9853a191e750510f305688eae3f2a688119509ecf2d4b2919ead561e0003a98c",
+      "text": "Allaahumma innee amsaytu ushhiduka, wa ushhidu hamalata 'arshika, wa malaa'ikataka, wa jamee'a khalqika, annaka antallaahu laa ilaaha illaa anta wahdaka laa shareeka lak, wa anna Muhammadan 'abduka wa rasooluk."
+    },
+    "routine-thanks-morning": {
+      "arabicSha256": "3a7776e368fba73eba1955caf817a7ec9a1a66762a8e5145c1c1cd7086ad3b86",
+      "text": "Allaahumma maa asbaha bee min ni'matin aw bi ahadin min khalqika faminka wahdaka laa shareeka lak, falakal-hamdu wa lakash-shukr."
+    },
+    "routine-thanks-evening": {
+      "arabicSha256": "0a126249abdca152b01ba2665367661019a5ad17732258752be80c28f39491d2",
+      "text": "Allaahumma maa amsaa bee min ni'matin aw bi ahadin min khalqika faminka wahdaka laa shareeka lak, falakal-hamdu wa lakash-shukr."
+    },
+    "routine-fitra-morning": {
+      "arabicSha256": "fc46a02c7dc0e6e8b357ab8f3fe9ffae9ce17c81aa00c886b386ec4a13fd227d",
+      "text": "Asbahnaa 'alaa fitratil-Islaam, wa 'alaa kalimatil-ikhlaas, wa 'alaa deeni nabiyyinaa Muhammadin sallallaahu 'alayhi wa sallam, wa 'alaa millati abeenaa Ibraaheema haneefan Musliman wa maa kaana minal-mushrikeen."
+    },
+    "routine-fitra-evening": {
+      "arabicSha256": "f08a4ed52c6bd22fff86c02173aca5df748f5395de55439ff131db8b04843db0",
+      "text": "Amsaynaa 'alaa fitratil-Islaam, wa 'alaa kalimatil-ikhlaas, wa 'alaa deeni nabiyyinaa Muhammadin sallallaahu 'alayhi wa sallam, wa 'alaa millati abeenaa Ibraaheema haneefan Musliman wa maa kaana minal-mushrikeen."
+    },
+    "routine-hayy": {
+      "arabicSha256": "7fff4e2d98262e4830f9279ef9e6e8809603cbd2717bdc4381f8783533079277",
+      "text": "Yaa Hayyu yaa Qayyoom, birahmatika astagheeth. Aslih lee sha'nee kullahu, wa laa takilnee ilaa nafsee tarfata 'ayn."
+    },
+    "morning-tasbih": {
+      "arabicSha256": "ebb3c7dfdab1e22c2860d1b4f92c1c82d041795a652a8156ac90e95807755ec4",
+      "text": "Subhaanallaahi wa bihamdih."
+    },
+    "routine-tahlil10": {
+      "arabicSha256": "af3597c05b7b01bcfb76b7da036a41416ad03b7d411ddb3180d83d91dceaf840",
+      "text": "Laa ilaaha illallaahu wahdahu laa shareeka lah, lahul-mulku wa lahul-hamd, wa huwa 'alaa kulli shay'in qadeer."
+    },
+    "routine-tahlil100": {
+      "arabicSha256": "af3597c05b7b01bcfb76b7da036a41416ad03b7d411ddb3180d83d91dceaf840",
+      "text": "Laa ilaaha illallaahu wahdahu laa shareeka lah, lahul-mulku wa lahul-hamd, wa huwa 'alaa kulli shay'in qadeer."
+    },
+    "routine-creation": {
+      "arabicSha256": "cb490b8604e99f9727a142fb4ba6d6ef5ef858f6eebece1ee179b1dc8f105137",
+      "text": "Subhaanallaahi wa bihamdih, 'adada khalqih, wa ridaa nafsih, wa zinata 'arshih, wa midaada kalimaatih."
+    },
+    "routine-fajr-knowledge": {
+      "arabicSha256": "5c74693771523715680571feb6843b8d2fbaf56d312f81dcf59ec5a0a968cf33",
+      "text": "Allaahumma innee as'aluka 'ilman naafi'an, wa rizqan tayyiban, wa 'amalan mutaqabbalaa."
+    },
+    "routine-words-evening": {
+      "arabicSha256": "30e0e3b7d7ba435d11a0b3acefe56df205d2bea5e64bce64d93559746ac4e9d2",
+      "text": "A'oodhu bikalimaatillaahit-taammaati min sharri maa khalaq."
+    },
+    "sleep-name": {
+      "arabicSha256": "654f5adca985550602b79feb72ef6a211bf49c6aab78afca71b29679388b8522",
+      "text": "Bismikallaahumma amootu wa ahyaa."
+    },
+    "wakeup": {
+      "arabicSha256": "af74f57d89cd4062d918b4aee7b1ef6917848fdc27492fdfebe520e870622c6b",
+      "text": "Al-hamdu lillaahil-ladhee ahyaanaa ba'da maa amaatanaa, wa ilayhin-nushoor."
+    },
+    "prayer-istighfar": {
+      "arabicSha256": "9ef913a347672f03b6c0b851c3a052ebd52c61a9ff40c76f1e76d932d031117f",
+      "text": "Astaghfirullaah."
+    },
+    "prayer-salam": {
+      "arabicSha256": "3840c67e4e5a5e049559fab53d9d6c6f134a9da0104eefb5b918eb48ee2f030d",
+      "text": "Allaahumma antas-salaamu wa minkas-salaam, tabaarakta dhal-jalaali wal-ikraam."
+    },
+    "prayer-subhan": {
+      "arabicSha256": "b5e0d9085ab0f48ddd30e15594aaa8da28b0e9faa07e73062bbb09b2eaf5dac3",
+      "text": "Subhaanallaah."
+    },
+    "prayer-hamd": {
+      "arabicSha256": "64d2fd2e2ac9ee8cfa866e3c68772059a1818ce6beb1703641dccf011b486c11",
+      "text": "Al-hamdu lillaah."
+    },
+    "prayer-akbar": {
+      "arabicSha256": "8815ef4c70eedd27151d862434eaf3a8f930e5b44b54909fba74817b32b7cca8",
+      "text": "Allaahu akbar."
+    },
+    "prayer-tahlil": {
+      "arabicSha256": "6d4e93101c3d3e9ffe9b4ff86ed30704501cedb4e3971491fb8ed80cba13283c",
+      "text": "Laa ilaaha illallaahu wahdahu laa shareeka lah, lahul-mulku wa lahul-hamd, wa huwa 'alaa kulli shay'in qadeer."
+    },
+    "prayer-help": {
+      "arabicSha256": "8c02873d0701f4dd02fb90b3d1c5935b5ce57bdc6777ddcbbff040f78e00a931",
+      "text": "Allaahumma a'innee 'alaa dhikrika, wa shukrika, wa husni 'ibaadatik."
+    },
+    "food-forgot": {
+      "arabicSha256": "9a2b151a0878313ce61e29d1a327fc67973ed0b2917c484e9d86a001a84a4f9c",
+      "text": "Bismillaahi awwalahu wa aakhirah."
+    },
+    "food-end": {
+      "arabicSha256": "d1ec0f02fac8a4ed9a8160a27dd105fbe0ea653844a6701e645019baae888d6d",
+      "text": "Al-hamdu lillaahil-ladhee at'amanee haadhat-ta'aama wa razaqaneehi min ghayri hawlin minnee wa laa quwwah."
+    },
+    "leave-home": {
+      "arabicSha256": "33e98e886d67e66657f1471e5cc0444be8b7153efffdae7a087b2e9a8977e351",
+      "text": "Bismillaah, tawakkaltu 'alallaah, laa hawla wa laa quwwata illaa billaah."
+    },
+    "mosque-enter": {
+      "arabicSha256": "ba5d9d688cc88dfd23eb9d17f413355f889801ddceb508c4adf94b44c51bc069",
+      "text": "Allaahummaftah lee abwaaba rahmatik."
+    },
+    "mosque-leave": {
+      "arabicSha256": "08cc07bfe5d00b020184279df823c77bf15f2dd4d154e4cc0ae155ea940ca788",
+      "text": "Allaahumma innee as'aluka min fadlik."
+    },
+    "bathroom-enter": {
+      "arabicSha256": "6271ced14d2f1a8bef97eaeade0cbefce39669f7249301c3a85f91684c1987af",
+      "text": "Allaahumma innee a'oodhu bika minal-khubuthi wal-khabaa'ith."
+    },
+    "bathroom-leave": {
+      "arabicSha256": "b9c094071a52749920a3e0624d2f980951915db284649c3ae052a6e4c8841468",
+      "text": "Ghufraanak."
+    },
+    "worry": {
+      "arabicSha256": "1c1250d440751ce835e6c40ed3f6c1dc1accd3b2f10486d94f8a3f9fa2903c3c",
+      "text": "Allaahumma innee a'oodhu bika minal-hammi wal-hazan, wal-'ajzi wal-kasal, wal-jubni wal-bukhl, wa dala'id-dayni wa ghalabatir-rijaal."
+    },
+    "guidance": {
+      "arabicSha256": "64b13693f36e4cf50f626b68d7bc11b89ac2f11ddfb8b9d4eefc2fe47586d4cb",
+      "text": "Allaahumma innee as'alukal-hudaa wat-tuqaa wal-'afaafa wal-ghinaa."
+    },
+    "healing": {
+      "arabicSha256": "dbd251a88f2560635eec63add3143213c98408d64b1c1243f077c642bfb6158a",
+      "text": "Allaahumma rabban-naasi adh-hibil-ba's, ishfihi wa antash-shaafee, laa shifaa'a illaa shifaa'uk, shifaa'an laa yughaadiru saqamaa."
+    },
+    "pardon": {
+      "arabicSha256": "f8b8f765386d060fe6a207ac05d5f94b9a721c41745ad65a5ba906a12c5ac573",
+      "text": "Allaahumma innaka 'afuwwun tuhibbul-'afwa fa'fu 'annee."
+    },
+    "sleep-subhan": {
+      "arabicSha256": "b5e0d9085ab0f48ddd30e15594aaa8da28b0e9faa07e73062bbb09b2eaf5dac3",
+      "text": "Subhaanallaah."
+    },
+    "sleep-hamd": {
+      "arabicSha256": "64d2fd2e2ac9ee8cfa866e3c68772059a1818ce6beb1703641dccf011b486c11",
+      "text": "Al-hamdu lillaah."
+    },
+    "sleep-akbar": {
+      "arabicSha256": "8815ef4c70eedd27151d862434eaf3a8f930e5b44b54909fba74817b32b7cca8",
+      "text": "Allaahu akbar."
+    },
+    "kursi": {
+      "arabicSha256": "c826c8de989a783d07855b47df70889895bfae4e99f2dbd39fdae5e2911f11d2",
+      "blocks": [
+        {
+          "basmala": false,
+          "verses": [
+            {
+              "key": "2:255",
+              "text": "Allaahu laa ilaaha illaa huwal-Hayyul-Qayyoom. Laa ta'khudhuhu sinatun wa laa nawm. Lahu maa fis-samaawaati wa maa fil-ard. Man dhal-ladhee yashfa'u 'indahu illaa bi idhnih. Ya'lamu maa bayna aydeehim wa maa khalfahum, wa laa yuheetoona bishay'in min 'ilmihi illaa bimaa shaa'. Wasi'a kursiyyuhus-samaawaati wal-ard, wa laa ya'ooduhu hifdhuhumaa, wa huwal-'Aliyyul-'Adheem."
+            }
+          ]
+        }
+      ],
+      "text": "[2:255] Allaahu laa ilaaha illaa huwal-Hayyul-Qayyoom. Laa ta'khudhuhu sinatun wa laa nawm. Lahu maa fis-samaawaati wa maa fil-ard. Man dhal-ladhee yashfa'u 'indahu illaa bi idhnih. Ya'lamu maa bayna aydeehim wa maa khalfahum, wa laa yuheetoona bishay'in min 'ilmihi illaa bimaa shaa'. Wasi'a kursiyyuhus-samaawaati wal-ard, wa laa ya'ooduhu hifdhuhumaa, wa huwal-'Aliyyul-'Adheem."
+    },
+    "baqara-last": {
+      "arabicSha256": "d920060cf204fb33d8ea51bd643bfdc37920cafbb05ac03df93ce993e9ca8875",
+      "blocks": [
+        {
+          "basmala": false,
+          "verses": [
+            {
+              "key": "2:285",
+              "text": "Aamanar-rasoolu bimaa unzila ilayhi min rabbihi wal-mu'minoon. Kullun aamana billaahi wa malaa'ikatihi wa kutubihi wa rusulih. Laa nufarriqu bayna ahadin min rusulih. Wa qaaloo sami'naa wa ata'naa, ghufraanaka rabbanaa wa ilaykal-maseer."
+            },
+            {
+              "key": "2:286",
+              "text": "Laa yukallifullaahu nafsan illaa wus'ahaa. Lahaa maa kasabat wa 'alayhaa maktasabat. Rabbanaa laa tu'aakhidhnaa in naseenaa aw akhta'naa. Rabbanaa wa laa tahmil 'alaynaa isran kamaa hamaltahu 'alal-ladheena min qablinaa. Rabbanaa wa laa tuhammilnaa maa laa taaqata lanaa bih. Wa'fu 'annaa, waghfir lanaa, warhamnaa. Anta mawlaanaa fansurnaa 'alal-qawmil-kaafireen."
+            }
+          ]
+        }
+      ],
+      "text": "[2:285] Aamanar-rasoolu bimaa unzila ilayhi min rabbihi wal-mu'minoon. Kullun aamana billaahi wa malaa'ikatihi wa kutubihi wa rusulih. Laa nufarriqu bayna ahadin min rusulih. Wa qaaloo sami'naa wa ata'naa, ghufraanaka rabbanaa wa ilaykal-maseer.\n[2:286] Laa yukallifullaahu nafsan illaa wus'ahaa. Lahaa maa kasabat wa 'alayhaa maktasabat. Rabbanaa laa tu'aakhidhnaa in naseenaa aw akhta'naa. Rabbanaa wa laa tahmil 'alaynaa isran kamaa hamaltahu 'alal-ladheena min qablinaa. Rabbanaa wa laa tuhammilnaa maa laa taaqata lanaa bih. Wa'fu 'annaa, waghfir lanaa, warhamnaa. Anta mawlaanaa fansurnaa 'alal-qawmil-kaafireen."
+    },
+    "quran-2-201": {
+      "arabicSha256": "e8201ab9bf74ac0e842ace8c4240f68389c8b78a1f7baa4ccde904154ae985d0",
+      "blocks": [
+        {
+          "basmala": false,
+          "verses": [
+            {
+              "key": "2:201",
+              "text": "Wa minhum man yaqoolu rabbanaa aatinaa fid-dunyaa hasanatan wa fil-aakhirati hasanatan wa qinaa 'adhaaban-naar."
+            }
+          ]
+        }
+      ],
+      "text": "[2:201] Wa minhum man yaqoolu rabbanaa aatinaa fid-dunyaa hasanatan wa fil-aakhirati hasanatan wa qinaa 'adhaaban-naar."
+    },
+    "quran-2-286": {
+      "arabicSha256": "7e3b683bb87f716f777ab6f75d6bd84cf723c741fc8288283d81ac4552ca65ff",
+      "blocks": [
+        {
+          "basmala": false,
+          "verses": [
+            {
+              "key": "2:286",
+              "text": "Laa yukallifullaahu nafsan illaa wus'ahaa. Lahaa maa kasabat wa 'alayhaa maktasabat. Rabbanaa laa tu'aakhidhnaa in naseenaa aw akhta'naa. Rabbanaa wa laa tahmil 'alaynaa isran kamaa hamaltahu 'alal-ladheena min qablinaa. Rabbanaa wa laa tuhammilnaa maa laa taaqata lanaa bih. Wa'fu 'annaa, waghfir lanaa, warhamnaa. Anta mawlaanaa fansurnaa 'alal-qawmil-kaafireen."
+            }
+          ]
+        }
+      ],
+      "text": "[2:286] Laa yukallifullaahu nafsan illaa wus'ahaa. Lahaa maa kasabat wa 'alayhaa maktasabat. Rabbanaa laa tu'aakhidhnaa in naseenaa aw akhta'naa. Rabbanaa wa laa tahmil 'alaynaa isran kamaa hamaltahu 'alal-ladheena min qablinaa. Rabbanaa wa laa tuhammilnaa maa laa taaqata lanaa bih. Wa'fu 'annaa, waghfir lanaa, warhamnaa. Anta mawlaanaa fansurnaa 'alal-qawmil-kaafireen."
+    },
+    "quran-3-8": {
+      "arabicSha256": "62a4307c2fe5d6e8be0b4df3f0f2a6ad24736477a01d8b8d66b91a43def47d4c",
+      "blocks": [
+        {
+          "basmala": false,
+          "verses": [
+            {
+              "key": "3:8",
+              "text": "Rabbanaa laa tuzigh quloobanaa ba'da idh hadaytanaa wa hab lanaa min ladunka rahmah. Innaka antal-Wahhaab."
+            }
+          ]
+        }
+      ],
+      "text": "[3:8] Rabbanaa laa tuzigh quloobanaa ba'da idh hadaytanaa wa hab lanaa min ladunka rahmah. Innaka antal-Wahhaab."
+    },
+    "quran-3-9": {
+      "arabicSha256": "c241ca76bf66d0013069974f88e8f75c86560df6ce162e195ee9603f7772f2c5",
+      "blocks": [
+        {
+          "basmala": false,
+          "verses": [
+            {
+              "key": "3:9",
+              "text": "Rabbanaa innaka jaami'un-naasi liyawmin laa rayba feeh. Innallaaha laa yukhliful-mee'aad."
+            }
+          ]
+        }
+      ],
+      "text": "[3:9] Rabbanaa innaka jaami'un-naasi liyawmin laa rayba feeh. Innallaaha laa yukhliful-mee'aad."
+    },
+    "quran-3-16": {
+      "arabicSha256": "d7be5d6491e6781d09ec1f698bbee31b26bd03d91e841f9a6bda1e88c2a79319",
+      "blocks": [
+        {
+          "basmala": false,
+          "verses": [
+            {
+              "key": "3:16",
+              "text": "Alladheena yaqooloona rabbanaa innanaa aamannaa faghfir lanaa dhunoobanaa wa qinaa 'adhaaban-naar."
+            }
+          ]
+        }
+      ],
+      "text": "[3:16] Alladheena yaqooloona rabbanaa innanaa aamannaa faghfir lanaa dhunoobanaa wa qinaa 'adhaaban-naar."
+    },
+    "quran-3-53": {
+      "arabicSha256": "730912fdbaf142440e8e4fbb5a57207fadd2b7103842e0bbd25364ef795f01c6",
+      "blocks": [
+        {
+          "basmala": false,
+          "verses": [
+            {
+              "key": "3:53",
+              "text": "Rabbanaa aamannaa bimaa anzalta wattaba'nar-rasoola faktubnaa ma'ash-shaahideen."
+            }
+          ]
+        }
+      ],
+      "text": "[3:53] Rabbanaa aamannaa bimaa anzalta wattaba'nar-rasoola faktubnaa ma'ash-shaahideen."
+    },
+    "quran-3-147": {
+      "arabicSha256": "46243800ba037e6888029dd2d24982cdd0ab7f041a61cf259165ab4ee1a03287",
+      "blocks": [
+        {
+          "basmala": false,
+          "verses": [
+            {
+              "key": "3:147",
+              "text": "Wa maa kaana qawlahum illaa an qaaloo rabbanaghfir lanaa dhunoobanaa wa israafanaa fee amrinaa wa thabbit aqdaamanaa wansurnaa 'alal-qawmil-kaafireen."
+            }
+          ]
+        }
+      ],
+      "text": "[3:147] Wa maa kaana qawlahum illaa an qaaloo rabbanaghfir lanaa dhunoobanaa wa israafanaa fee amrinaa wa thabbit aqdaamanaa wansurnaa 'alal-qawmil-kaafireen."
+    },
+    "quran-3-193": {
+      "arabicSha256": "bc0db947a9236f3f1178dfb7547cf6eb6a49f7793c98263839747673e672fc15",
+      "blocks": [
+        {
+          "basmala": false,
+          "verses": [
+            {
+              "key": "3:193",
+              "text": "Rabbanaa innanaa sami'naa munaadiyan yunaadee lil-eemaani an aaminoo birabbikum fa aamannaa. Rabbanaa faghfir lanaa dhunoobanaa wa kaffir 'annaa sayyi'aatinaa wa tawaffanaa ma'al-abraar."
+            }
+          ]
+        }
+      ],
+      "text": "[3:193] Rabbanaa innanaa sami'naa munaadiyan yunaadee lil-eemaani an aaminoo birabbikum fa aamannaa. Rabbanaa faghfir lanaa dhunoobanaa wa kaffir 'annaa sayyi'aatinaa wa tawaffanaa ma'al-abraar."
+    },
+    "quran-3-194": {
+      "arabicSha256": "050f77e4f250326d2081485bac14fc73870a5927e2566a4d3087b06a37cc254f",
+      "blocks": [
+        {
+          "basmala": false,
+          "verses": [
+            {
+              "key": "3:194",
+              "text": "Rabbanaa wa aatinaa maa wa'adtanaa 'alaa rusulika wa laa tukhzinaa yawmal-qiyaamah. Innaka laa tukhliful-mee'aad."
+            }
+          ]
+        }
+      ],
+      "text": "[3:194] Rabbanaa wa aatinaa maa wa'adtanaa 'alaa rusulika wa laa tukhzinaa yawmal-qiyaamah. Innaka laa tukhliful-mee'aad."
+    },
+    "quran-7-23": {
+      "arabicSha256": "a57d400df1b54457b00d95adeba422c36e46219d39a766bd5989ace423ab986e",
+      "blocks": [
+        {
+          "basmala": false,
+          "verses": [
+            {
+              "key": "7:23",
+              "text": "Qaalaa rabbanaa dhalamnaa anfusanaa wa in lam taghfir lanaa wa tarhamnaa lanakoonanna minal-khaasireen."
+            }
+          ]
+        }
+      ],
+      "text": "[7:23] Qaalaa rabbanaa dhalamnaa anfusanaa wa in lam taghfir lanaa wa tarhamnaa lanakoonanna minal-khaasireen."
+    },
+    "quran-7-126": {
+      "arabicSha256": "fe0fdca7d325defb87d8b04e85c5a5fc3ff519a076ecbdc1f1e1a6701fa485d7",
+      "blocks": [
+        {
+          "basmala": false,
+          "verses": [
+            {
+              "key": "7:126",
+              "text": "Wa maa tanqimu minnaa illaa an aamannaa bi aayaati rabbinaa lammaa jaa'atnaa. Rabbanaa afrigh 'alaynaa sabran wa tawaffanaa Muslimeen."
+            }
+          ]
+        }
+      ],
+      "text": "[7:126] Wa maa tanqimu minnaa illaa an aamannaa bi aayaati rabbinaa lammaa jaa'atnaa. Rabbanaa afrigh 'alaynaa sabran wa tawaffanaa Muslimeen."
+    },
+    "quran-14-40": {
+      "arabicSha256": "dc36e7226fee20216e843de872c7e946339af162260d1fbfdeef3e63451eb9d4",
+      "blocks": [
+        {
+          "basmala": false,
+          "verses": [
+            {
+              "key": "14:40",
+              "text": "Rabbij'alnee muqeemas-salaati wa min dhurriyyatee. Rabbanaa wa taqabbal du'aa'."
+            }
+          ]
+        }
+      ],
+      "text": "[14:40] Rabbij'alnee muqeemas-salaati wa min dhurriyyatee. Rabbanaa wa taqabbal du'aa'."
+    },
+    "quran-14-41": {
+      "arabicSha256": "074285ce00984cfe0e52c6913690d5b96357b95bf3b3edd0d507b8b688bddab4",
+      "blocks": [
+        {
+          "basmala": false,
+          "verses": [
+            {
+              "key": "14:41",
+              "text": "Rabbanaghfir lee wa liwaalidayya wa lil-mu'mineena yawma yaqoomul-hisaab."
+            }
+          ]
+        }
+      ],
+      "text": "[14:41] Rabbanaghfir lee wa liwaalidayya wa lil-mu'mineena yawma yaqoomul-hisaab."
+    },
+    "quran-17-24": {
+      "arabicSha256": "e9a5277b26023b4a29c6f9d0286daeae79918cc3b8ae3c0ee2cdc98c549f9982",
+      "blocks": [
+        {
+          "basmala": false,
+          "verses": [
+            {
+              "key": "17:24",
+              "text": "Wakhfid lahumaa janaahadh-dhulli minar-rahmati wa qul rabbirhamhumaa kamaa rabbayaanee sagheeraa."
+            }
+          ]
+        }
+      ],
+      "text": "[17:24] Wakhfid lahumaa janaahadh-dhulli minar-rahmati wa qul rabbirhamhumaa kamaa rabbayaanee sagheeraa."
+    },
+    "quran-18-10": {
+      "arabicSha256": "e9c64f0de27d488290bc53b98ad06442a9f3da1ae07e042d43f7ea8ac6d24b9c",
+      "blocks": [
+        {
+          "basmala": false,
+          "verses": [
+            {
+              "key": "18:10",
+              "text": "Idh awal-fityatu ilal-kahfi faqaaloo rabbanaa aatinaa min ladunka rahmatan wa hayyi' lanaa min amrinaa rashadaa."
+            }
+          ]
+        }
+      ],
+      "text": "[18:10] Idh awal-fityatu ilal-kahfi faqaaloo rabbanaa aatinaa min ladunka rahmatan wa hayyi' lanaa min amrinaa rashadaa."
+    },
+    "quran-20-114": {
+      "arabicSha256": "2e7ab486924b0ba8d62465851de8571d75b05f553e636b20d18321e68e4662ff",
+      "blocks": [
+        {
+          "basmala": false,
+          "verses": [
+            {
+              "key": "20:114",
+              "text": "Fata'aalallaahul-Malikul-Haqq. Wa laa ta'jal bil-Qur'aani min qabli an yuqdaa ilayka wahyuhu wa qul rabbi zidnee 'ilmaa."
+            }
+          ]
+        }
+      ],
+      "text": "[20:114] Fata'aalallaahul-Malikul-Haqq. Wa laa ta'jal bil-Qur'aani min qabli an yuqdaa ilayka wahyuhu wa qul rabbi zidnee 'ilmaa."
+    },
+    "quran-21-83": {
+      "arabicSha256": "9c226d31f8280a8ad4a28a9105db8bc0275eca6df923dad0fefe539b416f9516",
+      "blocks": [
+        {
+          "basmala": false,
+          "verses": [
+            {
+              "key": "21:83",
+              "text": "Wa Ayyooba idh naadaa rabbahu annee massaniyad-durru wa anta arhamur-raahimeen."
+            }
+          ]
+        }
+      ],
+      "text": "[21:83] Wa Ayyooba idh naadaa rabbahu annee massaniyad-durru wa anta arhamur-raahimeen."
+    },
+    "quran-21-87": {
+      "arabicSha256": "6ae9ff8cc324b8b48ed0d3a24d696489d20e92ffdcb6e931cf290d02cd71d3c4",
+      "blocks": [
+        {
+          "basmala": false,
+          "verses": [
+            {
+              "key": "21:87",
+              "text": "Wa dhan-Nooni idh dhahaba mughaadiban fadhanna an lan naqdira 'alayhi fanaadaa fidh-dhulumaati an laa ilaaha illaa anta subhaanaka innee kuntu minadh-dhaalimeen."
+            }
+          ]
+        }
+      ],
+      "text": "[21:87] Wa dhan-Nooni idh dhahaba mughaadiban fadhanna an lan naqdira 'alayhi fanaadaa fidh-dhulumaati an laa ilaaha illaa anta subhaanaka innee kuntu minadh-dhaalimeen."
+    },
+    "quran-23-97": {
+      "arabicSha256": "bfec1d0c986dccf7e8dc9b83273bf7fa77d8c7897be64380f81ad712900d12d2",
+      "blocks": [
+        {
+          "basmala": false,
+          "verses": [
+            {
+              "key": "23:97",
+              "text": "Wa qul rabbi a'oodhu bika min hamazaatish-shayaateen."
+            }
+          ]
+        }
+      ],
+      "text": "[23:97] Wa qul rabbi a'oodhu bika min hamazaatish-shayaateen."
+    },
+    "quran-23-109": {
+      "arabicSha256": "275eed61b0fa4752fd672292582c5b9223812739cb10ad27d4e8b899326fafa2",
+      "blocks": [
+        {
+          "basmala": false,
+          "verses": [
+            {
+              "key": "23:109",
+              "text": "Innahu kaana fareequn min 'ibaadee yaqooloona rabbanaa aamannaa faghfir lanaa warhamnaa wa anta khayrur-raahimeen."
+            }
+          ]
+        }
+      ],
+      "text": "[23:109] Innahu kaana fareequn min 'ibaadee yaqooloona rabbanaa aamannaa faghfir lanaa warhamnaa wa anta khayrur-raahimeen."
+    },
+    "quran-23-118": {
+      "arabicSha256": "bd9b995c5888bc0b4587ce60e80c8f9e3d2c4d98ce4462e75d20b4c53914b1e7",
+      "blocks": [
+        {
+          "basmala": false,
+          "verses": [
+            {
+              "key": "23:118",
+              "text": "Wa qul rabbighfir warham wa anta khayrur-raahimeen."
+            }
+          ]
+        }
+      ],
+      "text": "[23:118] Wa qul rabbighfir warham wa anta khayrur-raahimeen."
+    },
+    "quran-25-65": {
+      "arabicSha256": "9fb66d9ffdb6c6e562fb37c2af0e26dfdf9c5681979b0de31f297eb5f745b6ee",
+      "blocks": [
+        {
+          "basmala": false,
+          "verses": [
+            {
+              "key": "25:65",
+              "text": "Walladheena yaqooloona rabbanasrif 'annaa 'adhaaba Jahannam. Inna 'adhaabahaa kaana gharaamaa."
+            }
+          ]
+        }
+      ],
+      "text": "[25:65] Walladheena yaqooloona rabbanasrif 'annaa 'adhaaba Jahannam. Inna 'adhaabahaa kaana gharaamaa."
+    },
+    "quran-25-74": {
+      "arabicSha256": "4b38d9ddff8b05ed04ab3d262a8ac74e29635482a707b605e8dab4ad1b4afe1a",
+      "blocks": [
+        {
+          "basmala": false,
+          "verses": [
+            {
+              "key": "25:74",
+              "text": "Walladheena yaqooloona rabbanaa hab lanaa min azwaajinaa wa dhurriyyaatinaa qurrata a'yunin waj'alnaa lil-muttaqeena imaamaa."
+            }
+          ]
+        }
+      ],
+      "text": "[25:74] Walladheena yaqooloona rabbanaa hab lanaa min azwaajinaa wa dhurriyyaatinaa qurrata a'yunin waj'alnaa lil-muttaqeena imaamaa."
+    },
+    "quran-27-19": {
+      "arabicSha256": "5c37a83b01ee1282100ee1a43f668992cad04ff81265c79f0d5fa08d57cc0de2",
+      "blocks": [
+        {
+          "basmala": false,
+          "verses": [
+            {
+              "key": "27:19",
+              "text": "Fatabassama daahikan min qawlihaa wa qaala rabbi awzi'nee an ashkura ni'matakal-latee an'amta 'alayya wa 'alaa waalidayya wa an a'mala saalihan tardaahu wa adkhilnee birahmatika fee 'ibaadikas-saaliheen."
+            }
+          ]
+        }
+      ],
+      "text": "[27:19] Fatabassama daahikan min qawlihaa wa qaala rabbi awzi'nee an ashkura ni'matakal-latee an'amta 'alayya wa 'alaa waalidayya wa an a'mala saalihan tardaahu wa adkhilnee birahmatika fee 'ibaadikas-saaliheen."
+    },
+    "quran-28-16": {
+      "arabicSha256": "9e9bf3600a4a8b376ae28798b599bc0e3d84e5ea3897302c4b41fa04ac010f1e",
+      "blocks": [
+        {
+          "basmala": false,
+          "verses": [
+            {
+              "key": "28:16",
+              "text": "Qaala rabbi innee dhalamtu nafsee faghfir lee faghafara lah. Innahu huwal-Ghafoorur-Raheem."
+            }
+          ]
+        }
+      ],
+      "text": "[28:16] Qaala rabbi innee dhalamtu nafsee faghfir lee faghafara lah. Innahu huwal-Ghafoorur-Raheem."
+    },
+    "quran-28-24": {
+      "arabicSha256": "4e64a30578e0cdf4f61dd9a088bf47dc4d03db2c09b2aa392bd3a01c3a5f1e5b",
+      "blocks": [
+        {
+          "basmala": false,
+          "verses": [
+            {
+              "key": "28:24",
+              "text": "Fasaqaa lahumaa thumma tawallaa iladh-dhilli faqaala rabbi innee limaa anzalta ilayya min khayrin faqeer."
+            }
+          ]
+        }
+      ],
+      "text": "[28:24] Fasaqaa lahumaa thumma tawallaa iladh-dhilli faqaala rabbi innee limaa anzalta ilayya min khayrin faqeer."
+    },
+    "quran-46-15": {
+      "arabicSha256": "3c113c5c9529b540fdb922334ce2e27e141604ce4bc6a12e7b37b8d81b319ab2",
+      "blocks": [
+        {
+          "basmala": false,
+          "verses": [
+            {
+              "key": "46:15",
+              "text": "Wa wassaynal-insaana biwaalidayhi ihsaanaa. Hamalat-hu ummuhu kurhan wa wada'at-hu kurhaa. Wa hamluhu wa fisaaluhu thalaathoona shahraa. Hattaa idhaa balagha ashuddahu wa balagha arba'eena sanatan qaala rabbi awzi'nee an ashkura ni'matakal-latee an'amta 'alayya wa 'alaa waalidayya wa an a'mala saalihan tardaahu wa aslih lee fee dhurriyyatee. Innee tubtu ilayka wa innee minal-Muslimeen."
+            }
+          ]
+        }
+      ],
+      "text": "[46:15] Wa wassaynal-insaana biwaalidayhi ihsaanaa. Hamalat-hu ummuhu kurhan wa wada'at-hu kurhaa. Wa hamluhu wa fisaaluhu thalaathoona shahraa. Hattaa idhaa balagha ashuddahu wa balagha arba'eena sanatan qaala rabbi awzi'nee an ashkura ni'matakal-latee an'amta 'alayya wa 'alaa waalidayya wa an a'mala saalihan tardaahu wa aslih lee fee dhurriyyatee. Innee tubtu ilayka wa innee minal-Muslimeen."
+    },
+    "quran-59-10": {
+      "arabicSha256": "ad7082ffcd020a01e0bad52b57ddf3572b7cfd1bd4d919bb85087cc0da34589e",
+      "blocks": [
+        {
+          "basmala": false,
+          "verses": [
+            {
+              "key": "59:10",
+              "text": "Walladheena jaa'oo min ba'dihim yaqooloona rabbanaghfir lanaa wa li ikhwaaninal-ladheena sabaqoonaa bil-eemaani wa laa taj'al fee quloobinaa ghillan lilladheena aamanoo. Rabbanaa innaka Ra'oofur-Raheem."
+            }
+          ]
+        }
+      ],
+      "text": "[59:10] Walladheena jaa'oo min ba'dihim yaqooloona rabbanaghfir lanaa wa li ikhwaaninal-ladheena sabaqoonaa bil-eemaani wa laa taj'al fee quloobinaa ghillan lilladheena aamanoo. Rabbanaa innaka Ra'oofur-Raheem."
+    },
+    "quran-66-8": {
+      "arabicSha256": "6be36a52631ebaf593747c63771d1072d8eaa3f70ce3018f6b0b08863b0bb98e",
+      "blocks": [
+        {
+          "basmala": false,
+          "verses": [
+            {
+              "key": "66:8",
+              "text": "Yaa ayyuhal-ladheena aamanoo tooboo ilallaahi tawbatan nasoohan 'asaa rabbukum an yukaffira 'ankum sayyi'aatikum wa yudkhilakum jannaatin tajree min tahtihal-anhaar. Yawma laa yukhzillaahun-nabiyya walladheena aamanoo ma'ah. Nooruhum yas'aa bayna aydeehim wa bi aymaanihim yaqooloona rabbanaa atmim lanaa nooranaa waghfir lanaa. Innaka 'alaa kulli shay'in qadeer."
+            }
+          ]
+        }
+      ],
+      "text": "[66:8] Yaa ayyuhal-ladheena aamanoo tooboo ilallaahi tawbatan nasoohan 'asaa rabbukum an yukaffira 'ankum sayyi'aatikum wa yudkhilakum jannaatin tajree min tahtihal-anhaar. Yawma laa yukhzillaahun-nabiyya walladheena aamanoo ma'ah. Nooruhum yas'aa bayna aydeehim wa bi aymaanihim yaqooloona rabbanaa atmim lanaa nooranaa waghfir lanaa. Innaka 'alaa kulli shay'in qadeer."
+    },
+    "quran-66-11": {
+      "arabicSha256": "2eea37c0fad09026d9299c48bee380f146814c0e7f60ff4e6de7f6620b9c0b49",
+      "blocks": [
+        {
+          "basmala": false,
+          "verses": [
+            {
+              "key": "66:11",
+              "text": "Wa daraballaahu mathalan lilladheena aamanumra'ata Fir'awn. Idh qaalat rabbibni lee 'indaka baytan fil-jannati wa najjinee min Fir'awna wa 'amalihi wa najjinee minal-qawmidh-dhaalimeen."
+            }
+          ]
+        }
+      ],
+      "text": "[66:11] Wa daraballaahu mathalan lilladheena aamanumra'ata Fir'awn. Idh qaalat rabbibni lee 'indaka baytan fil-jannati wa najjinee min Fir'awna wa 'amalihi wa najjinee minal-qawmidh-dhaalimeen."
+    },
+    "quran-taha": {
+      "arabicSha256": "370587683d7def69b7e2c9534d7b1ee3e9c33a80ca5f6e75a0502d3008cca50e",
+      "blocks": [
+        {
+          "basmala": false,
+          "verses": [
+            {
+              "key": "20:25",
+              "text": "Qaala rabbishrah lee sadree."
+            },
+            {
+              "key": "20:26",
+              "text": "Wa yassir lee amree."
+            },
+            {
+              "key": "20:27",
+              "text": "Wahlul 'uqdatan min lisaanee."
+            },
+            {
+              "key": "20:28",
+              "text": "Yafqahoo qawlee."
+            }
+          ]
+        }
+      ],
+      "text": "[20:25] Qaala rabbishrah lee sadree.\n[20:26] Wa yassir lee amree.\n[20:27] Wahlul 'uqdatan min lisaanee.\n[20:28] Yafqahoo qawlee."
+    },
+    "muslim-375a": {
+      "arabicSha256": "663a552860d0e33b1f9a00aed0733b5112343ff9aa057f242da840c8b26ee187",
+      "text": "Allaahumma innee a'oodhu bika minal-khubuthi wal-khabaa'ith."
+    },
+    "muslim-405": {
+      "arabicSha256": "65656f4eb9bbb5cbc40520bba8d1d72523cbb12baaf899d07af4c286eb0f448d",
+      "text": "Allaahumma salli 'alaa Muhammadin wa 'alaa aali Muhammadin kamaa sallayta 'alaa aali Ibraaheem. Wa baarik 'alaa Muhammadin wa 'alaa aali Muhammadin kamaa baarakta 'alaa aali Ibraaheema fil-'aalameen. Innaka hameedun majeed."
+    },
+    "muslim-406a": {
+      "arabicSha256": "f80fc26810d5bceb8b9878fca5ab6598870082681671dfe568c95fc0f617e999",
+      "text": "Allaahumma salli 'alaa Muhammadin wa 'alaa aali Muhammadin kamaa sallayta 'alaa aali Ibraaheem. Innaka hameedun majeed. Allaahumma baarik 'alaa Muhammadin wa 'alaa aali Muhammadin kamaa baarakta 'alaa aali Ibraaheem. Innaka hameedun majeed."
+    },
+    "muslim-471b": {
+      "arabicSha256": "03d23cced832a98a1c4a448080175451be9781f1c8f8fd42eaf31a67a5abb9f2",
+      "text": "Allaahumma rabbanaa lakal-hamdu mil'as-samaawaati wa mil'al-ardi wa mil'a maa shi'ta min shay'in ba'd. Ahlath-thanaa'i wal-majd. Laa maani'a limaa a'tayta, wa laa mu'tiya limaa mana'ta, wa laa yanfa'u dhal-jaddi minkal-jadd."
+    },
+    "muslim-476c": {
+      "arabicSha256": "bd47bc5a7a0d8474e5aa6444e2e5c06db817520cf8f38d7e427e556154a603e8",
+      "text": "Allaahumma lakal-hamdu mil'as-samaa'i wa mil'al-ardi wa mil'a maa shi'ta min shay'in ba'd. Allaahumma tahhirnee bith-thalji wal-baradi wal-maa'il-baarid. Allaahumma tahhirnee minadh-dhunoobi wal-khataayaa kamaa yunaqqath-thawbul-abyadu minal-wasakh."
+    },
+    "muslim-477": {
+      "arabicSha256": "2c533c166ef75f155cf3f388387eef4d6e7d92aaec63a626244ef3bcebd6c4b9",
+      "text": "Rabbanaa lakal-hamdu mil'as-samaawaati wal-ardi wa mil'a maa shi'ta min shay'in ba'd. Ahlath-thanaa'i wal-majdi ahaqqu maa qaalal-'abd, wa kullunaa laka 'abd. Allaahumma laa maani'a limaa a'tayta, wa laa mu'tiya limaa mana'ta, wa laa yanfa'u dhal-jaddi minkal-jadd."
+    },
+    "muslim-483": {
+      "arabicSha256": "19ab7a1dc537eb455446650792f84bcd181712b3b03a50948755678c7eb899d9",
+      "text": "Allaahummaghfir lee dhanbee kullahu, diqqahu wa jillahu, wa awwalahu wa aakhirahu, wa 'alaaniyatahu wa sirrah."
+    },
+    "muslim-484a": {
+      "arabicSha256": "4370bd68669fd0d5f18fa838113948a844ed59a3d94356cff47cae68c8abcda9",
+      "text": "Subhaanakallaahumma rabbanaa wa bihamdik. Allaahummaghfir lee."
+    },
+    "muslim-485": {
+      "arabicSha256": "f5a766929668f3c9962c94c921a959723968430dc529b89021e4df45da54a337",
+      "text": "Subhaanaka wa bihamdik, laa ilaaha illaa ant."
+    },
+    "muslim-486": {
+      "arabicSha256": "a89bfc220a950fb7bf5f4eecd17accca48b01dc25c48320ed60f5482f3c697fc",
+      "text": "Allaahumma a'oodhu biridaaka min sakhatik, wa bimu'aafaatika min 'uqoobatik, wa a'oodhu bika mink. Laa uhsee thanaa'an 'alayk. Anta kamaa athnayta 'alaa nafsik."
+    },
+    "muslim-589": {
+      "arabicSha256": "8b002211c41b9faa016cc13732321eb44ad2f7e6338b011e042c9304a4e5ef6a",
+      "text": "Allaahumma innee a'oodhu bika min 'adhaabil-qabr, wa a'oodhu bika min fitnatil-Maseehid-Dajjaal, wa a'oodhu bika min fitnatil-mahyaa wal-mamaat. Allaahumma innee a'oodhu bika minal-ma'thami wal-maghram."
+    },
+    "muslim-588c": {
+      "arabicSha256": "5c6c867f44b2faf76091e0de1e2326fb5c0790726335fd117c6565cd7fefce88",
+      "text": "Allaahumma innee a'oodhu bika min 'adhaabil-qabri wa 'adhaabin-naar, wa fitnatil-mahyaa wal-mamaat, wa sharril-Maseehid-Dajjaal."
+    },
+    "muslim-591": {
+      "arabicSha256": "3840c67e4e5a5e049559fab53d9d6c6f134a9da0104eefb5b918eb48ee2f030d",
+      "text": "Allaahumma antas-salaamu wa minkas-salaam, tabaarakta dhal-jalaali wal-ikraam."
+    },
+    "muslim-593a": {
+      "arabicSha256": "015d66a71aededd88c9bd336dbfb891add93767b4937cbd8f7166a2ef84b1e4d",
+      "text": "Laa ilaaha illallaahu wahdahu laa shareeka lah, lahul-mulku wa lahul-hamd, wa huwa 'alaa kulli shay'in qadeer. Allaahumma laa maani'a limaa a'tayta, wa laa mu'tiya limaa mana'ta, wa laa yanfa'u dhal-jaddi minkal-jadd."
+    },
+    "muslim-594a": {
+      "arabicSha256": "8c13fc821bbb3865711ae739f748513fafa1239d391d8ddf13f977b3e3871ebc",
+      "text": "Laa ilaaha illallaahu wahdahu laa shareeka lah, lahul-mulku wa lahul-hamd, wa huwa 'alaa kulli shay'in qadeer. Laa hawla wa laa quwwata illaa billaah. Laa ilaaha illallaahu wa laa na'budu illaa iyyaah. Lahun-ni'matu wa lahul-fadlu wa lahuth-thanaa'ul-hasan. Laa ilaaha illallaahu mukhliseena lahud-deena wa law karihal-kaafiroon."
+    },
+    "muslim-598a-b": {
+      "arabicSha256": "09388ac3e400f764974758457e4c26bc7746d962e124cfe0e7b75c889bb2293d",
+      "text": "Allaahumma baa'id baynee wa bayna khataayaaya kamaa baa'adta baynal-mashriqi wal-maghrib. Allaahumma naqqinee min khataayaaya kamaa yunaqqath-thawbul-abyadu minad-danas. Allaahummaghsilnee min khataayaaya bith-thalji wal-maa'i wal-barad."
+    },
+    "muslim-713a": {
+      "arabicSha256": "ba5d9d688cc88dfd23eb9d17f413355f889801ddceb508c4adf94b44c51bc069",
+      "text": "Allaahummaftah lee abwaaba rahmatik."
+    },
+    "muslim-763a": {
+      "arabicSha256": "2d0eed4f373d6b3ab1ae89f1464e2db78dc43709523e5db7017b31443eeb0ba0",
+      "text": "Allaahummaj'al fee qalbee nooran, wa fee basaree nooran, wa fee sam'ee nooran, wa 'an yameenee nooran, wa 'an yasaaree nooran, wa fawqee nooran, wa tahtee nooran, wa amaamee nooran, wa khalfee nooran, wa 'adhdhim lee nooraa."
+    },
+    "muslim-763l": {
+      "arabicSha256": "833f15828f5861d16291715eae2d1b891c650d7285f0bcdfe1ba428411cd0545",
+      "text": "Allaahummaj'al fee qalbee nooran, wa fee lisaanee nooran, waj'al fee sam'ee nooran, waj'al fee basaree nooran, waj'al min khalfee nooran, wa min amaamee nooran, waj'al min fawqee nooran, wa min tahtee nooraa. Allaahumma a'tinee nooraa."
+    },
+    "muslim-769a": {
+      "arabicSha256": "a3e13095ccdbec098dbe11efdba9563f600368ae2c40b88e91a89f39c462b4bd",
+      "text": "Allaahumma lakal-hamd, anta noorus-samaawaati wal-ard, wa lakal-hamd, anta qayyaamus-samaawaati wal-ard, wa lakal-hamd, anta rabbus-samaawaati wal-ardi wa man feehinn. Antal-haqq, wa wa'dukal-haqq, wa qawlukal-haqq, wa liqaa'uka haqq, wal-jannatu haqq, wan-naaru haqq, was-saa'atu haqq. Allaahumma laka aslamtu, wa bika aamantu, wa 'alayka tawakkaltu, wa ilayka anabtu, wa bika khaasamtu, wa ilayka haakamtu. Faghfir lee maa qaddamtu wa akhkhartu, wa asrartu wa a'lant. Anta ilaahee, laa ilaaha illaa ant."
+    },
+    "muslim-770": {
+      "arabicSha256": "d0d3a0a626f97e70932131cfb67e88ae8184b2c928e7c9b3054c5ca83d2f926d",
+      "text": "Allaahumma rabba Jibraa'eela wa Meekaa'eela wa Israafeel, faatiras-samaawaati wal-ard, 'aalimal-ghaybi wash-shahaadah. Anta tahkumu bayna 'ibaadika feemaa kaanoo feehi yakhtalifoon. Ihdinee limakhtulifa feehi minal-haqqi bi idhnik. Innaka tahdee man tashaa'u ilaa siraatin mustaqeem."
+    },
+    "muslim-771a": {
+      "arabicSha256": "37a0b7cd0a39e3656883304c0ab582ee4d6f17bc92ce5a8e8a5f53ffc08a2100",
+      "text": "Wajjahtu wajhiya lilladhee fataras-samaawaati wal-arda haneefan wa maa ana minal-mushrikeen. Inna salaatee wa nusukee wa mahyaaya wa mamaatee lillaahi rabbil-'aalameen, laa shareeka lah, wa bidhaalika umirtu wa ana minal-Muslimeen. Allaahumma antal-malik, laa ilaaha illaa ant. Anta rabbee wa ana 'abduk. Dhalamtu nafsee wa'taraftu bidhanbee, faghfir lee dhunoobee jamee'an, innahu laa yaghfirudh-dhunooba illaa ant. Wahdinee li ahsanil-akhlaaq, laa yahdee li ahsanihaa illaa ant. Wasrif 'annee sayyi'ahaa, laa yasrifu 'annee sayyi'ahaa illaa ant. Labbayka wa sa'dayk, wal-khayru kulluhu fee yadayk, wash-sharru laysa ilayk. Ana bika wa ilayk, tabaarakta wa ta'aalayt. Astaghfiruka wa atoobu ilayk."
+    },
+    "muslim-772": {
+      "arabicSha256": "b26e15b6991d0a647fda3ec0e7aa86db7052369b0655014eaa159f989e8a09cc",
+      "text": "Subhaana rabbiyal-'adheem."
+    },
+    "muslim-897a": {
+      "arabicSha256": "3dbc4f7dac42b81f49d2e89e42bb85859c22c40431e0a19e93e06daf2e21b426",
+      "text": "Allaahumma aghithnaa. Allaahumma aghithnaa. Allaahumma aghithnaa."
+    },
+    "muslim-899b": {
+      "arabicSha256": "053c9e9847cffcaf65c0f5722fbb89cc40c2ddb356a51282ea87f35d326a3fd4",
+      "text": "Allaahumma innee as'aluka khayrahaa wa khayra maa feehaa wa khayra maa ursilat bih, wa a'oodhu bika min sharrihaa wa sharri maa feehaa wa sharri maa ursilat bih."
+    },
+    "muslim-963a": {
+      "arabicSha256": "705030e9ea7d2bab6d7d13f83075f07b4f66e48484cbd8a164ffbbfb5af06cad",
+      "text": "Allaahummaghfir lahu warhamhu wa 'aafihi wa'fu 'anh, wa akrim nuzulahu wa wassi' mudkhalah, waghsilhu bil-maa'i wath-thalji wal-barad, wa naqqihi minal-khataayaa kamaa naqqaytath-thawbal-abyada minad-danas. Wa abdilhu daaran khayran min daarihi, wa ahlan khayran min ahlihi, wa zawjan khayran min zawjihi, wa adkhilhul-jannata wa a'idhhu min 'adhaabil-qabri aw min 'adhaabin-naar."
+    },
+    "muslim-963d": {
+      "arabicSha256": "8bd38894def2bf941ee3de532ed94cefaf9bc3ab63a6238ec54b4ff3ab3b3810",
+      "text": "Allaahummaghfir lahu warhamhu wa'fu 'anhu wa 'aafih, wa akrim nuzulahu wa wassi' mudkhalah, waghsilhu bil-maa'i wath-thalji wal-barad, wa naqqihi minal-khataayaa kamaa yunaqqath-thawbul-abyadu minad-danas. Wa abdilhu daaran khayran min daarihi, wa ahlan khayran min ahlihi, wa zawjan khayran min zawjihi, wa qihi fitnatal-qabri wa 'adhaaban-naar."
+    },
+    "muslim-974a": {
+      "arabicSha256": "c942e5d13828b678a6571102ba346ad3df3de112861ab2417ff64190ab21b7a0",
+      "text": "As-salaamu 'alaykum daara qawmin mu'mineen. Wa ataakum maa too'adoona ghadan mu'ajjaloon. Wa innaa in shaa'allaahu bikum laahiqoon. Allaahummaghfir li ahli Baqee'il-Gharqad."
+    },
+    "muslim-1055": {
+      "arabicSha256": "67b64d2d7163e7bfc46acc900e41bc9ee195ed5899636263b5ce4e515b886c87",
+      "text": "Allaahummaj'al rizqa aali Muhammadin qootaa."
+    },
+    "muslim-1184a": {
+      "arabicSha256": "55d9ce5ca0c9bc18b6347f2edafaf13b9de535ad7049f19c772bb9f2efd161b8",
+      "text": "Labbaykallaahumma labbayk. Labbayka laa shareeka laka labbayk. Innal-hamda wan-ni'mata laka wal-mulk, laa shareeka lak."
+    },
+    "muslim-1342": {
+      "arabicSha256": "39fe3252389defd072a19804c13191c51a63f11f4f2dcde7f9f47f926034163a",
+      "text": "Subhaanal-ladhee sakhkhara lanaa haadhaa wa maa kunnaa lahu muqrineen, wa innaa ilaa rabbinaa lamunqaliboon. Allaahumma innaa nas'aluka fee safarinaa haadhal-birra wat-taqwaa, wa minal-'amali maa tardaa. Allaahumma hawwin 'alaynaa safaranaa haadhaa watwi 'annaa bu'dah. Allaahumma antas-saahibu fis-safari wal-khaleefatu fil-ahl. Allaahumma innee a'oodhu bika min wa'thaa'is-safari, wa ka'aabatil-mandhari, wa soo'il-munqalabi fil-maali wal-ahl."
+    },
+    "muslim-1434a": {
+      "arabicSha256": "0ac3517d70f2d827fcb4dacbd90637f3113187d8a58a4be7d26a48ae493be59b",
+      "text": "Bismillaah. Allaahumma jannibnash-shaytaana, wa jannibish-shaytaana maa razaqtanaa."
+    },
+    "muslim-1792a": {
+      "arabicSha256": "b3116f0e8f441b7bcefa7ca78667d9f38a5dbb0ba46dad3fd4cdd8e916c6960c",
+      "text": "Allaahummaghfir liqawmee fa innahum laa ya'lamoon."
+    },
+    "muslim-1804": {
+      "arabicSha256": "c8417afd73445b992800f3bfb2e2563bdc8634a861ea3be034f9942beeaa807a",
+      "text": "Allaahumma laa 'aysha illaa 'ayshul-aakhirah, faghfir lil-muhaajireena wal-ansaar."
+    },
+    "muslim-2055a": {
+      "arabicSha256": "2fa11a325bf33f5f8124b7909b6a193b22c1f41a109c954534106c9fc425ca92",
+      "text": "Allaahumma at'im man at'amanee, wa asqi man saqaanee."
+    },
+    "muslim-2186": {
+      "arabicSha256": "4df0113b5508db481b85c91bd5e5a68748c169e72145e886f97c354266764c53",
+      "text": "Bismillaahi arqeek, min kulli shay'in yu'dheek, min sharri kulli nafsin aw 'ayni haasid, Allaahu yashfeek. Bismillaahi arqeek."
+    },
+    "muslim-2191a": {
+      "arabicSha256": "8544b947d9376d6bd3cc18fa677ca30881e0a992b25539ee023521baaa6c4bc1",
+      "text": "Adh-hibil-ba'sa rabban-naasi washfi antash-shaafee, laa shifaa'a illaa shifaa'uk, shifaa'an laa yughaadiru saqamaa."
+    },
+    "pain-bismillah": {
+      "arabicSha256": "1af75146a13a98249deaa3e778783d51403645ab541679692f6727479c03e37c",
+      "text": "Bismillaah."
+    },
+    "muslim-2202": {
+      "arabicSha256": "0224ec07ee165b2a2cf8ce66596013ac782345e1a5f21e5ccf7b2dc9574fc431",
+      "text": "A'oodhu billaahi wa qudratihi min sharri maa ajidu wa uhaadhir."
+    },
+    "muslim-2444a": {
+      "arabicSha256": "83a80c92ac6203014316ecdc7cc1211fcb2f088e62e00fe69fc0d0357946afdc",
+      "text": "Allaahummaghfir lee warhamnee wa alhiqnee bir-rafeeq."
+    },
+    "muslim-2480a": {
+      "arabicSha256": "efe5a4e6257e21984c1495cf2cb751db6d2e4b5f5d1acf1ee4ccb5603884fbb1",
+      "text": "Allaahumma akthir maalahu wa waladahu, wa baarik lahu feemaa a'taytah."
+    },
+    "muslim-2690a": {
+      "arabicSha256": "d7f8ecbee0fed1209695031885e3d7f9963c9fcefb05becd268b75cebb64c590",
+      "text": "Allaahumma aatinaa fid-dunyaa hasanatan wa fil-aakhirati hasanatan wa qinaa 'adhaaban-naar."
+    },
+    "muslim-2690b": {
+      "arabicSha256": "707b2c264f897dd991314b4fa720d7b333e025146f28f9af157453a5cb1a2405",
+      "text": "Rabbanaa aatinaa fid-dunyaa hasanatan wa fil-aakhirati hasanatan wa qinaa 'adhaaban-naar."
+    },
+    "muslim-2697a": {
+      "arabicSha256": "75031a7d59768c5acf0307ad4d92f94bf7ca8a526b578867ca19ee44e62cbf03",
+      "text": "Allaahummaghfir lee warhamnee wahdinee warzuqnee."
+    },
+    "muslim-2697b": {
+      "arabicSha256": "21d84726da9992604d34b7165a439b538bb6f6e4fc58c278dd69e4f8253d8eac",
+      "text": "Allaahummaghfir lee warhamnee wahdinee wa 'aafinee warzuqnee."
+    },
+    "muslim-2706a": {
+      "arabicSha256": "ef33b8837d793ca934f78556e1d343b44ea029b4d91c40bff69829675308c771",
+      "text": "Allaahumma innee a'oodhu bika minal-'ajzi wal-kasali wal-jubni wal-harami wal-bukhl. Wa a'oodhu bika min 'adhaabil-qabri wa min fitnatil-mahyaa wal-mamaat."
+    },
+    "muslim-2706d": {
+      "arabicSha256": "36a77b170cc105bcf1ef1313283d38b4e02cbcf3650a28fd6f8ba009cf3a1230",
+      "text": "Allaahumma innee a'oodhu bika minal-bukhli wal-kasali wa ardhalil-'umuri wa 'adhaabil-qabri wa fitnatil-mahyaa wal-mamaat."
+    },
+    "muslim-2708a": {
+      "arabicSha256": "39bc09969e681187bdbcf4838e2a43c1ad23ed786565f7cc7a9a530c2877e7d7",
+      "text": "A'oodhu bikalimaatillaahit-taammaati min sharri maa khalaq."
+    },
+    "muslim-2710a": {
+      "arabicSha256": "3b2e2026b5275879f312c554dc87277e8dc65acbdb19e69237a87eba1b15d85e",
+      "text": "Allaahumma innee aslamtu wajhee ilayk, wa fawwadtu amree ilayk, wa alja'tu dhahree ilayk, raghbatan wa rahbatan ilayk. Laa malja'a wa laa manjaa minka illaa ilayk. Aamantu bikitaabikal-ladhee anzalta, wa binabiyyikal-ladhee arsalt."
+    },
+    "muslim-2710c": {
+      "arabicSha256": "46063341a59e82c59249e3506c65694e20935b642f7dd434d663e999e895571d",
+      "text": "Allaahumma aslamtu nafsee ilayk, wa wajjahtu wajhee ilayk, wa alja'tu dhahree ilayk, wa fawwadtu amree ilayk, raghbatan wa rahbatan ilayk. Laa malja'a wa laa manjaa minka illaa ilayk. Aamantu bikitaabikal-ladhee anzalta, wa birasoolikal-ladhee arsalt."
+    },
+    "muslim-2711": {
+      "arabicSha256": "9437032d6f5bdbf34b58fabf30a2cb77edda59240667cf87e0b607fc0773b615",
+      "text": "Allaahumma bismika ahyaa wa bismika amoot."
+    },
+    "muslim-2712": {
+      "arabicSha256": "c6a9ab58b46637c120d2b22dbe24f553f2da6e7358cc5b2b8929688b55c7e2f6",
+      "text": "Allaahumma khalaqta nafsee wa anta tawaffaahaa, laka mamaatuhaa wa mahyaahaa. In ahyaytahaa fahfadhhaa, wa in amattahaa faghfir lahaa. Allaahumma innee as'alukal-'aafiyah."
+    },
+    "muslim-2713a": {
+      "arabicSha256": "424d9ae813b3818b2c397e62a98a112a070b585cb0dcc6abaf435b90af5ce309",
+      "text": "Allaahumma rabbas-samaawaati wa rabbal-ardi wa rabbal-'arshil-'adheem, rabbanaa wa rabba kulli shay', faaliqal-habbi wan-nawaa, wa munzilat-Tawraati wal-Injeeli wal-Furqaan. A'oodhu bika min sharri kulli shay'in anta aakhidhun binaasiyatih. Allaahumma antal-awwalu falaysa qablaka shay', wa antal-aakhiru falaysa ba'daka shay', wa antadh-dhaahiru falaysa fawqaka shay', wa antal-baatinu falaysa doonaka shay'. Iqdi 'annad-dayna wa aghninaa minal-faqr."
+    },
+    "muslim-2714a": {
+      "arabicSha256": "288816822c3d9b6e61cf870516a6a9e8b81a33e3d2688e315a6928d9c96a901d",
+      "text": "Subhaanakallaahumma rabbee, bika wada'tu janbee, wa bika arfa'uh. In amsakta nafsee faghfir lahaa, wa in arsaltahaa fahfadhhaa bimaa tahfadhu bihi 'ibaadakas-saaliheen."
+    },
+    "muslim-2715": {
+      "arabicSha256": "352880797bffdec1e04232f2898d48923a2daf1dda4408ed0e4ec2496383e368",
+      "text": "Al-hamdu lillaahil-ladhee at'amanaa wa saqaanaa wa kafaanaa wa aawaanaa, fakam mimman laa kaafiya lahu wa laa mu'wi."
+    },
+    "muslim-2716a": {
+      "arabicSha256": "fd7e7406d2e98a38eddb1cd6b94e57425214a62a20d3a5fa7487526a038c9b2e",
+      "text": "Allaahumma innee a'oodhu bika min sharri maa 'amiltu, wa min sharri maa lam a'mal."
+    },
+    "muslim-2717": {
+      "arabicSha256": "9b15dae0aa5585aad6acbfe185a73d70819c40dbf375aff5f6b823662493b84d",
+      "text": "Allaahumma laka aslamtu, wa bika aamantu, wa 'alayka tawakkaltu, wa ilayka anabtu, wa bika khaasamt. Allaahumma innee a'oodhu bi'izzatika, laa ilaaha illaa anta, an tudillanee. Antal-hayyul-ladhee laa yamoot, wal-jinnu wal-insu yamootoon."
+    },
+    "muslim-2718": {
+      "arabicSha256": "0591210c8f3bfb2538b263a43d09bf282605e6a856bf3bcb12f83d8368324d77",
+      "text": "Samma'a saami'un bihamdillaahi wa husni balaa'ihi 'alaynaa. Rabbanaa saahibnaa wa afdil 'alaynaa, 'aa'idhan billaahi minan-naar."
+    },
+    "muslim-2719a": {
+      "arabicSha256": "0e25fc86bb17568389f6a5a3c0e69da944eb02b5a6d403a9d2b418cf9612a80f",
+      "text": "Allaahummaghfir lee khatee'atee wa jahlee wa israafee fee amree, wa maa anta a'lamu bihi minnee. Allaahummaghfir lee jiddee wa hazlee wa khata'ee wa 'amdee, wa kullu dhaalika 'indee. Allaahummaghfir lee maa qaddamtu wa maa akhkhartu, wa maa asrartu wa maa a'lantu, wa maa anta a'lamu bihi minnee. Antal-muqaddimu wa antal-mu'akhkhir, wa anta 'alaa kulli shay'in qadeer."
+    },
+    "muslim-2720": {
+      "arabicSha256": "c4bf0a11b343ee5eaa30dcb292d0ac75e7ffd548378f6e4f81a5f173bccc693a",
+      "text": "Allaahumma aslih lee deeniyal-ladhee huwa 'ismatu amree, wa aslih lee dunyaayal-latee feehaa ma'aashee, wa aslih lee aakhiratiyal-latee feehaa ma'aadee. Waj'alil-hayaata ziyaadatan lee fee kulli khayr, waj'alil-mawta raahatan lee min kulli sharr."
+    },
+    "muslim-2721a": {
+      "arabicSha256": "64b13693f36e4cf50f626b68d7bc11b89ac2f11ddfb8b9d4eefc2fe47586d4cb",
+      "text": "Allaahumma innee as'alukal-hudaa wat-tuqaa wal-'afaafa wal-ghinaa."
+    },
+    "muslim-2722": {
+      "arabicSha256": "9d7cfef7ae088d5b6595a64e33b8d5f3959e13b580c12b12a32570af585e996a",
+      "text": "Allaahumma innee a'oodhu bika minal-'ajzi wal-kasali wal-jubni wal-bukhli wal-harami wa 'adhaabil-qabr. Allaahumma aati nafsee taqwaahaa, wa zakkihaa anta khayru man zakkaahaa, anta waliyyuhaa wa mawlaahaa. Allaahumma innee a'oodhu bika min 'ilmin laa yanfa', wa min qalbin laa yakhsha', wa min nafsin laa tashba', wa min da'watin laa yustajaabu lahaa."
+    },
+    "muslim-2725a": {
+      "arabicSha256": "1367f66b2287ee91397615047218d67f0a90e23d1714d294aa7a8e3fe486236e",
+      "text": "Allaahummahdinee wa saddidnee."
+    },
+    "muslim-2726a": {
+      "arabicSha256": "3457ca2b9aadcf637d0b54e5e911c06b2fc522bdc15aea521beb78bd5c4c374f",
+      "text": "Subhaanallaahi wa bihamdih, 'adada khalqih, wa ridaa nafsih, wa zinata 'arshih, wa midaada kalimaatih."
+    },
+    "muslim-2702a": {
+      "arabicSha256": "9ef913a347672f03b6c0b851c3a052ebd52c61a9ff40c76f1e76d932d031117f",
+      "text": "Astaghfirullaah."
+    },
+    "muslim-2730a": {
+      "arabicSha256": "b8ab65b7ddd500ee20a7a59087caf6cf43bb4cd0dff0f8e3fa74c9ee0dafe4ba",
+      "text": "Laa ilaaha illallaahul-'adheemul-haleem. Laa ilaaha illallaahu rabbul-'arshil-'adheem. Laa ilaaha illallaahu rabbus-samaawaati wa rabbul-ardi wa rabbul-'arshil-kareem."
+    },
+    "muslim-2739": {
+      "arabicSha256": "27878803ff9a9e623077bcd25a22ea4323a013e7549a767a11bb38a6a0db41af",
+      "text": "Allaahumma innee a'oodhu bika min zawaali ni'matika, wa tahawwuli 'aafiyatika, wa fujaa'ati niqmatika, wa jamee'i sakhatik."
+    },
+    "muslim-2680a": {
+      "arabicSha256": "12daed2eb2b93c0b9be5a9ecea92ebf897a13abf0daf2189890110e57eaf90d7",
+      "text": "Allaahumma ahyinee maa kaanatil-hayaatu khayran lee, wa tawaffanee idhaa kaanatil-wafaatu khayran lee."
+    },
+    "muslim-2705a": {
+      "arabicSha256": "373eac7fcd7920339d5fefefd6fb340c5c87f6c4e5952cb44b13fb64e13a8f10",
+      "text": "Allaahumma innee dhalamtu nafsee dhulman kabeeran, wa laa yaghfirudh-dhunooba illaa ant. Faghfir lee maghfiratan min 'indika warhamnee, innaka antal-ghafoorur-raheem."
+    },
+    "muslim-713a-exit": {
+      "arabicSha256": "08cc07bfe5d00b020184279df823c77bf15f2dd4d154e4cc0ae155ea940ca788",
+      "text": "Allaahumma innee as'aluka min fadlik."
+    },
+    "muslim-771a-ruku": {
+      "arabicSha256": "c4bb2c7f366fbf157c50ae03738a2b9a5c737d6ea29b1f4607f482b57fccffce",
+      "text": "Allaahumma laka raka'tu, wa bika aamantu, wa laka aslamt. Khasha'a laka sam'ee wa basaree wa mukhkhee wa 'adhmee wa 'asabee."
+    },
+    "muslim-771a-raising": {
+      "arabicSha256": "9ef5aeff32b981828a723f0f4c31a850dd462971a3288ea29fba124b960a8192",
+      "text": "Allaahumma rabbanaa lakal-hamdu mil'as-samaawaati wa mil'al-ardi wa mil'a maa baynahumaa wa mil'a maa shi'ta min shay'in ba'd."
+    },
+    "muslim-771a-sujud": {
+      "arabicSha256": "d78a3c96644b98410f38e717d6a9db01c9ff8d0694bfc7862d1927a7cb36cdc9",
+      "text": "Allaahumma laka sajadtu, wa bika aamantu, wa laka aslamt. Sajada wajhee lilladhee khalaqahu wa sawwarahu wa shaqqa sam'ahu wa basarah. Tabaarakallaahu ahsanul-khaaliqeen."
+    },
+    "muslim-771a-before-salam": {
+      "arabicSha256": "b27384f2c663ae82493bb90a3f678b18f85d7258bb1ee6562fa33805a3e4806c",
+      "text": "Allaahummaghfir lee maa qaddamtu wa maa akhkhartu, wa maa asrartu wa maa a'lantu, wa maa asraftu, wa maa anta a'lamu bihi minnee. Antal-muqaddimu wa antal-mu'akhkhir, laa ilaaha illaa ant."
+    },
+    "muslim-772-sujud": {
+      "arabicSha256": "37d951dbf51ddade019d1d519db4c684f77bc80aac2e1db39fdb8cbb33e56977",
+      "text": "Subhaana rabbiyal-a'laa."
+    },
+    "muslim-897a-excess-rain": {
+      "arabicSha256": "9237aaf5f38d1dd724cb613afb6e6dd29209f8be8fec8c878a7e6318c5fbcccd",
+      "text": "Allaahumma hawaalaynaa wa laa 'alaynaa. Allaahumma 'alal-aakaami wadh-dhiraabi wa butoonil-awdiyati wa manaabitish-shajar."
+    },
+    "muslim-1342-return": {
+      "arabicSha256": "fca2322ec5bceab2256f9af8d74d36d5c8130cfa85a4733abbb5c9f489320866",
+      "text": "Aayiboona taa'iboona 'aabidoona lirabbinaa haamidoon."
+    },
+    "muslim-2191a-companion": {
+      "arabicSha256": "25ed67e6c18f54afcaecfaf45a6a42c826f71e81057846258d0296e815ffb6d4",
+      "text": "Allaahummaghfir lee waj'alnee ma'ar-rafeeqil-a'laa."
+    },
+    "audit-new-garment": {
+      "arabicSha256": "2caa5b97e97b18943151bf6a02945ccd2dc842b2bf33f3fab10a24b510cbfde1",
+      "text": "Allaahumma lakal-hamdu anta kasawtaneeh. As'aluka min khayrihi wa khayri maa suni'a lah, wa a'oodhu bika min sharrihi wa sharri maa suni'a lah."
+    },
+    "audit-leave-home-safety": {
+      "arabicSha256": "83f9572e8c124a9e94bc60b44062e728ae45e6184980a06bfa2b9bd06c8a4c05",
+      "text": "Allaahumma innee a'oodhu bika an adilla aw udall, aw azilla aw uzall, aw adhlima aw udhlam, aw ajhala aw yujhala 'alayy."
+    },
+    "audit-qunoot": {
+      "arabicSha256": "836347045169183d9ef1c80f701e465cd203d4778169d8a2dbabf120801d2c67",
+      "text": "Allaahummahdinee feeman hadayta, wa 'aafinee feeman 'aafayta, wa tawallanee feeman tawallayta, wa baarik lee feemaa a'tayta, wa qinee sharra maa qadayt. Innaka taqdee wa laa yuqdaa 'alayk, wa innahu laa yadhillu man waalayta, wa laa ya'izzu man 'aadayt. Tabaarakta rabbanaa wa ta'aalayt."
+    },
+    "audit-between-sujud": {
+      "arabicSha256": "8688bceac2301b4a188af2e16f4bcc554015fde092bc098b6a01e396c13c768f",
+      "text": "Allaahummaghfir lee warhamnee wa 'aafinee wahdinee warzuqnee."
+    },
+    "audit-ask-paradise": {
+      "arabicSha256": "789b759f6ad6507278ce64d217cc090fb200adb014fa3b8f9370fbe4379e0b76",
+      "text": "Allaahumma innee as'alukal-jannata, wa a'oodhu bika minan-naar."
+    },
+    "audit-all-good": {
+      "arabicSha256": "fc36eb87bb22f5cd290f9fb78091740d36bb449c4ce5fb32384178483bf59eb5",
+      "text": "Allaahumma innee as'aluka minal-khayri kullihi, 'aajilihi wa aajilihi, maa 'alimtu minhu wa maa lam a'lam. Wa a'oodhu bika minash-sharri kullihi, 'aajilihi wa aajilihi, maa 'alimtu minhu wa maa lam a'lam. Allaahumma innee as'aluka min khayri maa sa'alaka 'abduka wa nabiyyuka, wa a'oodhu bika min sharri maa 'aadha bihi 'abduka wa nabiyyuk. Allaahumma innee as'alukal-jannata wa maa qarraba ilayhaa min qawlin aw 'amal, wa a'oodhu bika minan-naari wa maa qarraba ilayhaa min qawlin aw 'amal. Wa as'aluka an taj'ala kulla qadaa'in qadaytahu lee khayraa."
+    },
+    "audit-sneeze": {
+      "arabicSha256": "0cde81587afebd788a3d6cc1fffecb74d4742a967f3b13d897d883bb37c70658",
+      "text": "Al-hamdu lillaah."
+    },
+    "audit-sneeze-response": {
+      "arabicSha256": "778a75c50cf31b21026b4f90452d396038c0c0d1d494e36b141a558bd476aace",
+      "text": "Yarhamukallaah."
+    },
+    "audit-sneeze-reply": {
+      "arabicSha256": "528f618fc5c3846ce4788fcb18142c2ee1eb0d46bf0504b940b1dd9838f1cdbe",
+      "text": "Yahdeekumullaahu wa yuslihu baalakum."
+    },
+    "audit-anger": {
+      "arabicSha256": "2f94e22a8ce609aa71feca88ae048a9b87b55c984e3d5224bf95dafa6df44a14",
+      "text": "A'oodhu billaahi minash-shaytaanir-rajeem."
+    },
+    "audit-after-adhan": {
+      "arabicSha256": "4d25c400db93f8946fc9c97fe64ac400cdf3f888af9ecde9a9a04cd973f3fbc1",
+      "text": "Allaahumma rabba haadhihid-da'watit-taammati was-salaatil-qaa'imah, aati Muhammadanil-waseelata wal-fadeelah, wab'athhu maqaaman mahmoodanil-ladhee wa'adtah."
+    },
+    "audit-hayala": {
+      "arabicSha256": "a8e6d5234a3ff1db28da4a622387cc84be1ad574b3d3c30cfc83d5deeee88982",
+      "text": "Laa hawla wa laa quwwata illaa billaah."
+    },
+    "audit-shahada-adhan": {
+      "arabicSha256": "abf5938337478227ccb83745ab57767e0c4fb708659ba03240c3e149ec5c85aa",
+      "text": "Ashhadu an laa ilaaha illallaahu wahdahu laa shareeka lah, wa anna Muhammadan 'abduhu wa rasooluh. Radeetu billaahi rabban, wa bi-Muhammadin rasoolan, wa bil-Islaami deenaa."
+    },
+    "audit-meal-praise": {
+      "arabicSha256": "d63e5f132464c02fa79151156bc42a6ee30e90fd4d78b8fb0c125cc32222cc7c",
+      "text": "Al-hamdu lillaahi katheeran tayyiban mubaarakan feeh, ghayra makfiyyin, wa laa muwadda'in wa laa mustaghnan 'anhu rabbanaa."
+    },
+    "audit-rain": {
+      "arabicSha256": "f26e54b431c728a729f99b1d717e4184c4e6d9cd9beafb29249624cdbd3e3b37",
+      "text": "Sayyiban naafi'aa."
+    },
+    "audit-after-rain": {
+      "arabicSha256": "e4dd021fd2383ba72afeb8bad2ee1436845b12c81af08a4a94a24f754d0fb8cd",
+      "text": "Mutirnaa bifadlillaahi wa rahmatih."
+    },
+    "audit-condolence": {
+      "arabicSha256": "a4106c560587ea30050e4b5d419ced5dda9cbb7841ec2db808b3e39c7f5f70bb",
+      "text": "Inna lillaahi maa akhadha wa lahu maa a'taa, wa kullun 'indahu bi ajalin musamman, faltasbir waltahtasib."
+    },
+    "audit-food-blessing": {
+      "arabicSha256": "ed25bf1bebf6ea9c8f9060f1b6ff751c925a37bb77619dff3141a8dc5a785f03",
+      "text": "Allaahumma baarik lanaa feehi wa at'imnaa khayran minh."
+    },
+    "audit-milk": {
+      "arabicSha256": "d27dbd900279b3c46156d871194d739914aeecd56203a6488917c97b1f2f4800",
+      "text": "Allaahumma baarik lanaa feehi wa at'imnaa khayran minh. Wa idhaa suqiya labanan falyaqul: Allaahumma baarik lanaa feehi wa zidnaa minh."
+    },
+    "audit-host": {
+      "arabicSha256": "d6b3559400eb754e88dafa174593a6cee1c73078be6d2a29a073bb5bb61347b8",
+      "text": "Allaahumma baarik lahum fee maa razaqtahum, waghfir lahum warhamhum."
+    },
+    "audit-graves": {
+      "arabicSha256": "e3a5ef5bd194c82c38fa164c46fb114d4bf94538e734caadbb0c89f03ec0655c",
+      "text": "As-salaamu 'alaykum ahlad-diyaari minal-mu'mineena wal-Muslimeen, wa innaa in shaa'allaahu lalaahiqoon. As'alullaaha lanaa wa lakumul-'aafiyah."
+    },
+    "audit-tashahhud": {
+      "arabicSha256": "c8659e11bef2b0a8d97abd6098f98883a28bc24054cbcb73e586cb448d704dfa",
+      "text": "At-tahiyyaatu lillaahi was-salawaatu wat-tayyibaat. As-salaamu 'alayka ayyuhan-nabiyyu wa rahmatullaahi wa barakaatuh. As-salaamu 'alaynaa wa 'alaa 'ibaadillaahis-saaliheen. Ashhadu an laa ilaaha illallaahu, wa ashhadu anna Muhammadan 'abduhu wa rasooluh."
+    },
+    "audit-istikhara": {
+      "arabicSha256": "d9d6679d2ff78be1539281cf0b9665b75636aab2730106e0446f1c60a62910d2",
+      "text": "Allaahumma innee astakheeruka bi'ilmika, wa astaqdiruka biqudratika, wa as'aluka min fadlikal-'adheem. Fa innaka taqdiru wa laa aqdir, wa ta'lamu wa laa a'lam, wa anta 'allaamul-ghuyoob. Allaahumma in kunta ta'lamu anna haadhal-amra khayrun lee fee deenee wa ma'aashee wa 'aaqibati amree, faqdurhu lee wa yassirhu lee, thumma baarik lee feeh. Wa in kunta ta'lamu anna haadhal-amra sharrun lee fee deenee wa ma'aashee wa 'aaqibati amree, fasrifhu 'annee wasrifnee 'anh, waqdur liyal-khayra haythu kaana, thumma ardinee bih."
+    },
+    "post-prayer-112": {
+      "arabicSha256": "37447359d456392ecb36baaca092479a6ec08d6e5c89385742d83e901dc08943",
+      "blocks": [
+        {
+          "basmala": true,
+          "verses": [
+            {
+              "key": "112:1",
+              "text": "Qul huwallaahu ahad."
+            },
+            {
+              "key": "112:2",
+              "text": "Allaahus-samad."
+            },
+            {
+              "key": "112:3",
+              "text": "Lam yalid wa lam yoolad."
+            },
+            {
+              "key": "112:4",
+              "text": "Wa lam yakun lahu kufuwan ahad."
+            }
+          ]
+        }
+      ],
+      "text": "Bismillaahir-Rahmaanir-Raheem.\n[112:1] Qul huwallaahu ahad.\n[112:2] Allaahus-samad.\n[112:3] Lam yalid wa lam yoolad.\n[112:4] Wa lam yakun lahu kufuwan ahad."
+    },
+    "post-prayer-113": {
+      "arabicSha256": "355ce482a7f3f87cb7061794c3b9fbcfb8d1c830b28b293d835bab530186dd66",
+      "blocks": [
+        {
+          "basmala": true,
+          "verses": [
+            {
+              "key": "113:1",
+              "text": "Qul a'oodhu birabbil-falaq."
+            },
+            {
+              "key": "113:2",
+              "text": "Min sharri maa khalaq."
+            },
+            {
+              "key": "113:3",
+              "text": "Wa min sharri ghaasiqin idhaa waqab."
+            },
+            {
+              "key": "113:4",
+              "text": "Wa min sharrin-naffaathaati fil-'uqad."
+            },
+            {
+              "key": "113:5",
+              "text": "Wa min sharri haasidin idhaa hasad."
+            }
+          ]
+        }
+      ],
+      "text": "Bismillaahir-Rahmaanir-Raheem.\n[113:1] Qul a'oodhu birabbil-falaq.\n[113:2] Min sharri maa khalaq.\n[113:3] Wa min sharri ghaasiqin idhaa waqab.\n[113:4] Wa min sharrin-naffaathaati fil-'uqad.\n[113:5] Wa min sharri haasidin idhaa hasad."
+    },
+    "post-prayer-114": {
+      "arabicSha256": "dbe8bd9fb168c7f74898b4ce2da84cd24af7053425009f78a1ee352419570338",
+      "blocks": [
+        {
+          "basmala": true,
+          "verses": [
+            {
+              "key": "114:1",
+              "text": "Qul a'oodhu birabbin-naas."
+            },
+            {
+              "key": "114:2",
+              "text": "Malikin-naas."
+            },
+            {
+              "key": "114:3",
+              "text": "Ilaahin-naas."
+            },
+            {
+              "key": "114:4",
+              "text": "Min sharril-waswaasil-khannaas."
+            },
+            {
+              "key": "114:5",
+              "text": "Alladhee yuwaswisu fee sudoorin-naas."
+            },
+            {
+              "key": "114:6",
+              "text": "Minal-jinnati wan-naas."
+            }
+          ]
+        }
+      ],
+      "text": "Bismillaahir-Rahmaanir-Raheem.\n[114:1] Qul a'oodhu birabbin-naas.\n[114:2] Malikin-naas.\n[114:3] Ilaahin-naas.\n[114:4] Min sharril-waswaasil-khannaas.\n[114:5] Alladhee yuwaswisu fee sudoorin-naas.\n[114:6] Minal-jinnati wan-naas."
+    },
+    "post-prayer-kursi": {
+      "arabicSha256": "c826c8de989a783d07855b47df70889895bfae4e99f2dbd39fdae5e2911f11d2",
+      "blocks": [
+        {
+          "basmala": false,
+          "verses": [
+            {
+              "key": "2:255",
+              "text": "Allaahu laa ilaaha illaa huwal-Hayyul-Qayyoom. Laa ta'khudhuhu sinatun wa laa nawm. Lahu maa fis-samaawaati wa maa fil-ard. Man dhal-ladhee yashfa'u 'indahu illaa bi idhnih. Ya'lamu maa bayna aydeehim wa maa khalfahum, wa laa yuheetoona bishay'in min 'ilmihi illaa bimaa shaa'. Wasi'a kursiyyuhus-samaawaati wal-ard, wa laa ya'ooduhu hifdhuhumaa, wa huwal-'Aliyyul-'Adheem."
+            }
+          ]
+        }
+      ],
+      "text": "[2:255] Allaahu laa ilaaha illaa huwal-Hayyul-Qayyoom. Laa ta'khudhuhu sinatun wa laa nawm. Lahu maa fis-samaawaati wa maa fil-ard. Man dhal-ladhee yashfa'u 'indahu illaa bi idhnih. Ya'lamu maa bayna aydeehim wa maa khalfahum, wa laa yuheetoona bishay'in min 'ilmihi illaa bimaa shaa'. Wasi'a kursiyyuhus-samaawaati wal-ard, wa laa ya'ooduhu hifdhuhumaa, wa huwal-'Aliyyul-'Adheem."
+    },
+    "night-three-surahs": {
+      "arabicSha256": "bd9946877a9008be9f98a53a6a0f2ba91c78a143c763598f743c75e15683ff64",
+      "blocks": [
+        {
+          "basmala": true,
+          "verses": [
+            {
+              "key": "112:1",
+              "text": "Qul huwallaahu ahad."
+            },
+            {
+              "key": "112:2",
+              "text": "Allaahus-samad."
+            },
+            {
+              "key": "112:3",
+              "text": "Lam yalid wa lam yoolad."
+            },
+            {
+              "key": "112:4",
+              "text": "Wa lam yakun lahu kufuwan ahad."
+            }
+          ]
+        },
+        {
+          "basmala": true,
+          "verses": [
+            {
+              "key": "113:1",
+              "text": "Qul a'oodhu birabbil-falaq."
+            },
+            {
+              "key": "113:2",
+              "text": "Min sharri maa khalaq."
+            },
+            {
+              "key": "113:3",
+              "text": "Wa min sharri ghaasiqin idhaa waqab."
+            },
+            {
+              "key": "113:4",
+              "text": "Wa min sharrin-naffaathaati fil-'uqad."
+            },
+            {
+              "key": "113:5",
+              "text": "Wa min sharri haasidin idhaa hasad."
+            }
+          ]
+        },
+        {
+          "basmala": true,
+          "verses": [
+            {
+              "key": "114:1",
+              "text": "Qul a'oodhu birabbin-naas."
+            },
+            {
+              "key": "114:2",
+              "text": "Malikin-naas."
+            },
+            {
+              "key": "114:3",
+              "text": "Ilaahin-naas."
+            },
+            {
+              "key": "114:4",
+              "text": "Min sharril-waswaasil-khannaas."
+            },
+            {
+              "key": "114:5",
+              "text": "Alladhee yuwaswisu fee sudoorin-naas."
+            },
+            {
+              "key": "114:6",
+              "text": "Minal-jinnati wan-naas."
+            }
+          ]
+        }
+      ],
+      "text": "Bismillaahir-Rahmaanir-Raheem.\n[112:1] Qul huwallaahu ahad.\n[112:2] Allaahus-samad.\n[112:3] Lam yalid wa lam yoolad.\n[112:4] Wa lam yakun lahu kufuwan ahad.\n\nBismillaahir-Rahmaanir-Raheem.\n[113:1] Qul a'oodhu birabbil-falaq.\n[113:2] Min sharri maa khalaq.\n[113:3] Wa min sharri ghaasiqin idhaa waqab.\n[113:4] Wa min sharrin-naffaathaati fil-'uqad.\n[113:5] Wa min sharri haasidin idhaa hasad.\n\nBismillaahir-Rahmaanir-Raheem.\n[114:1] Qul a'oodhu birabbin-naas.\n[114:2] Malikin-naas.\n[114:3] Ilaahin-naas.\n[114:4] Min sharril-waswaasil-khannaas.\n[114:5] Alladhee yuwaswisu fee sudoorin-naas.\n[114:6] Minal-jinnati wan-naas."
+    },
+    "audit-food-name": {
+      "arabicSha256": "e04227e76e93073d4986e666c2d93df8cb9ee56e50fc400f6a93cee30b7f3513",
+      "text": "Bismillaah."
+    },
+    "audit-garment-praise": {
+      "arabicSha256": "315d20f07bccbe85d17f0b39fd4379322d6fcd18c521b9a03f9a283c334df758",
+      "text": "Al-hamdu lillaahil-ladhee kasaanee haadhath-thawba wa razaqaneehi min ghayri hawlin minnee wa laa quwwah."
+    },
+    "audit-after-wudu": {
+      "arabicSha256": "e9c40909b3c1a7e92a7c29adcef67c672af4872297a9bacd4b1b06ca49d6c0cd",
+      "text": "Ashhadu an laa ilaaha illallaahu wahdahu laa shareeka lah, wa ashhadu anna Muhammadan 'abduhu wa rasooluh."
+    },
+    "audit-meeting": {
+      "arabicSha256": "6942edc63fcb3804f5da2997cea25d05c06bad51b993aea25470197b84af73f6",
+      "text": "Subhaanakallaahumma wa bihamdik. Ashhadu an laa ilaaha illaa ant. Astaghfiruka wa atoobu ilayk."
+    },
+    "audit-night-wake": {
+      "arabicSha256": "e0cb46a796866c4e8ed2e5f9f0f55f932a19a64713d5c801c66896e5f46d364e",
+      "text": "Laa ilaaha illallaahu wahdahu laa shareeka lah, lahul-mulku wa lahul-hamd, wa huwa 'alaa kulli shay'in qadeer. Al-hamdu lillaah, wa subhaanallaah, wa laa ilaaha illallaah, wallaahu akbar, wa laa hawla wa laa quwwata illaa billaah. Allaahummaghfir lee."
+    }
+  },
+  "quranVerses": {
+    "1:1": "Bismillaahir-Rahmaanir-Raheem.",
+    "2:201": "Wa minhum man yaqoolu rabbanaa aatinaa fid-dunyaa hasanatan wa fil-aakhirati hasanatan wa qinaa 'adhaaban-naar.",
+    "2:255": "Allaahu laa ilaaha illaa huwal-Hayyul-Qayyoom. Laa ta'khudhuhu sinatun wa laa nawm. Lahu maa fis-samaawaati wa maa fil-ard. Man dhal-ladhee yashfa'u 'indahu illaa bi idhnih. Ya'lamu maa bayna aydeehim wa maa khalfahum, wa laa yuheetoona bishay'in min 'ilmihi illaa bimaa shaa'. Wasi'a kursiyyuhus-samaawaati wal-ard, wa laa ya'ooduhu hifdhuhumaa, wa huwal-'Aliyyul-'Adheem.",
+    "2:285": "Aamanar-rasoolu bimaa unzila ilayhi min rabbihi wal-mu'minoon. Kullun aamana billaahi wa malaa'ikatihi wa kutubihi wa rusulih. Laa nufarriqu bayna ahadin min rusulih. Wa qaaloo sami'naa wa ata'naa, ghufraanaka rabbanaa wa ilaykal-maseer.",
+    "2:286": "Laa yukallifullaahu nafsan illaa wus'ahaa. Lahaa maa kasabat wa 'alayhaa maktasabat. Rabbanaa laa tu'aakhidhnaa in naseenaa aw akhta'naa. Rabbanaa wa laa tahmil 'alaynaa isran kamaa hamaltahu 'alal-ladheena min qablinaa. Rabbanaa wa laa tuhammilnaa maa laa taaqata lanaa bih. Wa'fu 'annaa, waghfir lanaa, warhamnaa. Anta mawlaanaa fansurnaa 'alal-qawmil-kaafireen.",
+    "3:8": "Rabbanaa laa tuzigh quloobanaa ba'da idh hadaytanaa wa hab lanaa min ladunka rahmah. Innaka antal-Wahhaab.",
+    "3:9": "Rabbanaa innaka jaami'un-naasi liyawmin laa rayba feeh. Innallaaha laa yukhliful-mee'aad.",
+    "3:16": "Alladheena yaqooloona rabbanaa innanaa aamannaa faghfir lanaa dhunoobanaa wa qinaa 'adhaaban-naar.",
+    "3:53": "Rabbanaa aamannaa bimaa anzalta wattaba'nar-rasoola faktubnaa ma'ash-shaahideen.",
+    "3:147": "Wa maa kaana qawlahum illaa an qaaloo rabbanaghfir lanaa dhunoobanaa wa israafanaa fee amrinaa wa thabbit aqdaamanaa wansurnaa 'alal-qawmil-kaafireen.",
+    "3:193": "Rabbanaa innanaa sami'naa munaadiyan yunaadee lil-eemaani an aaminoo birabbikum fa aamannaa. Rabbanaa faghfir lanaa dhunoobanaa wa kaffir 'annaa sayyi'aatinaa wa tawaffanaa ma'al-abraar.",
+    "3:194": "Rabbanaa wa aatinaa maa wa'adtanaa 'alaa rusulika wa laa tukhzinaa yawmal-qiyaamah. Innaka laa tukhliful-mee'aad.",
+    "7:23": "Qaalaa rabbanaa dhalamnaa anfusanaa wa in lam taghfir lanaa wa tarhamnaa lanakoonanna minal-khaasireen.",
+    "7:126": "Wa maa tanqimu minnaa illaa an aamannaa bi aayaati rabbinaa lammaa jaa'atnaa. Rabbanaa afrigh 'alaynaa sabran wa tawaffanaa Muslimeen.",
+    "14:40": "Rabbij'alnee muqeemas-salaati wa min dhurriyyatee. Rabbanaa wa taqabbal du'aa'.",
+    "14:41": "Rabbanaghfir lee wa liwaalidayya wa lil-mu'mineena yawma yaqoomul-hisaab.",
+    "17:24": "Wakhfid lahumaa janaahadh-dhulli minar-rahmati wa qul rabbirhamhumaa kamaa rabbayaanee sagheeraa.",
+    "18:10": "Idh awal-fityatu ilal-kahfi faqaaloo rabbanaa aatinaa min ladunka rahmatan wa hayyi' lanaa min amrinaa rashadaa.",
+    "20:25": "Qaala rabbishrah lee sadree.",
+    "20:26": "Wa yassir lee amree.",
+    "20:27": "Wahlul 'uqdatan min lisaanee.",
+    "20:28": "Yafqahoo qawlee.",
+    "20:114": "Fata'aalallaahul-Malikul-Haqq. Wa laa ta'jal bil-Qur'aani min qabli an yuqdaa ilayka wahyuhu wa qul rabbi zidnee 'ilmaa.",
+    "21:83": "Wa Ayyooba idh naadaa rabbahu annee massaniyad-durru wa anta arhamur-raahimeen.",
+    "21:87": "Wa dhan-Nooni idh dhahaba mughaadiban fadhanna an lan naqdira 'alayhi fanaadaa fidh-dhulumaati an laa ilaaha illaa anta subhaanaka innee kuntu minadh-dhaalimeen.",
+    "23:97": "Wa qul rabbi a'oodhu bika min hamazaatish-shayaateen.",
+    "23:109": "Innahu kaana fareequn min 'ibaadee yaqooloona rabbanaa aamannaa faghfir lanaa warhamnaa wa anta khayrur-raahimeen.",
+    "23:118": "Wa qul rabbighfir warham wa anta khayrur-raahimeen.",
+    "25:65": "Walladheena yaqooloona rabbanasrif 'annaa 'adhaaba Jahannam. Inna 'adhaabahaa kaana gharaamaa.",
+    "25:74": "Walladheena yaqooloona rabbanaa hab lanaa min azwaajinaa wa dhurriyyaatinaa qurrata a'yunin waj'alnaa lil-muttaqeena imaamaa.",
+    "27:19": "Fatabassama daahikan min qawlihaa wa qaala rabbi awzi'nee an ashkura ni'matakal-latee an'amta 'alayya wa 'alaa waalidayya wa an a'mala saalihan tardaahu wa adkhilnee birahmatika fee 'ibaadikas-saaliheen.",
+    "28:16": "Qaala rabbi innee dhalamtu nafsee faghfir lee faghafara lah. Innahu huwal-Ghafoorur-Raheem.",
+    "28:24": "Fasaqaa lahumaa thumma tawallaa iladh-dhilli faqaala rabbi innee limaa anzalta ilayya min khayrin faqeer.",
+    "46:15": "Wa wassaynal-insaana biwaalidayhi ihsaanaa. Hamalat-hu ummuhu kurhan wa wada'at-hu kurhaa. Wa hamluhu wa fisaaluhu thalaathoona shahraa. Hattaa idhaa balagha ashuddahu wa balagha arba'eena sanatan qaala rabbi awzi'nee an ashkura ni'matakal-latee an'amta 'alayya wa 'alaa waalidayya wa an a'mala saalihan tardaahu wa aslih lee fee dhurriyyatee. Innee tubtu ilayka wa innee minal-Muslimeen.",
+    "59:10": "Walladheena jaa'oo min ba'dihim yaqooloona rabbanaghfir lanaa wa li ikhwaaninal-ladheena sabaqoonaa bil-eemaani wa laa taj'al fee quloobinaa ghillan lilladheena aamanoo. Rabbanaa innaka Ra'oofur-Raheem.",
+    "66:8": "Yaa ayyuhal-ladheena aamanoo tooboo ilallaahi tawbatan nasoohan 'asaa rabbukum an yukaffira 'ankum sayyi'aatikum wa yudkhilakum jannaatin tajree min tahtihal-anhaar. Yawma laa yukhzillaahun-nabiyya walladheena aamanoo ma'ah. Nooruhum yas'aa bayna aydeehim wa bi aymaanihim yaqooloona rabbanaa atmim lanaa nooranaa waghfir lanaa. Innaka 'alaa kulli shay'in qadeer.",
+    "66:11": "Wa daraballaahu mathalan lilladheena aamanumra'ata Fir'awn. Idh qaalat rabbibni lee 'indaka baytan fil-jannati wa najjinee min Fir'awna wa 'amalihi wa najjinee minal-qawmidh-dhaalimeen.",
+    "112:1": "Qul huwallaahu ahad.",
+    "112:2": "Allaahus-samad.",
+    "112:3": "Lam yalid wa lam yoolad.",
+    "112:4": "Wa lam yakun lahu kufuwan ahad.",
+    "113:1": "Qul a'oodhu birabbil-falaq.",
+    "113:2": "Min sharri maa khalaq.",
+    "113:3": "Wa min sharri ghaasiqin idhaa waqab.",
+    "113:4": "Wa min sharrin-naffaathaati fil-'uqad.",
+    "113:5": "Wa min sharri haasidin idhaa hasad.",
+    "114:1": "Qul a'oodhu birabbin-naas.",
+    "114:2": "Malikin-naas.",
+    "114:3": "Ilaahin-naas.",
+    "114:4": "Min sharril-waswaasil-khannaas.",
+    "114:5": "Alladhee yuwaswisu fee sudoorin-naas.",
+    "114:6": "Minal-jinnati wan-naas."
+  },
+  "arabicAssetsSha256": {
+    "quran.js": "97909f3e04bd0433037331a1b0b52c6d03c6d25528cf3e3cb2f88cafe2395865",
+    "devotions-data.js": "bb80cb8057812dddd08db1b80f3ad57f6624023af1e997b744f2c478e3b0cafc",
+    "muslim-devotions.js": "0f38377a3d6da926fcf7f8acdb62ecdae6134762fac57ba3d4ac566ba581c1b5",
+    "morning-evening-data.js": "e5b2d6b79d949b7e72e82e1e11e314b9e529f394e76bcfe4dd76430df2cfb0ce",
+    "library-audit-data.js": "5a3652c2f97a7c13522ce5748cb357cd6fb00e881177c2a3c7f81c9cc1f59e37"
+  }
+}

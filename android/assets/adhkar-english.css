@@ -1,0 +1,11 @@
+.dhikr-meaning[hidden],.dhikr-list-meaning[hidden],.sebha-english-meaning[hidden]{display:none!important}
+.dhikr-meaning{margin:2px 0 14px;padding:16px 0;border-top:1px solid var(--line);text-align:left;direction:ltr;color:var(--ink);font-family:system-ui,sans-serif;overflow-wrap:anywhere}
+.dhikr-meaning>small{display:block;margin-bottom:9px;color:var(--gold);font:500 12px/1.5 system-ui,sans-serif}
+.dhikr-meaning-text{white-space:pre-line;font:400 18px/1.85 system-ui,sans-serif;color:inherit}
+.dhikr-list-meaning{margin:6px 0;color:var(--muted);text-align:left;direction:ltr}
+.dhikr-list-meaning .dhikr-meaning-text{font-size:14px;line-height:1.65;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+html[lang=en] .dhikr-reader-header>div>small,html[lang=en] .devotion-open>strong{font-family:system-ui,sans-serif;text-align:start;line-height:1.6}
+html[lang=en] .dhikr-note p,html[lang=en] .dhikr-grade{font-family:system-ui,sans-serif;text-align:start;direction:ltr}
+html[lang=en] .dhikr-source{justify-content:flex-start;text-align:start}
+.sebha-english-meaning{display:block;margin:8px auto 16px;max-width:500px;color:var(--muted);font:400 17px/1.7 system-ui,sans-serif;text-align:center;overflow-wrap:anywhere}
+@media(max-width:360px){.dhikr-meaning-text{font-size:17px}.dhikr-reader-header{gap:6px}.dhikr-reader-header>div{min-width:0}.dhikr-reader-header h1{font-size:15px}}

@@ -1,0 +1,2 @@
+// Import previous file-origin preferences once into the secure local origin.
+if(window.AndroidReader&&typeof AndroidReader.legacySettings==='function'&&!localStorage.secureOriginImported){try{var previous=JSON.parse(AndroidReader.legacySettings());Object.keys(previous).forEach(function(key){var value=previous[key];if(typeof value==='string'&&localStorage.getItem(key)===null)localStorage.setItem(key,value)});localStorage.secureOriginImported='1'}catch(error){console.warn('Legacy settings could not be imported')}}

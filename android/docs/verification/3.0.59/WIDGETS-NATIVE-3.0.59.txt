@@ -1,0 +1,1 @@
+PASS: three real AppWidget providers, host binding, independent options, RTL/LTR themes and resizing, native render, prayer boundaries including after Isha, canonical daily texts, missing location and per-instance cleanup.

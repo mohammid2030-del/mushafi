@@ -1,0 +1,1 @@
+PASS: five actual official MP3 files, publisher host accepted, legacy Maher cache ignored, actual decoded durations, seeks and ayah keys, paused latest rapid seek, same continuous MediaPlayer.

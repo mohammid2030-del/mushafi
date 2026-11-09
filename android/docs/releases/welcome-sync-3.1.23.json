@@ -1,0 +1,29 @@
+{
+  "version": "3.1.23",
+  "code": 173,
+  "filename": "Mushafi-3.1.23.apk",
+  "size": 119627780,
+  "sha256": "586f8659793684718d71a23fff551bb76576ac9261a82acc150ce67d358dab87",
+  "key": "releases/Mushafi-3.1.23.apk",
+  "minimumAndroid": "6.0",
+  "feature": "Synchronized multilingual welcome promises; duplicate top language button removed",
+  "tests": [
+    "Promise row and greeting language match at every 3-second tick for all five languages",
+    "Top language button absent",
+    "Explicit language choice persists and updates both greeting and promises",
+    "Responsive layouts, light/dark themes and timer cleanup passed",
+    "Signed native release assembled successfully"
+  ],
+  "publication": {
+    "commit": "2ccf3e3a96ef79e13bd59813ae5bbcdc4137a9ef",
+    "versionId": "appgprj_6aeacba839208191859bee126a2cd9df~appgver_cd707d07d4dc8191963e07da6daaf431",
+    "deploymentId": "appgdep_6aeda663150c819196e18e269a43dd08",
+    "environmentRevision": 44,
+    "url": "https://mushafi.mohammedasif241.chatgpt.site/download/Mushafi-3.1.23.apk",
+    "status": "published and publicly verified",
+    "FCMAnnouncementAccepted": true,
+    "fullDownloadVerified": true,
+    "temporaryRoutesClosed": true
+  },
+  "timestamp": "2026-11-06T10:06:18.824971+00:00"
+}

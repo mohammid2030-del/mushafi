@@ -1,0 +1,1 @@
+PASS: actual cloudApply during reader/chapter/mode selection preserves chooser DOM, selected reader, search/focus and route; repeated asynchronous sync still applies account data; home refreshes once after close, restores scroll/inert state; stepwise Android Back preserved; bare home still refreshes. AR/EN light/dark.

@@ -1,0 +1,41 @@
+{
+  "reader": {
+    "id": 259,
+    "name": "أحمد النفيس",
+    "letter": "أ",
+    "date": "2025-08-30T21:47:54.000000Z",
+    "moshaf": [
+      {
+        "id": 259,
+        "name": "حفص عن عاصم - مرتل",
+        "rewaya_id": 1,
+        "server": "https://cdn.mp3quran.net/audio/ahmad-nufais/r1/",
+        "surah_total": 114,
+        "moshaf_type": 11,
+        "surah_list": "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114"
+      }
+    ]
+  },
+  "timingReader": {
+    "id": 259,
+    "name": "أحمد النفيس",
+    "rewaya": "حفص عن عاصم",
+    "folder_url": "https://cdn.mp3quran.net/audio/ahmad-nufais/r1/",
+    "soar_count": 114,
+    "soar_link": "https://www.mp3quran.net/api/v3/ayat_timing/soar?read=259"
+  },
+  "chapterCount": 114,
+  "publishedTimingCount": 6236,
+  "playableVerseSegments": 6235,
+  "unavailable": [
+    "1:1"
+  ],
+  "fatiha": {
+    "fixture": "qa/assets/nafees-1.mp3",
+    "sha256": "1f1ccba4676cf55634b98580733be30401cc0039d8264787a5b5770fa33085bf",
+    "observation": "Recording starts with al-hamdu lillah; no audible basmalah. Publisher row 1 (240-820ms) overlaps the first word rather than a recited basmalah. Keep the publisher report unchanged; declare omission and start verse 2 at the beginning of this recording.",
+    "diagnostic": "Multilingual tiny ASR on the public Fatiha fixture begins al-hamdu lillah at 0.0s. No ASR-derived interior verse timings are shipped."
+  },
+  "validation": "All 114 publisher timing files have exact canonical verse counts/order, disjoint intervals, successful audio range responses and matching published folder. All final verse times fit audio header-derived durations. Timings are publisher-provided, not independently forced-aligned for every verse.",
+  "alignmentStatus": "REJECTED in 3.0.89: publisher timing does not match current audio. This older inventory is not alignment evidence; reports retained for diagnosis only."
+}

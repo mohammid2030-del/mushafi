@@ -1,0 +1,1 @@
+PASS: three native widgets, compact artwork at tall/short sizes, adjacent art/countdown/footer, actual system 12/24-hour preference for prayer row and next prayer, host binding, independent RTL/LTR themes, configuration cancel/save, prayer boundaries, canonical daily texts and cleanup.

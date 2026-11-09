@@ -1,0 +1,34 @@
+{
+  "version": "3.1.26",
+  "code": 176,
+  "filename": "Mushafi-3.1.26.apk",
+  "size": 119639155,
+  "sha256": "f087618ce90f22b4f671146a66593a70d1549695a5eb0cf7303627af6e014d60",
+  "key": "releases/Mushafi-3.1.26.apk",
+  "minimumAndroid": "6.0",
+  "feature": "Real document scrolling behind transparent system bars",
+  "native": "Full-height WebView; safe top/bottom space transferred to document and controls; IME handled separately; stable ignoring-visibility bar metrics passed in CSS pixels",
+  "validation": [
+    "Eight phone/tablet/landscape and theme cases: scrollable content reaches y=0 behind emulated system bars",
+    "Initial header safely below status bar; floating navigation above gesture area",
+    "Keyboard shrunk viewport, book fullscreen bounds, return from book and welcome footer all passed",
+    "All 60 book pages, resume state, controls, Quran checkpoint and multilingual welcome regression passed",
+    "Native build and original certificate passed; exact final sources and inset bridge verified in APK"
+  ],
+  "supportFeature": "Unconfigured support remains owner-preview only; no public shortcut or automatic financial prompt",
+  "limitations": [
+    "Native system-bar behavior not instrumented on a connected Android device; no device or emulator available"
+  ],
+  "publication": {
+    "status": "published and publicly verified",
+    "commit": "7cd8e207253005768e72b167cc139836805614c8",
+    "versionId": "appgprj_6aeacba839208191859bee126a2cd9df~appgver_279287f76594819191e84cc11f9095f9",
+    "deploymentId": "appgdep_6aee2d221acc8191918b8317dcdfc0ab",
+    "environmentRevision": 48,
+    "url": "https://mushafi.mohammedasif241.chatgpt.site/download/Mushafi-3.1.26.apk",
+    "FCMAnnouncementAccepted": true,
+    "fullDownloadVerified": true,
+    "temporaryRoutesClosed": true,
+    "timestamp": "2026-11-06T19:41:48.253400+00:00"
+  }
+}

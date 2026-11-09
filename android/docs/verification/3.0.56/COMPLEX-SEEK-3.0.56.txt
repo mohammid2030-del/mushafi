@@ -1,0 +1,1 @@
+PASS: 1→15 minute live ayah/tafsir preview, no stale slider reset on release, request token rejects old completions, latest rapid seek wins, ten skips accumulate without awaiting callbacks, main reading anchor preserved

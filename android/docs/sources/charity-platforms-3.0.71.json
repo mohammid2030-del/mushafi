@@ -1,0 +1,23 @@
+{
+  "checked": "2026-10-30",
+  "platforms": [
+    {
+      "id": "ehsan",
+      "url": "https://ehsan.sa/",
+      "primary": "https://www.ehsan.sa/home/faq",
+      "registry": "https://ncnp.gov.sa/ar/pages/المنصة-الوطنية-للعمل-الخيري-إحسان"
+    },
+    {
+      "id": "donations",
+      "url": "https://donations.sa/",
+      "registry": "https://ncnp.gov.sa/ar/pages/المنصة-الوطنية-للتبرعات-تبرع",
+      "availability": "Root fetch in research returned 502; official identity corroborated by registry. No live project inventory is asserted."
+    },
+    {
+      "id": "waqfy",
+      "url": "https://waqfy.sa/",
+      "primary": "https://waqfy.sa/faq/",
+      "registry": "https://ncnp.gov.sa/ar/pages/تبرّع-بأمان-منصة-وقفي"
+    }
+  ]
+}

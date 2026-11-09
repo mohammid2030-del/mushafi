@@ -1,0 +1,13 @@
+# Book page turning — Mushafi 3.0.97 (147)
+
+Replaces horizontal text translation/fade with an interactive curved paper leaf. Swipe right advances, swipe left returns. In landscape, the left leaf turns across the spine to the right, displaying the correct reverse page; the stationary old page remains until the leaf covers it. Phone turns use an unprinted paper reverse. Quran glyphs are never mirrored.
+
+The short-lived renderer uses clipped live-DOM strips with a continuous angle profile, perspective, paper shading and a cached moving shadow. It copies fitted QCF layout and original local fonts; no screenshots, remote resources, rasterized verse assets or new dependencies. Per-word baseline transforms are flattened into relative offsets inside visual copies to reduce compositor work. Original reader text/layout remains untouched. Captured visual copies are inert, aria-hidden and localization-frozen; the real reader remains the accessible source. English-meaning scroll positions are copied.
+
+Movement follows swipe displacement. A short/vertical/cancelled swipe returns the leaf without changing page or saved reading anchors. Font preparation never navigates; only a completed visual turn calls the original navigation chain once. Main reading, khatma, smart Mulk/Kahf sessions and recitation preserve their existing ownership/bounds. Direct page jumps and audio follow remain immediate. Busy locking prevents repeated quick turns. No additional sound or haptic is enabled.
+
+Navigation, direct jumps, theme/language changes, resize, background/blur, multitouch and reduced-motion changes clean up the overlay and pending gesture. Font failure keeps the original page and cursor and supports retry. Reduced-motion system setting or existing reading-motion preference bypasses the animation.
+
+Validation: real CDP touch swipe; next/previous/rapid input; page1/604 boundaries; cancelled and interrupted drag; font failure/retry; both themes; 16 spread/page/device layout combinations; Arabic source text and English meanings; khatma automatic progress; isolated smart-surah completion; navigation memory. CPU-throttled Chromium was used to inspect preparation and steady animation; initial raster/preparation can still cost more on slower devices. No physical Android device was available, so physical-device frame rate is not certified.
+
+Canonical pages.js/quran.js/QCF font files and all prayer/audio/challenge data are unchanged. Presentation and gesture orchestration only. Release still runs the existing nine source/content gates and signed APK/AAB asset parity/signing-continuity checks.

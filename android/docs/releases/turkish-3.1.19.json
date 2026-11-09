@@ -1,0 +1,22 @@
+{
+  "version": "3.1.19",
+  "code": 169,
+  "language": "tr",
+  "nativeName": "Türkçe",
+  "catalogEntries": 2826,
+  "quranEdition": "tr.diyanet",
+  "translator": "Diyanet İşleri",
+  "source": "https://api.alquran.cloud/v1/quran/tr.diyanet",
+  "sourceArchive": "docs/sources/tr.diyanet.json",
+  "sourceSha256": "924921904bb05fdb6c0b054dad39343c6336f52fd1c0a6c51f22a20c47024799",
+  "verses": 6236,
+  "tests": [
+    "Gradle locale coverage/placeholders, exact Turkish publisher verses and release build",
+    "Turkish browser: 11 sections, light/dark, LTR, persisted language, exact Arabic text integrity, Turkish meanings, Turkish uppercase/dotted-I surah search, English switching, welcome picker, tr-TR system language, contextual page counts",
+    "Urdu and Bengali reader/search/welcome regressions",
+    "Cold/warm/slow-boot/welcome-deferred update UI across Arabic/English/Urdu/Bengali/Turkish",
+    "Signed APK contents and full public binary compared over three ranges",
+    "Automatic FCM version169 announcement confirmed through durable sent marker; temporary routes closed"
+  ],
+  "releaseReceipt": "store-release/DEPLOYMENT-3.1.19.json"
+}

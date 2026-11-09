@@ -1,0 +1,1 @@
+PASS: unchanged in-app browser isolation, TLS cancellation, allowed initial domains, native Back and no JS bridge/payment-page injection.

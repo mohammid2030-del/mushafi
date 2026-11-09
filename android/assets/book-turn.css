@@ -1,0 +1,20 @@
+/* The moving leaf is a continuous curved sheet made of clipped DOM strips.
+   Original QCF glyphs remain live; no screenshot, reversed text or canvas copy. */
+.book-turn-scene{position:fixed;overflow:hidden;pointer-events:none;z-index:24;isolation:isolate;contain:layout paint style;perspective:2400px;perspective-origin:50% 50%;background:var(--book-paper);color:var(--book-ink);direction:rtl}
+.book-turn-scene .book-snapshot{position:absolute!important;inset:0!important;margin:0!important;max-width:none!important;box-sizing:border-box!important;pointer-events:none!important;overflow:hidden!important;transform:none!important}
+.book-turn-scene .reader-controls,.book-turn-scene .verse-toolbar,.book-turn-scene .verse-sheet{display:none!important}
+.book-turn-under,.book-turn-stationary{position:absolute;inset:0;background:var(--book-paper);overflow:hidden;pointer-events:none}
+.book-turn-under{z-index:0}.book-turn-stationary{z-index:1}
+.book-turn-sheets{z-index:3;position:absolute;inset:0;transform-style:preserve-3d;pointer-events:none}
+.book-turn-strip{position:absolute;left:0;top:0;transform-style:preserve-3d;will-change:transform;pointer-events:none}
+.book-turn-face{position:absolute;inset:0;overflow:hidden;backface-visibility:hidden;-webkit-backface-visibility:hidden;background:var(--book-paper);pointer-events:none;transform:translateZ(.12px)}
+.book-turn-back{transform:rotateY(180deg) translateZ(.12px)}
+.book-turn-tone{will-change:opacity;position:absolute;inset:0;background:#000;pointer-events:none;opacity:0}
+.book-turn-back:after{content:'';position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,rgba(150,128,84,.035),transparent 26%,rgba(255,255,255,.035) 70%,transparent)}
+.book-turn-shadow{position:absolute;top:0;bottom:0;z-index:2;pointer-events:none;opacity:0;background:linear-gradient(90deg,transparent,rgba(0,0,0,.32) 44%,rgba(0,0,0,.2) 66%,transparent);filter:blur(13px);will-change:transform,opacity;transform-origin:left center}
+.book-turn-scene.dark-paper .book-turn-shadow{background:linear-gradient(90deg,transparent,rgba(0,0,0,.72) 45%,rgba(0,0,0,.44) 68%,transparent)}
+.book-turn-scene .qword{cursor:default!important;outline:none!important}
+@media(prefers-reduced-motion:reduce){.book-turn-scene{display:none!important}}
+
+/* Flatten each glyph into its face to avoid thousands of nested compositor transforms. */
+.book-turn-scene .qline .qword{transform:none!important;position:relative;top:var(--ink-shift,0px)}

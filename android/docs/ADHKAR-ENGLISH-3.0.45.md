@@ -1,0 +1,15 @@
+# English adhkar meanings — 3.0.45 (95)
+
+The English interface displays English meanings beneath the original Arabic for all 195 selected adhkar/supplication entries. This includes morning/evening, sleep/night, after prayer, daily occasions, Quranic supplications, comprehensive supplications, selected Sahih Muslim prayers, prayer/adhan/travel/illness/weather/funerals and the separate disputed narrations category.
+
+Titles, instructions, exact references, grading attribution and explanatory notes are localized. Search accepts Arabic or English, case-insensitively, in both global and category search. Lists and saved supplications use the same IDs. English sharing includes the full original Arabic, English meaning and references; Arabic sharing remains unchanged. The six tasbih choices show English meanings while option values and saved phrases remain Arabic. No counters, targets, favorites, classification, timing or sync schema are changed by localization.
+
+The 153 non-Quran entries are editorial English renderings of the exact embedded Arabic excerpts, prepared against those excerpts and their existing references. They are not represented as a certified publisher translation or independent scholarly authentication. Variant wording, pronouns, occasion instructions and disputed gradings are retained; translators do not silently combine alternative narrations. The English label is “English meaning”.
+
+The 42 Quran entries use the existing verbatim Saheeh International/Tanzil translation, with exact canonical verse IDs and the same basmalah blocks as the Arabic reader. The existing non-commercial-use terms apply. No new translation service, account or runtime internet request is introduced. Source provenance remains in documentation/data.
+
+The separate complete Sahih Muslim reference library remains Arabic and continues to be labelled as such. This release translates all selected adhkar, not all 7,368 full hadith narrations in that reference library. Arabic original passages elsewhere in the app also remain untouched.
+
+`docs/sources/adhkar-arabic-3.0.44.json` retains all exact pre-change records. `docs/sources/adhkar-english-editorial.json` retains the English text and Arabic asset hashes. `tools/verify-adhkar-english.cjs` compares all live Arabic records against the snapshot, complete English ID coverage, hash/metadata integrity and exact Quran meanings. The portable Gradle release gate verifies the English bundle against the editorial data, Arabic asset hashes, all 195 IDs and all Quran blocks. These mechanical checks do not substitute for an independent linguistic or scholarly review.
+
+Validation: all 195 readers and source panels, language reversibility without resetting the reading DOM/counts/favorites, English and Arabic search, sharing, Arabic storage values, real touch scrolling without incrementing a count, 320/393/740/1280 layouts. Regression checks cover existing English UI, English Quran reading, Arabic tap-to-count/auto-advance and Arabic typesetting. Native player/location/sync/notification logic is unchanged; no physical-device test is claimed for this release.

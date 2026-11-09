@@ -1,0 +1,7 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android" android:id="@+id/widget_root" android:layout_width="match_parent" android:layout_height="match_parent" android:padding="8dp" android:clipChildren="true" android:clipToPadding="true" android:background="@drawable/widget_dark">
+<LinearLayout android:id="@+id/widget_panel" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_gravity="top" android:orientation="vertical">
+<ImageView android:id="@+id/widget_art" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:adjustViewBounds="true" android:scaleType="fitCenter" android:contentDescription="@string/widget_name"/>
+<Chronometer android:id="@+id/widget_countdown" style="@style/WidgetCountdown" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="22dp" android:gravity="center" android:textSize="18sp" android:textColor="#F3ECD9" android:visibility="gone"/>
+<ImageView android:id="@+id/widget_prayer_row" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:adjustViewBounds="true" android:scaleType="fitCenter"/>
+<TextView android:id="@+id/widget_footer" android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center" android:textSize="10sp" android:textColor="#C7B17B" android:text="@string/widget_name"/>
+</LinearLayout></FrameLayout>

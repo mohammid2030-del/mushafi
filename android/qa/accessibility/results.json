@@ -1,0 +1,150 @@
+{
+  "screens": [
+    {
+      "page": "home",
+      "dark": false,
+      "violations": [],
+      "small": [],
+      "smallCount": 0
+    },
+    {
+      "page": "quran",
+      "dark": false,
+      "violations": [],
+      "small": [],
+      "smallCount": 0
+    },
+    {
+      "page": "adhkar",
+      "dark": false,
+      "violations": [],
+      "small": [],
+      "smallCount": 0
+    },
+    {
+      "page": "library",
+      "dark": false,
+      "violations": [],
+      "small": [],
+      "smallCount": 0
+    },
+    {
+      "page": "more",
+      "dark": false,
+      "violations": [],
+      "small": [],
+      "smallCount": 0
+    },
+    {
+      "page": "stories",
+      "dark": false,
+      "violations": [],
+      "small": [],
+      "smallCount": 0
+    },
+    {
+      "page": "challenge",
+      "dark": false,
+      "violations": [],
+      "small": [],
+      "smallCount": 0
+    },
+    {
+      "page": "language",
+      "dark": false,
+      "violations": [],
+      "small": [],
+      "smallCount": 0
+    },
+    {
+      "page": "welcome",
+      "dark": false,
+      "violations": [],
+      "small": [],
+      "smallCount": 0
+    },
+    {
+      "page": "home",
+      "dark": true,
+      "violations": [],
+      "small": [],
+      "smallCount": 0
+    },
+    {
+      "page": "quran",
+      "dark": true,
+      "violations": [],
+      "small": [],
+      "smallCount": 0
+    },
+    {
+      "page": "adhkar",
+      "dark": true,
+      "violations": [],
+      "small": [],
+      "smallCount": 0
+    },
+    {
+      "page": "library",
+      "dark": true,
+      "violations": [],
+      "small": [],
+      "smallCount": 0
+    },
+    {
+      "page": "more",
+      "dark": true,
+      "violations": [],
+      "small": [],
+      "smallCount": 0
+    },
+    {
+      "page": "stories",
+      "dark": true,
+      "violations": [],
+      "small": [],
+      "smallCount": 0
+    },
+    {
+      "page": "challenge",
+      "dark": true,
+      "violations": [],
+      "small": [],
+      "smallCount": 0
+    },
+    {
+      "page": "language",
+      "dark": true,
+      "violations": [],
+      "small": [],
+      "smallCount": 0
+    },
+    {
+      "page": "welcome",
+      "dark": true,
+      "violations": [],
+      "small": [],
+      "smallCount": 0
+    }
+  ],
+  "scope": "Chromium + axe WCAG A/AA; actual TalkBack and Android font rendering require physical device validation",
+  "contrast": {
+    "lightMutedOnBackground": 5.31,
+    "lightGoldOnBackground": 5.18,
+    "method": "WCAG relative luminance of solid palette colors; gradients not fully assessed"
+  },
+  "targetMinimumCSSPixels": 44,
+  "automatedViolationCount": 0,
+  "undersizedVisibleControls": 0,
+  "fontScaleSimulationCases": 30,
+  "modalChecks": [
+    "initial focus",
+    "background isolation",
+    "Tab and Shift+Tab wrap",
+    "Escape close",
+    "trigger restoration",
+    "nested dialog return"
+  ],
+  "nativePolicyTests": "passed",
+  "release": "3.1.27"
+}

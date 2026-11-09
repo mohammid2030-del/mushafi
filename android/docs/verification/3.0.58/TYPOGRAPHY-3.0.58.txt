@@ -1,0 +1,1 @@
+PASS: Quran font; all 6236 source strings intact; reported hamza/waqf verses, Alif-Lam-Mim and long 2:282 at four viewports with tools shown/hidden; measured line ink separation, stop signs stay with their words, no horizontal overflow.

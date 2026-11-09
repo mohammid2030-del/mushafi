@@ -1,0 +1,4 @@
+package com.mushafi.app;
+public class ForegroundPolicyCheck {
+ public static void main(String[] args){long t=1000;for(long n:new long[]{0,1,599999,600000})if(AppForegroundPolicy.reloadAfterBackground(t,t+n))throw new AssertionError("quick return "+n);if(!AppForegroundPolicy.reloadAfterBackground(t,t+600001))throw new AssertionError("long return");if(AppForegroundPolicy.reloadAfterBackground(0,700000))throw new AssertionError("no stop");for(boolean r:new boolean[]{false,true})for(boolean a:new boolean[]{false,true})for(boolean f:new boolean[]{false,true})if(AppForegroundPolicy.keepScreenOn(r,a,f)!=(f&&(r||a)))throw new AssertionError("screen policy");System.out.println("PASS: quick returns including exactly ten minutes, long return threshold, no stop, all eight reading/playback/foreground screen combinations");}
+}

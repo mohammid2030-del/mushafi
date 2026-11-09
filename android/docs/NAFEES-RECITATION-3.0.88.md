@@ -1,0 +1,22 @@
+> Superseded by 3.0.89: the structural publisher checks below did not prove audio/timing alignment. Publisher timings were found mismatched and are no longer shipped as active timings. See NAFEES-PLAYBACK-FIX-3.0.89.md.
+
+# Ahmad Al-Nufais — 3.0.88
+
+Added internal reciter 1005, publisher reciter/read 259, Hafs, 114 chapters. Existing user-supplied portrait images/ahmad-alnafees.png is reused in Home/More/Welcome/verse selection and native media artwork. Welcome now counts ten reciters. All nine prior full and inline catalog records are preserved.
+
+Primary publisher source: https://www.mp3quran.net/api/v3/reciters?language=ar and https://www.mp3quran.net/api/v3/ayat_timing/reads . Both bind Ahmad Al-Nufais/Hafs/114 chapters to https://cdn.mp3quran.net/audio/ahmad-nufais/r1/ . Individual timings: /api/v3/ayat_timing?read=259&surah=N . All 114 actual MP3 URLs returned audio range responses with recorded total size, head SHA256 and ETag. All timing files have 6236 canonical verse rows in order with disjoint intervals. Header-derived durations contain every final verse. Publisher reports and verification ledger are in docs/sources/nafees-mp3quran/.
+
+These are the publisher's own timestamps, not timestamps borrowed from another reciter or independently forced-aligned across every verse. Some files continue beyond the final timed Quran verse (notably chapter 2); the explicit trimToTimings flag ends full playback at the final publisher verse boundary, keeping non-Quran tails out of verse/tafsir tracking. Native and browser full players clamp duration and finish sequential/random/single modes at that boundary.
+
+Fatiha exception: the actual public file begins Al-Hamdu Lillah without an audible basmalah. Publisher row 1 (240–820ms) labels a short part of that opening as verse 1. The raw report is retained; playback declares omittedVerses=[1], a zero-duration verse-1 sentinel, and verse 2 starting at file time zero. The first spoken verse shown is 1:2. Inline 1:1 is explicitly unavailable with an explanatory message; the other 6235 intervals are playable. Inline shuffle skips unavailable 1:1 to first spoken 1:2. Download counts reflect six available Fatiha verses. No replacement voice, invented basmalah or ASR-derived interior timestamps are shipped. A tiny multilingual ASR diagnostic on the public fixture confirmed the opening words; its model/runtime are not part of the app.
+
+New inline source type streams/seeks the same publisher chapter and stops at the selected verse end. Native and browser paths verify the completed seek before starting, stop polling while paused, cancel stale load/seek callbacks and bound repeated playback. Native chapter downloads validate complete byte length and share a versioned cache with full playback; existing URL/archive source behavior remains intact. Offline browser downloading remains unsupported as before.
+
+Validation:
+- Publisher inventory 114/114, 6236 raw timing rows, 6235 usable verse segments plus declared omission; strict source/reader/key/size unit tests pass.
+- Existing ten-reader UI suite: Home/More, 114 chapters per reader, AR/EN, four viewports, play dispatch, 15-minute verse/tafsir seek, Back and reading anchor preserved.
+- Real publisher Fatiha MP3 played in Chromium through HTTP range fixture: selected verse seeks to its start, pauses/resumes in place, ends at its boundary, repeats three times without spilling, and loading cancellation prevents autoplay.
+- Browser policy checks cover trimmed chapter completion/last-Quran termination, single first-spoken verse, old continuous/random/single behavior, source changes and stale seek state; player modes cover 32 AR/EN/theme/viewport layouts.
+- Added an eighth release gate binding new catalog to publisher evidence and declaring the sole Fatiha exception; original seven gates remain. Android release compilation/signing and APK/AAB parity checked.
+
+Actual Android MediaPlayer/background playback has not been exercised on a physical device in this environment. The publisher timeline uses a logical playback clock: audioOffsetMs skips each chapter introduction, full timing rows subtract that offset, and inline segments retain raw file coordinates. SurahClock converts native seek/progress coordinates, and browser full playback verifies the initial seek before playing. Both end at the final publisher verse boundary. A real MP3 transport fixture checks offset seeking, logical zero and bounded completion. The Fatiha omission correction remains explicit.

@@ -1,0 +1,36 @@
+{
+  "source": "https://www.mp3quran.net/api/v3/reciters?language=ar",
+  "policy": "Hafs murattal, same reciter. Standalone full-surah listening only, no verse timings or position transfer. Primary catalog and approved timings preserved.",
+  "readers": {
+    "133": {
+      "name": "ماهر المعيقلي",
+      "server": "https://cdn.mp3quran.net/audio/maher-muaiqly/r1/",
+      "publisherReciterId": 102,
+      "publisherMoshafId": 102
+    },
+    "1001": {
+      "name": "علي بن عبدالرحمن الحذيفي",
+      "server": "https://cdn.mp3quran.net/audio/ali-hudhaifi/r1/",
+      "publisherReciterId": 74,
+      "publisherMoshafId": 74
+    },
+    "1002": {
+      "name": "محمد أيوب",
+      "server": "https://cdn.mp3quran.net/audio/muhammad-ayyub/r1/",
+      "publisherReciterId": 109,
+      "publisherMoshafId": 109
+    },
+    "1003": {
+      "name": "خالد المهنا",
+      "server": "https://cdn.mp3quran.net/audio/khalid-mohanna/r1/",
+      "publisherReciterId": 159,
+      "publisherMoshafId": 159
+    },
+    "1004": {
+      "name": "إبراهيم الأخضر",
+      "server": "https://cdn.mp3quran.net/audio/ibrahim-akhdar/r1/",
+      "publisherReciterId": 1,
+      "publisherMoshafId": 1
+    }
+  }
+}

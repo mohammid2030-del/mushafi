@@ -1,0 +1,360 @@
+{
+  "version": "3.1.30",
+  "code": 180,
+  "filename": "Mushafi-3.1.30.apk",
+  "size": 117810116,
+  "sha256": "3b3881fa67d49d6e7f9f2bebef34a22f8579fa9baea056ff85213bb8b923b22e",
+  "key": "releases/Mushafi-3.1.30.apk",
+  "minimumAndroid": "6.0",
+  "release": {
+    "version": "3.1.30",
+    "code": 180,
+    "filename": "Mushafi-3.1.30.apk",
+    "size": 117810116,
+    "sha256": "3b3881fa67d49d6e7f9f2bebef34a22f8579fa9baea056ff85213bb8b923b22e",
+    "key": "releases/Mushafi-3.1.30.apk",
+    "minimumAndroid": "6.0"
+  },
+  "change": "Replace five unavailable primary recitations with timed primary recordings shared by both engines; remove untimed fallback",
+  "reciters": {
+    "133": "ماهر المعيقلي",
+    "1001": "علي الحذيفي",
+    "1002": "محمد أيوب",
+    "1003": "خالد المهنا",
+    "1004": "إبراهيم الأخضر"
+  },
+  "coverage": {
+    "livePrimaryRecordingChecks": 570,
+    "timedVerseSegments": 31180,
+    "untimedFallbackUrls": 0,
+    "primaryClipTests": 25,
+    "publisherCorrectionCases": 3
+  },
+  "checks": [
+    "All 570 primary URLs returned range audio; MPEG durations and file lengths bound every verse",
+    "Actual downloaded Fatiha files for all five sources decode and match validated duration and size",
+    "Primary verse samples first/middle/last, three repetitions and four corrected-boundary clips passed in Chromium",
+    "All five primary reciters play exact verse clips inside khatma without changing its saved position",
+    "All ten full players, actual home entry, mini-player and navigation regression passed",
+    "Release validators match native/UI catalogs, exact segment bounds and unaffected recordings",
+    "Source revisions isolate caches and reset obsolete audio positions without changing Quran/khatma reading progress"
+  ],
+  "limits": [
+    "Not a human review of every spoken boundary",
+    "Actual Android MediaPlayer/headset/locked-screen instrumentation was unavailable; native code compiled and signed, with real media tests executed in Chromium"
+  ],
+  "evidence": "docs/sources/primary-audio-validation.json",
+  "publication": {
+    "status": "published and publicly verified",
+    "commit": "d605cf6bb18840449a5e496f8b5069599f5e08bf",
+    "versionId": "appgprj_6aeacba839208191859bee126a2cd9df~appgver_ab4f8e3912e481919996e3b7a123f04e",
+    "deploymentId": "appgdep_6aef817240308191a83459568c59d7ea",
+    "environmentRevision": 56,
+    "url": "https://mushafi.mohammedasif241.chatgpt.site/download/Mushafi-3.1.30.apk",
+    "FCMAnnouncementAccepted": true,
+    "fullDownloadVerified": true,
+    "temporaryRoutesClosed": true
+  },
+  "liveAllReaderSamples": [
+    {
+      "reader": 2,
+      "chapter": 1,
+      "url": "https://download.quranicaudio.com/qdc/abdul_baset/murattal/1.mp3",
+      "status": 200,
+      "mime": "audio/mpeg",
+      "seconds": 41.795918,
+      "codec": "mp3",
+      "expectedSeconds": 0.0,
+      "ok": true,
+      "elapsedSeconds": 0.82
+    },
+    {
+      "reader": 2,
+      "chapter": 2,
+      "url": "https://download.quranicaudio.com/qdc/abdul_baset/murattal/2.mp3",
+      "status": 206,
+      "mime": "audio/mpeg",
+      "ok": true,
+      "elapsedSeconds": 0.57
+    },
+    {
+      "reader": 2,
+      "chapter": 114,
+      "url": "https://download.quranicaudio.com/qdc/abdul_baset/murattal/114.mp3",
+      "status": 206,
+      "mime": "audio/mpeg",
+      "ok": true,
+      "elapsedSeconds": 0.74
+    },
+    {
+      "reader": 6,
+      "chapter": 1,
+      "url": "https://download.quranicaudio.com/qdc/khalil_al_husary/murattal/1.mp3",
+      "status": 200,
+      "mime": "audio/mpeg",
+      "seconds": 48.222041,
+      "codec": "mp3",
+      "expectedSeconds": 0.0,
+      "ok": true,
+      "elapsedSeconds": 0.66
+    },
+    {
+      "reader": 6,
+      "chapter": 2,
+      "url": "https://download.quranicaudio.com/qdc/khalil_al_husary/murattal/2.mp3",
+      "status": 206,
+      "mime": "audio/mpeg",
+      "ok": true,
+      "elapsedSeconds": 0.6
+    },
+    {
+      "reader": 6,
+      "chapter": 114,
+      "url": "https://download.quranicaudio.com/qdc/khalil_al_husary/murattal/114.mp3",
+      "status": 206,
+      "mime": "audio/mpeg",
+      "ok": true,
+      "elapsedSeconds": 0.17
+    },
+    {
+      "reader": 7,
+      "chapter": 1,
+      "url": "https://download.quranicaudio.com/qdc/mishari_al_afasy/murattal/1.mp3",
+      "status": 200,
+      "mime": "audio/mpeg",
+      "seconds": 46.497959,
+      "codec": "mp3",
+      "expectedSeconds": 0.0,
+      "ok": true,
+      "elapsedSeconds": 0.63
+    },
+    {
+      "reader": 7,
+      "chapter": 2,
+      "url": "https://download.quranicaudio.com/qdc/mishari_al_afasy/murattal/2.mp3",
+      "status": 206,
+      "mime": "audio/mpeg",
+      "ok": true,
+      "elapsedSeconds": 0.44
+    },
+    {
+      "reader": 7,
+      "chapter": 114,
+      "url": "https://download.quranicaudio.com/qdc/mishari_al_afasy/murattal/114.mp3",
+      "status": 206,
+      "mime": "audio/mpeg",
+      "ok": true,
+      "elapsedSeconds": 0.48
+    },
+    {
+      "reader": 133,
+      "chapter": 1,
+      "url": "https://cdn.mp3quran.net/audio/maher-muaiqly/r3/001.mp3",
+      "status": 200,
+      "mime": "audio/mpeg",
+      "seconds": 62.6155,
+      "codec": "mp3",
+      "expectedSeconds": 62.616,
+      "ok": true,
+      "elapsedSeconds": 0.39
+    },
+    {
+      "reader": 133,
+      "chapter": 2,
+      "url": "https://cdn.mp3quran.net/audio/maher-muaiqly/r3/002.mp3",
+      "status": 206,
+      "mime": "audio/mpeg",
+      "ok": true,
+      "elapsedSeconds": 0.2
+    },
+    {
+      "reader": 133,
+      "chapter": 114,
+      "url": "https://cdn.mp3quran.net/audio/maher-muaiqly/r3/114.mp3",
+      "status": 206,
+      "mime": "audio/mpeg",
+      "ok": true,
+      "elapsedSeconds": 0.15
+    },
+    {
+      "reader": 3,
+      "chapter": 1,
+      "url": "https://download.quranicaudio.com/qdc/abdurrahmaan_as_sudais/murattal/1.mp3",
+      "status": 200,
+      "mime": "audio/mpeg",
+      "seconds": 34.925714,
+      "codec": "mp3",
+      "expectedSeconds": 0.0,
+      "ok": true,
+      "elapsedSeconds": 0.67
+    },
+    {
+      "reader": 3,
+      "chapter": 2,
+      "url": "https://download.quranicaudio.com/qdc/abdurrahmaan_as_sudais/murattal/2.mp3",
+      "status": 206,
+      "mime": "audio/mpeg",
+      "ok": true,
+      "elapsedSeconds": 0.32
+    },
+    {
+      "reader": 3,
+      "chapter": 114,
+      "url": "https://download.quranicaudio.com/qdc/abdurrahmaan_as_sudais/murattal/114.mp3",
+      "status": 206,
+      "mime": "audio/mpeg",
+      "ok": true,
+      "elapsedSeconds": 0.15
+    },
+    {
+      "reader": 1001,
+      "chapter": 1,
+      "url": "https://cdn.mp3quran.net/audio/ali-hudhaifi/r1/001.mp3",
+      "status": 200,
+      "mime": "audio/mpeg",
+      "seconds": 62.992,
+      "codec": "mp3",
+      "expectedSeconds": 62.992,
+      "ok": true,
+      "elapsedSeconds": 0.2
+    },
+    {
+      "reader": 1001,
+      "chapter": 2,
+      "url": "https://cdn.mp3quran.net/audio/ali-hudhaifi/r1/002.mp3",
+      "status": 206,
+      "mime": "audio/mpeg",
+      "ok": true,
+      "elapsedSeconds": 0.19
+    },
+    {
+      "reader": 1001,
+      "chapter": 114,
+      "url": "https://cdn.mp3quran.net/audio/ali-hudhaifi/r1/114.mp3",
+      "status": 206,
+      "mime": "audio/mpeg",
+      "ok": true,
+      "elapsedSeconds": 0.21
+    },
+    {
+      "reader": 1002,
+      "chapter": 1,
+      "url": "https://cdn.mp3quran.net/audio/muhammad-ayyub/r1/001.mp3",
+      "status": 200,
+      "mime": "audio/mpeg",
+      "seconds": 59.036756,
+      "codec": "mp3",
+      "expectedSeconds": 59.037,
+      "ok": true,
+      "elapsedSeconds": 0.29
+    },
+    {
+      "reader": 1002,
+      "chapter": 2,
+      "url": "https://cdn.mp3quran.net/audio/muhammad-ayyub/r1/002.mp3",
+      "status": 206,
+      "mime": "audio/mpeg",
+      "ok": true,
+      "elapsedSeconds": 0.13
+    },
+    {
+      "reader": 1002,
+      "chapter": 114,
+      "url": "https://cdn.mp3quran.net/audio/muhammad-ayyub/r1/114.mp3",
+      "status": 206,
+      "mime": "audio/mpeg",
+      "ok": true,
+      "elapsedSeconds": 0.14
+    },
+    {
+      "reader": 1003,
+      "chapter": 1,
+      "url": "https://cdn.mp3quran.net/audio/khalid-mohanna/r1/001.mp3",
+      "status": 200,
+      "mime": "audio/mpeg",
+      "seconds": 61.173333,
+      "codec": "mp3",
+      "expectedSeconds": 61.173,
+      "ok": true,
+      "elapsedSeconds": 0.26
+    },
+    {
+      "reader": 1003,
+      "chapter": 2,
+      "url": "https://cdn.mp3quran.net/audio/khalid-mohanna/r1/002.mp3",
+      "status": 206,
+      "mime": "audio/mpeg",
+      "ok": true,
+      "elapsedSeconds": 0.14
+    },
+    {
+      "reader": 1003,
+      "chapter": 114,
+      "url": "https://cdn.mp3quran.net/audio/khalid-mohanna/r1/114.mp3",
+      "status": 206,
+      "mime": "audio/mpeg",
+      "ok": true,
+      "elapsedSeconds": 0.15
+    },
+    {
+      "reader": 1004,
+      "chapter": 1,
+      "url": "https://cdn.mp3quran.net/audio/ibrahim-akhdar/r1/001.mp3",
+      "status": 200,
+      "mime": "audio/mpeg",
+      "seconds": 61.121667,
+      "codec": "mp3",
+      "expectedSeconds": 61.122,
+      "ok": true,
+      "elapsedSeconds": 0.23
+    },
+    {
+      "reader": 1004,
+      "chapter": 2,
+      "url": "https://cdn.mp3quran.net/audio/ibrahim-akhdar/r1/002.mp3",
+      "status": 206,
+      "mime": "audio/mpeg",
+      "ok": true,
+      "elapsedSeconds": 0.23
+    },
+    {
+      "reader": 1004,
+      "chapter": 114,
+      "url": "https://cdn.mp3quran.net/audio/ibrahim-akhdar/r1/114.mp3",
+      "status": 206,
+      "mime": "audio/mpeg",
+      "ok": true,
+      "elapsedSeconds": 0.17
+    },
+    {
+      "reader": 1005,
+      "chapter": 1,
+      "url": "https://cdn.mp3quran.net/audio/ahmad-nufais/r1/001.mp3",
+      "status": 200,
+      "mime": "audio/mpeg",
+      "seconds": 48.3265,
+      "codec": "mp3",
+      "expectedSeconds": 48.326,
+      "ok": true,
+      "elapsedSeconds": 0.2
+    },
+    {
+      "reader": 1005,
+      "chapter": 2,
+      "url": "https://cdn.mp3quran.net/audio/ahmad-nufais/r1/002.mp3",
+      "status": 206,
+      "mime": "audio/mpeg",
+      "ok": true,
+      "elapsedSeconds": 0.13
+    },
+    {
+      "reader": 1005,
+      "chapter": 114,
+      "url": "https://cdn.mp3quran.net/audio/ahmad-nufais/r1/114.mp3",
+      "status": 206,
+      "mime": "audio/mpeg",
+      "ok": true,
+      "elapsedSeconds": 0.09
+    }
+  ]
+}

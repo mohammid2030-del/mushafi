@@ -1,0 +1,20 @@
+html[lang=en] #devotion-text,html[lang=en] .devotion-open>p,html[lang=en] .sebha-phrase,html[lang=en] .azkar-title>div>span:not(.azkar-english-caption){display:none!important}
+.sebha-pronunciation[hidden],.azkar-english-caption[hidden]{display:none!important}
+.dhikr-meaning{border-top:0;padding-top:0}
+.dhikr-pronunciation{padding:0 0 20px;margin-bottom:18px;border-bottom:1px solid var(--line);text-align:left;color:var(--ink)}
+.dhikr-pronunciation>small{display:block;color:var(--gold);font:500 12px/1.6 system-ui,sans-serif;margin-bottom:12px}
+.dhikr-pronunciation-text{font:400 22px/1.9 system-ui,sans-serif;white-space:pre-line;overflow-wrap:anywhere;color:var(--ink)}
+.dhikr-pronunciation-basmala{margin-bottom:20px}
+.dhikr-pronunciation-verse{margin-bottom:20px}
+.dhikr-pronunciation-verse-tools{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:8px}
+.dhikr-pronunciation-verse-tools>small{color:var(--gold);font:400 12px/1.6 system-ui,sans-serif}
+.dhikr-pronunciation-listen{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-width:74px;min-height:40px;padding:8px 12px;border:1px solid var(--line);border-radius:20px;background:transparent;color:var(--ink);font:500 12px/1.4 system-ui,sans-serif;touch-action:manipulation}
+.dhikr-pronunciation-listen .ui-icon{width:17px;height:17px;color:var(--gold)}
+p.dhikr-pronunciation-note{margin:14px 0 0;font:400 11px/1.8 system-ui,sans-serif;color:var(--muted);text-align:left}
+.dhikr-list-pronunciation{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin:7px 0;font:400 17px/1.8 system-ui,sans-serif;color:var(--ink);text-align:left;white-space:pre-line}
+.sebha-pronunciation{display:block;margin:10px auto;max-width:600px;font:500 27px/1.8 system-ui,sans-serif;color:var(--ink);text-align:center;overflow-wrap:anywhere}
+.dhikr-audio-pronunciation{font:400 21px/1.9 system-ui,sans-serif;color:var(--ink);text-align:left;overflow-wrap:anywhere;white-space:pre-line;margin:18px 0}
+html[lang=en] .azkar-title>div>span.azkar-english-caption{display:block;font-family:system-ui,sans-serif}
+@media(max-width:370px){.dhikr-pronunciation-text{font-size:20px}.sebha-pronunciation{font-size:24px}}
+/* The full local hadith corpus is Arabic; keep its link in Arabic mode. */
+html[lang=en] #muslim-source-local{display:none!important}

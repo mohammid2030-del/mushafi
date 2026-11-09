@@ -1,0 +1,6 @@
+> Task :verifyAdhkarEnglish
+> Task :verifyAdhkarPronunciation
+> Task :verifyComplexRecitations
+> Task :verifyEnglishMeanings
+> Task :verifyUiLocales
+BUILD SUCCESSFUL in 57s

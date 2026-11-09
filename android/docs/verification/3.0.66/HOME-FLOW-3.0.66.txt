@@ -1,0 +1,1 @@
+PASS: home remains active and mounted; nine readers, 114 chapters/search, all four AR/EN light/dark combinations; native play dispatch, 15-minute seek ayah/tafsir sync, tafsir pause/resume; close restores home scroll and page, mini reopens modal, Back steps through modal, explicit Mushaf opens reader.

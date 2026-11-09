@@ -1,0 +1,1 @@
+PASS: 36 source-derived exact section routes; no Donations platform; matched per-cause providers, official sections/filters/endowment scopes and gift link; AR/EN light/dark and responsive UI; only native route IDs dispatched, invalid IDs rejected; isolated Activity launch and security/back-policy source checks. No live payment transaction performed.

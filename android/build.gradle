@@ -1,0 +1,347 @@
+plugins { id 'com.android.application' version '8.10.1' }
+layout.buildDirectory = file(System.getenv('MUSHAFI_BUILD_DIRECTORY') ?: 'gradle-build')
+android {
+ namespace 'com.mushafi.app'
+ compileSdk 36
+ buildToolsVersion '36.0.0'
+ defaultConfig { applicationId 'com.mushafi.app'; minSdk 23; targetSdk 36; versionCode 181; versionName '3.1.31'; multiDexEnabled true; testInstrumentationRunner 'com.mushafi.qa.CloudInstrumentation' }
+ sourceSets { main { manifest.srcFile 'AndroidManifest.xml'; java.srcDirs=['src']; res.srcDirs=['res']; assets.srcDirs=['assets'] } }
+ sourceSets { debug.java.srcDirs=['qa/debug/java']; debug.manifest.srcFile 'qa/debug/AndroidManifest.xml'; androidTest.java.srcDirs=['qa/android']; androidTest.assets.srcDirs=['qa/assets'] }
+ compileOptions { sourceCompatibility JavaVersion.VERSION_1_8; targetCompatibility JavaVersion.VERSION_1_8 }
+ def releaseProperties = new Properties()
+ def releasePropertiesFile = file(System.getenv('MUSHAFI_SIGNING_PROPERTIES') ?: 'signing/upload.properties')
+ if (releasePropertiesFile.exists()) releasePropertiesFile.withInputStream { releaseProperties.load(it) }
+ signingConfigs { release { if (releasePropertiesFile.exists()) { storeFile file(releaseProperties.getProperty('storeFile')); storePassword releaseProperties.getProperty('storePassword'); keyAlias releaseProperties.getProperty('keyAlias'); keyPassword releaseProperties.getProperty('keyPassword') } } }
+ buildTypes { release { signingConfig signingConfigs.release; minifyEnabled false }; debug { } }
+
+ packaging { resources.excludes += ['META-INF/DEPENDENCIES','META-INF/LICENSE*','META-INF/NOTICE*'] }
+}
+dependencies {
+ implementation 'androidx.core:core:1.9.0'
+ implementation platform('com.google.firebase:firebase-bom:34.19.0')
+ implementation 'com.google.firebase:firebase-auth'
+ implementation 'com.google.firebase:firebase-messaging'
+ implementation 'com.google.firebase:firebase-firestore'
+ implementation 'androidx.credentials:credentials:1.3.0'
+ implementation 'androidx.credentials:credentials-play-services-auth:1.3.0'
+ implementation 'com.google.android.libraries.identity.googleid:googleid:1.1.1'
+}
+
+// Do not publish a partially translated language selection.
+tasks.register("verifyUiLocales") {
+    doLast {
+        def parser = new groovy.json.JsonSlurper()
+        def source = parser.parse(file("assets/locales/ar.json"), "UTF-8")
+        def errors = []
+        ["en", "ur", "bn", "tr"].each { language ->
+            def path = file("assets/locales/${language}.json")
+            if (!path.exists()) { errors.add("${language}: missing catalog") }
+            else {
+                def catalog = parser.parse(path, "UTF-8")
+                def missing = source.keySet() - catalog.keySet()
+                if (missing) errors.add("${language}: ${missing.size()} missing entries")
+                source.keySet().intersect(catalog.keySet()).each { key ->
+                    def value = catalog[key]
+                    if (!(value instanceof String) || !value.trim() || (key.findAll(/\{\d+\}/).sort() != value.findAll(/\{\d+\}/).sort())) errors.add("${language}: invalid entry")
+                }
+            }
+        }
+        if (errors) throw new GradleException("Localization release blocked: " + errors.join("; "))
+    }
+}
+tasks.matching { it.name in ["assembleRelease", "bundleRelease"] }.configureEach {
+    dependsOn tasks.named("verifyUiLocales")
+}
+// Preserve exact publisher text and all canonical verse identifiers.
+tasks.register("verifyEnglishMeanings") {
+    doLast {
+        def parser = new groovy.json.JsonSlurper()
+        def data = parser.parse(file("assets/quran-english-meanings.json"), "UTF-8")
+        def raw = file("docs/sources/en.sahih.txt")
+        def sha = java.security.MessageDigest.getInstance("SHA-256").digest(raw.bytes).encodeHex().toString()
+        if (sha != data.sourceSha256) throw new GradleException("English source hash mismatch")
+        def expected = [:]
+        raw.readLines("UTF-8").each { line ->
+            if (line ==~ /^\d+\|\d+\|.*$/) {
+                def parts = line.split(/\|/, 3)
+                def key = parts[0] + ":" + parts[1]
+                if (expected.containsKey(key)) throw new GradleException("Duplicate English verse")
+                expected[key] = parts[2]
+            }
+        }
+        if (expected.size() != 6236 || expected != data.verses) throw new GradleException("English verse text differs from source")
+    }
+}
+tasks.matching { it.name in ["assembleRelease", "bundleRelease"] }.configureEach {
+    dependsOn tasks.named("verifyEnglishMeanings")
+}
+// English adhkar remain separate from the original Arabic text and repetition rules.
+tasks.register("verifyAdhkarEnglish") {
+    doLast {
+        def parser = new groovy.json.JsonSlurper()
+        def expected = parser.parse(file("docs/sources/adhkar-english-editorial.json"), "UTF-8")
+        def raw = file("assets/adhkar-english-data.js").getText("UTF-8")
+        def data = parser.parseText(raw.substring(raw.indexOf("const dhikrEnglishData=") + "const dhikrEnglishData=".length()).trim().replaceFirst(/;$/, ""))
+        def originals = parser.parse(file("docs/sources/adhkar-arabic-3.0.44.json"), "UTF-8")
+        def quran = parser.parse(file("assets/quran-english-meanings.json"), "UTF-8").verses
+        if (data != expected || data.entries.size() != 195 || data.entries.keySet() != originals.collect { it.id }.toSet()) throw new GradleException("Adhkar English coverage mismatch")
+        data.arabicAssetsSha256.each { name, sha ->
+            def actual = java.security.MessageDigest.getInstance("SHA-256").digest(file("assets/" + name).bytes).encodeHex().toString()
+            if (sha != actual) throw new GradleException("Canonical adhkar asset changed: " + name)
+        }
+        originals.each { item ->
+            def en = data.entries[item.id]
+            def hash = java.security.MessageDigest.getInstance("SHA-256").digest(item.text.getBytes("UTF-8")).encodeHex().toString()
+            if (en.arabicSha256 != hash || !en.title?.trim() || !en.meaning?.trim() || !en.reference?.trim()) throw new GradleException("Adhkar text mismatch: " + item.id)
+            if (item.kind == "quran") {
+                def meaning = en.quranBlocks.collect { block -> (block.basmala ? quran["1:1"] + "\n" : "") + block.keys.collect { key -> "[" + key + "] " + quran[key] }.join("\n") }.join("\n\n")
+                if (meaning != en.meaning || en.quranBlocks.collectMany { it.keys } != item.keys) throw new GradleException("Adhkar Quran verse mismatch: " + item.id)
+            }
+        }
+    }
+}
+tasks.matching { it.name in ["assembleRelease", "bundleRelease"] }.configureEach {
+    dependsOn tasks.named("verifyAdhkarEnglish")
+}
+// Prevent incomplete or mismatched English pronunciation guides from shipping.
+tasks.register("verifyAdhkarPronunciation") {
+    doLast {
+        def parser = new groovy.json.JsonSlurper()
+        def expected = parser.parse(file("docs/sources/adhkar-pronunciation-editorial.json"), "UTF-8")
+        def raw = file("assets/adhkar-pronunciation-data.js").getText("UTF-8")
+        def prefix = "const dhikrPronunciationData="
+        def data = parser.parseText(raw.substring(raw.indexOf(prefix) + prefix.length()).trim().replaceFirst(/;$/, ""))
+        def originals = parser.parse(file("docs/sources/adhkar-arabic-3.0.44.json"), "UTF-8")
+        def meanings = parser.parse(file("docs/sources/adhkar-english-editorial.json"), "UTF-8")
+        if (data != expected || data.entries.size() != 195 || data.quranVerses.size() != 52 || data.entries.keySet() != originals.collect { it.id }.toSet()) throw new GradleException("Pronunciation coverage mismatch")
+        data.arabicAssetsSha256.each { name, sha ->
+            def actual = java.security.MessageDigest.getInstance("SHA-256").digest(file("assets/" + name).bytes).encodeHex().toString()
+            if (sha != actual) throw new GradleException("Arabic source changed: " + name)
+        }
+        originals.each { item ->
+            def en = data.entries[item.id]
+            def hash = java.security.MessageDigest.getInstance("SHA-256").digest(item.text.getBytes("UTF-8")).encodeHex().toString()
+            if (en.arabicSha256 != hash || !en.text?.trim() || !(en.text ==~ /[\x20-\x7e\n]+/)) throw new GradleException("Pronunciation source mismatch: " + item.id)
+            if (item.kind == "quran") {
+                if (en.blocks.collectMany { it.verses.collect { v -> v.key } } != item.keys || en.blocks.collect { it.basmala } != meanings.entries[item.id].quranBlocks.collect { !!it.basmala }) throw new GradleException("Quran pronunciation keys mismatch: " + item.id)
+                en.blocks.each { block -> block.verses.each { v -> if (v.text != data.quranVerses[v.key]) throw new GradleException("Quran pronunciation differs: " + v.key) } }
+                def text = en.blocks.collect { block -> (block.basmala ? data.basmala + "\n" : "") + block.verses.collect { v -> "[" + v.key + "] " + v.text }.join("\n") }.join("\n\n")
+                if (en.text != text) throw new GradleException("Quran pronunciation block mismatch: " + item.id)
+            }
+        }
+    }
+}
+tasks.matching { it.name in ["assembleRelease", "bundleRelease"] }.configureEach {
+    dependsOn tasks.named("verifyAdhkarPronunciation")
+}
+
+// Primary recording migration: source URLs, publisher/QUD timing evidence and exact-verse clips agree.
+tasks.register("verifyComplexRecitations") {
+ doLast {
+  def p = new groovy.json.JsonSlurper()
+  def catalog = p.parse(file("assets/surah-audio.json"), "UTF-8")
+  def audio = p.parse(file("assets/audio-index.json"), "UTF-8")
+  def evidence = p.parse(file("docs/sources/primary-audio-validation.json"), "UTF-8")
+  def preserved = p.parse(file("docs/sources/surah-readers-preserved-3.0.55.json"), "UTF-8")
+  def quran = p.parseText(file("assets/quran.js").getText("UTF-8").substring("const chapters=".length()).trim().replaceFirst(/;$/, ""))
+  def ids = ["133","1001","1002","1003","1004"] as Set
+  if(catalog.size()!=10 || evidence.readers.keySet()!=ids || evidence.bindings.keySet()!=ids) throw new GradleException("Incomplete primary reciter migration")
+  preserved.each { id, original -> if(!ids.contains(id) && catalog[id]!=original) throw new GradleException("Unaffected recording changed: "+id) }
+  catalog.each { id, reciter -> if(reciter.chapters.values().any { it.containsKey("fallbackUrl") }) throw new GradleException("Untimed fallback must not ship") }
+  ids.each { id ->
+   def reciter=catalog[id], clips=audio[id], proof=evidence.readers[id], folder=evidence.bindings[id].folder
+   if(reciter.chapters.size()!=114 || proof.size()!=114 || clips.chapterUrls.size()!=114 || clips.chapterSizes.size()!=114 || clips.segments.size()!=6236 || !clips.verseTimingVerified || clips.sourceVersion!="mp3quran-primary-v1") throw new GradleException("Incomplete timed primary: "+id)
+   int count=0
+   (1..114).each { c ->
+    def ch=c.toString(), t=reciter.chapters[ch], e=proof[ch], expected=quran[c-1].verses_count as int
+    def url="https://cdn.mp3quran.net/audio/"+folder+"/"+ch.padLeft(3,"0")+".mp3"
+    if(t.url!=url || t.url!=e.url || t.timings!=e.timings || t.duration!=e.duration || t.byteSize!=e.byteSize || t.sourceVersion!="mp3quran-primary-v1" || t.audioOffsetMs!=0 || !t.verseTimingVerified || !t.trimToTimings || !e.ok || !(e.prefixSha256==~/[0-9a-f]{64}/) || e.byteSize<128 || e.duration<1000 || t.timings.size()!=expected || clips.chapterUrls[ch]!=url || clips.chapterSizes[ch]!=e.byteSize) throw new GradleException("Primary source/timing mismatch: "+id+"/"+ch)
+    t.timings.eachWithIndex { row,i ->
+     if(row[0]!=i+1 || row[1]<0 || row[2]<=row[1] || row[2]>e.duration || (i>0 && row[1]<=t.timings[i-1][1]) || clips.segments[ch+":"+row[0]]!=[c,row[1],row[2]]) throw new GradleException("Invalid primary verse segment: "+id+"/"+ch+"/"+(i+1))
+    }
+    count+=expected
+   }
+   if(count!=6236) throw new GradleException("Missing Quran verses: "+id)
+  }
+ }
+}
+tasks.matching { it.name in ["assembleRelease", "bundleRelease"] }.configureEach { dependsOn tasks.named("verifyComplexRecitations") }
+
+// Widget copies must retain the exact existing Quran and remembrance texts.
+tasks.register("verifyWidgetTexts") {
+ doLast {
+  def parser = new groovy.json.JsonSlurper()
+  def chapters = parser.parseText(file("assets/quran.js").getText("UTF-8").replaceFirst(/^const chapters=/, "").replaceFirst(/;$/, ""))
+  def verses = [:]
+  chapters.each { chapter -> chapter.verses.each { verse -> verses[verse.verse_key] = verse.text_uthmani } }
+  def widget = parser.parse(file("assets/widget-verses.json"), "UTF-8")
+  if(widget.size()!=7 || widget.any { key,value -> verses[key]!=value }) throw new GradleException("Widget Quran text differs from canonical source")
+  def originals = parser.parse(file("docs/sources/adhkar-arabic-3.0.44.json"), "UTF-8").collectEntries { [(it.id): it] }
+  def raw = file("assets/adhkar-english-data.js").getText("UTF-8")
+  def english = parser.parseText(raw.substring(raw.indexOf("const dhikrEnglishData=")+"const dhikrEnglishData=".length()).trim().replaceFirst(/;$/, "")).entries
+  def entries = parser.parse(file("assets/widget-adhkar.json"), "UTF-8").entries
+  if(entries.size()!=3 || entries.any { it.ar!=originals[it.id]?.text || it.en!=english[it.id]?.meaning || it.referenceAr!=originals[it.id]?.reference || it.referenceEn!=english[it.id]?.reference }) throw new GradleException("Widget remembrance text differs from source")
+ }
+}
+tasks.matching { it.name in ["assembleRelease", "bundleRelease"] }.configureEach { dependsOn tasks.named("verifyWidgetTexts") }
+
+// Isolated-ayah sources require verified timings; full-file-only readers declare every key unavailable.
+tasks.register("verifyInlineReaders") {
+ doLast {
+  def parser=new groovy.json.JsonSlurper()
+  def inline=parser.parse(file("assets/audio-index.json"),"UTF-8")
+  def full=parser.parse(file("assets/surah-audio.json"),"UTF-8")
+  def original=parser.parseText(file("assets/quran.js").getText("UTF-8").replaceFirst(/^const chapters=/,"").replaceFirst(/;$/,""))
+  def keys=original.collectMany{it.verses.collect{it.verse_key}}.toSet()
+  if(inline.keySet()!=full.keySet()||keys.size()!=6236)throw new GradleException("Inline/full reciter catalogs differ")
+  def js=file("assets/audio-index.js").getText("UTF-8")
+  if(parser.parseText(js.substring("const audioIndex=".length(),js.indexOf(";\n")))!=inline)throw new GradleException("Native and UI inline catalogs differ")
+  def evidence=parser.parse(file("docs/sources/complex-audio-validation.json"),"UTF-8").readers
+  def preserved=parser.parse(file("docs/sources/inline-readers-3.0.63.json"),"UTF-8").preserved
+  if(preserved.keySet() != ["2","6","7","133"].toSet())throw new GradleException("Missing preserved inline sources")
+  preserved.findAll { id,sha -> id!="133" }.each { id,sha ->
+   def data=inline[id];def normalized=data.name+"\n"+data.urls.keySet().sort().collect{it+"="+data.urls[it]+"\n"}.join("")
+   if(java.security.MessageDigest.getInstance("SHA-256").digest(normalized.getBytes("UTF-8")).encodeHex().toString()!=sha)throw new GradleException("Existing inline recording changed ${id}")
+  }
+  inline.each { id,data ->
+   if((data.urls.keySet()+(data.entries?:[:]).keySet()+(data.segments?:[:]).keySet()+(data.unavailable?:[])).toSet()!=keys)throw new GradleException("Incomplete inline reader ${id}")
+   if(data.archive){
+    if(!data.archive.startsWith("https://download.qurancomplex.gov.sa/new-sounds/")||!data.archive.endsWith(".zip")||data.archiveSize<=0)throw new GradleException("Invalid publisher source")
+    data.entries.each { key,row ->
+     def parts=key.split(":");def proof=evidence[id][parts[0]].validation.find{it.verse==parts[1].toInteger()}
+     if(row.size()!=6||row[0]<0||row[1]<100||row[2]<100||!(row[4] in [0,8])||row[5]!=proof?.clipSha256)throw new GradleException("Inline publisher evidence mismatch ${id}/${key}")
+    }
+   }else if(data.segments){
+    if(!(id in ["133","1001","1002","1003","1004"])||data.sourceVersion!="mp3quran-primary-v1")throw new GradleException("Unknown timed inline source")
+    data.segments.each { key,row -> def parts=key.split(":");def timing=full[id].chapters[parts[0]].timings[parts[1].toInteger()-1];if(row!=[parts[0].toInteger(),timing[1]+(full[id].chapters[parts[0]].audioOffsetMs?:0),timing[2]+(full[id].chapters[parts[0]].audioOffsetMs?:0)])throw new GradleException("Timed verse mismatch ${key}") }
+   }else if(data.urls.any{key,url -> !url.startsWith("https://verses.quran.com/")&&!url.startsWith("https://mirrors.quranicaudio.com/")&&!url.startsWith("https://everyayah.com/data/")})throw new GradleException("Unexpected inline source")
+  }
+ }
+}
+tasks.matching { it.name in ["assembleRelease","bundleRelease"] }.configureEach { dependsOn tasks.named("verifyInlineReaders") }
+
+tasks.register("verifyNafeesRecitation") {
+ doLast {
+  def p=new groovy.json.JsonSlurper();def full=p.parse(file("assets/surah-audio.json"),"UTF-8")["1005"];def inline=p.parse(file("assets/audio-index.json"),"UTF-8")["1005"]
+  if(full?.name!="أحمد النفيس"||full.chapters.size()!=114||inline.verseTimingVerified!=false||inline.urls||inline.segments||inline.entries||inline.unavailable.size()!=6236)throw new GradleException("Unsafe Nafees verse source")
+  (1..114).each { c ->
+   def report=p.parse(file("docs/sources/nafees-mp3quran/${c}.json"),"UTF-8");def track=full.chapters[c.toString()]
+   if(track.url!=String.format("https://cdn.mp3quran.net/audio/ahmad-nufais/r1/%03d.mp3",c)||track.timings||track.audioOffsetMs!=0||track.trimToTimings||track.verseTimingVerified!=false||track.timelineRevision!="full-file-v2"||track.verseCount!=report.timings.size()||track.duration!=report.headerDurationMs)throw new GradleException("Nafees must play complete files without unverified cuts ${c}")
+  }
+ }
+}
+tasks.matching { it.name in ["assembleRelease","bundleRelease"] }.configureEach { dependsOn tasks.named("verifyNafeesRecitation") }
+
+// A competitive round must never ship malformed answer sets or broken source references.
+tasks.register("verifyChallengeBank") {
+    doLast {
+        def bank = new groovy.json.JsonSlurper().parse(file("assets/challenge-bank.json"), "UTF-8")
+        def ids = [] as Set
+        def stems = [] as Set
+        if (bank.size() != 288) throw new GradleException("Challenge bank coverage changed")
+        if (file("services/challenge/worker/bank.json").getText("UTF-8") != file("assets/challenge-bank.json").getText("UTF-8")) throw new GradleException("Challenge client/server bank mismatch")
+        bank.each { q ->
+            if (!ids.add(q.id) || !stems.add(q.question) || q.options.size() != 4 || q.options.toSet().size() != 4 || !(q.correct in 0..3) || !(q.difficulty in 1..3) || !q.explanation || !q.source.proofs || q.source.proofs.any { !it.text || !it.label || !(it.url.startsWith("https://quran.com/") || it.url.startsWith("https://sunnah.com/muslim:")) }) throw new GradleException("Invalid challenge question: " + q.id)
+        }
+        ["quran","prophets","sira","sahaba","history","hadith","fiqh","general"].each { category ->
+            (1..3).each { difficulty -> if (bank.count { it.category == category && it.difficulty == difficulty } != 12) throw new GradleException("Incomplete challenge category") }
+        }
+    }
+}
+tasks.matching { it.name in ["assembleRelease","bundleRelease"] }.configureEach { dependsOn tasks.named("verifyChallengeBank") }
+
+// Urdu meanings are bundled publisher text, never generated by UI localization.
+tasks.register("verifyUrduMeanings") {
+ doLast {
+  def parser=new groovy.json.JsonSlurper()
+  def data=parser.parse(file("assets/quran-urdu-meanings.json"),"UTF-8")
+  def raw=file("docs/sources/ur.jalandhry.json")
+  def sha=java.security.MessageDigest.getInstance("SHA-256").digest(raw.bytes).encodeHex().toString()
+  if(data.language!="ur" || data.kind!="translation-of-meanings" || data.sourceSha256!=sha || data.verses.size()!=6236) throw new GradleException("Urdu meanings metadata mismatch")
+  def original=parser.parse(raw,"UTF-8").data
+  if(original.edition.identifier!="ur.jalandhry" || original.surahs.size()!=114) throw new GradleException("Unexpected Urdu edition")
+  original.surahs.each { surah -> surah.ayahs.each { verse ->
+   if(data.verses["${surah.number}:${verse.numberInSurah}".toString()]!=verse.text) throw new GradleException("Urdu source verse mismatch")
+  }}
+ }
+}
+tasks.matching { it.name in ["assembleRelease", "bundleRelease"] }.configureEach {
+ dependsOn tasks.named("verifyUrduMeanings")
+}
+
+tasks.register("verifyBengaliMeanings") {
+ doLast {
+  def parser=new groovy.json.JsonSlurper()
+  def data=parser.parse(file("assets/quran-bengali-meanings.json"),"UTF-8")
+  def raw=file("docs/sources/bn.bengali.json")
+  def sha=java.security.MessageDigest.getInstance("SHA-256").digest(raw.bytes).encodeHex().toString()
+  if(data.language!="bn" || data.kind!="translation-of-meanings" || data.sourceSha256!=sha || data.verses.size()!=6236) throw new GradleException("Bengali meanings metadata mismatch")
+  def original=parser.parse(raw,"UTF-8").data
+  if(original.edition.identifier!="bn.bengali" || original.surahs.size()!=114) throw new GradleException("Unexpected Bengali edition")
+  original.surahs.each { surah -> surah.ayahs.each { verse ->
+   if(data.verses["${surah.number}:${verse.numberInSurah}".toString()]!=verse.text) throw new GradleException("Bengali source verse mismatch")
+  }}
+ }
+}
+tasks.matching { it.name in ["assembleRelease", "bundleRelease"] }.configureEach {
+ dependsOn tasks.named("verifyBengaliMeanings")
+}
+
+tasks.register("verifyTurkishMeanings") {
+ doLast {
+  def parser=new groovy.json.JsonSlurper()
+  def data=parser.parse(file("assets/quran-turkish-meanings.json"),"UTF-8")
+  def raw=file("docs/sources/tr.diyanet.json")
+  def sha=java.security.MessageDigest.getInstance("SHA-256").digest(raw.bytes).encodeHex().toString()
+  if(data.language!="tr" || data.kind!="translation-of-meanings" || data.sourceSha256!=sha || data.verses.size()!=6236) throw new GradleException("Turkish meanings metadata mismatch")
+  def original=parser.parse(raw,"UTF-8").data
+  if(original.edition.identifier!="tr.diyanet" || original.surahs.size()!=114) throw new GradleException("Unexpected Turkish edition")
+  original.surahs.each { surah -> surah.ayahs.each { verse ->
+   if(data.verses["${surah.number}:${verse.numberInSurah}".toString()]!=verse.text) throw new GradleException("Turkish source verse mismatch")
+  }}
+ }
+}
+tasks.matching { it.name in ["assembleRelease", "bundleRelease"] }.configureEach {
+ dependsOn tasks.named("verifyTurkishMeanings")
+}
+
+// Each selectable UI language must have the complete three-card guidance.
+tasks.register("verifyTranslationGuide") {
+ doLast {
+  def parser=new groovy.json.JsonSlurper()
+  def raw=file("assets/quran-translation-guide-copy.js").getText("UTF-8").split('const QURAN_TRANSLATION_GUIDE=',2)[1].trim().replaceFirst(/;$/, '')
+  def data=parser.parseText(raw)
+  def declaration=file("assets/i18n.js").readLines("UTF-8").find { it.startsWith('const UI_LANGUAGES=') }
+  def languages=[];def matcher=(declaration =~ /\['([a-z]{2})',/);matcher.each { languages.add(it[1]) }
+  if(data.version!=1 || data.languages.keySet()!=languages.toSet())throw new GradleException("Incomplete translation guidance languages")
+  data.languages.each { language,copy ->
+   ['title','next','done','back','close','progress','loading','error','sources'].each { field -> if(!(copy[field] instanceof String)||!copy[field].trim())throw new GradleException("Missing guidance text: "+language+"/"+field) }
+   if(copy.steps.size()!=3 || copy.sourceNames.size()!=data.sources.size())throw new GradleException("Incomplete guidance cards")
+   copy.steps.each { step -> if(!step.title?.trim()||!step.rule?.trim()||step.paragraphs.size()!=2||step.paragraphs.any{!it?.trim()})throw new GradleException("Incomplete guidance paragraph") }
+   if(copy.progress.findAll(/\{\d+\}/).sort()!=['{0}','{1}'])throw new GradleException("Invalid guidance progress placeholders")
+  }
+  data.sources.each { source -> def uri=new URI(source.url);if(uri.scheme!='https'||!(uri.host in ['binbaz.org.sa','www.diyanet.gov.tr']))throw new GradleException("Untrusted guidance reference") }
+ }
+}
+tasks.matching { it.name in ["assembleRelease", "bundleRelease"] }.configureEach { dependsOn tasks.named("verifyTranslationGuide") }
+
+// Refuse releases with missing editions, changed canonical pages or altered Quran quotations.
+tasks.register('verifyStoryEditions') {
+    doLast {
+        def root = file('assets/stories/hina-saal-alinsan')
+        def original = new File(root, 'book.json')
+        def digest = java.security.MessageDigest.getInstance('SHA-256').digest(original.bytes).encodeHex().toString()
+        if (digest != 'c5319ab0c8d1f86c82664f76ad60588fab0989830e7abe8de1dc5032323f5388') throw new GradleException('Canonical story changed')
+        def parser = new groovy.json.JsonSlurper()
+        def source = parser.parse(original)
+        ['en','ur','bn','tr'].each { locale ->
+            def edition = parser.parse(new File(root, "book-${locale}.json"))
+            if (edition.language != locale || edition.originalSourceSha256 != digest || edition.pages.size() != 60 || edition.page_count != 60) throw new GradleException("Invalid story edition: ${locale}")
+            source.pages.eachWithIndex { page, index ->
+                def translated = edition.pages[index]
+                if (translated.page != page.page || translated.content.split('\\n', -1).length != page.content.split('\\n', -1).length || (translated.content =~ /﴿[^﴾]+﴾/).findAll() != (page.content =~ /﴿[^﴾]+﴾/).findAll() || translated.content.contains('__MUSHAFI_')) throw new GradleException("Invalid story page: ${locale}/${page.page}")
+            }
+        }
+    }
+}
+tasks.matching { it.name in ['assembleRelease', 'bundleRelease'] }.configureEach { dependsOn tasks.named('verifyStoryEditions') }

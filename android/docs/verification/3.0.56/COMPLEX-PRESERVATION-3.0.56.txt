@@ -1,0 +1,1 @@
+PASS: 708 other app assets byte-identical to 3.0.55, including Quran, tafsir, adhkar, fonts and portraits. Only app version, reader order/names and audio catalog assets changed. Nine complete readers / 1026 chapters / 56124 verse timings. Six previous catalogs preserved by release gate.

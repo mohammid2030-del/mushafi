@@ -1,0 +1,25 @@
+package com.mushafi.app;
+import java.io.*;import java.net.*;import java.security.*;import java.util.*;import java.util.regex.*;import java.util.zip.*;import org.json.*;
+/** Extract exactly one pinned publisher verse, never a guessed chapter segment. */
+final class PublisherVerseArchive {
+ interface Cancel { boolean cancelled(); }
+ interface Range { byte[] read(long start,int length)throws Exception; }
+ interface Connection { void set(HttpURLConnection connection); }
+ static final int LIMIT=32*1024*1024;
+ static URL checked(String value)throws Exception{URL u=new URL(value);if(!"https".equals(u.getProtocol())||!"download.qurancomplex.gov.sa".equals(u.getHost())||u.getPort()!=-1||u.getUserInfo()!=null||!u.getPath().startsWith("/new-sounds/")||!u.getPath().endsWith(".zip"))throw new IOException("Untrusted publisher archive");return u;}
+ static byte[] range(URL url,long total,long start,int length,Cancel cancel,Connection active)throws Exception{
+  if(length<1||length>LIMIT||start<0||start+length>total)throw new IOException("Invalid archive range");ByteArrayOutputStream result=new ByteArrayOutputStream(length);
+  while(result.size()<length){if(cancel.cancelled())throw new InterruptedIOException();long lo=start+result.size();int want=Math.min(524288,length-result.size());byte[] chunk=null;Exception failure=null;
+   for(int attempt=0;attempt<3&&chunk==null;attempt++){if(cancel.cancelled())throw new InterruptedIOException();HttpURLConnection c=(HttpURLConnection)url.openConnection();active.set(c);c.setConnectTimeout(15000);c.setReadTimeout(20000);c.setInstanceFollowRedirects(false);c.setRequestProperty("Range","bytes="+lo+"-"+(lo+want-1));c.setRequestProperty("Accept-Encoding","identity");
+    try{if(c.getResponseCode()!=206)throw new IOException("Archive range not honored");String header=c.getHeaderField("Content-Range");Matcher m=Pattern.compile("bytes (\\d+)-(\\d+)/(\\d+)").matcher(header==null?"":header);if(!m.matches())throw new IOException("Missing archive range");long a=Long.parseLong(m.group(1)),b=Long.parseLong(m.group(2)),size=Long.parseLong(m.group(3));if(a!=lo||b<a||b>=lo+want||size!=total)throw new IOException("Wrong archive range");int count=(int)(b-a+1);byte[] data=new byte[count];try(InputStream in=c.getInputStream()){int offset=0,n;while(offset<count&&(n=in.read(data,offset,count-offset))!=-1){if(cancel.cancelled())throw new InterruptedIOException();offset+=n;}if(offset!=count||in.read()!=-1)throw new IOException("Incomplete archive range");}chunk=data;
+    }catch(Exception e){failure=e;}finally{c.disconnect();active.set(null);}
+   }if(chunk==null)throw failure;result.write(chunk);
+  }return result.toByteArray();
+ }
+ static int u16(byte[] b,int at){return(b[at]&255)|((b[at+1]&255)<<8);}
+ static byte[] extract(JSONArray entry,Range reader,Cancel cancel)throws Exception{
+  long offset=entry.getLong(0);int compressed=entry.getInt(1),size=entry.getInt(2),method=entry.getInt(4);if(offset<0||compressed<100||compressed>LIMIT||size<100||size>LIMIT||(method!=0&&method!=8))throw new IOException("Invalid verse descriptor");byte[] header=reader.read(offset,30);if(header.length!=30||header[0]!='P'||header[1]!='K'||header[2]!=3||header[3]!=4||(u16(header,6)&1)!=0||u16(header,8)!=method)throw new IOException("Wrong verse entry");long dataOffset=offset+30+u16(header,26)+u16(header,28);byte[] packed=reader.read(dataOffset,compressed);if(packed.length!=compressed)throw new IOException("Incomplete verse entry");
+  ByteArrayOutputStream out=new ByteArrayOutputStream(size);Inflater inflater=method==8?new Inflater(true):null;try(InputStream in=method==8?new InflaterInputStream(new ByteArrayInputStream(packed),inflater):new ByteArrayInputStream(packed)){byte[] b=new byte[16384];int n;while((n=in.read(b))!=-1){if(cancel.cancelled())throw new InterruptedIOException();if(out.size()+n>size)throw new IOException("Oversized verse");out.write(b,0,n);}}finally{if(inflater!=null)inflater.end();}byte[] data=out.toByteArray();CRC32 crc=new CRC32();crc.update(data);if(data.length!=size||crc.getValue()!=entry.getLong(3))throw new IOException("Verse CRC mismatch");byte[] digest=MessageDigest.getInstance("SHA-256").digest(data);StringBuilder sha=new StringBuilder();for(byte b:digest)sha.append(String.format(Locale.US,"%02x",b&255));if(!sha.toString().equals(entry.getString(5)))throw new IOException("Verse SHA256 mismatch");return data;
+ }
+ static void download(JSONObject spec,String key,File target,Cancel cancel,Connection active)throws Exception{URL u=checked(spec.getString("archive"));long total=spec.getLong("archiveSize");JSONArray entry=spec.getJSONObject("entries").getJSONArray(key);byte[] data=extract(entry,(start,length)->range(u,total,start,length,cancel,active),cancel);if(cancel.cancelled())throw new InterruptedIOException();target.getParentFile().mkdirs();File temp=new File(target.getAbsolutePath()+".part-"+Thread.currentThread().getId());try{try(FileOutputStream out=new FileOutputStream(temp)){out.write(data);}if(cancel.cancelled())throw new InterruptedIOException();if(!temp.renameTo(target))throw new IOException("Cannot store verified verse");}finally{temp.delete();}}
+}

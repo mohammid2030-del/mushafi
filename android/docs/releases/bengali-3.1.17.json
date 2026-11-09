@@ -1,0 +1,22 @@
+{
+  "version": "3.1.17",
+  "code": 167,
+  "language": "bn",
+  "nativeName": "বাংলা",
+  "quranEdition": "bn.bengali",
+  "translator": "মুহিউদ্দীন খান",
+  "source": "https://api.alquran.cloud/v1/quran/bn.bengali",
+  "sourceArchive": "docs/sources/bn.bengali.json",
+  "sourceSha256": "1f77ff20c1b1fcbef24fbab1265257fe34dc035934a876ccd11221272333218a",
+  "verses": 6236,
+  "font": "Noto Sans Bengali (SIL OFL)",
+  "fontLicense": "assets/fonts/NotoSansBengali-OFL.txt",
+  "tests": [
+    "Gradle verifyUiLocales/verifyBengaliMeanings and assembleRelease",
+    "Bengali browser: 11 sections, light/dark, persistence, LTR, offline font readiness, exact Arabic text preserved, Bengali meanings, Bengali surah search, English/Bengali switching, welcome picker, bn-BD device language",
+    "Urdu browser regression: Arabic text preserved, meanings, search, persistence and welcome",
+    "Notification-open browser: Arabic/English/Urdu/Bengali, cold/warm/slow-boot and welcome deferral",
+    "APK signature and packaged fonts/catalog/meanings/notification bridge verification",
+    "Public update metadata, entire signed APK byte-for-byte across three parallel ranges, legacy downloads and upload route removal"
+  ]
+}

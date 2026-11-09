@@ -1,0 +1,1 @@
+{ before: 'chapters', applied: true, after: 'closed', view: 'home' }

@@ -1,0 +1,9 @@
+@font-face{font-family:UiDevanagari;src:url(fonts/UiDevanagari.ttf) format("truetype");font-weight:100 900;font-display:swap}
+@font-face{font-family:UiSinhala;src:url(fonts/UiSinhala.ttf) format("truetype");font-weight:100 900;font-display:swap}
+@font-face{font-family:UiTamil;src:url(fonts/UiTamil.ttf) format("truetype");font-weight:100 900;font-display:swap}
+@font-face{font-family:UiBengali;src:url(fonts/UiBengali.ttf) format("truetype");font-weight:100 900;font-display:swap}
+html[lang=hi]{--ui-font:UiDevanagari,AppArabic}
+html[lang=si]{--ui-font:UiSinhala,AppArabic}
+html[lang=ta]{--ui-font:UiTamil,AppArabic}
+html[lang=bn]{--ui-font:UiBengali,AppArabic}
+html[lang=en],html[lang=fr],html[lang=tr]{--ui-font:system-ui,AppArabic}html[lang=ur]{--ui-font:AppArabic}

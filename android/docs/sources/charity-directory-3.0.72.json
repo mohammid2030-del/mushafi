@@ -1,0 +1,48 @@
+{
+  "checkedAt": "2026-10-30",
+  "projectTypes": {
+    "Education": "تعليمي",
+    "Feeding": "غذائي",
+    "Housing": "سكني",
+    "Health": "صحي",
+    "Religious": "ديني",
+    "Social": "اجتماعي",
+    "Environmental": "بيئي",
+    "Technical": "تقني"
+  },
+  "waqfTypes": {
+    "1": "رعاية الأيتام",
+    "2": "سقيا الماء",
+    "3": "رعاية المرضى",
+    "4": "خدمة بيوت الله",
+    "5": "طباعة المصاحف",
+    "6": "الدعم الغذائي",
+    "7": "إعانة المعسرين",
+    "8": "خدمة ضيوف الرحمن",
+    "9": "إسكان الأسر",
+    "10": "رعاية تعليمية"
+  },
+  "sources": [
+    {
+      "url": "https://ehsan.sa/projects",
+      "sha256": "2239997d2fe5c6286cce973edbc427b988787eadab4e7e166b85528ed15acf1c"
+    },
+    {
+      "url": "https://ehsan.sa/waqf",
+      "sha256": "45b39df9ed39995f771bed58c72fa75d75cfab795b711dc08f7be6bf2140c4d2"
+    },
+    {
+      "url": "https://cdn.ehsan.sa/ehsan-ui/js/waqfService.js",
+      "sha256": "4be43f85addaf33a02d4abdfe0f8df745c80f0ecaf733f3bb4b24706d0f3f851"
+    },
+    {
+      "url": "https://ehsan.sa/projects?projectType=Religious",
+      "sha256": "3f282514050216c02da9a867f1541a3f789fdd0294e50104756c3564ca169e80"
+    },
+    {
+      "url": "https://waqfy.sa/product-donation-list",
+      "sha256": "305e39a2fd0f2d26059711c1d62933e67b022bd2806c6a1e05dcd6fd6a4fa184"
+    }
+  ],
+  "waqfPublicParameters": "Published waqfService.js builds https://ehsan.sa/waqf?p=<project-type>, reads URLSearchParams p, selects the field and opens advanced customization. No runtime script injection is used."
+}

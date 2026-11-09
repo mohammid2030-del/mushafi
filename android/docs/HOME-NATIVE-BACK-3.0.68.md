@@ -1,0 +1,7 @@
+# 3.0.68 (118): native Android Back consumes home recitation
+
+The modal retained view=home. MainActivity calls window.handleNativeBack and backgrounds the task only for the serialized false return. The central dispatcher checked activeSheet/known sheets, then returned false at home; the home modal was not an activeSheet. Earlier flow tests exercised handleBack directly, bypassing this native dispatch boundary.
+
+The home module now wraps window.handleNativeBack. While its modal is open with no nested feature sheet or reader picker, it closes that modal, restores home focus/scroll/inert state and returns true. Native Back therefore returns directly to home from reader/chapter/mode stages. Nested overlays retain the existing dispatcher. Internal header Back keeps its step navigation. Bare-home exit still returns false; full-screen listening and other routes retain their existing behavior.
+
+Regression calls the exact window.handleNativeBack entry used by Android. Tests all three home modal stages in both languages/themes, true consumed vs false bare-home boundary, home active/inert/scroll/page restoration, full-screen -> chapters -> home sequence without exit, ongoing playback and internal arrow behavior. The complete home player seek/ayah/tafsir flow also passes. Native Java and all playback code/data are unchanged. Release data gates, signing continuity and APK/AAB asset parity verified.

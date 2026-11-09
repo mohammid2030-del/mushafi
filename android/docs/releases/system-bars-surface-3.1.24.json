@@ -1,0 +1,41 @@
+{
+  "version": "3.1.24",
+  "code": 174,
+  "filename": "Mushafi-3.1.24.apk",
+  "size": 119627878,
+  "sha256": "b12e0dd178a6f106a4227a3ff60f3dce4884afc7478c1db95d5eaf43f3811f6d",
+  "key": "releases/Mushafi-3.1.24.apk",
+  "minimumAndroid": "6.0",
+  "feature": "Continuous native app background behind visible system bars",
+  "implementation": [
+    "Use the bundled geometry SVG for one native background across content and padded system-bar areas",
+    "Transparent WebView normal-app body only when native capability is present; web preview fallback retained",
+    "Transparent visible system bars with theme-appropriate icon appearance and disabled contrast scrims on supported Android versions",
+    "WindowCompat safe content insets retained; reader viewport policy unchanged; landscape cutout padding retained"
+  ],
+  "tests": [
+    "Native release assembled successfully",
+    "Capability styles preserve content geometry in light/dark at compact phone, phone, landscape and tablet sizes",
+    "Book reader keeps opaque paper and returns to app background",
+    "All 60 story pages, reading position, controls and Quran checkpoint regression passed",
+    "Five-language welcome and navigation regression passed",
+    "Reader inset/cutout policy API 23–36 unit checks passed",
+    "Packaged DEX contains native drawable and capability bridge"
+  ],
+  "limitations": [
+    "No Android device or emulator was connected for physical system-bar visual verification",
+    "Android 23–25 retain a translucent navigation contrast tint because dark navigation icons are unavailable"
+  ],
+  "publication": {
+    "status": "published and publicly verified",
+    "commit": "d2c2976a002dc26b2453602176b7145e2864bf8a",
+    "versionId": "appgprj_6aeacba839208191859bee126a2cd9df~appgver_06f055e8a4dc81919e9e007d7d794c88",
+    "deploymentId": "appgdep_6aedab398bb0819190104e9a37d8409a",
+    "environmentRevision": 46,
+    "url": "https://mushafi.mohammedasif241.chatgpt.site/download/Mushafi-3.1.24.apk",
+    "FCMAnnouncementAccepted": true,
+    "fullDownloadVerified": true,
+    "temporaryRoutesClosed": true,
+    "timestamp": "2026-11-06T10:27:09.812645+00:00"
+  }
+}

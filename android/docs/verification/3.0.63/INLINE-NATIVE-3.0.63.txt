@@ -1,0 +1,1 @@
+PASS: exact publisher verse extraction and SHA256, bounded partial HTTP ranges, rejection of bad ranges/corruption/cancellation, five added reciters play actual individual MP3 files, native pause/resume/stop and three natural completions, stale fetch cannot autoplay after close or replace new reader.

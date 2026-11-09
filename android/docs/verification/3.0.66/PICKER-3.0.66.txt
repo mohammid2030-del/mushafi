@@ -1,0 +1,1 @@
+PASS: AR/EN light/dark picker, nine portraits, both native selects hidden by computed display, themed repeat picker and saved repeat, actual selection and saved reader, back preserves ayah sheet/page, home card directly below Quran dua opens nine readers, responsive widths and reduced motion.
