@@ -4,7 +4,7 @@
 # allowance), so nothing runs automatically on every push:
 #   • Actions → "iOS" → Run workflow → action = testflight  → signed build uploaded to TestFlight
 #   • Actions → "iOS" → Run workflow → action = check       → compile check only (no signing)
-#   • Pushing a tag like v3.1.32                            → TestFlight upload
+#   • Pushing a tag like v3.1.32, or pushing to branch ios-release → TestFlight upload
 #
 # Required repository secrets (Settings → Secrets and variables → Actions):
 #   APPLE_TEAM_ID           10-character Team ID (developer.apple.com → Membership details)
@@ -16,6 +16,8 @@ name: iOS
 on:
   push:
     tags: ["v*"]
+    # Pushing to this branch also uploads to TestFlight (handy for automated fixes).
+    branches: ["ios-release"]
   workflow_dispatch:
     inputs:
       action:
@@ -77,7 +79,7 @@ jobs:
 
   testflight:
     name: Archive & upload to TestFlight
-    if: (github.event_name == 'workflow_dispatch' && inputs.action == 'testflight') || startsWith(github.ref, 'refs/tags/v')
+    if: (github.event_name == 'workflow_dispatch' && inputs.action == 'testflight') || startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/ios-release'
     runs-on: macos-26
     timeout-minutes: 75
     env:
