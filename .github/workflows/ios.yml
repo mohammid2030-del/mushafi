@@ -113,17 +113,15 @@ jobs:
       - name: App Store Connect API key
         env:
           ASC_KEY_P8_BASE64: ${{ secrets.ASC_KEY_P8_BASE64 }}
-        run: |
-          key="$RUNNER_TEMP/AuthKey_${ASC_KEY_ID}.p8"
-          echo "$ASC_KEY_P8_BASE64" | base64 --decode > "$key"
-          echo "ASC_KEY_PATH=$key" >> "$GITHUB_ENV"
+        run: ios/scripts/install-asc-key.sh
 
       - name: Generate Xcode project
         run: |
           ios/scripts/sync-version.sh
           ios/scripts/configure-firebase.sh
           # Unique, always-increasing build number: <Android versionCode>.<workflow run>
-          echo "BUILD_NUMBER=${MUSHAFI_VERSION_CODE}.${GITHUB_RUN_NUMBER}" >> "$GITHUB_ENV"
+          code="$(perl -ne 'print $1 if /versionCode\s+(\d+)/' android/build.gradle)"
+          echo "BUILD_NUMBER=${code}.${GITHUB_RUN_NUMBER}" >> "$GITHUB_ENV"
           cd ios && xcodegen generate
 
       - name: Archive (cloud-managed signing)
