@@ -134,8 +134,6 @@ jobs:
           cd ios && xcodegen generate
 
       - name: Revoke old CI development certificates
-        env:
-          MUSHAFI_REVOKE_ALL_DEV_CERTS: "1"
         run: python3 ios/scripts/revoke-ci-dev-certs.py
 
       - name: Archive (cloud-managed signing)
