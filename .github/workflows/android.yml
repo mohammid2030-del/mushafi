@@ -44,6 +44,7 @@ jobs:
 
       - name: Build
         run: |
+          set -o pipefail
           chmod +x gradlew
           ./gradlew --no-daemon --stacktrace verifyUiLocales assembleDebug 2>&1 | tee "$RUNNER_TEMP/build.log"
 
