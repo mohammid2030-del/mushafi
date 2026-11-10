@@ -99,19 +99,19 @@ struct VerseView: View {
     }
 
     private func card(_ verse: Verse) -> some View {
-        let large = family == .systemLarge
+        let large = family == .systemLarge || family == .systemExtraLarge
         return VStack(spacing: large ? 12 : 6) {
             WidgetHeader(icon: "book.closed.fill", title: WidgetText.t("آية اليوم"), theme: theme,
                          trailing: family == .systemSmall ? nil : verse.surah)
             Spacer(minLength: 0)
             Text("﴿ \(verse.text) ﴾")
-                .font(WidgetFont.quran(large ? 30 : (family == .systemSmall ? 19 : 23)))
+                .font(WidgetFont.quran(family == .systemExtraLarge ? 38 : (large ? 30 : (family == .systemSmall ? 19 : 23))))
                 .foregroundStyle(theme.ink)
                 .multilineTextAlignment(.center)
                 .lineSpacing(large ? 8 : 3)
                 .minimumScaleFactor(0.5)
                 .environment(\.layoutDirection, .rightToLeft)
-            if large && !WidgetText.arabicScript && !verse.translation.isEmpty {
+            if (large && !WidgetText.arabicScript || family == .systemExtraLarge) && !verse.translation.isEmpty {
                 Text(verse.translation).font(.system(size: 13, design: .serif)).foregroundStyle(theme.muted)
                     .multilineTextAlignment(.center).minimumScaleFactor(0.6)
             }
@@ -119,7 +119,7 @@ struct VerseView: View {
             HStack(spacing: 6) {
                 Rectangle().fill(theme.accent.opacity(0.4)).frame(height: 0.7)
                 Text("\(verse.surah) · \(verse.ayahNumber)").font(WidgetFont.ui(10, .semibold)).foregroundStyle(theme.accent)
-                    .lineLimit(1).fixedSize()
+                    .lineLimit(1).fixedSize().widgetAccentable()
                 Rectangle().fill(theme.accent.opacity(0.4)).frame(height: 0.7)
             }
         }
@@ -133,7 +133,7 @@ struct DailyVerseWidget: Widget {
         }
         .configurationDisplayName(WidgetText.t("آية اليوم"))
         .description(WidgetText.t("آية جديدة كل يوم بخط المصحف"))
-        .supportedFamilies([.systemSmall, .systemMedium, .systemLarge, .accessoryRectangular])
+        .supportedFamilies([.systemSmall, .systemMedium, .systemLarge, .systemExtraLarge, .accessoryRectangular])
     }
 }
 
@@ -217,7 +217,7 @@ struct DevotionView: View {
                 .minimumScaleFactor(0.45)
                 .environment(\.layoutDirection, .rightToLeft)
             Spacer(minLength: 0)
-            Text(item.reference).font(WidgetFont.ui(9, .medium)).foregroundStyle(theme.accent).lineLimit(1)
+            Text(item.reference).font(WidgetFont.ui(9, .medium)).foregroundStyle(theme.accent).lineLimit(1).widgetAccentable()
                 .minimumScaleFactor(0.7)
         }
     }
@@ -322,10 +322,37 @@ struct TimedAdhkarView: View {
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .accessoryContainer()
+            case .systemLarge:
+                VStack(alignment: .leading, spacing: 10) {
+                    HStack {
+                        Image(systemName: period.icon).font(.system(size: 17, weight: .semibold)).foregroundStyle(theme.accent)
+                            .widgetAccentable()
+                        Text(period.title).font(WidgetFont.ui(18, .bold)).foregroundStyle(theme.ink)
+                        Spacer(minLength: 0)
+                    }
+                    ForEach(Array(Devotions.group(period.rawValue).prefix(4).enumerated()), id: \.offset) { _, item in
+                        VStack(alignment: .leading, spacing: 3) {
+                            HStack {
+                                Text(item.title).font(WidgetFont.ui(11, .semibold)).foregroundStyle(theme.accent).widgetAccentable()
+                                Spacer(minLength: 0)
+                                if item.count > 1 { Chip(text: "× " + WidgetText.number(item.count), theme: theme) }
+                            }
+                            Text(item.text).font(WidgetFont.naskh(14, .medium)).foregroundStyle(theme.ink)
+                                .lineLimit(2).minimumScaleFactor(0.7)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .environment(\.layoutDirection, .rightToLeft)
+                        }
+                        .padding(8)
+                        .background(RoundedRectangle(cornerRadius: 10, style: .continuous).fill(theme.chip))
+                    }
+                    Spacer(minLength: 0)
+                }
+                .widgetTheme(theme)
             default:
                 VStack(alignment: .leading, spacing: 6) {
                     HStack {
                         Image(systemName: period.icon).font(.system(size: 15, weight: .semibold)).foregroundStyle(theme.accent)
+                            .widgetAccentable()
                         Text(period.title).font(WidgetFont.ui(15, .bold)).foregroundStyle(theme.ink)
                         Spacer(minLength: 0)
                         if family != .systemSmall, let count = item?.count, count > 1 {
@@ -363,7 +390,7 @@ struct TimedAdhkarWidget: Widget {
         }
         .configurationDisplayName(WidgetText.t("أذكار الوقت"))
         .description(WidgetText.t("أذكار الصباح والمساء والنوم تتبدل تلقائيًا حسب مواقيت الصلاة"))
-        .supportedFamilies([.systemSmall, .systemMedium, .accessoryRectangular, .accessoryInline])
+        .supportedFamilies([.systemSmall, .systemMedium, .systemLarge, .accessoryRectangular, .accessoryInline])
     }
 }
 
@@ -428,7 +455,7 @@ struct LastPageView: View {
                     Spacer(minLength: 0)
                     Text(WidgetText.t("سورة {0}", state?.surah ?? WidgetText.t("الفاتحة")))
                         .font(WidgetFont.quran(family == .systemSmall ? 24 : 30)).foregroundStyle(theme.accent)
-                        .lineLimit(1).minimumScaleFactor(0.5)
+                        .lineLimit(1).minimumScaleFactor(0.5).widgetAccentable()
                     HStack(spacing: 6) {
                         Chip(text: WidgetText.t("صفحة {0}", WidgetText.number(page)), theme: theme)
                         Chip(text: WidgetText.t("الجزء {0}", WidgetText.number(state?.juz ?? 1)), theme: theme)

@@ -171,18 +171,23 @@ struct Countdown: View {
 }
 
 struct PrayerRow: View {
+    @Environment(\.widgetRenderingMode) private var mode
     let prayer: PrayerTime
     let highlighted: Bool
     let zone: TimeZone
     let theme: WidgetTheme
     var size: CGFloat = 12
     var showIcon = true
+    /// Dims prayers whose time has passed and marks them with a check.
+    var passed = false
 
     var body: some View {
+        let full = mode == .fullColor
         HStack(spacing: 6) {
             if showIcon {
-                Image(systemName: prayer.icon).font(.system(size: size - 2)).frame(width: size + 4)
-                    .foregroundStyle(highlighted ? theme.top : theme.accent.opacity(0.85))
+                Image(systemName: passed && !highlighted ? "checkmark.circle.fill" : prayer.icon)
+                    .font(.system(size: size - 2)).frame(width: size + 4)
+                    .foregroundStyle(highlighted && full ? theme.top : theme.accent.opacity(0.85))
             }
             Text(prayer.name).font(WidgetFont.ui(size, highlighted ? .bold : .regular))
             Spacer(minLength: 4)
@@ -190,9 +195,9 @@ struct PrayerRow: View {
         }
         .lineLimit(1)
         .padding(.horizontal, 7)
-        .padding(.vertical, size > 13 ? 4 : 2.5)
-        .background(RoundedRectangle(cornerRadius: 7, style: .continuous).fill(highlighted ? theme.accent : Color.clear))
-        .foregroundStyle(highlighted ? theme.top : theme.ink)
+        .padding(.vertical, size > 13 ? 5 : 2.5)
+        .highlight(highlighted, theme, radius: 7)
+        .opacity(passed && !highlighted ? 0.55 : 1)
     }
 }
 
@@ -223,6 +228,20 @@ struct NextPrayerView: View {
                     .widgetTheme(theme)
                 case .systemLarge:
                     large(next).widgetTheme(theme)
+                case .systemExtraLarge:
+                    HStack(alignment: .top, spacing: 18) {
+                        large(next).frame(maxWidth: .infinity)
+                        VStack(alignment: .leading, spacing: 10) {
+                            WidgetHeader(icon: "location.fill", title: entry.city, theme: theme)
+                            ForEach(entry.today, id: \.self) { prayer in
+                                PrayerRow(prayer: prayer, highlighted: prayer == entry.next, zone: entry.zone, theme: theme, size: 18,
+                                          passed: prayer.at <= entry.date)
+                            }
+                            Spacer(minLength: 0)
+                        }
+                        .frame(maxWidth: .infinity)
+                    }
+                    .widgetTheme(theme)
                 default:
                     headline(next).widgetTheme(theme)
                 }
@@ -273,7 +292,7 @@ struct NextPrayerView: View {
             WidgetHeader(icon: next.icon, title: WidgetText.t("الصلاة القادمة"), theme: theme)
             Spacer(minLength: 0)
             Text(next.name).font(WidgetFont.ui(28, .bold)).foregroundStyle(theme.accent)
-                .minimumScaleFactor(0.6).lineLimit(1)
+                .minimumScaleFactor(0.6).lineLimit(1).widgetAccentable()
             Text(WidgetText.time(next.at, zone: entry.zone)).font(WidgetFont.number(17, .semibold)).foregroundStyle(theme.ink)
             Countdown(to: next.at, size: 13, weight: .medium).foregroundStyle(theme.muted)
             if let range = entry.interval {
@@ -289,7 +308,8 @@ struct NextPrayerView: View {
     private func table(size: CGFloat) -> some View {
         VStack(spacing: 1) {
             ForEach(entry.today, id: \.self) { prayer in
-                PrayerRow(prayer: prayer, highlighted: prayer == entry.next, zone: entry.zone, theme: theme, size: size)
+                PrayerRow(prayer: prayer, highlighted: prayer == entry.next, zone: entry.zone, theme: theme, size: size,
+                          passed: prayer.at <= entry.date)
             }
         }
     }
@@ -309,7 +329,7 @@ struct NextPrayerView: View {
             HStack(alignment: .center, spacing: 12) {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(WidgetText.t("الصلاة القادمة")).font(WidgetFont.ui(11)).foregroundStyle(theme.muted)
-                    Text(next.name).font(WidgetFont.ui(30, .bold)).foregroundStyle(theme.accent)
+                    Text(next.name).font(WidgetFont.ui(30, .bold)).foregroundStyle(theme.accent).widgetAccentable()
                     Text(WidgetText.time(next.at, zone: entry.zone)).font(WidgetFont.number(16)).foregroundStyle(theme.ink)
                 }
                 Spacer()
@@ -335,7 +355,7 @@ struct NextPrayerWidget: Widget {
         }
         .configurationDisplayName(WidgetText.t("الصلاة القادمة"))
         .description(WidgetText.t("الصلاة القادمة مع عدّ تنازلي حي"))
-        .supportedFamilies([.systemSmall, .systemMedium, .systemLarge, .accessoryCircular, .accessoryRectangular, .accessoryInline])
+        .supportedFamilies([.systemSmall, .systemMedium, .systemLarge, .systemExtraLarge, .accessoryCircular, .accessoryRectangular, .accessoryInline])
     }
 }
 
@@ -354,8 +374,10 @@ struct PrayerTimesView: View {
                 switch family {
                 case .accessoryRectangular:
                     threeColumns.accessoryContainer()
-                case .systemMedium:
+                case .systemMedium, .systemExtraLarge:
                     medium.widgetTheme(theme)
+                case .systemLarge:
+                    large.widgetTheme(theme)
                 default:
                     small.widgetTheme(theme)
                 }
@@ -389,7 +411,8 @@ struct PrayerTimesView: View {
             WidgetHeader(icon: "clock.fill", title: WidgetText.t("مواقيت الصلاة"), theme: theme)
                 .padding(.bottom, 2)
             ForEach(entry.today, id: \.self) { prayer in
-                PrayerRow(prayer: prayer, highlighted: prayer == entry.next, zone: entry.zone, theme: theme, size: 11, showIcon: false)
+                PrayerRow(prayer: prayer, highlighted: prayer == entry.next, zone: entry.zone, theme: theme, size: 11, showIcon: false,
+                          passed: prayer.at <= entry.date)
             }
             Spacer(minLength: 0)
         }
@@ -416,14 +439,44 @@ struct PrayerTimesView: View {
                         Text(WidgetText.shortTime(prayer.at, zone: entry.zone)).font(WidgetFont.number(13, .bold))
                             .lineLimit(1).minimumScaleFactor(0.7)
                     }
-                    .foregroundStyle(isNext ? theme.top : theme.ink)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 9)
-                    .background(RoundedRectangle(cornerRadius: 12, style: .continuous)
-                        .fill(isNext ? theme.accent : theme.chip))
+                    .background(RoundedRectangle(cornerRadius: 12, style: .continuous).fill(theme.chip))
+                    .highlight(isNext, theme, radius: 12)
                 }
             }
             .frame(maxHeight: .infinity)
+        }
+    }
+
+    private var large: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(alignment: .top) {
+                VStack(alignment: .leading, spacing: 1) {
+                    Text(WidgetText.t("مواقيت الصلاة")).font(WidgetFont.ui(16, .bold)).foregroundStyle(theme.ink)
+                    Text(WidgetText.formatted(entry.date, .islamicUmmAlQura, "EEEEdMMMMy")).font(WidgetFont.ui(11)).foregroundStyle(theme.muted)
+                }
+                Spacer()
+                if !entry.city.isEmpty { Chip(text: entry.city, theme: theme, icon: "location.fill") }
+            }
+            if let next = entry.next {
+                HStack(spacing: 6) {
+                    Image(systemName: "hourglass").foregroundStyle(theme.accent).widgetAccentable()
+                    Text(WidgetText.t("متبقي على {0}", next.name)).font(WidgetFont.ui(13, .medium)).foregroundStyle(theme.ink)
+                    Spacer(minLength: 4)
+                    Countdown(to: next.at, size: 15, weight: .bold).foregroundStyle(theme.accent).frame(maxWidth: 90)
+                        .widgetAccentable()
+                }
+                .padding(10)
+                .background(RoundedRectangle(cornerRadius: 12, style: .continuous).fill(theme.chip))
+            }
+            VStack(spacing: 3) {
+                ForEach(entry.today, id: \.self) { prayer in
+                    PrayerRow(prayer: prayer, highlighted: prayer == entry.next, zone: entry.zone, theme: theme, size: 16,
+                              passed: prayer.at <= entry.date)
+                }
+            }
+            Spacer(minLength: 0)
         }
     }
 }
@@ -435,7 +488,7 @@ struct PrayerTimesWidget: Widget {
         }
         .configurationDisplayName(WidgetText.t("مواقيت الصلاة"))
         .description(WidgetText.t("مواقيت اليوم مع إبراز الصلاة القادمة"))
-        .supportedFamilies([.systemSmall, .systemMedium, .accessoryRectangular])
+        .supportedFamilies([.systemSmall, .systemMedium, .systemLarge, .systemExtraLarge, .accessoryRectangular])
     }
 }
 
@@ -507,6 +560,18 @@ struct PrayerCounterView: View {
                 switch family {
                 case .accessoryCircular: circular.accessoryContainer()
                 case .accessoryRectangular: rectangular.accessoryContainer()
+                case .systemMedium:
+                    HStack(spacing: 14) {
+                        small.frame(maxWidth: .infinity)
+                        VStack(spacing: 2) {
+                            ForEach(entry.today, id: \.self) { prayer in
+                                PrayerRow(prayer: prayer, highlighted: prayer == entry.next, zone: entry.zone, theme: theme, size: 11,
+                                          passed: prayer.at <= entry.date)
+                            }
+                        }
+                        .frame(maxWidth: 160)
+                    }
+                    .widgetTheme(theme)
                 default: small.widgetTheme(theme)
                 }
             }
@@ -566,7 +631,7 @@ struct PrayerCounterView: View {
             if let passed = entry.sinceAdhan {
                 WidgetHeader(icon: "checkmark.seal.fill", title: WidgetText.t("حان وقت الصلاة"), theme: theme)
                 Spacer(minLength: 0)
-                Text(passed.name).font(WidgetFont.ui(26, .bold)).foregroundStyle(done)
+                Text(passed.name).font(WidgetFont.ui(26, .bold)).foregroundStyle(done).widgetAccentable()
                 Text(WidgetText.t("مضى على الأذان")).font(WidgetFont.ui(11)).foregroundStyle(theme.muted)
                 Countdown(to: passed.at, size: 24, weight: .bold).foregroundStyle(theme.ink)
                 ProgressView(timerInterval: passed.at...passed.at.addingTimeInterval(PrayerEntry.afterWindow),
@@ -575,7 +640,7 @@ struct PrayerCounterView: View {
             } else if let next = entry.next {
                 WidgetHeader(icon: "hourglass", title: WidgetText.t("متبقي على الأذان"), theme: theme)
                 Spacer(minLength: 0)
-                Text(next.name).font(WidgetFont.ui(26, .bold)).foregroundStyle(theme.accent)
+                Text(next.name).font(WidgetFont.ui(26, .bold)).foregroundStyle(theme.accent).widgetAccentable()
                 Text(WidgetText.time(next.at, zone: entry.zone)).font(WidgetFont.number(12, .medium)).foregroundStyle(theme.muted)
                 Countdown(to: next.at, size: 24, weight: .bold).foregroundStyle(theme.ink)
                 if let range = entry.interval {
@@ -594,6 +659,6 @@ struct PrayerCounterWidget: Widget {
         }
         .configurationDisplayName(WidgetText.t("عدّاد الصلاة"))
         .description(WidgetText.t("عدّ تنازلي قبل الأذان، ثم الوقت المنقضي بعده لمدة نصف ساعة"))
-        .supportedFamilies([.systemSmall, .accessoryCircular, .accessoryRectangular])
+        .supportedFamilies([.systemSmall, .systemMedium, .accessoryCircular, .accessoryRectangular])
     }
 }

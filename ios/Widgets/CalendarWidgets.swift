@@ -66,6 +66,18 @@ struct DateWidgetView: View {
                     prayersBlock.frame(maxWidth: .infinity)
                 }
                 .widgetTheme(theme)
+            case .systemLarge:
+                HijriMonthGrid(date: entry.date, theme: theme).widgetTheme(theme)
+            case .systemExtraLarge:
+                HStack(spacing: 20) {
+                    HijriMonthGrid(date: entry.date, theme: theme).frame(maxWidth: .infinity)
+                    VStack(spacing: 16) {
+                        calendarBlock
+                        prayersBlock
+                    }
+                    .frame(maxWidth: 260)
+                }
+                .widgetTheme(theme)
             default:
                 calendarBlock.widgetTheme(theme)
             }
@@ -77,7 +89,7 @@ struct DateWidgetView: View {
         VStack(spacing: 2) {
             Text(WidgetText.formatted(entry.date, .gregorian, "EEEE")).font(WidgetFont.ui(13, .semibold)).foregroundStyle(theme.accent)
             Text(WidgetText.number(Hijri.day(entry.date))).font(WidgetFont.number(46, .bold)).foregroundStyle(theme.ink)
-                .minimumScaleFactor(0.6)
+                .minimumScaleFactor(0.6).widgetAccentable()
             Text(WidgetText.formatted(entry.date, .islamicUmmAlQura, "MMMMy")).font(WidgetFont.ui(13, .medium))
                 .foregroundStyle(theme.ink).lineLimit(1).minimumScaleFactor(0.7)
             Rectangle().fill(theme.accent.opacity(0.35)).frame(width: 36, height: 1).padding(.vertical, 3)
@@ -124,7 +136,82 @@ struct DateWidget: Widget {
         }
         .configurationDisplayName(WidgetText.t("التاريخ الهجري والميلادي"))
         .description(WidgetText.t("التاريخ بالتقويمين، ومعه الصلاة السابقة والقادمة"))
-        .supportedFamilies([.systemSmall, .systemMedium, .accessoryCircular, .accessoryRectangular, .accessoryInline])
+        .supportedFamilies([.systemSmall, .systemMedium, .systemLarge, .systemExtraLarge, .accessoryCircular, .accessoryRectangular, .accessoryInline])
+    }
+}
+
+/// The current Hijri month as a calendar, Gregorian day numbers in small type.
+struct HijriMonthGrid: View {
+    let date: Date
+    let theme: WidgetTheme
+
+    private struct Cell: Hashable {
+        let hijri: Int
+        let gregorian: Int
+        let today: Bool
+    }
+
+    private var weeks: [[Cell?]] {
+        let hijri = Hijri.calendar
+        let gregorian = Calendar.current
+        guard let interval = hijri.dateInterval(of: .month, for: date),
+              let count = hijri.range(of: .day, in: .month, for: date)?.count else { return [] }
+        let first = interval.start
+        let lead = (gregorian.component(.weekday, from: first) - gregorian.firstWeekday + 7) % 7
+        var cells: [Cell?] = Array(repeating: nil, count: lead)
+        for offset in 0..<count {
+            guard let day = gregorian.date(byAdding: .day, value: offset, to: first) else { continue }
+            cells.append(Cell(hijri: offset + 1, gregorian: gregorian.component(.day, from: day),
+                              today: gregorian.isDate(day, inSameDayAs: date)))
+        }
+        while cells.count % 7 != 0 { cells.append(nil) }
+        return stride(from: 0, to: cells.count, by: 7).map { Array(cells[$0..<$0 + 7]) }
+    }
+
+    private var weekdaySymbols: [String] {
+        let f = DateFormatter()
+        f.locale = WidgetText.locale
+        let symbols = f.veryShortWeekdaySymbols ?? ["S", "M", "T", "W", "T", "F", "S"]
+        let start = Calendar.current.firstWeekday - 1
+        return Array(symbols[start...] + symbols[..<start])
+    }
+
+    var body: some View {
+        VStack(spacing: 6) {
+            HStack {
+                VStack(alignment: .leading, spacing: 0) {
+                    Text(WidgetText.formatted(date, .islamicUmmAlQura, "MMMMy")).font(WidgetFont.ui(17, .bold))
+                        .foregroundStyle(theme.accent).widgetAccentable()
+                    Text(WidgetText.formatted(date, .gregorian, "EEEEdMMMMy")).font(WidgetFont.ui(11)).foregroundStyle(theme.muted)
+                }
+                Spacer()
+                MoonDisc(date: date, glow: false).frame(width: 26)
+            }
+            HStack(spacing: 0) {
+                ForEach(Array(weekdaySymbols.enumerated()), id: \.offset) { _, symbol in
+                    Text(symbol).font(WidgetFont.ui(10, .semibold)).foregroundStyle(theme.muted).frame(maxWidth: .infinity)
+                }
+            }
+            VStack(spacing: 3) {
+                ForEach(Array(weeks.enumerated()), id: \.offset) { _, week in
+                    HStack(spacing: 3) {
+                        ForEach(Array(week.enumerated()), id: \.offset) { _, cell in
+                            if let cell {
+                                VStack(spacing: -1) {
+                                    Text(WidgetText.number(cell.hijri)).font(WidgetFont.number(14, cell.today ? .bold : .medium))
+                                    Text(WidgetText.number(cell.gregorian)).font(WidgetFont.number(8, .regular)).opacity(0.6)
+                                }
+                                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                                .highlight(cell.today, theme, radius: 8)
+                            } else {
+                                Color.clear.frame(maxWidth: .infinity, maxHeight: .infinity)
+                            }
+                        }
+                    }
+                }
+            }
+            .frame(maxHeight: .infinity)
+        }
     }
 }
 
@@ -163,7 +250,7 @@ struct DayNameView: View {
                 VStack(spacing: 2) {
                     Spacer(minLength: 0)
                     Text(dayName).font(WidgetFont.quran(family == .systemMedium ? 54 : 40))
-                        .foregroundStyle(theme.accent).minimumScaleFactor(0.5).lineLimit(1)
+                        .foregroundStyle(theme.accent).minimumScaleFactor(0.5).lineLimit(1).widgetAccentable()
                     Text(WidgetText.formatted(entry.date, .islamicUmmAlQura, "dMMMMy")).font(WidgetFont.ui(12, .semibold))
                         .foregroundStyle(theme.ink).lineLimit(1).minimumScaleFactor(0.7)
                     Text(WidgetText.formatted(entry.date, .gregorian, "dMMMMy")).font(WidgetFont.ui(11))
@@ -203,6 +290,13 @@ enum MoonPhase {
 
     static func illumination(_ date: Date) -> Int {
         Int(((1 - cos(2 * Double.pi * fraction(date))) / 2 * 100).rounded())
+    }
+
+    /// Next moment the phase reaches `target` (0 = new, 0.5 = full).
+    static func next(_ target: Double, after date: Date) -> Date {
+        var delta = target - fraction(date)
+        if delta <= 0.01 { delta += 1 }
+        return date.addingTimeInterval(delta * synodic * 86_400)
     }
 
     static func name(_ date: Date) -> String {
@@ -269,7 +363,7 @@ struct MoonDisc: View {
 struct MoonView: View {
     @Environment(\.widgetFamily) private var family
     let entry: DayEntry
-    private let theme = WidgetTheme.midnight
+    let theme = WidgetTheme.midnight
 
     var body: some View {
         Group {
@@ -298,9 +392,28 @@ struct MoonView: View {
                     Spacer(minLength: 0)
                 }
                 .accessoryContainer()
+            case .systemMedium:
+                HStack(spacing: 16) {
+                    MoonDisc(date: entry.date).frame(width: 96)
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(MoonPhase.name(entry.date)).font(WidgetFont.ui(17, .bold)).foregroundStyle(theme.accent).widgetAccentable()
+                        Text(WidgetText.formatted(entry.date, .islamicUmmAlQura, "EEEEdMMMMy")).font(WidgetFont.ui(11))
+                            .foregroundStyle(theme.ink).lineLimit(1).minimumScaleFactor(0.7)
+                        Text(WidgetText.t("الإضاءة {0}٪", WidgetText.number(MoonPhase.illumination(entry.date))))
+                            .font(WidgetFont.ui(11)).foregroundStyle(theme.muted)
+                        Spacer(minLength: 0)
+                        moonLine("circle.fill", WidgetText.t("البدر"), MoonPhase.next(0.5, after: entry.date))
+                        moonLine("circle", WidgetText.t("المحاق"), MoonPhase.next(0, after: entry.date))
+                        if (12...15).contains(Hijri.day(entry.date)) || Hijri.day(entry.date) < 12 {
+                            Chip(text: WidgetText.t("الأيام البيض ١٣–١٥"), theme: theme, icon: "sparkles")
+                        }
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                }
+                .widgetTheme(theme)
             default:
                 VStack(spacing: 6) {
-                    MoonDisc(date: entry.date).frame(width: family == .systemSmall ? 62 : 74)
+                    MoonDisc(date: entry.date).frame(width: 62)
                     Text(MoonPhase.name(entry.date)).font(WidgetFont.ui(14, .bold)).foregroundStyle(theme.accent)
                     Text(WidgetText.formatted(entry.date, .islamicUmmAlQura, "dMMMMy")).font(WidgetFont.ui(11))
                         .foregroundStyle(theme.ink).lineLimit(1).minimumScaleFactor(0.7)
@@ -315,6 +428,18 @@ struct MoonView: View {
     }
 }
 
+extension MoonView {
+    fileprivate func moonLine(_ icon: String, _ title: String, _ date: Date) -> some View {
+        HStack(spacing: 5) {
+            Image(systemName: icon).font(.system(size: 9)).foregroundStyle(theme.accent)
+            Text(title).font(WidgetFont.ui(11, .medium)).foregroundStyle(theme.ink)
+            Spacer(minLength: 2)
+            Text(WidgetText.formatted(date, .gregorian, "EEEdMMM")).font(WidgetFont.ui(11)).foregroundStyle(theme.muted)
+        }
+        .lineLimit(1)
+    }
+}
+
 struct MoonWidget: Widget {
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: "MushafiMoon", provider: DayProvider()) { entry in
@@ -322,7 +447,7 @@ struct MoonWidget: Widget {
         }
         .configurationDisplayName(WidgetText.t("أطوار القمر"))
         .description(WidgetText.t("طور القمر الليلة مع اليوم الهجري"))
-        .supportedFamilies([.systemSmall, .accessoryCircular, .accessoryRectangular])
+        .supportedFamilies([.systemSmall, .systemMedium, .accessoryCircular, .accessoryRectangular])
     }
 }
 
@@ -340,23 +465,25 @@ enum Occasions {
         (12, 10, "عيد الأضحى"), (1, 1, "رأس السنة الهجرية"), (1, 10, "يوم عاشوراء"),
     ]
 
-    static func next(after date: Date) -> Occasion? {
+    static func next(after date: Date) -> Occasion? { upcoming(after: date).first }
+
+    static func upcoming(after date: Date) -> [Occasion] {
         let hijri = Hijri.calendar
         let gregorian = Calendar.current
         let today = gregorian.startOfDay(for: date)
         let year = hijri.component(.year, from: date)
-        var best: Occasion?
+        var result: [Occasion] = []
         for item in list {
             for y in [year, year + 1] {
                 guard let start = hijri.date(from: DateComponents(year: y, month: item.month, day: item.day)) else { continue }
                 let day = gregorian.startOfDay(for: start)
                 guard day >= today else { continue }
                 let days = gregorian.dateComponents([.day], from: today, to: day).day ?? 0
-                if best == nil || days < best!.days { best = Occasion(name: WidgetText.t(item.name), date: day, days: days) }
+                result.append(Occasion(name: WidgetText.t(item.name), date: day, days: days))
                 break
             }
         }
-        return best
+        return result.sorted { $0.days < $1.days }
     }
 
     /// Day of Ramadan and days left, or nil outside Ramadan.
@@ -398,6 +525,30 @@ struct OccasionView: View {
     @ViewBuilder
     private func layout(title: String, big: String, unit: String, detail: String, icon: String) -> some View {
         switch family {
+        case .systemMedium, .systemLarge:
+            VStack(alignment: .leading, spacing: 8) {
+                HStack(alignment: .firstTextBaseline, spacing: 8) {
+                    Image(systemName: icon).foregroundStyle(theme.accent).widgetAccentable()
+                    Text(title).font(WidgetFont.quran(22)).foregroundStyle(theme.accent).lineLimit(1).widgetAccentable()
+                    Spacer(minLength: 4)
+                    Text(big).font(WidgetFont.number(26, .bold)).foregroundStyle(theme.ink)
+                    Text(unit).font(WidgetFont.ui(12)).foregroundStyle(theme.muted)
+                }
+                let list = Array(Occasions.upcoming(after: entry.date).filter { $0.name != title }.prefix(family == .systemLarge ? 6 : 2))
+                ForEach(list, id: \.name) { occasion in
+                    HStack(spacing: 8) {
+                        Text(occasion.name).font(WidgetFont.ui(13, .medium)).foregroundStyle(theme.ink)
+                        Spacer(minLength: 4)
+                        Text(WidgetText.formatted(occasion.date, .islamicUmmAlQura, "dMMMM")).font(WidgetFont.ui(11)).foregroundStyle(theme.muted)
+                        Chip(text: occasion.days == 0 ? WidgetText.t("اليوم") : WidgetText.t("{0} يومًا", WidgetText.number(occasion.days)), theme: theme)
+                    }
+                    .lineLimit(1)
+                    .padding(.vertical, family == .systemLarge ? 6 : 2)
+                }
+                Spacer(minLength: 0)
+                Text(detail).font(WidgetFont.ui(10)).foregroundStyle(theme.muted).lineLimit(1)
+            }
+            .widgetTheme(theme)
         case .accessoryInline:
             Text("\(title) · \(big) \(unit)").accessoryContainer()
         case .accessoryCircular:
@@ -430,6 +581,7 @@ struct OccasionView: View {
                 WidgetHeader(icon: icon, title: WidgetText.t("المناسبة القادمة"), theme: theme)
                 Spacer(minLength: 0)
                 Text(title).font(WidgetFont.quran(24)).foregroundStyle(theme.accent).lineLimit(1).minimumScaleFactor(0.6)
+                    .widgetAccentable()
                 HStack(alignment: .firstTextBaseline, spacing: 4) {
                     Text(big).font(WidgetFont.number(36, .bold)).foregroundStyle(theme.ink).minimumScaleFactor(0.5)
                     Text(unit).font(WidgetFont.ui(13)).foregroundStyle(theme.muted)
@@ -449,6 +601,6 @@ struct OccasionWidget: Widget {
         }
         .configurationDisplayName(WidgetText.t("رمضان والمناسبات"))
         .description(WidgetText.t("عدّ تنازلي لرمضان والعيدين ويوم عرفة وعاشوراء"))
-        .supportedFamilies([.systemSmall, .accessoryCircular, .accessoryRectangular, .accessoryInline])
+        .supportedFamilies([.systemSmall, .systemMedium, .systemLarge, .accessoryCircular, .accessoryRectangular, .accessoryInline])
     }
 }

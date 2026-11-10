@@ -259,6 +259,35 @@ enum WidgetText {
     }
 }
 
+// MARK: - Clear / Tinted Home Screen support
+//
+// In "Clear" and "Tinted" modes (iOS 18+) the system removes the container background and
+// renders content as a single tint using each view's alpha. Solid fills with contrasting text
+// would turn into blank blocks there, so highlights switch to a translucent pill and the
+// important parts are marked accentable.
+
+struct Highlight: ViewModifier {
+    @Environment(\.widgetRenderingMode) private var mode
+    let on: Bool
+    let theme: WidgetTheme
+    var radius: CGFloat = 8
+
+    func body(content: Content) -> some View {
+        let full = mode == .fullColor
+        content
+            .foregroundStyle(on && full ? theme.top : theme.ink)
+            .background(RoundedRectangle(cornerRadius: radius, style: .continuous)
+                .fill(on ? (full ? theme.accent : Color.white.opacity(0.2)) : Color.clear))
+            .widgetAccentable(on && !full)
+    }
+}
+
+extension View {
+    func highlight(_ on: Bool, _ theme: WidgetTheme, radius: CGFloat = 8) -> some View {
+        modifier(Highlight(on: on, theme: theme, radius: radius))
+    }
+}
+
 /// Small rounded label used across widgets.
 struct Chip: View {
     let text: String
@@ -273,6 +302,7 @@ struct Chip: View {
         .padding(.vertical, 3)
         .background(Capsule().fill(theme.chip))
         .foregroundStyle(theme.accent)
+        .widgetAccentable()
     }
 }
 
@@ -285,6 +315,7 @@ struct WidgetHeader: View {
     var body: some View {
         HStack(spacing: 4) {
             Image(systemName: icon).font(.system(size: 10, weight: .semibold)).foregroundStyle(theme.accent)
+                .widgetAccentable()
             Text(title).font(WidgetFont.ui(11, .medium)).foregroundStyle(theme.muted).lineLimit(1)
             Spacer(minLength: 2)
             if let trailing {
