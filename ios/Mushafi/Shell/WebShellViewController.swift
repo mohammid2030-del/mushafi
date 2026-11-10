@@ -75,6 +75,8 @@ final class WebShellViewController: UIViewController, WKNavigationDelegate, WKUI
             webView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
         ])
 
+        installBackSwipe()
+
         launchCover.backgroundColor = currentBackground
         launchCover.frame = view.bounds
         launchCover.autoresizingMask = [.flexibleWidth, .flexibleHeight]
@@ -354,5 +356,60 @@ final class WebShellViewController: UIViewController, WKNavigationDelegate, WKUI
               let data = try? JSONSerialization.data(withJSONObject: [value]),
               let text = String(data: data, encoding: .utf8) else { return "null" }
         return String(text.dropFirst().dropLast())   // strip the wrapping [ ]
+    }
+}
+
+
+// MARK: - Swipe back (iOS edge gesture)
+
+/// Swiping in from the leading edge goes back, like other iPhone apps (right edge in Arabic and
+/// Urdu, left edge otherwise). It runs the same `handleNativeBack()` as Android's back gesture,
+/// and the page follows the finger slightly so the gesture feels responsive. Back buttons stay.
+extension WebShellViewController: UIGestureRecognizerDelegate {
+    private static var backState: (canGoBack: Bool, active: Bool) = (false, false)
+
+    fileprivate func installBackSwipe() {
+        for edge in [UIRectEdge.left, .right] {
+            let pan = UIScreenEdgePanGestureRecognizer(target: self, action: #selector(handleBackSwipe(_:)))
+            pan.edges = edge
+            pan.delegate = self
+            view.addGestureRecognizer(pan)
+        }
+    }
+
+    func gestureRecognizerShouldBegin(_ gesture: UIGestureRecognizer) -> Bool {
+        guard let pan = gesture as? UIScreenEdgePanGestureRecognizer else { return true }
+        guard pageIsReady, presentedViewController == nil else { return false }
+        let backEdge: UIRectEdge = UiLanguage.isRTL ? .right : .left
+        return pan.edges == backEdge
+    }
+
+    @objc fileprivate func handleBackSwipe(_ pan: UIScreenEdgePanGestureRecognizer) {
+        let direction: CGFloat = pan.edges == .right ? -1 : 1
+        let travel = max(0, pan.translation(in: view).x * direction)
+        switch pan.state {
+        case .began:
+            Self.backState = (false, true)
+            let probe = "(function(){try{if(document.querySelector('.first-tour,.verse-sheet,.verse-toolbar,.feature-sheet,.night-select-overlay'))return true;if(typeof activeSheet!=='undefined'&&activeSheet)return true;return !(view==='home'||(view==='onboarding'&&onboardingState&&onboardingState.step===0))}catch(e){return false}})()"
+            webView.evaluateJavaScript(probe) { result, _ in Self.backState.canGoBack = (result as? Bool) == true }
+        case .changed:
+            guard Self.backState.canGoBack else { return }
+            let offset = min(travel * 0.45, 110)
+            webView.transform = CGAffineTransform(translationX: offset * direction, y: 0)
+        case .ended, .cancelled, .failed:
+            let velocity = pan.velocity(in: view).x * direction
+            let commit = pan.state == .ended && Self.backState.canGoBack && (travel > 90 || velocity > 700)
+            Self.backState.active = false
+            if commit {
+                UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                webView.evaluateJavaScript("typeof window.handleNativeBack==='function'&&window.handleNativeBack()", completionHandler: nil)
+            }
+            UIView.animate(withDuration: commit ? 0.22 : 0.28, delay: 0, usingSpringWithDamping: 0.9, initialSpringVelocity: 0.4,
+                           options: [.allowUserInteraction, .beginFromCurrentState]) {
+                self.webView.transform = .identity
+            }
+        default:
+            break
+        }
     }
 }
