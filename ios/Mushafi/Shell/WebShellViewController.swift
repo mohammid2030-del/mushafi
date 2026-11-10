@@ -125,6 +125,19 @@ final class WebShellViewController: UIViewController, WKNavigationDelegate, WKUI
         darkTheme ? .lightContent : .darkContent
     }
 
+    /// While reading the Mushaf the status bar is hidden (like Android's immersive reader),
+    /// so the page header no longer sits underneath the clock.
+    var readingMode = false {
+        didSet {
+            guard readingMode != oldValue else { return }
+            UIView.animate(withDuration: 0.2) { self.setNeedsStatusBarAppearanceUpdate() }
+            setNeedsUpdateOfHomeIndicatorAutoHidden()
+        }
+    }
+    override var prefersStatusBarHidden: Bool { readingMode }
+    override var preferredStatusBarUpdateAnimation: UIStatusBarAnimation { .fade }
+    override var prefersHomeIndicatorAutoHidden: Bool { readingMode }
+
     // MARK: - Used by NativeBridge
 
     /// The app never overrides its interface style, so the trait collection is the system's.

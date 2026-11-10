@@ -30,7 +30,7 @@ final class NativeBridge: NSObject, WKScriptMessageHandler {
             "requestPrayerLocation", "requestQiblaLocation", "cancelPrayerLocation", "openLocationSettings",
             "startQibla", "stopQibla", "requestHomeWeather",
             "requestPrayerNotifications", "openPrayerSystemSettings", "previewPrayerVoice", "stopPrayerVoice",
-            "testPrayerNotification", "openWidgets",
+            "testPrayerNotification", "openWidgets", "openLiveBroadcast",
             "surahPlay", "surahPlaySession", "surahSetMode", "surahPause", "surahResume", "surahStop", "surahSkip", "surahSeek",
         ]
         if CloudSync.isAvailable {
@@ -117,7 +117,7 @@ final class NativeBridge: NSObject, WKScriptMessageHandler {
         case "startupReady": shell?.pageReady()
         case "setAppTheme": shell?.applyTheme(dark: a.bool(0))
         case "setUiLanguage": if let code = a.string(0) { UiLanguage.save(code); prayer.schedule() }
-        case "setReading": reading = a.bool(0); updateIdleTimer()
+        case "setReading": reading = a.bool(0); updateIdleTimer(); shell?.readingMode = reading
         case "setStoryReading": storyReading = a.bool(0); updateIdleTimer()
         case "haptic":
             let style: UIImpactFeedbackGenerator.FeedbackStyle = a.int(0) == 1 ? .medium : .light
@@ -130,6 +130,11 @@ final class NativeBridge: NSObject, WKScriptMessageHandler {
         case "openWeatherReference": ExternalLinks.openWeatherReference(a.string(0))
         case "openRecitationReference": ExternalLinks.openRecitationReference(a.string(0))
         case "openSupportPage": ExternalLinks.openSupportPage(a.string(0))
+        case "openLiveBroadcast":
+            if let city = a.string(0), LiveBroadcastViewController.cities.contains(city) {
+                SurahPlayer.shared.pause()
+                shell?.present(LiveBroadcastViewController(city: city, dark: a.bool(1)), animated: true)
+            }
         case "openCharityPlatform":
             if !ExternalLinks.openCharity(a.string(0)) { fileMessage(false, "تعذر فتح صفحة الجهة") }
 
