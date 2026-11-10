@@ -1,0 +1,59 @@
+name: Android
+
+# Builds the Android app on every change so both platforms stay in step.
+# The debug APK is attached to the run (Actions → this run → Artifacts) for testing on a phone.
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, ios-release]
+    paths:
+      - "android/**"
+      - ".github/workflows/android.yml"
+
+concurrency:
+  group: android-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build debug APK
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    defaults:
+      run:
+        working-directory: android
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Android SDK 36
+        run: |
+          echo "sdk.dir=$ANDROID_SDK_ROOT" > local.properties
+          yes | "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager" --install "platforms;android-36" "build-tools;36.0.0" > /dev/null
+
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-${{ hashFiles('android/build.gradle', 'android/settings.gradle', 'android/gradle/wrapper/gradle-wrapper.properties') }}
+
+      - name: Build
+        run: |
+          chmod +x gradlew
+          ./gradlew --no-daemon --stacktrace verifyUiLocales assembleDebug 2>&1 | tee "$RUNNER_TEMP/build.log"
+
+      - name: Errors
+        if: failure()
+        run: grep -n -B2 -A8 -E "error:|FAILURE|What went wrong" "$RUNNER_TEMP/build.log" | head -200 || true
+
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: mushafi-debug-apk
+          path: android/gradle-build/outputs/apk/debug/*.apk
+          if-no-files-found: warn
