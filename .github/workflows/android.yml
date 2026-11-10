@@ -33,6 +33,12 @@ jobs:
           distribution: temurin
           java-version: "21"
 
+      # Names only (never values): shows which signing secrets exist in the repository.
+      - name: Available secrets
+        env:
+          ALL_SECRETS: ${{ toJSON(secrets) }}
+        run: python3 -c "import json,os;print(sorted(k for k in json.loads(os.environ['ALL_SECRETS']) if k!='github_token'))"
+
       - name: Android SDK 36
         run: |
           echo "sdk.dir=$ANDROID_SDK_ROOT" > local.properties
