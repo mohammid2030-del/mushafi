@@ -122,3 +122,13 @@ body.dark .reader-language-switch button[aria-pressed=true]{background:var(--nig
 .cloud-apple-button{background:#fff;color:#000;border-color:#fff}
 
 body.dark .welcome-apple{background:#fff;color:#000;border-color:#fff}
+
+/* In-app chooser in light mode too (replaces the system select dialog everywhere). */
+select[data-night-select="1"]{display:none!important}
+body:not(.dark) .night-select-trigger{background:rgba(255,255,255,.72);border-color:var(--line);color:var(--ink)}
+body:not(.dark) .night-select-overlay{background:rgba(24,30,26,.42)}
+body:not(.dark) .night-select-dialog{background:var(--paper,#fbf8f1);color:var(--ink);border-color:rgba(156,106,28,.22);box-shadow:0 24px 70px rgba(30,40,30,.22)}
+body:not(.dark) .night-select-heading .icon{background:rgba(255,255,255,.7);border-color:var(--line)}
+body:not(.dark) .night-select-option{background:#fff;border-color:var(--line);color:var(--ink)}
+body:not(.dark) .night-select-option>i{color:var(--gold-deep,#8a6420)}
+body:not(.dark) .night-select-option[aria-selected=true]{background:rgba(156,106,28,.10);border-color:rgba(156,106,28,.45);color:var(--green,#173b3b);font-weight:600}
