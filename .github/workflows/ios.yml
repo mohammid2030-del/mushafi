@@ -133,6 +133,11 @@ jobs:
           echo "BUILD_NUMBER=${code}.${GITHUB_RUN_NUMBER}" >> "$GITHUB_ENV"
           cd ios && xcodegen generate
 
+      - name: Revoke old CI development certificates
+        env:
+          MUSHAFI_REVOKE_ALL_DEV_CERTS: "1"
+        run: python3 ios/scripts/revoke-ci-dev-certs.py
+
       - name: Archive (cloud-managed signing)
         run: |
           set -o pipefail
