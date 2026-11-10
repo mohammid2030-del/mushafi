@@ -3,3 +3,10 @@
 .account-delete-card{margin-top:24px}.account-delete-confirm{display:flex;align-items:flex-start;gap:12px;font-size:12px;line-height:2;margin:20px 0}.account-delete-confirm input{margin-top:6px;accent-color:var(--green);width:20px;height:20px;flex-shrink:0}.account-delete-card [data-account-delete]{color:var(--ink)}
 
 .cloud-apple-button{display:flex;align-items:center;justify-content:center;gap:10px;background:#000;color:#fff;border:1px solid #000;border-radius:14px;min-height:54px;width:100%;padding:12px 16px;margin:24px 0 -9px;font-size:13px;font-weight:600}.cloud-apple-button+.cloud-google-button{margin-top:15px}.cloud-apple-logo{font-family:-apple-system,system-ui;font-size:20px;line-height:1;margin-top:-3px}.cloud-apple-button:disabled{opacity:.6}
+
+/* Official Apple logo (supplied artwork): white on the black button, black on the white night-mode button. */
+img.cloud-apple-logo{width:16px;height:auto;margin:0;flex:none}
+.apple-logo-on-light{display:none}
+body.dark .apple-logo-on-dark{display:none}
+body.dark .apple-logo-on-light{display:inline-block}
+.welcome-apple img.cloud-apple-logo{width:17px}
