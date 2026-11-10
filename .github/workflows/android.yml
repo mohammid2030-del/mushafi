@@ -10,6 +10,9 @@ on:
       - "android/**"
       - ".github/workflows/android.yml"
 
+permissions:
+  contents: write
+
 concurrency:
   group: android-${{ github.ref }}
   cancel-in-progress: true
@@ -58,3 +61,17 @@ jobs:
           name: mushafi-debug-apk
           path: android/gradle-build/outputs/apk/debug/*.apk
           if-no-files-found: warn
+
+      # A fixed download link for testing on a phone (no zip, no Actions page):
+      # https://github.com/<owner>/<repo>/releases/download/android-test/mushafi-android-test.apk
+      - name: Publish test APK
+        if: success() && github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cp gradle-build/outputs/apk/debug/*.apk "$RUNNER_TEMP/mushafi-android-test.apk"
+          gh release delete android-test --yes --cleanup-tag || true
+          gh release create android-test "$RUNNER_TEMP/mushafi-android-test.apk" \
+            --title "مصحفي — نسخة تجربة اندرويد" \
+            --notes "نسخة تجربة من آخر تحديث (${GITHUB_SHA::7}). ليست للنشر." \
+            --prerelease --target "$GITHUB_SHA"
