@@ -78,6 +78,10 @@ targets:
         buildPhase: resources
       - path: ../android/assets/widget-adhkar.json
         buildPhase: resources
+      - path: ../android/assets/widget-daily-verses.json
+        buildPhase: resources
+      - path: ../android/assets/widget-devotions.json
+        buildPhase: resources
       # Arabic fonts for the widgets (registered through UIAppFonts).
       - path: ../android/assets/quran.ttf
         buildPhase: resources

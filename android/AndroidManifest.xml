@@ -229,6 +229,114 @@
                 android:resource="@xml/widget_daily" />
         </receiver>
 
+        <receiver
+            android:name="com.mushafi.app.MushafiWidget$Times"
+            android:label="@string/widget_times"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_times" />
+        </receiver>
+
+        <receiver
+            android:name="com.mushafi.app.MushafiWidget$Counter"
+            android:label="@string/widget_counter"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_counter" />
+        </receiver>
+
+        <receiver
+            android:name="com.mushafi.app.MushafiWidget$Adhkar"
+            android:label="@string/widget_adhkar"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_adhkar" />
+        </receiver>
+
+        <receiver
+            android:name="com.mushafi.app.MushafiWidget$Dua"
+            android:label="@string/widget_dua"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_dua" />
+        </receiver>
+
+        <receiver
+            android:name="com.mushafi.app.MushafiWidget$Page"
+            android:label="@string/widget_page"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_page" />
+        </receiver>
+
+        <receiver
+            android:name="com.mushafi.app.MushafiWidget$DayName"
+            android:label="@string/widget_dayname"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_dayname" />
+        </receiver>
+
+        <receiver
+            android:name="com.mushafi.app.MushafiWidget$Moon"
+            android:label="@string/widget_moon"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_moon" />
+        </receiver>
+
+        <receiver
+            android:name="com.mushafi.app.MushafiWidget$Occasions"
+            android:label="@string/widget_occasions"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_occasions" />
+        </receiver>
+
+        <receiver
+            android:name="com.mushafi.app.MushafiWidget$Calendar"
+            android:label="@string/widget_calendar"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_calendar" />
+        </receiver>
+
         <!-- Hands the verified update APK in cache/updates/ to the system installer -->
         <provider
             android:name="androidx.core.content.FileProvider"
