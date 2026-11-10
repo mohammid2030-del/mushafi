@@ -14,3 +14,6 @@ android/signing/upload.properties
 *.keystore
 *.p8
 .env
+
+# Shared test-only signing key for CI debug builds (never used for store releases)
+!android/signing/test-debug.keystore

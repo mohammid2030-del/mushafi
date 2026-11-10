@@ -160,7 +160,7 @@ final class CloudSync: NSObject {
                 guard let self else { return }
                 guard let credential else { self.loginFinished(message); return }
                 self.auth.signIn(with: credential) { _, failure in
-                    self.loginFinished(failure == nil ? "" : "تعذر الدخول بقوقل. تحقق من الاتصال وإعدادات الحساب ثم أعد المحاولة.")
+                    self.loginFinished(failure == nil ? "" : "تعذر الدخول بقوقل. تحقق من الاتصال وإعدادات الحساب ثم أعد المحاولة." + Self.code(failure))
                 }
             }
         }
@@ -183,7 +183,7 @@ final class CloudSync: NSObject {
         GIDSignIn.sharedInstance.signIn(withPresenting: presenter) { result, failure in
             if let failure {
                 let cancelled = (failure as NSError).code == -5   // kGIDSignInErrorCodeCanceled
-                done(nil, cancelled ? "" : "تعذر فتح تسجيل قوقل. تحقق من الاتصال ثم أعد المحاولة.")
+                done(nil, cancelled ? "" : "تعذر فتح تسجيل قوقل. تحقق من الاتصال ثم أعد المحاولة." + Self.code(failure))
                 return
             }
             guard let user = result?.user, let idToken = user.idToken?.tokenString else {
@@ -567,6 +567,15 @@ final class CloudSync: NSObject {
         }
     }
 
+    /// Short technical code appended to sign-in errors (e.g. ERROR_INVALID_CREDENTIAL) for support.
+    static func code(_ failure: Error?) -> String {
+        guard let failure else { return "" }
+        let error = failure as NSError
+        let name = error.userInfo["FIRAuthErrorUserInfoNameKey"] as? String ?? "\(error.domain) \(error.code)"
+        let message = String(error.localizedDescription.prefix(90))
+        return "\n(\(name) — \(message))"
+    }
+
     private static func explain(_ failure: Error) -> String {
         let error = failure as NSError
         if error.domain == "FIRFirestoreErrorDomain" {
@@ -619,7 +628,7 @@ extension CloudSync: ASAuthorizationControllerDelegate, ASAuthorizationControlle
         switch applePurpose {
         case .signIn:
             auth.signIn(with: credential) { [weak self] _, failure in
-                self?.loginFinished(failure == nil ? "" : "تعذر الدخول بأبل. تحقق من الاتصال ثم أعد المحاولة.")
+                self?.loginFinished(failure == nil ? "" : "تعذر الدخول بأبل. تحقق من الاتصال ثم أعد المحاولة." + Self.code(failure))
             }
         case .deleteAccount:
             guard let user = auth.currentUser else { deletionFailed("تغيرت جلسة الحساب؛ أعد تأكيد الحذف."); return }
@@ -641,7 +650,7 @@ extension CloudSync: ASAuthorizationControllerDelegate, ASAuthorizationControlle
 
     func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
         let cancelled = (error as NSError).code == ASAuthorizationError.canceled.rawValue
-        appleFailed(cancelled ? "" : "تعذر فتح تسجيل الدخول بأبل. أعد المحاولة.")
+        appleFailed(cancelled ? "" : "تعذر فتح تسجيل الدخول بأبل. أعد المحاولة." + Self.code(error))
     }
 
     private func appleFailed(_ message: String) {
