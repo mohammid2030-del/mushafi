@@ -12,6 +12,32 @@ enum AppGroup {
     static func set(_ value: String?, _ key: String) { defaults.set(value, forKey: key) }
 }
 
+/// Reading position published by the app for the "Mushaf page" widget.
+struct ReadingState: Codable, Equatable {
+    var page: Int
+    var surah: String
+    var juz: Int
+    var started: Bool
+}
+
+enum WidgetStore {
+    static let readingKind = "MushafiLastPage"
+    private static let readingKey = "widget.reading"
+
+    static func reading() -> ReadingState? {
+        guard let data = AppGroup.defaults.data(forKey: readingKey) else { return nil }
+        return try? JSONDecoder().decode(ReadingState.self, from: data)
+    }
+
+    /// Returns true when the stored value changed.
+    @discardableResult
+    static func save(_ state: ReadingState) -> Bool {
+        guard state != reading(), let data = try? JSONEncoder().encode(state) else { return false }
+        AppGroup.defaults.set(data, forKey: readingKey)
+        return true
+    }
+}
+
 /// Locates bundled data files in the app (inside "assets/") or in the widget extension (bundle root).
 enum SharedResources {
     static func url(_ name: String, _ ext: String, subdirectory: String? = nil) -> URL? {

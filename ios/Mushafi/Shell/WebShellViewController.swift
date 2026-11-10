@@ -1,5 +1,6 @@
 import UIKit
 import WebKit
+import WidgetKit
 
 /// Hosts the shared Mushafi web UI full-screen, like Android's MainActivity.
 final class WebShellViewController: UIViewController, WKNavigationDelegate, WKUIDelegate {
@@ -84,6 +85,7 @@ final class WebShellViewController: UIViewController, WKNavigationDelegate, WKUI
         center.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
 
         center.addObserver(self, selector: #selector(appBecameActive), name: UIApplication.didBecomeActiveNotification, object: nil)
+        center.addObserver(self, selector: #selector(publishWidgetState), name: UIApplication.willResignActiveNotification, object: nil)
         AppRouter.shared.onRoute = { [weak self] route in self?.route(route) }
 
         let timeout = DispatchWorkItem { [weak self] in self?.pageReady() }
@@ -135,9 +137,17 @@ final class WebShellViewController: UIViewController, WKNavigationDelegate, WKUI
     }
 
     func pageReady() {
+        let firstReady = !pageIsReady
         pageIsReady = true
         launchTimeout?.cancel()
         launchTimeout = nil
+        if firstReady {
+            // Widget links that arrived before the page could handle them.
+            for pending in AppRouter.pageRoutes where AppRouter.shared.consume(pending) {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) { [weak self] in self?.runPageRoute(pending) }
+                break
+            }
+        }
         guard launchCover.superview != nil else { return }
         UIView.animate(withDuration: 0.2, animations: { self.launchCover.alpha = 0 }) { _ in
             self.launchCover.removeFromSuperview()
@@ -178,7 +188,7 @@ final class WebShellViewController: UIViewController, WKNavigationDelegate, WKUI
     func showWidgetHelp() {
         let alert = UIAlertController(
             title: UiLanguage.text("ويدجت الشاشة الرئيسية"),
-            message: UiLanguage.text("اضغط مطولًا على مساحة فارغة في الشاشة الرئيسية، ثم اضغط زر الإضافة (+) وابحث عن مصحفي لإضافة الصلاة القادمة أو التاريخ أو آية وذكر اليوم."),
+            message: UiLanguage.text("اضغط مطولًا على الشاشة الرئيسية أو شاشة القفل، ثم اختر «تعديل» أو «تخصيص» واضغط (+) وابحث عن مصحفي. ستجد ويدجات الصلاة والعدّاد والتاريخ والقمر والمناسبات والأذكار والآيات وصفحة المصحف بأحجام مختلفة."),
             preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: UiLanguage.text("حسنًا"), style: .default))
         topPresenter.present(alert, animated: true)
@@ -192,7 +202,36 @@ final class WebShellViewController: UIViewController, WKNavigationDelegate, WKUI
         case "prayer": callbackRaw("openPrayerFromNotification", "")
         case "daily-verse", "daily-dhikr": callbackRaw("openDailyFromWidget", "")
         case "surah": callbackRaw("openSurahFromNotification", "")
-        default: break
+        default:
+            if AppRouter.pageRoutes.contains(route), AppRouter.shared.consume(route) { runPageRoute(route) }
+        }
+    }
+
+    /// Opens a section of the web UI for a widget link, only if the page defines the function.
+    private func runPageRoute(_ route: String) {
+        let script: String
+        if route == "reader" {
+            script = "typeof showPage==='function'&&showPage(+localStorage.lastPage||1)"
+        } else if route.hasPrefix("adhkar-") {
+            let group = String(route.dropFirst("adhkar-".count))
+            guard ["morning", "evening", "sleep", "quran", "prayer", "sunnah"].contains(group) else { return }
+            script = "typeof duaHome==='function'&&duaHome('\(group)')"
+        } else {
+            return
+        }
+        webView?.evaluateJavaScript(script, completionHandler: nil)
+    }
+
+    /// Publishes the reading position for the "Mushaf page" widget when the app leaves the foreground.
+    @objc private func publishWidgetState() {
+        guard pageIsReady, let webView else { return }
+        let script = "(function(){try{var l=lastReading();return JSON.stringify({page:l.page,surah:String(l.name||''),juz:l.juz,started:!!localStorage.lastPage})}catch(e){return ''}})()"
+        webView.evaluateJavaScript(script) { result, _ in
+            guard let text = result as? String, let data = text.data(using: .utf8),
+                  let state = try? JSONDecoder().decode(ReadingState.self, from: data) else { return }
+            if WidgetStore.save(state) {
+                WidgetCenter.shared.reloadTimelines(ofKind: WidgetStore.readingKind)
+            }
         }
     }
 

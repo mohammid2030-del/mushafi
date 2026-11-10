@@ -78,6 +78,13 @@ targets:
         buildPhase: resources
       - path: ../android/assets/widget-adhkar.json
         buildPhase: resources
+      # Arabic fonts for the widgets (registered through UIAppFonts).
+      - path: ../android/assets/quran.ttf
+        buildPhase: resources
+      - path: ../android/assets/reading-naskh.ttf
+        buildPhase: resources
+      - path: ../android/assets/ui-arabic.ttf
+        buildPhase: resources
       - path: ../android/assets/locales
         type: folder
         buildPhase: resources

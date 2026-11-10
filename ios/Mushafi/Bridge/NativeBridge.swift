@@ -238,6 +238,8 @@ final class WeakScriptMessageHandler: NSObject, WKScriptMessageHandler {
 /// The page asks with consume…() at start-up; when it is already running we call it directly.
 final class AppRouter {
     static let shared = AppRouter()
+    /// Routes the shell runs itself in the page (widgets), as opposed to routes the page consumes.
+    static let pageRoutes = ["reader", "adhkar-morning", "adhkar-evening", "adhkar-sleep", "adhkar-quran"]
     private var pending = Set<String>()
     var onRoute: ((String) -> Void)?
 
@@ -254,7 +256,7 @@ final class AppRouter {
     func handle(_ url: URL) -> Bool {
         guard url.scheme == "mushafi-app", url.host == "open" else { return false }
         let route = url.path.trimmingCharacters(in: CharacterSet(charactersIn: "/"))
-        guard ["prayer", "daily-verse", "daily-dhikr", "surah", "home"].contains(route) else { return false }
+        guard ["prayer", "daily-verse", "daily-dhikr", "surah", "home"].contains(route) || Self.pageRoutes.contains(route) else { return false }
         if route != "home" { open(route) }
         return true
     }
