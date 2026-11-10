@@ -469,11 +469,17 @@ final class SurahPlayer: NSObject {
 
     private func setupRemoteCommands() {
         let commands = MPRemoteCommandCenter.shared()
-        commands.playCommand.addTarget { [weak self] _ in self?.resume(); return .success }
+        commands.playCommand.addTarget { [weak self] _ in
+            guard let self, !self.accessoryJustConnected else { return .commandFailed }
+            self.resume()
+            return .success
+        }
         commands.pauseCommand.addTarget { [weak self] _ in self?.pause(); return .success }
         commands.togglePlayPauseCommand.addTarget { [weak self] _ in
             guard let self else { return .commandFailed }
-            if self.status == "playing" || self.status == "loading" { self.pause() } else { self.resume() }
+            if self.status == "playing" || self.status == "loading" { self.pause() }
+            else if self.accessoryJustConnected { return .commandFailed }
+            else { self.resume() }
             return .success
         }
         commands.stopCommand.addTarget { [weak self] _ in self?.stop(); return .success }
@@ -521,11 +527,84 @@ final class SurahPlayer: NSObject {
         let names = [7: "mishary-alafasy", 133: "maher-almuaiqly", 6: "mahmoud-alhusary", 2: "abdulbasit-abdulsamad",
                      3: "abdurrahman-as-sudais", 1001: "ali-alhudhaifi", 1002: "muhammad-ayyub", 1003: "khalid-almuhanna",
                      1004: "ibrahim-alakhdar", 1005: "ahmad-alnafees"]
-        let name = names[reader] ?? "mushafi-official-icon"
-        guard let url = SharedResources.url(name, "png", subdirectory: "images"),
-              let image = UIImage(contentsOfFile: url.path) else { return nil }
-        artwork = MPMediaItemArtwork(boundsSize: image.size) { _ in image }
+        let portrait = names[reader].flatMap { SharedResources.url($0, "png", subdirectory: "images") }.flatMap { UIImage(contentsOfFile: $0.path) }
+        let icon = SharedResources.url("mushafi-official-icon", "png", subdirectory: "images").flatMap { UIImage(contentsOfFile: $0.path) }
+        guard let image = Self.composeArtwork(portrait: portrait, icon: icon) else { return nil }
+        artwork = MPMediaItemArtwork(boundsSize: image.size) { size in
+            guard size.width > 0, size.width < image.size.width else { return image }
+            return UIGraphicsImageRenderer(size: size).image { _ in image.draw(in: CGRect(origin: .zero, size: size)) }
+        }
         return artwork
+    }
+
+    /// Square cover for the lock screen and Control Center: the app's night palette, a soft gold
+    /// glow and the reciter's portrait (transparent PNG) resting on the bottom edge.
+    static func composeArtwork(portrait: UIImage?, icon: UIImage?) -> UIImage? {
+        let side: CGFloat = 1024
+        let format = UIGraphicsImageRendererFormat()
+        format.scale = 1
+        format.opaque = true
+        return UIGraphicsImageRenderer(size: CGSize(width: side, height: side), format: format).image { context in
+            let cg = context.cgContext
+            let space = CGColorSpaceCreateDeviceRGB()
+            let top = UIColor(red: 0.11, green: 0.11, blue: 0.13, alpha: 1).cgColor
+            let bottom = UIColor(red: 0.04, green: 0.04, blue: 0.05, alpha: 1).cgColor
+            if let gradient = CGGradient(colorsSpace: space, colors: [top, bottom] as CFArray, locations: [0, 1]) {
+                cg.drawLinearGradient(gradient, start: .zero, end: CGPoint(x: 0, y: side), options: [])
+            }
+            let gold = UIColor(red: 0.89, green: 0.77, blue: 0.5, alpha: 1)
+            if let glow = CGGradient(colorsSpace: space, colors: [gold.withAlphaComponent(0.34).cgColor, gold.withAlphaComponent(0).cgColor] as CFArray, locations: [0, 1]) {
+                cg.drawRadialGradient(glow, startCenter: CGPoint(x: side / 2, y: side * 0.56), startRadius: 0,
+                                      endCenter: CGPoint(x: side / 2, y: side * 0.56), endRadius: side * 0.5, options: [])
+            }
+            // Thin gold ring behind the portrait.
+            cg.setStrokeColor(gold.withAlphaComponent(0.35).cgColor)
+            cg.setLineWidth(3)
+            cg.strokeEllipse(in: CGRect(x: side * 0.17, y: side * 0.2, width: side * 0.66, height: side * 0.66))
+
+            if let portrait, let cropped = Self.trimTransparent(portrait) {
+                let maxWidth = side * 0.8, maxHeight = side * 0.86
+                let scale = min(maxWidth / cropped.size.width, maxHeight / cropped.size.height)
+                let size = CGSize(width: cropped.size.width * scale, height: cropped.size.height * scale)
+                cropped.draw(in: CGRect(x: (side - size.width) / 2, y: side - size.height, width: size.width, height: size.height))
+                // Fade the bottom edge into the background.
+                if let fade = CGGradient(colorsSpace: space, colors: [bottom.copy(alpha: 0)!, bottom] as CFArray, locations: [0, 1]) {
+                    cg.drawLinearGradient(fade, start: CGPoint(x: 0, y: side * 0.84), end: CGPoint(x: 0, y: side), options: [])
+                }
+            } else if let icon {
+                let s = side * 0.5
+                icon.draw(in: CGRect(x: (side - s) / 2, y: (side - s) / 2, width: s, height: s))
+            }
+            // Small app mark in the corner.
+            if portrait != nil, let icon {
+                let s: CGFloat = 92
+                let rect = CGRect(x: side - s - 40, y: 40, width: s, height: s)
+                cg.saveGState()
+                UIBezierPath(roundedRect: rect, cornerRadius: 22).addClip()
+                icon.draw(in: rect)
+                cg.restoreGState()
+            }
+        }
+    }
+
+    /// Crops a transparent PNG to its visible pixels.
+    static func trimTransparent(_ image: UIImage) -> UIImage? {
+        guard let cg = image.cgImage else { return image }
+        let width = cg.width, height = cg.height
+        var pixels = [UInt8](repeating: 0, count: width * height * 4)
+        guard let context = CGContext(data: &pixels, width: width, height: height, bitsPerComponent: 8, bytesPerRow: width * 4,
+                                      space: CGColorSpaceCreateDeviceRGB(), bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue) else { return image }
+        context.draw(cg, in: CGRect(x: 0, y: 0, width: width, height: height))
+        var minX = width, minY = height, maxX = 0, maxY = 0
+        for y in 0..<height {
+            for x in 0..<width where pixels[(y * width + x) * 4 + 3] > 16 {
+                minX = min(minX, x); maxX = max(maxX, x)
+                minY = min(minY, y); maxY = max(maxY, y)
+            }
+        }
+        guard maxX > minX, maxY > minY,
+              let cropped = cg.cropping(to: CGRect(x: minX, y: minY, width: maxX - minX + 1, height: maxY - minY + 1)) else { return image }
+        return UIImage(cgImage: cropped)
     }
 
     // MARK: - Audio session events
@@ -547,9 +626,23 @@ final class SurahPlayer: NSObject {
         }
     }
 
+    /// Headphones, Bluetooth or CarPlay often send "play" right after connecting. A recitation the
+    /// user stopped must not start by itself, so remote play is ignored for a few seconds after a
+    /// new audio device appears. Pressing play on the lock screen afterwards works as usual.
+    private var deviceArrivedAt = Date.distantPast
+    private var accessoryJustConnected: Bool {
+        status != "playing" && status != "loading" && Date().timeIntervalSince(deviceArrivedAt) < 6
+    }
+
     @objc private func routeChanged(_ note: Notification) {
         guard let raw = note.userInfo?[AVAudioSessionRouteChangeReasonKey] as? UInt,
-              AVAudioSession.RouteChangeReason(rawValue: raw) == .oldDeviceUnavailable else { return }
-        DispatchQueue.main.async { self.pause() }   // headphones unplugged
+              let reason = AVAudioSession.RouteChangeReason(rawValue: raw) else { return }
+        DispatchQueue.main.async {
+            switch reason {
+            case .newDeviceAvailable: self.deviceArrivedAt = Date()
+            case .oldDeviceUnavailable: self.pause()   // headphones unplugged
+            default: break
+            }
+        }
     }
 }
