@@ -89,6 +89,10 @@ final class WebShellViewController: UIViewController, WKNavigationDelegate, WKUI
         center.addObserver(self, selector: #selector(appBecameActive), name: UIApplication.didBecomeActiveNotification, object: nil)
         center.addObserver(self, selector: #selector(publishWidgetState), name: UIApplication.willResignActiveNotification, object: nil)
         AppRouter.shared.onRoute = { [weak self] route in self?.route(route) }
+        AppRouter.shared.onPageCallback = { [weak self] name in
+            guard let self, self.pageIsReady else { return }
+            self.callbackRaw(name, "")
+        }
 
         let timeout = DispatchWorkItem { [weak self] in self?.pageReady() }
         launchTimeout = timeout
@@ -251,8 +255,10 @@ final class WebShellViewController: UIViewController, WKNavigationDelegate, WKUI
     }
 
     @objc private func appBecameActive() {
+        ReminderService.shared.enter()
         PrayerService.shared.refreshAuthorization { [weak self] in
             PrayerService.shared.schedule()
+            ReminderService.shared.schedule()
             self?.callbackRaw("onPrayerNativeChanged", "")
         }
     }

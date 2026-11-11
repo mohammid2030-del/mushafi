@@ -15,6 +15,8 @@ final class NativeBridge: NSObject, WKScriptMessageHandler {
             "prayerSnapshot", "savePrayerSettings", "syncDeviceState",
             "consumePrayerOpen", "consumeWidgetDaily", "consumeSurahOpen",
             "surahSnapshot",
+            "initializeDailyReminderConsent", "setDailyReminderConsent", "consumeFridayReminder", "consumeDailyReminderOpen",
+            "saveKhatmaPlan", "khatmaStatus", "consumeKhatmaOpen",
         ]
         if CloudSync.isAvailable { list += ["cloudSnapshot", "cloudMatchesAck"] }
         return list
@@ -96,6 +98,13 @@ final class NativeBridge: NSObject, WKScriptMessageHandler {
         case "consumeWidgetDaily":
             value = AppRouter.shared.consume("daily-dhikr") ? "dhikr" : (AppRouter.shared.consume("daily-verse") ? "quran" : "")
         case "consumeSurahOpen": value = AppRouter.shared.consume("surah")
+        case "initializeDailyReminderConsent": value = ReminderService.shared.initializeConsent()
+        case "setDailyReminderConsent": value = ReminderService.shared.setConsent(a.bool(0))
+        case "consumeFridayReminder": value = ReminderService.shared.consumeFriday()
+        case "consumeDailyReminderOpen": value = ReminderService.shared.consumeDailyOpen()
+        case "saveKhatmaPlan": value = ReminderService.shared.saveKhatma(a.string(0) ?? "")
+        case "khatmaStatus": value = ReminderService.shared.khatmaStatus()
+        case "consumeKhatmaOpen": value = ReminderService.shared.consumeKhatmaOpen()
         case "surahSnapshot": value = surah.snapshot
         case "cloudSnapshot": value = CloudSync.shared.snapshotJSON()
         case "cloudMatchesAck": value = CloudSync.shared.matchesAck(a.string(0))
@@ -247,6 +256,9 @@ final class AppRouter {
     static let pageRoutes = ["reader", "adhkar-morning", "adhkar-evening", "adhkar-sleep", "adhkar-quran"]
     private var pending = Set<String>()
     var onRoute: ((String) -> Void)?
+    /// Calls `window.<name>()` in the page once it is ready (cold starts consume pending state instead).
+    var onPageCallback: ((String) -> Void)?
+    func notifyPage(_ name: String) { onPageCallback?(name) }
 
     func open(_ route: String) {
         pending.insert(route)

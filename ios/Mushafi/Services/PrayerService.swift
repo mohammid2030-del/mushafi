@@ -22,7 +22,7 @@ final class PrayerService: NSObject {
     private let center = UNUserNotificationCenter.current()
     private static let prefix = "prayer."
     private static let testId = "prayer.test"
-    private static let maxScheduled = 56   // leave room under iOS's 64 for other reminders
+    private static let maxScheduled = 40   // iOS keeps 64 pending: prayer 40, daily reminders 16, khatma 6
 
     // MARK: Status
 

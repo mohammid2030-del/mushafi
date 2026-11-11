@@ -16,7 +16,7 @@ final class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationC
         CloudSync.shared.start()
 
         UNUserNotificationCenter.current().delegate = self
-        PrayerService.shared.refreshAuthorization { PrayerService.shared.schedule() }
+        PrayerService.shared.refreshAuthorization { PrayerService.shared.schedule(); ReminderService.shared.schedule() }
 
         _ = BGTaskScheduler.shared.register(forTaskWithIdentifier: Self.refreshTask, using: nil) { task in
             guard let task = task as? BGAppRefreshTask else { return }
@@ -49,6 +49,7 @@ final class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationC
         DispatchQueue.main.async {
             PrayerSource.refresh(PrayerSettings.load()) { _ in
                 PrayerService.shared.schedule()
+                ReminderService.shared.schedule()
                 DispatchQueue.main.asyncAfter(deadline: .now() + 2) { task.setTaskCompleted(success: true) }
             }
         }
@@ -63,8 +64,22 @@ final class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationC
 
     func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse,
                                 withCompletionHandler completionHandler: @escaping () -> Void) {
-        if (response.notification.request.content.userInfo["open"] as? String) == "prayer" {
+        let info = response.notification.request.content.userInfo
+        switch info["open"] as? String {
+        case "prayer":
             DispatchQueue.main.async { AppRouter.shared.open("prayer") }
+        case "daily":
+            DispatchQueue.main.async {
+                ReminderService.shared.pendingDaily = (info["kind"] as? String ?? "", info["item"] as? String ?? "")
+                AppRouter.shared.notifyPage("openDailyReminderFromNotification")
+            }
+        case "khatma":
+            DispatchQueue.main.async {
+                ReminderService.shared.pendingKhatma = true
+                AppRouter.shared.notifyPage("openKhatmaFromNotification")
+            }
+        default:
+            break
         }
         completionHandler()
     }
