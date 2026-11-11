@@ -1,47 +1,19 @@
 /* Large screens: iPad, iPhone Duo / foldables unfolded, Android tablets.
-   The interface (not the Mushaf page) is scaled to tablet proportions, and screens get
-   multi-column layouts that follow the orientation. The reader keeps its own sizing:
-   one page when tall, a two-page spread when wide. */
+   Same arrangement as the Android tablet: one centred column (max 900px, see app-shell.css)
+   in the natural order of the phone layout, gently scaled so it fills big screens in
+   proportion in both orientations. The Mushaf reader keeps its own sizing. */
 
-/* 1) Interface scale per screen class */
-@media (min-width:600px) and (max-width:819px) and (orientation:portrait){:root{--ui-zoom:1.06}}   /* Duo open, tall */
-@media (min-width:820px) and (orientation:portrait){:root{--ui-zoom:1.26}}                         /* iPad, tall */
-@media (min-width:1000px) and (max-width:1199px) and (orientation:landscape){:root{--ui-zoom:1.1}}
-@media (min-width:1200px) and (orientation:landscape){:root{--ui-zoom:1.2}}                         /* iPad, wide */
+/* Interface scale per screen class (never applied while reading) */
+@media (min-width:820px) and (orientation:portrait){:root{--ui-zoom:1.1}}                           /* iPad held tall */
+@media (min-width:1200px) and (orientation:landscape){:root{--ui-zoom:1.15}}                        /* iPad held wide */
 body:not(.reading):not(.story-reading) :is(.app-header,main#app,.glass-nav){zoom:var(--ui-zoom,1)}
 
-/* 2) Home: two balanced columns when wide (landscape) or on iPad held tall */
-@media (min-width:760px) and (orientation:landscape),(min-width:820px) and (orientation:portrait){
-  main#app:has(> .home-prayer-widget){display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:22px;row-gap:18px;align-items:start;max-width:1120px}
-  main#app:has(> .home-prayer-widget) > *{min-width:0;margin-top:0;margin-bottom:0}
-  main#app:has(> .home-prayer-widget) > :is(.home-weather,.quick-grid,.home-footer){grid-column:1/-1}
-  main#app:has(> .home-prayer-widget) > .reading-hero{min-height:100%}
-}
-
-/* 3) Prayer times: next prayer + extras beside today's table when wide */
-@media (min-width:760px) and (orientation:landscape){
-  .prayer-page{columns:2;column-gap:24px;column-fill:balance}
-  .prayer-page > *{break-inside:avoid;-webkit-column-break-inside:avoid}
-  .prayer-page > :is(section,.prayer-table,.prayer-status-note,.prayer-method-note){width:100%;box-sizing:border-box}
-  .prayer-page > .prayer-section-head{break-after:avoid}
-}
-
-/* 4) Adhkar: routines and categories in more columns */
-@media (min-width:760px) and (orientation:landscape),(min-width:820px) and (orientation:portrait){
-  main#app:has(> .azkar-category-list){max-width:1120px}
-  .azkar-category-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-  .azkar-category-list > *{margin:0!important}
-}
-@media (min-width:1200px) and (orientation:landscape){
-  .azkar-category-list{grid-template-columns:repeat(3,minmax(0,1fr))}
-}
-
-/* 5) Comfortable reading width for text-heavy screens */
+/* Comfortable reading width for text-heavy screens */
 @media (min-width:760px){
   main#app:has(> .devotion-paper),main#app:has(> .dhikr-reader){max-width:820px}
 }
 
-/* 6) Mushaf on big screens held tall (iPad): a larger page instead of a small centred one */
+/* Mushaf on big screens held tall (iPad): a larger page instead of a small centred one */
 @media (min-width:900px) and (orientation:portrait){
   body.reading .mushaf-reader:not(.spread) .page-stage{left:calc((100% - min(92vw,980px))/2);right:calc((100% - min(92vw,980px))/2);top:64px;bottom:60px}
 }
