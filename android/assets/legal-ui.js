@@ -3,16 +3,18 @@ const supportOrigin='https://mohammid2030-del.github.io/mushafi-support',support
 function openPublicSupport(page='support'){if(!['privacy','support','delete-account'].includes(page))return;if(window.AndroidReader?.openSupportPage)AndroidReader.openSupportPage(page);else window.open(supportOrigin+'/'+(page==='privacy'?'privacy.html':''),'_blank','noopener')}
 const legalMoreHome=moreHome;moreHome=function(){legalMoreHome();const menu=document.querySelector('.app-version')?.previousElementSibling;if(menu?.classList.contains('menu-list'))menu.insertAdjacentHTML('beforeend',listAction('note','تواصل مع المطوّر','راسلنا على بريد الدعم','openFeedback()'))};
 function openFeedback(){const box=featureSheet('تواصل مع المطوّر','app-feedback');box.innerHTML='<p class="small-note">المطوّر: محمد · MOHAMMED</p><form id="app-feedback-form"><label for="feedback-subject">العنوان</label><input id="feedback-subject" name="subject" maxlength="160" required><label for="feedback-note">الملاحظة</label><textarea id="feedback-note" name="note" maxlength="4000" required rows="5"></textarea><p class="small-note">عند الإرسال يُفتح تطبيق البريد برسالتك جاهزة إلى بريد الدعم. لا ترسل كلمات المرور أو رموز الدخول.</p><p class="small-note"><bdi dir="ltr">'+supportEmail+'</bdi></p><button class="primary action source-open" type="submit">إرسال الملاحظة</button><p id="feedback-result" role="status"></p></form>';uiLocalize?.(box);box.querySelector('form').onsubmit=e=>{e.preventDefault();const form=e.currentTarget,result=form.querySelector('#feedback-result'),subject=form.subject.value.trim(),note=form.note.value.trim();if(!subject||!note)return;const body=note+'\n\n— مصحفي '+(document.querySelector('.app-version')?.textContent||'').trim();if(window.AndroidReader?.contactDeveloper)AndroidReader.contactDeveloper(subject,body);else location.href='mailto:'+supportEmail+'?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body);result.textContent='افتح تطبيق البريد واضغط إرسال لتصل رسالتك.'}}
-function renderPrivacySummary(){
- enterSection('about','n-more');
- const items=[
+function privacyItems(){return [
   ['bookmark','بياناتك محفوظة','تُحفظ قراءتك وختمتك وملاحظاتك وإعداداتك على جهازك. القراءة لا تحتاج حسابًا.'],
-  ['repeat','المزامنة باختيارك','عند الدخول بقوقل، تُحفظ نسخة من بياناتك وإعدادات الصلاة في حسابك عبر اتصال مشفّر، لتستعيدها على أجهزتك.'],
+  ['repeat','المزامنة باختيارك','عند الدخول بـ Apple أو قوقل، تُحفظ نسخة من بياناتك وإعدادات الصلاة في حسابك عبر اتصال مشفّر، لتستعيدها على أجهزتك.'],
   ['settings','أذونات بقدر حاجتك','الموقع اختياري للمواقيت والقبلة، ويمكن اختيار المدينة يدويًا. لعرض الطقس تُرسل إحداثيات تقريبية إلى مزوّد الطقس دون بيانات حسابك. وعند تفعيل جلب المواقيت، تُرسل إحداثيات موقع الصلاة إلى AlAdhan دون بيانات حسابك، ويمكن تعطيله من إعدادات الصلاة. والتنبيهات تعمل بعد موافقتك. لا نطلب الكاميرا أو الميكروفون أو جهات الاتصال.'],
   ['book','تحدّي مصحفي','يُحفظ تقدمك التعليمي محليًا ويُضمّن في مزامنتك الاختيارية. المنافسات تتطلب تسجيل الدخول؛ نرسل معرّف الحساب والإجابات وتوقيتها إلى خدمة المنافسات لحساب النتائج. يظهر للآخرين اسم لاعب مستعار دون بريدك أو موقعك. تُحفظ النتائج لإنجازاتك، ويمكن حذفها من صفحة تقدمك، وتُزال عند حذف الحساب. تنتهي الغرف بعد أربع ساعات وتُحذف عند الطلب التالي للخدمة.'],
   ['info','أنت تتحكم ببياناتك','يمكنك حذف حساب مصحفي وبياناته من «حسابي والمزامنة». لا نبيع بياناتك.']
- ];
- app.innerHTML=sectionHeading('الخصوصية','بياناتك، بوضوح','moreHome()')+'<article class="info-card privacy-summary">'+items.map(([icon,title,text])=>'<section class="privacy-summary-row"><span class="privacy-summary-icon" aria-hidden="true">'+uiIcon(icon)+'</span><div><h2>'+title+'</h2><p>'+text+'</p></div></section>').join('')+'</article><div class="privacy-summary-actions"><button class="action source-open" onclick="accountHome()">إدارة حسابي وبياناتي '+uiIcon('arrow')+'</button><button class="text-link" onclick="openPublicSupport(\'privacy\')">سياسة الخصوصية الكاملة</button></div>';
+ ];}
+function openPrivacySheet(){const box=featureSheet('الخصوصية','privacy');box.innerHTML='<article class="info-card privacy-summary">'+privacyItems().map(([icon,title,text])=>'<section class="privacy-summary-row"><span class="privacy-summary-icon" aria-hidden="true">'+uiIcon(icon)+'</span><div><h2>'+title+'</h2><p>'+text+'</p></div></section>').join('')+'</article>';}
+function renderPrivacySummary(){
+ enterSection('about','n-more');
+ const items=privacyItems();
+ app.innerHTML=sectionHeading('الخصوصية','بياناتك، بوضوح','moreHome()')+'<article class="info-card privacy-summary">'+items.map(([icon,title,text])=>'<section class="privacy-summary-row"><span class="privacy-summary-icon" aria-hidden="true">'+uiIcon(icon)+'</span><div><h2>'+title+'</h2><p>'+text+'</p></div></section>').join('')+'</article><div class="privacy-summary-actions"><button class="action source-open" onclick="accountHome()">إدارة حسابي وبياناتي '+uiIcon('arrow')+'</button></div>';
  revealSection();
 }
 about=renderPrivacySummary;
