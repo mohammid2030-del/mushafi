@@ -29,3 +29,7 @@ body>header.app-header{display:none}body.home-screen:not(.reading):not(.onboardi
 body:not(.dark) .mushafi-brand-icon .mushafi-logo-background{display:block;fill:rgba(255,255,255,.62);stroke:rgba(255,255,255,.9);stroke-width:1.5}
 
 html.glass-theme body .mushafi-brand-icon{background:transparent!important;border:0!important;box-shadow:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;border-radius:0!important;filter:none!important;opacity:1!important}
+
+/* Search boxes: no inner focus square; the whole field shows focus instead */
+.search-field input:focus,.search-field input:focus-visible{outline:none!important;box-shadow:none!important}
+.search-field:focus-within{border-color:color-mix(in srgb,var(--gold) 55%,var(--line))!important}
