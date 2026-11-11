@@ -40,3 +40,8 @@ body:not(.reading):not(.story-reading) :is(.app-header,main#app,.glass-nav){zoom
 @media (min-width:760px){
   main#app:has(> .devotion-paper),main#app:has(> .dhikr-reader){max-width:820px}
 }
+
+/* 6) Mushaf on big screens held tall (iPad): a larger page instead of a small centred one */
+@media (min-width:900px) and (orientation:portrait){
+  body.reading .mushaf-reader:not(.spread) .page-stage{left:calc((100% - min(92vw,980px))/2);right:calc((100% - min(92vw,980px))/2);top:64px;bottom:60px}
+}
