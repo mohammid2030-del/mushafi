@@ -13,7 +13,7 @@ final class HomeWeather {
   String lat=String.format(Locale.US,"%.2f",latitude),lon=String.format(Locale.US,"%.2f",longitude);
   HttpURLConnection c=(HttpURLConnection)new URL("https://api.met.no/weatherapi/locationforecast/2.0/compact?lat="+lat+"&lon="+lon).openConnection();
   c.setConnectTimeout(10000);c.setReadTimeout(10000);c.setInstanceFollowRedirects(false);
-  c.setRequestProperty("User-Agent","Mushafi/3.0.95 https://mushafi-support.mohammedasif241.chatgpt.site/support");
+  c.setRequestProperty("User-Agent","Mushafi/3.0.95 https://mohammid2030-del.github.io/mushafi-support/");
   try {
    if(c.getResponseCode()!=200)throw new IOException("weather unavailable");
    ByteArrayOutputStream out=new ByteArrayOutputStream();try(InputStream in=c.getInputStream()){byte[] b=new byte[4096];int n;while((n=in.read(b))!=-1){out.write(b,0,n);if(out.size()>524288)throw new IOException("response too large");}}
