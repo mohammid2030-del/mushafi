@@ -27,7 +27,7 @@ final class NativeBridge: NSObject, WKScriptMessageHandler {
         var list = [
             "startupReady", "setAppTheme", "setUiLanguage", "setReading", "setStoryReading",
             "haptic", "copyText", "shareText",
-            "openSourceUrl", "openWeatherReference", "openRecitationReference", "openSupportPage", "openCharityPlatform",
+            "openSourceUrl", "openWeatherReference", "openRecitationReference", "openSupportPage", "contactDeveloper", "openCharityPlatform",
             "exportAppBackup", "importAppBackup",
             "requestPrayerLocation", "requestQiblaLocation", "cancelPrayerLocation", "openLocationSettings",
             "startQibla", "stopQibla", "requestHomeWeather",
@@ -139,6 +139,7 @@ final class NativeBridge: NSObject, WKScriptMessageHandler {
         case "openWeatherReference": ExternalLinks.openWeatherReference(a.string(0))
         case "openRecitationReference": ExternalLinks.openRecitationReference(a.string(0))
         case "openSupportPage": ExternalLinks.openSupportPage(a.string(0))
+        case "contactDeveloper": ExternalLinks.contactDeveloper(subject: a.string(0), body: a.string(1))
         case "openLiveBroadcast":
             if let city = a.string(0), LiveBroadcastViewController.cities.contains(city) {
                 SurahPlayer.shared.pause()

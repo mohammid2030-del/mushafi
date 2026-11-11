@@ -6,7 +6,8 @@ enum ExternalLinks {
         "quran.com", "sunnah.com", "islamhouse.com", "dorar.net",
         "binbaz.org.sa", "www.diyanet.gov.tr", "saadalkhathlan.com",
     ]
-    private static let supportBase = "https://mushafi-support.mohammedasif241.chatgpt.site/"
+    private static let supportBase = "https://mohammid2030-del.github.io/mushafi-support/"
+    static let supportEmail = "appmushafi@gmail.com"
 
     static func openSource(_ text: String?) {
         guard let text, let url = URL(string: text), url.scheme == "https",
@@ -34,7 +35,19 @@ enum ExternalLinks {
 
     static func openSupportPage(_ page: String?) {
         guard let page, ["privacy", "support", "delete-account"].contains(page) else { return }
-        open(supportBase + page)
+        open(supportBase + (page == "privacy" ? "privacy.html" : ""))
+    }
+
+    /// Opens the user's mail app with a message to the developer already addressed and filled in.
+    static func contactDeveloper(subject: String?, body: String?) {
+        var parts = URLComponents()
+        parts.scheme = "mailto"
+        parts.path = supportEmail
+        parts.queryItems = [
+            URLQueryItem(name: "subject", value: String((subject ?? "").prefix(160))),
+            URLQueryItem(name: "body", value: String((body ?? "").prefix(4000))),
+        ]
+        if let url = parts.url { open(url) }
     }
 
     /// App Store rule 3.2.2: donations are completed in Safari, never inside the app.
