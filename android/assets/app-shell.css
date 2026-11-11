@@ -29,12 +29,3 @@ body>header.app-header{display:none}body.home-screen:not(.reading):not(.onboardi
 body:not(.dark) .mushafi-brand-icon .mushafi-logo-background{display:block;fill:rgba(255,255,255,.62);stroke:rgba(255,255,255,.9);stroke-width:1.5}
 
 html.glass-theme body .mushafi-brand-icon{background:transparent!important;border:0!important;box-shadow:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;border-radius:0!important;filter:none!important;opacity:1!important}
-
-/* Wide screens (iPhone Duo / foldables unfolded and held wide, tablets in landscape):
-   the home screen becomes a balanced two-column layout instead of one stretched column. */
-@media (min-width:760px) and (orientation:landscape){
-  main#app:has(> .home-prayer-widget){display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:22px;row-gap:18px;align-items:start;max-width:1120px}
-  main#app:has(> .home-prayer-widget) > *{min-width:0;margin-top:0;margin-bottom:0}
-  main#app:has(> .home-prayer-widget) > :is(.home-weather,.quick-grid,.home-footer){grid-column:1/-1}
-  main#app:has(> .home-prayer-widget) > .reading-hero{min-height:100%}
-}
