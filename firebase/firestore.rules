@@ -74,6 +74,12 @@ service cloud.firestore {
    allow delete: if signedIn() && (request.auth.uid == uid || request.auth.uid == peer);
   }
 
+  // Where the apps send ring pushes (written by CI after the Cloudflare worker deploys).
+  match /wakeConfig/{doc} {
+   allow read: if signedIn();
+   allow write: if false;
+  }
+
   // One ring. Caller creates; callee answers/declines; caller cancels; either side marks missed.
   match /wakeCalls/{call} {
    allow get: if signedIn() && (resource.data.from == request.auth.uid || resource.data.to == request.auth.uid);

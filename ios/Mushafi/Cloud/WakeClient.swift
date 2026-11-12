@@ -147,12 +147,14 @@ final class WakeClient: NSObject, MessagingDelegate {
                 self.emitCall(token, "", "failed", error.code == 7 ? "permission" : "network"); return
             }
             self.emitCall(token, ref.documentID, "ringing", nil)
+            self.tokens[ref.documentID] = token
+            self.relay(ref.documentID)
             self.listeners[ref.documentID] = ref.addSnapshotListener { snap, _ in
                 guard let state = snap?.data()?["state"] as? String, state != "ringing" else { return }
                 self.stop(ref.documentID)
                 self.emitCall(token, ref.documentID, state, nil)
             }
-            let work = DispatchWorkItem { ref.updateData(["state": "missed", "updatedAt": FieldValue.serverTimestamp()]) }
+            let work = DispatchWorkItem { ref.updateData(["state": "missed", "updatedAt": FieldValue.serverTimestamp()]) { error in if error == nil { self.relay(ref.documentID) } } }
             self.timeouts[ref.documentID] = work
             DispatchQueue.main.asyncAfter(deadline: .now() + Self.ringSeconds, execute: work)
         }
@@ -160,7 +162,50 @@ final class WakeClient: NSObject, MessagingDelegate {
 
     func cancel(_ callId: String?) {
         guard let callId, callId.range(of: "^[A-Za-z0-9]{10,40}$", options: .regularExpression) != nil else { return }
+        db.collection("wakeCalls").document(callId).updateData(["state": "cancelled", "updatedAt": FieldValue.serverTimestamp()]) { [weak self] error in
+            if error == nil { self?.relay(callId) }
+        }
+    }
+
+    // MARK: - Ring push relay (Cloudflare worker; URL in wakeConfig/endpoint)
+
+    private var endpoint: String?
+    private var tokens: [String: String] = [:]
+
+    private func relay(_ callId: String) {
+        guard let u = user else { return }
+        guard let endpoint else {
+            db.collection("wakeConfig").document("endpoint").getDocument { [weak self] snap, _ in
+                guard let self else { return }
+                if let url = snap?.data()?["url"] as? String,
+                   url.range(of: "^https://[a-z0-9.-]+\\.workers\\.dev$", options: .regularExpression) != nil {
+                    self.endpoint = url; self.relay(callId)
+                } else { self.failRelay(callId) }
+            }
+            return
+        }
+        u.getIDToken { [weak self] idToken, error in
+            guard let self else { return }
+            guard let idToken, error == nil, let url = URL(string: endpoint + "/notify") else { self.failRelay(callId); return }
+            var request = URLRequest(url: url, timeoutInterval: 15)
+            request.httpMethod = "POST"
+            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+            request.setValue("Bearer " + idToken, forHTTPHeaderField: "Authorization")
+            request.httpBody = try? JSONSerialization.data(withJSONObject: ["callId": callId])
+            URLSession.shared.dataTask(with: request) { _, response, error in
+                let code = (response as? HTTPURLResponse)?.statusCode ?? 0
+                if error != nil || code >= 500 { DispatchQueue.main.async { self.failRelay(callId) } }
+            }.resume()
+        }
+    }
+
+    /// If the relay can't be reached while ringing, report it instead of waiting.
+    private func failRelay(_ callId: String) {
+        guard listeners[callId] != nil else { return }
+        let token = tokens.removeValue(forKey: callId) ?? ""
+        stop(callId)
         db.collection("wakeCalls").document(callId).updateData(["state": "cancelled", "updatedAt": FieldValue.serverTimestamp()])
+        emitCall(token, callId, "failed", "relay")
     }
 
     private func stop(_ id: String) {

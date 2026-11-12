@@ -128,6 +128,8 @@ final class WakeClient {
   d.put("createdAt", FieldValue.serverTimestamp()); d.put("updatedAt", FieldValue.serverTimestamp());
   ref.set(d).addOnSuccessListener(x -> {
    emitCall(token, ref.getId(), "ringing", null);
+   tokens.put(ref.getId(), token == null ? "" : token);
+   relay(ref.getId());
    ListenerRegistration l = ref.addSnapshotListener((snap, err) -> {
     if (err != null || snap == null || !snap.exists()) return;
     String state = snap.getString("state");
@@ -136,7 +138,7 @@ final class WakeClient {
     emitCall(token, ref.getId(), state, null);
    });
    calls.put(ref.getId(), l);
-   Runnable timeout = () -> ref.update("state", "missed", "updatedAt", FieldValue.serverTimestamp());
+   Runnable timeout = () -> ref.update("state", "missed", "updatedAt", FieldValue.serverTimestamp()).addOnSuccessListener(v -> relay(ref.getId()));
    timeouts.put(ref.getId(), timeout);
    main.postDelayed(timeout, RING_SECONDS * 1000L);
   }).addOnFailureListener(e -> emitCall(token, "", "failed", e instanceof FirebaseFirestoreException && ((FirebaseFirestoreException) e).getCode() == FirebaseFirestoreException.Code.PERMISSION_DENIED ? "permission" : "network"));
@@ -144,8 +146,44 @@ final class WakeClient {
 
  void cancel(String callId) {
   if (callId == null || !callId.matches("[A-Za-z0-9]{10,40}")) return;
-  db().collection("wakeCalls").document(callId).update("state", "cancelled", "updatedAt", FieldValue.serverTimestamp());
+  db().collection("wakeCalls").document(callId).update("state", "cancelled", "updatedAt", FieldValue.serverTimestamp()).addOnSuccessListener(v -> relay(callId));
  }
+
+ /* The ring push is sent by the Cloudflare relay (wake-worker); its URL lives in wakeConfig/endpoint. */
+ private static volatile String endpoint;
+ private void relay(String callId) {
+  final FirebaseUser u = user(); if (u == null) return;
+  if (endpoint == null) {
+   db().collection("wakeConfig").document("endpoint").get().addOnSuccessListener(snap -> {
+    String url = snap.getString("url");
+    if (url != null && url.matches("https://[a-z0-9.-]+\\.workers\\.dev")) { endpoint = url; relay(callId); }
+    else failRelay(callId);
+   }).addOnFailureListener(e -> failRelay(callId));
+   return;
+  }
+  u.getIdToken(false).addOnSuccessListener(r -> {
+   final String id = r.getToken(), url = endpoint;
+   new Thread(() -> {
+    try {
+     java.net.HttpURLConnection c = (java.net.HttpURLConnection) new java.net.URL(url + "/notify").openConnection();
+     c.setRequestMethod("POST"); c.setConnectTimeout(10000); c.setReadTimeout(15000); c.setDoOutput(true);
+     c.setRequestProperty("Content-Type", "application/json"); c.setRequestProperty("Authorization", "Bearer " + id);
+     try (java.io.OutputStream o = c.getOutputStream()) { o.write(new JSONObject().put("callId", callId).toString().getBytes("UTF-8")); }
+     int code = c.getResponseCode(); c.disconnect();
+     if (code >= 500) main.post(() -> failRelay(callId));
+    } catch (Exception e) { main.post(() -> failRelay(callId)); }
+   }, "wake-relay").start();
+  }).addOnFailureListener(e -> failRelay(callId));
+ }
+ /** If the relay can't be reached while ringing, the person can't be woken: report it instead of waiting. */
+ private void failRelay(String callId) {
+  if (!calls.containsKey(callId)) return;
+  String token = tokens.remove(callId);
+  stop(callId);
+  db().collection("wakeCalls").document(callId).update("state", "cancelled", "updatedAt", FieldValue.serverTimestamp());
+  emitCall(token, callId, "failed", "relay");
+ }
+ private final Map<String, String> tokens = new HashMap<>();
 
  private void stop(String callId) {
   ListenerRegistration l = calls.remove(callId); if (l != null) l.remove();

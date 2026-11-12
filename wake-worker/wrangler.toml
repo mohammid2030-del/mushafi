@@ -1,0 +1,7 @@
+name = "mushafi-wake"
+main = "src/index.js"
+compatibility_date = "2024-11-01"
+workers_dev = true
+
+[triggers]
+crons = ["17 3 * * *"]

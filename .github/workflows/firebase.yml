@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       deploy:
-        description: 'Deploy Firestore rules and Cloud Functions to mushafiapp-1b3d7'
+        description: 'Deploy Firestore rules to mushafiapp-1b3d7'
         type: boolean
         default: true
 jobs:
@@ -24,11 +24,6 @@ jobs:
           cp ../firestore.rules firestore.rules
           npm install --no-audit --no-fund
           npx firebase emulators:exec --only firestore --project demo-mushafi "node wake-rules-test.cjs"
-      - name: Check functions load
-        working-directory: firebase/functions
-        run: |
-          npm install --no-audit --no-fund
-          node -e "require('./index.js'); console.log('functions load')"
   deploy:
     if: github.event_name == 'workflow_dispatch' && inputs.deploy
     needs: rules
@@ -45,6 +40,5 @@ jobs:
           if [ -z "$GOOGLE_APPLICATION_CREDENTIALS_JSON" ]; then echo "::error::Add the FIREBASE_SERVICE_ACCOUNT secret first"; exit 1; fi
           printf '%s' "$GOOGLE_APPLICATION_CREDENTIALS_JSON" > "$RUNNER_TEMP/sa.json"
           export GOOGLE_APPLICATION_CREDENTIALS="$RUNNER_TEMP/sa.json"
-          (cd functions && npm install --no-audit --no-fund)
-          npx --yes firebase-tools@14 deploy --only firestore:rules,functions --project mushafiapp-1b3d7 --non-interactive --force
+          npx --yes firebase-tools@14 deploy --only firestore:rules --project mushafiapp-1b3d7 --non-interactive --force
           rm -f "$RUNNER_TEMP/sa.json"
