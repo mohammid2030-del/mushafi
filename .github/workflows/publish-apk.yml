@@ -1,0 +1,21 @@
+name: Publish APK
+# Copies the latest Android test build (private draft) to the public download used by the website.
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Copy draft APK to the public download
+        run: |
+          set -e
+          ID=$(gh api "repos/$GITHUB_REPOSITORY/releases?per_page=100" -q '[.[] | select(.draft and .name == "android-test")][0].assets[0].id')
+          [ -n "$ID" ] || { echo "::error::No android-test draft APK found"; exit 1; }
+          gh api -H "Accept: application/octet-stream" "repos/$GITHUB_REPOSITORY/releases/assets/$ID" > Mushafi.apk
+          ls -la Mushafi.apk
+          gh release delete android-latest --repo "$GITHUB_REPOSITORY" --yes --cleanup-tag 2>/dev/null || true
+          gh release create android-latest Mushafi.apk --repo "$GITHUB_REPOSITORY" --title "Mushafi Android" --notes "Android download for the Mushafi website." --latest=false

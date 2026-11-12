@@ -1,0 +1,81 @@
+(function () {
+  'use strict';
+  var hero = document.getElementById('hero');
+  var shot = document.getElementById('heroShot');
+  var label = document.getElementById('phaseLabel');
+  var nav = document.getElementById('nav');
+
+  /* The hero sky follows the visitor's own clock, like the home screen in the app. */
+  function phaseFor(d) {
+    var h = d.getHours() + d.getMinutes() / 60;
+    if (h >= 5 && h < 7) return 'dawn';
+    if (h >= 7 && h < 16.5) return 'day';
+    if (h >= 16.5 && h < 19) return 'dusk';
+    return 'night';
+  }
+  var SHOT = { night: '/img/home-night.webp', dawn: '/img/home-morning.webp', day: '/img/home-day.webp', dusk: '/img/home-day.webp' };
+  var TEXT = { night: 'سماء الليل الآن، كما في التطبيق', dawn: 'سماء الفجر الآن، كما في التطبيق', day: 'سماء النهار الآن، كما في التطبيق', dusk: 'سماء الغروب الآن، كما في التطبيق' };
+  function applyPhase() {
+    var p = phaseFor(new Date());
+    if (hero.dataset.phase === p) return;
+    hero.dataset.phase = p;
+    shot.src = SHOT[p];
+    label.textContent = TEXT[p];
+    var light = p === 'night' || p === 'dusk';
+    document.documentElement.style.setProperty('--navInk', light ? '#f4ecda' : '#163b2e');
+  }
+  applyPhase();
+  setInterval(applyPhase, 60000);
+
+  /* Solid nav after the hero starts scrolling away. */
+  function onScroll() { nav.classList.toggle('solid', window.scrollY > 40); }
+  onScroll();
+  window.addEventListener('scroll', onScroll, { passive: true });
+
+  /* Word-by-word verse, like the app's dua animation. */
+  var ayah = document.getElementById('ayah');
+  var words = ayah.textContent.trim().split(/\s+/);
+  ayah.innerHTML = words.map(function (w) { return '<span class="w">' + w + '</span>'; }).join(' ');
+
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (!('IntersectionObserver' in window) || reduce) {
+    document.querySelectorAll('.reveal,.ayah .w').forEach(function (e) { e.classList.add('in'); });
+  } else {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        var el = e.target;
+        if (el === ayah) {
+          el.querySelectorAll('.w').forEach(function (w, i) { setTimeout(function () { w.classList.add('in'); }, 160 + i * 230); });
+        } else {
+          var sib = Array.prototype.indexOf.call(el.parentNode.children, el);
+          el.style.transitionDelay = Math.min(sib, 6) * 70 + 'ms';
+          el.classList.add('in');
+        }
+        io.unobserve(el);
+      });
+    }, { threshold: 0.16, rootMargin: '0px 0px -40px 0px' });
+    document.querySelectorAll('.reveal').forEach(function (e) { io.observe(e); });
+    io.observe(ayah);
+  }
+
+  /* Gallery arrows. */
+  var rail = document.getElementById('rail');
+  document.querySelectorAll('.rail-nav button').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var step = rail.querySelector('figure').offsetWidth + 34;
+      rail.scrollBy({ left: Number(b.dataset.dir) * step * 2, behavior: 'smooth' });
+    });
+  });
+
+  /* Gentle tilt of the hero phone with the pointer (desktop only). */
+  var phone = document.getElementById('heroPhone');
+  if (!reduce && window.matchMedia('(pointer:fine)').matches) {
+    hero.addEventListener('pointermove', function (e) {
+      var r = hero.getBoundingClientRect();
+      var x = (e.clientX - r.left) / r.width - 0.5, y = (e.clientY - r.top) / r.height - 0.5;
+      phone.style.transform = 'perspective(1200px) rotateY(' + (x * 10) + 'deg) rotateX(' + (-y * 8) + 'deg) rotate(-3deg)';
+    });
+    hero.addEventListener('pointerleave', function () { phone.style.transform = ''; });
+  }
+})();
