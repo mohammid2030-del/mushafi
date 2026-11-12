@@ -118,16 +118,16 @@ function hlTimesMarkup(data) {
       const pct = Math.min(100, Math.max(2, (now - prev) / (phase.target - prev) * 100));
       extra = `<div class="hl-progress"><span class="hl-bar"><i style="width:${pct.toFixed(1)}%"></i></span><small>${phase.kind === 'iqama' ? '<span>الإقامة</span> ' : ''}<span>${hlRemain(phase.target - now)}</span></small></div>`
     }
-    return `<button class="hl-row${active ? ' active' : ''}${t < now && !active ? ' past' : ''}" onclick="prayerHome()">
+    return `<div class="hl-row${active ? ' active' : ''}${t < now && !active ? ' past' : ''}">
       <span class="hl-dot" aria-hidden="true"></span>
       <span class="hl-row-main"><strong>${prayerNames[k]}</strong>${active ? `<em class="hl-next">${phase.kind === 'iqama' ? 'الإقامة' : 'التالية'}</em>` : ''}<span class="hl-time">${prayerClock(t, zone)}</span><span class="hl-sound ${on ? '' : 'off'}" aria-label="${on ? 'الأذان مفعّل' : 'الأذان متوقف'}">${uiIcon(on ? 'volume' : 'mute')}</span></span>
       ${extra}
-    </button>`
+    </div>`
   }).join('');
   return `<section class="hl-times">
     <div class="hl-times-head"><div><strong>${esc(greg)}</strong><small>${esc(hijri)}${s.city ? ' · ' + esc(s.city) : ''}</small></div><button class="hl-link" onclick="prayerHome()"><span>كل المواقيت</span>${uiIcon('arrow')}</button></div>
     <div class="hl-rows">${rows}</div>
-    ${!nextKey && phase ? `<button class="hl-tomorrow" onclick="prayerHome()"><span><span>${phase.kind === 'iqama' ? 'إقامة ' + prayerNames[phase.key] : prayerNames[phase.key]}</span> <span>غدًا</span></span><span class="hl-time">${prayerClock(phase.target, zone)}</span><small>${hlRemain(phase.target - now)}</small></button>` : ''}
+    ${!nextKey && phase ? `<div class="hl-tomorrow"><span><span>${phase.kind === 'iqama' ? 'إقامة ' + prayerNames[phase.key] : prayerNames[phase.key]}</span> <span>غدًا</span></span><span class="hl-time">${prayerClock(phase.target, zone)}</span><small>${hlRemain(phase.target - now)}</small></div>` : ''}
   </section>`
 }
 

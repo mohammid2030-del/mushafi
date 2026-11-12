@@ -61,7 +61,7 @@
 .hl-next{font-style:normal;font-size:11.5px;font-weight:600;color:var(--gold);background:color-mix(in srgb,var(--gold) 14%,transparent);border-radius:999px;padding:3px 10px}
 .hl-progress{display:flex;align-items:center;gap:10px;margin-top:10px}
 .hl-bar{flex:1;height:5px;border-radius:5px;background:color-mix(in srgb,var(--ink) 14%,transparent);overflow:hidden;display:block}
-.hl-bar i{display:block;height:100%;border-radius:5px;background:linear-gradient(90deg,color-mix(in srgb,var(--gold) 70%,transparent),var(--gold));margin-inline-start:auto}
+.hl-bar i{display:block;height:100%;border-radius:5px;margin-inline-start:0!important;background:linear-gradient(to left,color-mix(in srgb,var(--gold) 70%,transparent),var(--gold));margin-inline-start:auto}
 .hl-progress small{font-size:12px;color:color-mix(in srgb,var(--ink) 75%,transparent);white-space:nowrap}
 
 /* headings + links */
@@ -121,3 +121,12 @@ body.hl-sky-on{background-color:var(--bg)}
 body.hl-sky-on[data-hl-sky="day"] .app-header,body.hl-sky-on[data-hl-sky="afternoon"] .app-header{--ink:#1d3328;--muted:rgba(29,51,40,.68);--gold:#7a5a22;color:#1d3328}
 body.hl-sky-on:is([data-hl-sky="night"],[data-hl-sky="dawn"],[data-hl-sky="dusk"]) .app-header{--ink:#fff6e6;--muted:rgba(255,246,230,.75);--gold:#f0d29a;color:#fff6e6}
 .hl-sky-body{padding-top:6px}
+
+/* cardless tiles: icon + label on the page */
+.hl-tile{background:transparent!important;border:0!important;box-shadow:none!important;padding:6px 2px 4px!important;gap:9px!important}
+.hl-tile>.ui-icon{width:26px!important;height:26px!important;padding:17px!important;border-radius:22px!important;background:color-mix(in srgb,var(--gold) 12%,transparent)!important;border:1px solid color-mix(in srgb,var(--gold) 18%,transparent)}
+.hl-quick .hl-tile>.ui-icon{width:24px!important;height:24px!important;padding:15px!important;border-radius:20px!important}
+.hl-grid{row-gap:18px}
+.hl-badge{top:0;inset-inline-start:calc(50% + 12px)}
+.hl-item-ico{background:color-mix(in srgb,var(--gold) 12%,transparent);border-color:color-mix(in srgb,var(--gold) 18%,transparent)}
+.hl-row{cursor:default}
