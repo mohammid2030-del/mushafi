@@ -88,6 +88,7 @@ final class WebShellViewController: UIViewController, WKNavigationDelegate, WKUI
         launchCover.frame = view.bounds
         launchCover.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         launchCover.onRetry = { [weak self] in self?.webView.reload() }
+        launchCover.onDismissed = { [weak self] in self?.callbackRaw("onMushafiLaunchDone", "") }
         view.addSubview(launchCover)
         launchCover.show()
 

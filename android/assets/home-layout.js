@@ -57,6 +57,7 @@ function hlSkyMarkup(data) {
     ? `<span>إقامة ${prayerNames[phase.key]}</span> <span>${hlLeft(phase.target - now, true)}</span>`
     : `<span>${prayerNames[phase.key]}</span> <span>${hlLeft(phase.target - now, true)}</span>`;
   const weather = hlWeatherChip(), sky = hlSky(today, now), wx = hlWeatherKind(), dark = /night|dawn|dusk/.test(sky);
+  const night = hlNightVerse(data, today, now), dua = hlDua(today, now);
   return `<section class="hl-sky ${sky}${wx ? ' wx wx-' + wx : ''}" aria-label="حالة يومك">
     <span class="hl-stars" aria-hidden="true"></span>
     ${hlWeatherLayer(wx, dark)}
@@ -64,9 +65,11 @@ function hlSkyMarkup(data) {
       <div class="hl-place"><button class="hl-place-city" onclick="prayerHome()" aria-label="الموقع">${uiIcon('pin')}<span>${esc(hlCityName(s))}</span></button>${weather ? '<i aria-hidden="true"></i>' + weather : ''}</div>
     </div>
     <div class="hl-sky-body">
-      <span class="hl-sky-kicker">أنت الآن في وقت</span>
-      <h2>${current ? prayerNames[current.key] : prayerNames.isha}</h2>
+      ${night
+        ? `<p class="hl-verse hl-words" data-hl-slot="head" data-hl-key="fajr-verse" lang="ar" translate="no">${hlWords('﴿وَقُرْآنَ الْفَجْرِ | إِنَّ قُرْآنَ الْفَجْرِ كَانَ مَشْهُودًا﴾')}<small>الإسراء · ٧٨</small></p>`
+        : `<div class="hl-now hl-words" data-hl-slot="head" data-hl-key="now-${current ? current.key : 'isha'}"><span class="hl-sky-kicker">أنت الآن في وقت</span><h2>${current ? prayerNames[current.key] : prayerNames.isha}</h2></div>`}
       <button class="hl-pill" onclick="prayerHome()">${uiIcon('clock')}${pill}</button>
+      ${dua ? `<p class="hl-dua hl-words" data-hl-slot="dua" data-hl-key="dua-${dua.key}" lang="ar" translate="no">${hlWords(dua.text)}<small>${dua.source}</small></p>` : ''}
     </div>
     ${hlArc(today, now)}
     <div class="hl-sky-times">${hlTimesMarkup(data)}</div>
@@ -113,6 +116,46 @@ function hlWeatherChip() {
     return `<button class="hl-place-weather" onclick="openWeatherCredits()" aria-label="الطقس">${homeWeatherIcon(c.symbol)}<span dir="ltr">${ar(Math.round(c.temperature))}°</span></button>`
   } catch (e) { return '' }
 }
+/* ---------- a short dua for the coming prayer, and the Fajr verse at night ---------- */
+// From half an hour before each adhan its dua shows; Isha's stays through the night until Fajr's.
+const HL_DUAS = {
+  fajr: { text: 'اللَّهُمَّ اجْعَلْ فِي قَلْبِي نُورًا', source: 'رواه مسلم' },
+  dhuhr: { text: 'رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ', source: 'البقرة · ٢٠١' },
+  asr: { text: 'اللَّهُمَّ أَعِنِّي عَلَى ذِكْرِكَ وَشُكْرِكَ وَحُسْنِ عِبَادَتِكَ', source: 'رواه أبو داود' },
+  maghrib: { text: 'اللَّهُمَّ بِكَ أَمْسَيْنَا وَبِكَ أَصْبَحْنَا وَبِكَ نَحْيَا وَبِكَ نَمُوتُ وَإِلَيْكَ الْمَصِيرُ', source: 'رواه الترمذي' },
+  isha: { text: 'بِاسْمِكَ اللَّهُمَّ أَمُوتُ وَأَحْيَا', source: 'رواه البخاري' },
+};
+function hlDua(today, now) {
+  if (!today) return null;
+  let key = 'isha';
+  for (const k of ['fajr', 'dhuhr', 'asr', 'maghrib', 'isha']) if (Number.isFinite(today[k]) && now >= today[k] - 30 * 60000) key = k;
+  return { key, ...HL_DUAS[key] }
+}
+// From 10 pm until an hour before Fajr the head of the sky shows ﴿وقرآن الفجر…﴾.
+function hlNightVerse(data, today, now) {
+  if (!today) return false;
+  const hour = +new Intl.DateTimeFormat('en-GB', { timeZone: hlZone(data), hour: '2-digit', hour12: false }).format(new Date(now)) % 24;
+  return hour >= 22 || now < today.fajr - 60 * 60000
+}
+function hlWords(text) { let i = 0; return String(text).split('|').map(line => `<span class="hl-line">${line.trim().split(/\s+/).map(w => `<span style="--i:${i++}">${esc(w)}</span>`).join(' ')}</span>`).join('<br>') }
+// Words rise in one by one when a new dua or the verse appears, and again when the app opens.
+let hlLaunchDone = false, hlShown = {};
+function hlAnimate(root = app, replay = false) {
+  root.querySelectorAll('.hl-words').forEach(el => {
+    const slot = el.dataset.hlSlot, key = el.dataset.hlKey;
+    const fresh = replay || hlShown[slot] !== key; hlShown[slot] = key;
+    if (!fresh) return;
+    el.classList.remove('hl-play'); el.classList.add('hl-wait');
+    if (hlLaunchDone) requestAnimationFrame(() => requestAnimationFrame(() => { el.classList.remove('hl-wait'); el.classList.add('hl-play') }))
+  })
+}
+window.onMushafiLaunchDone = function () {
+  hlLaunchDone = true;
+  if (view === 'home') hlAnimate(app, true)
+};
+// No native opening screen (browser preview): play after a moment.
+setTimeout(() => { if (!hlLaunchDone) window.onMushafiLaunchDone() }, window.AndroidReader ? 9000 : 1200);
+
 /* ---------- the sky follows the weather (MET Norway symbol codes from the weather cache) ---------- */
 function hlWeatherKind() {
   try {
@@ -279,6 +322,7 @@ function homeLayout() {
   app.replaceChildren(...frag.childNodes);
   uiLocalize?.(app);
   hlLift();
+  hlAnimate(app);
   hlStart()
 }
 // «تحديد الموقع» on Home asks for the location straight away, then shows prayer times.
@@ -294,7 +338,7 @@ function hlRefresh() {
   sky.innerHTML = hlSkyMarkup(data);
   if (times) times.innerHTML = hlTimesMarkup(data);
   uiLocalize?.(sky); if (times) uiLocalize?.(times);
-  hlLift()
+  hlLift(); hlAnimate(sky)
 }
 // The sky runs up behind the header and the status bar, so the top of Home is one scene.
 function hlLift() {
