@@ -23,7 +23,7 @@ jobs:
           git clone --branch covers --single-branch "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" covers || {
             mkdir covers && cd covers && git init -q -b covers && git remote add origin "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git"; }
       - name: Tools
-        run: sudo apt-get install -y -qq poppler-utils python3-pil > /dev/null
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq poppler-utils > /dev/null && (python3 -c "import PIL" 2>/dev/null || pip install --quiet --break-system-packages pillow)
       - name: Make covers (saved every 40 minutes)
         working-directory: covers
         run: |
