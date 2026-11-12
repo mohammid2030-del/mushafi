@@ -17,7 +17,6 @@ export default {
       if (len) headers.set('content-length', len);
       return new Response(request.method === 'HEAD' ? null : upstream.body, { status: 200, headers });
     }
-    if (url.pathname === '/privacy') return env.ASSETS.fetch(new Request(url.origin + '/privacy.html', request));
     const res = await env.ASSETS.fetch(request);
     const out = new Response(res.body, res);
     out.headers.set('x-content-type-options', 'nosniff');
