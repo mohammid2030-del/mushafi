@@ -29,6 +29,7 @@ Object.assign(iconPaths, {
   trash: '<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>',
   play: '<path d="M7 4v16l13-8z"/>',
   stop: '<rect x="6" y="6" width="12" height="12" rx="2"/>',
+  chevron: iconPaths.chevron || '<path d="m6 9 6 6 6-6"/>',
   plus: iconPaths.plus || '<path d="M12 5v14M5 12h14"/>',
   skip: '<path d="M5 5v14l10-7zM19 5v14"/>',
   bell: iconPaths.bell || '<path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4zM10 21h4"/>',
@@ -495,16 +496,50 @@ function fajrTotals(c, calls) {
 }
 
 /* ---------- history ---------- */
+const FAJR_TONE = { answered: 'ok', missed: 'miss', failed: 'miss', unsure: 'miss', declined: 'decl', cancelled: 'fail' };
+function fajrHistoryDay(t) {
+  const d = new Date(t), today = new Date(); today.setHours(0, 0, 0, 0);
+  const diff = Math.round((new Date(d).setHours(0, 0, 0, 0) - today) / 86400000);
+  if (diff === 0) return 'اليوم'; if (diff === -1) return 'أمس';
+  return d.toLocaleDateString(uiLocale() === 'ar' ? 'ar-SA-u-nu-arab' : uiLocale(), { weekday: 'long', day: 'numeric', month: 'long' })
+}
 function fajrHistory() {
   enterSection('fajr-history', fajrOrigin === 'more' ? 'n-more' : 'n-home');
   const log = fajrLog(), all = { answered: 0, missed: 0, declined: 0, cancelled: 0, failed: 0, unsure: 0 }; let calls = 0;
-  for (const r of log) { const c = fajrCount(r.results || {}); for (const k in all) all[k] += c[k] || 0; calls += r.entries.length }
-  app.innerHTML = sectionHeading('سجل الاتصالات', 'كل صحبة: من ردّ، ومن لم يردّ', 'fajrHome()') + (log.length ? fajrTotals(all, calls) + `<div class="fajr-log">${log.map((r, i) => {
-    const c = fajrCount(r.results || {}), d = new Date(r.startedAt);
-    return `<details class="fajr-card fajr-log-run"${i ? '' : ' open'}><summary><div><strong>${esc(r.listName)}${r.test ? ' <em class="chip unsure">تجربة</em>' : ''}</strong><small class="fajr-meta">${fajrBits([fajrDayLabel(r.startedAt) === 'اليوم' ? 'اليوم' : d.toLocaleDateString(uiLocale() === 'ar' ? 'ar-SA-u-nu-arab' : uiLocale(), { weekday: 'long', day: 'numeric', month: 'long' }), fajrClock(r.startedAt), r.stopped ? 'أُنهيت يدويًا' : ''])}</small></div><span class="fajr-log-mini"><em class="chip ok">${ar(c.answered)}</em><em class="chip miss">${ar(c.missed + c.failed + (c.unsure || 0) + (c.declined || 0) + (c.cancelled || 0))}</em></span></summary>
-      <div class="fajr-log-rows">${r.entries.map(e => { const [cls, label] = fajrStatusChip(e.status); return `<div class="fajr-log-row"><span class="fajr-avatar">${fajrInitials(e.name)}</span><span class="fajr-log-who"><strong>${esc(e.name)}</strong><small class="fajr-meta">${fajrBits([fajrClock(e.at), e.attempt > 1 ? 'محاولة ' + ar(e.attempt) : '', e.loop > 1 ? 'جولة ' + ar(e.loop) : '', e.duration ? ar(e.duration) + ' ث' : ''])}</small></span><em class="chip ${cls}">${label}</em></div>` }).join('')}</div></details>`
-  }).join('')}</div><button class="fajr-link danger center" onclick="fajrClearLog()">مسح السجل</button>` : `<div class="fajr-empty">${uiIcon('history')}<strong>لا يوجد سجل بعد</strong><p>بعد أول صحبة يظهر هنا من ردّ ومن لم يردّ</p></div>`);
-  revealSection()
+  for (const r of log) { const c = fajrCount(r.results || {}); for (const k in all) all[k] += c[k] || 0; calls += (r.entries || []).length }
+  const head = sectionHeading('سجل الاتصالات', 'كل صحبة: من ردّ، ومن لم يردّ', 'fajrHome()');
+  if (!log.length) { app.innerHTML = head + `<div class="fajr-empty">${uiIcon('history')}<strong>لا يوجد سجل بعد</strong><p>بعد أول صحبة يظهر هنا من ردّ ومن لم يردّ</p></div>`; uiLocalize?.(app); revealSection(); return }
+  const missed = all.missed + all.failed + (all.unsure || 0), closed = all.declined + all.cancelled;
+  const summary = `<section class="fajr-log-summary">
+    <div class="ok"><b>${ar(all.answered)}</b><span>ردّ</span></div>
+    <div class="miss"><b>${ar(missed)}</b><span>لم يردّ</span></div>
+    <div class="decl"><b>${ar(closed)}</b><span>أُغلق أو أُلغي</span></div>
+    <p>${fajrBits([fajrT('الاتصالات: {0}', ar(calls)), fajrT('الصحبات: {0}', ar(log.length))])}</p></section>`;
+  let day = '', body = '';
+  log.forEach((r, i) => {
+    const label = fajrHistoryDay(r.startedAt);
+    if (label !== day) { day = label; body += `<h3 class="fajr-log-day">${esc(label)}</h3>` }
+    const people = [], seen = new Set();
+    for (const e of (r.entries || [])) if (!seen.has(e.memberId)) { seen.add(e.memberId); people.push({ name: e.name, status: (r.results || {})[e.memberId] || e.status }) }
+    const answered = people.filter(p => p.status === 'answered').length;
+    const faces = people.slice(0, 4).map(p => `<span class="fajr-avatar tone-${FAJR_TONE[p.status] || 'wait'}">${fajrInitials(p.name)}</span>`).join('') + (people.length > 4 ? `<span class="fajr-avatar more">+${ar(people.length - 4)}</span>` : '');
+    const rows = (r.entries || []).map(e => {
+      const [, label] = fajrStatusChip(e.status), tone = FAJR_TONE[e.status] || 'wait';
+      const meta = fajrBits([fajrClock(e.at), e.attempt > 1 ? fajrT('المحاولة {0}', ar(e.attempt)) : '', e.loop > 1 ? fajrT('الجولة {0}', ar(e.loop)) : '']);
+      const after = e.status === 'answered' && e.duration ? `<small>${fajrT('بعد {0} ث', ar(e.duration))}</small>` : '';
+      return `<div class="fajr-log-row"><span class="fajr-avatar tone-${tone}">${fajrInitials(e.name)}</span><span class="fajr-log-who"><strong>${esc(e.name)}</strong><small class="fajr-meta">${meta}</small></span><span class="fajr-log-state ${tone}"><em>${label}</em>${after}</span></div>`
+    }).join('');
+    body += `<details class="fajr-log-run"${i ? '' : ' open'}><summary>
+      <span class="fajr-log-time">${fajrClock(r.startedAt)}</span>
+      <span class="fajr-log-main"><strong>${esc(r.listName)}${r.test ? ' <em class="chip unsure">تجربة</em>' : ''}${r.stopped ? ' <em class="chip wait">أُنهيت يدويًا</em>' : ''}</strong>
+        <small>${people.length ? fajrT('ردّ {0} من {1}', ar(answered), ar(people.length)) : 'لم يُتصل بأحد'}</small>
+        <span class="fajr-log-bar"><i style="width:${people.length ? Math.round(answered / people.length * 100) : 0}%"></i></span></span>
+      <span class="fajr-log-faces">${faces}</span>
+      <span class="fajr-log-chev">${uiIcon('chevron')}</span></summary>
+      <div class="fajr-log-rows">${rows || '<p class="fajr-help">لا توجد اتصالات في هذه الصحبة</p>'}</div></details>`
+  });
+  app.innerHTML = head + summary + `<div class="fajr-log">${body}</div><button class="fajr-clear" onclick="fajrClearLog()">${uiIcon('trash')}<span>مسح السجل</span></button>`;
+  uiLocalize?.(app); revealSection()
 }
 function fajrClearLog() { if (confirm(fajrT('مسح سجل الاتصالات كاملًا؟'))) { localStorage.removeItem(FAJR_LOG); fajrHistory() } }
 

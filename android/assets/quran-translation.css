@@ -11,3 +11,8 @@
 .bengali-page,.bengali-page .english-page-content,.bengali-page .english-verse-text.qword{font-family:UiBengali,system-ui,sans-serif;direction:ltr;text-align:left}.bengali-page .english-page-content{font-size:19px;line-height:2}.bengali-page .english-surah-heading{font-family:UiBengali,sans-serif!important;line-height:1.7}.bengali-page .english-meanings-note{font-family:UiBengali,sans-serif;line-height:1.9}
 
 .turkish-page,.turkish-page .english-page-content,.turkish-page .english-verse-text.qword{font-family:system-ui,sans-serif;direction:ltr;text-align:left}.turkish-page .english-page-content{font-size:19px;line-height:1.9}.turkish-page .english-surah-heading{font-family:system-ui,sans-serif!important;line-height:1.5}
+/* the language switch is a segmented control, never squeezed into round icon buttons */
+.reader-top .reader-language-switch{gap:0;padding:3px;margin:6px auto 0;flex:0 0 auto;width:auto;border-radius:999px;background:var(--glass-film,color-mix(in srgb,var(--ink) 6%,transparent));border:1px solid var(--glass-edge,var(--line))}
+.reader-top .reader-language-switch button{width:auto!important;height:auto!important;min-width:92px!important;min-height:34px!important;aspect-ratio:auto!important;flex:0 0 auto!important;white-space:nowrap!important;padding:6px 18px!important;border:0!important;border-radius:999px!important;background:transparent!important;line-height:1.4!important}
+.reader-top.has-language-switch{justify-content:space-between}
+.reader-top.has-language-switch .reader-language-switch{order:10;flex-basis:auto!important;margin-left:auto;margin-right:auto}

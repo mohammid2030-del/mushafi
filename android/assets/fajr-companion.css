@@ -250,3 +250,60 @@ body.dark .chip.decl{color:#f0a593}
 .fajr-accept p{margin:0;font-size:14px;line-height:1.8;color:var(--muted)}
 .fajr-accept .fajr-actions{width:100%}
 #wake-code{text-align:center;letter-spacing:3px;font-size:20px;font-family:ui-monospace,Menlo,monospace;margin:8px 0}
+
+/* ===== people: cards never touch or overlap ===== */
+#app>.fajr-card,#app>section.fajr-card{position:relative;margin:0 0 14px}
+.fajr-add-row.wide{margin-bottom:16px}
+.fajr-card-head span{min-width:26px;height:26px;display:inline-grid;place-items:center;border-radius:999px;background:color-mix(in srgb,var(--gold) 14%,transparent);color:var(--gold);font-weight:600}
+.fajr-card .fajr-help{margin:0 0 12px}
+.fajr-member{min-height:60px}
+.fajr-member-text{flex:1;min-width:0}.fajr-member-text strong{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fajr-member-actions button{width:40px;height:40px;min-height:40px;border-radius:50%;display:grid;place-items:center;border:0;background:transparent;color:var(--fajr-miss)}
+.fajr-member-actions button .ui-icon{width:20px;height:20px}
+
+/* ===== call log ===== */
+.fajr-log-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin:4px 0 18px;padding:16px 8px 12px;border-radius:24px;background:var(--glass-card,var(--paper));border:1px solid var(--glass-edge,var(--line))}
+.fajr-log-summary>div{display:flex;flex-direction:column;align-items:center;gap:2px;position:relative}
+.fajr-log-summary>div+div::before{content:"";position:absolute;inset:8px auto 8px 100%;width:1px;background:var(--line)}
+html[dir=rtl] .fajr-log-summary>div+div::before{inset:8px 100% 8px auto}
+.fajr-log-summary b{font-size:28px;font-weight:700;line-height:1.2}
+.fajr-log-summary span{font-size:12.5px;color:var(--muted);white-space:nowrap}
+.fajr-log-summary .ok b{color:var(--fajr-ok)}.fajr-log-summary .miss b{color:var(--fajr-miss)}.fajr-log-summary .decl b{color:var(--fajr-fail)}
+.fajr-log-summary p{grid-column:1/-1;margin:12px 4px 0;padding-top:10px;border-top:1px solid var(--line);text-align:center;font-size:12px;color:var(--muted)}
+.fajr-log-summary p span{color:inherit;font-size:inherit}
+.fajr-log-day{margin:18px 4px 8px;font-size:13px;font-weight:600;color:var(--muted)}
+.fajr-log-day:first-child{margin-top:0}
+.fajr-log{gap:10px}
+.fajr-log-run{padding:14px 14px;border-radius:22px;background:var(--glass-card,var(--paper));border:1px solid var(--glass-edge,var(--line))}
+.fajr-log-run summary{display:flex;align-items:center;gap:12px;list-style:none;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.fajr-log-run summary::-webkit-details-marker{display:none}
+.fajr-log-time{flex:none;min-width:58px;padding:8px 6px;border-radius:14px;text-align:center;font-size:13px;font-weight:700;background:color-mix(in srgb,var(--gold) 12%,transparent);color:var(--gold);unicode-bidi:plaintext}
+.fajr-log-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.fajr-log-main strong{font-size:15.5px;font-weight:600;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.fajr-log-main strong .chip{font-size:11px;padding:2px 8px}
+.fajr-log-main small{font-size:12.5px;color:var(--muted)}
+.fajr-log-bar{display:block;height:4px;border-radius:4px;background:color-mix(in srgb,var(--ink) 10%,transparent);overflow:hidden;margin-top:2px;max-width:160px}
+.fajr-log-bar i{display:block;height:100%;border-radius:4px;background:var(--fajr-ok);margin-inline-start:0}
+.fajr-log-faces{display:flex;flex:none}
+.fajr-log-faces .fajr-avatar{width:30px;height:30px;font-size:11px;margin-inline-start:-9px;border:2px solid var(--paper);box-sizing:content-box}
+.fajr-log-faces .fajr-avatar:first-child{margin-inline-start:0}
+.fajr-log-faces .fajr-avatar.more{background:color-mix(in srgb,var(--ink) 14%,var(--paper));color:var(--ink)}
+.fajr-avatar.tone-ok{box-shadow:0 0 0 2px var(--fajr-ok)}
+.fajr-avatar.tone-miss{box-shadow:0 0 0 2px var(--fajr-miss)}
+.fajr-avatar.tone-decl,.fajr-avatar.tone-fail{box-shadow:0 0 0 2px var(--fajr-fail)}
+.fajr-log-chev{flex:none;color:var(--muted);transition:transform .2s}
+.fajr-log-chev .ui-icon{width:18px;height:18px}
+.fajr-log-run[open] .fajr-log-chev{transform:rotate(180deg)}
+.fajr-log-rows{display:flex;flex-direction:column;gap:2px;margin-top:12px;padding-top:6px;border-top:1px solid var(--line)}
+.fajr-log-row{display:flex;align-items:center;gap:12px;padding:8px 2px}
+.fajr-log-row+.fajr-log-row{border-top:1px solid color-mix(in srgb,var(--line) 60%,transparent)}
+.fajr-log-row .fajr-avatar{width:36px;height:36px;font-size:12px}
+.fajr-log-state{flex:none;display:flex;flex-direction:column;align-items:flex-end;gap:2px;text-align:end}
+.fajr-log-state em{font-style:normal;font-size:12px;font-weight:600;padding:4px 10px;border-radius:999px;white-space:nowrap}
+.fajr-log-state small{font-size:11px;color:var(--muted)}
+.fajr-log-state.ok em{color:var(--fajr-ok);background:color-mix(in srgb,var(--fajr-ok) 13%,transparent)}
+.fajr-log-state.miss em{color:var(--fajr-miss);background:color-mix(in srgb,var(--fajr-miss) 12%,transparent)}
+.fajr-log-state.decl em,.fajr-log-state.fail em{color:var(--fajr-fail);background:color-mix(in srgb,var(--fajr-fail) 14%,transparent)}
+.fajr-log-state.wait em{color:var(--muted);background:color-mix(in srgb,var(--muted) 10%,transparent)}
+.fajr-clear{display:flex;align-items:center;justify-content:center;gap:8px;margin:22px auto 120px;padding:12px 22px;min-height:46px;border-radius:999px;border:1px solid color-mix(in srgb,var(--fajr-miss) 35%,transparent);background:transparent;color:var(--fajr-miss);font:600 14px var(--ui-font,AppArabic),sans-serif}
+.fajr-clear .ui-icon{width:18px;height:18px}
