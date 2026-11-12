@@ -21,6 +21,7 @@ jobs:
       - name: Test Firestore rules (emulator)
         working-directory: firebase/tests
         run: |
+          cp ../firestore.rules firestore.rules
           npm install --no-audit --no-fund
           npx firebase emulators:exec --only firestore --project demo-mushafi "node wake-rules-test.cjs"
       - name: Check functions load
