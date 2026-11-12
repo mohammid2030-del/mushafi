@@ -257,7 +257,7 @@ final class PrayerService: NSObject {
             content.title = UiLanguage.text("موعد إقامة صلاة {0}", name)
             content.body = UiLanguage.text("حان وقت إقامة صلاة {0}", name)
         }
-        content.sound = sound(for: s, kind: e.kind)
+        content.sound = e.kind == "adhan" && PrayerMute.muted(e.key, at: e.at) ? nil : sound(for: s, kind: e.kind)
         content.threadIdentifier = "prayer"
         content.userInfo = ["open": "prayer", "key": e.key, "kind": e.kind]
         if #available(iOS 15.0, *) { content.interruptionLevel = .timeSensitive }
@@ -275,5 +275,31 @@ final class PrayerService: NSObject {
 extension PrayerService: AVAudioPlayerDelegate {
     func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
         if player === preview { stopPreview() }
+    }
+}
+
+
+/// Adhan voice muted for single prayers of today only; the notification itself still arrives.
+enum PrayerMute {
+    private static let key = "prayer.mute"
+    static func save(_ text: String?) -> String {
+        let now = Int64(Date().timeIntervalSince1970 * 1000)
+        guard let data = (text ?? "[]").data(using: .utf8),
+              let list = try? JSONSerialization.jsonObject(with: data) as? [[String: Any]] else { return "[]" }
+        let kept: [[String: Any]] = list.compactMap { entry in
+            guard let k = entry["key"] as? String, PrayerSettings.keys.contains(k),
+                  let at = (entry["at"] as? NSNumber)?.int64Value,
+                  at > now - 2 * 3_600_000, at < now + 26 * 3_600_000 else { return nil }
+            return ["key": k, "at": at]
+        }.prefix(12).map { $0 }
+        let json = (try? JSONSerialization.data(withJSONObject: kept)).flatMap { String(data: $0, encoding: .utf8) } ?? "[]"
+        UserDefaults.standard.set(json, forKey: key)
+        PrayerService.shared.schedule()
+        return json
+    }
+    static func muted(_ prayer: String, at: Int64) -> Bool {
+        guard let data = UserDefaults.standard.string(forKey: key)?.data(using: .utf8),
+              let list = try? JSONSerialization.jsonObject(with: data) as? [[String: Any]] else { return false }
+        return list.contains { ($0["key"] as? String) == prayer && abs((($0["at"] as? NSNumber)?.int64Value ?? 0) - at) < 90_000 }
     }
 }

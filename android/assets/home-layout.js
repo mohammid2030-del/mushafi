@@ -101,6 +101,28 @@ function hlSilhouette() {
 }
 
 /* ---------- today's times ---------- */
+/* ---------- mute today's adhan voice (the notification still arrives) ---------- */
+function hlMutes() { const now = Date.now(); return (readJSON('prayerMuteToday', []) || []).filter(m => m && Number.isFinite(m.at) && m.at > now - 7200000) }
+function hlIsMuted(key, at) { return hlMutes().some(m => m.key === key && Math.abs(m.at - at) < 90000) }
+function hlSoundButton(key, at, on, now) {
+  const past = at <= now, muted = on && hlIsMuted(key, at);
+  const label = !on ? 'الأذان متوقف لهذه الصلاة' : past ? 'مضى وقت هذه الصلاة' : muted ? 'أذان هذه الصلاة صامت اليوم' : 'كتم أذان هذه الصلاة اليوم';
+  return `<button class="hl-sound${!on || muted ? ' off' : ''}${past ? ' past' : ''}${muted ? ' muted' : ''}" ${past ? 'disabled' : ''} onclick="hlToggleMute('${key}',${at},${on})" aria-label="${label}" aria-pressed="${muted}">${uiIcon(!on || muted ? 'mute' : 'volume')}</button>`
+}
+function hlToggleMute(key, at, on) {
+  if (at <= Date.now()) return;
+  if (!on) { showSmallNotice('الأذان متوقف لهذه الصلاة من إعدادات الصلاة'); return }
+  let list = hlMutes(); const muted = list.some(m => m.key === key && Math.abs(m.at - at) < 90000);
+  list = muted ? list.filter(m => !(m.key === key && Math.abs(m.at - at) < 90000)) : [...list, { key, at }];
+  saveJSON('prayerMuteToday', list);
+  try { window.AndroidReader?.setPrayerMute?.(JSON.stringify(list)) } catch (e) {}
+  window.AndroidReader?.haptic?.(0);
+  showSmallNotice(muted ? `عاد أذان ${prayerNames[key]}` : `أذان ${prayerNames[key]} صامت اليوم، والإشعار يصلك`);
+  const times = app.querySelector('.hl-times-slot'); if (times) { times.innerHTML = hlTimesMarkup(readPrayerData()); uiLocalize?.(times) }
+}
+// keep the device in step after restarts
+setTimeout(() => { try { window.AndroidReader?.setPrayerMute?.(JSON.stringify(hlMutes())) } catch (e) {} }, 1200);
+
 function hlTimesMarkup(data) {
   const s = data?.settings || {}; if (!s.confirmed) return '';
   const now = Date.now(), today = hlToday(data, now); if (!today) return '';
@@ -120,7 +142,7 @@ function hlTimesMarkup(data) {
     }
     return `<div class="hl-row${active ? ' active' : ''}${t < now && !active ? ' past' : ''}">
       <span class="hl-dot" aria-hidden="true"></span>
-      <span class="hl-row-main"><strong>${prayerNames[k]}</strong>${active ? `<em class="hl-next">${phase.kind === 'iqama' ? 'الإقامة' : 'التالية'}</em>` : ''}<span class="hl-time">${prayerClock(t, zone)}</span><span class="hl-sound ${on ? '' : 'off'}" aria-label="${on ? 'الأذان مفعّل' : 'الأذان متوقف'}">${uiIcon(on ? 'volume' : 'mute')}</span></span>
+      <span class="hl-row-main"><strong>${prayerNames[k]}</strong>${active ? `<em class="hl-next">${phase.kind === 'iqama' ? 'الإقامة' : 'التالية'}</em>` : ''}<span class="hl-time">${prayerClock(t, zone)}</span>${hlSoundButton(k, t, on, now)}</span>
       ${extra}
     </div>`
   }).join('');

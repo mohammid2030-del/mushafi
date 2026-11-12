@@ -17,7 +17,7 @@ final class NativeBridge: NSObject, WKScriptMessageHandler {
             "surahSnapshot",
             "initializeDailyReminderConsent", "setDailyReminderConsent", "consumeFridayReminder", "consumeDailyReminderOpen",
             "saveKhatmaPlan", "khatmaStatus", "consumeKhatmaOpen",
-            "fajrSave", "fajrStatus", "fajrConsumeLaunch",
+            "fajrSave", "fajrStatus", "fajrConsumeLaunch", "setPrayerMute",
         ]
         if CloudSync.isAvailable { list += ["cloudSnapshot", "cloudMatchesAck"] }
         return list
@@ -110,6 +110,7 @@ final class NativeBridge: NSObject, WKScriptMessageHandler {
         case "khatmaStatus": value = ReminderService.shared.khatmaStatus()
         case "consumeKhatmaOpen": value = ReminderService.shared.consumeKhatmaOpen()
         case "surahSnapshot": value = surah.snapshot
+        case "setPrayerMute": value = PrayerMute.save(a.string(0))
         case "fajrSave": value = FajrCompanion.shared.save(a.string(0))
         case "fajrStatus": value = FajrCompanion.shared.status()
         case "fajrConsumeLaunch": value = FajrCompanion.shared.consumeLaunch()
