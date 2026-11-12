@@ -233,3 +233,20 @@ body.fajr-running .glass-nav,body.fajr-running nav{display:none!important}
 .fajr-meta{display:inline-flex;flex-wrap:wrap;gap:0 6px;align-items:center}
 .fajr-meta i{font-style:normal;opacity:.6}
 .fajr-gate-actions :is(.cloud-apple-button,.cloud-google-button){margin:0!important;width:100%}
+
+/* people: invites and linked Mushafi users */
+.fajr-peer-chips{display:flex;flex-wrap:wrap;gap:8px;margin:4px 0 10px}
+.fajr-peer-chip{all:unset;cursor:pointer;display:inline-flex;align-items:center;gap:8px;padding:5px 12px 5px 6px;border-radius:999px;border:1px dashed color-mix(in srgb,var(--gold) 55%,transparent);color:var(--ink);font:600 13px/1.4 var(--ui-font,AppArabic),sans-serif;-webkit-tap-highlight-color:transparent}
+.fajr-peer-chip .fajr-avatar{width:28px;height:28px;font-size:11px}
+.fajr-peer-chip .ui-icon{width:15px;height:15px;color:var(--gold)}
+.fajr-peer-chip:active{background:color-mix(in srgb,var(--gold) 12%,transparent)}
+.fajr-add-row.wide{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:4px 0 16px}
+.fajr-add-row.wide>button{justify-content:center}
+.chip.decl{color:#9b4a36;background:color-mix(in srgb,#b4553f 14%,transparent)}
+body.dark .chip.decl{color:#f0a593}
+.fajr-run-last{margin:-4px 0 6px;font-size:13.5px;color:var(--muted);text-align:center}
+.fajr-accept{display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px;padding:6px 4px 4px}
+.fajr-accept h3{margin:6px 0 0;font:700 21px/1.5 var(--ui-font,AppArabic),sans-serif;color:var(--ink)}
+.fajr-accept p{margin:0;font-size:14px;line-height:1.8;color:var(--muted)}
+.fajr-accept .fajr-actions{width:100%}
+#wake-code{text-align:center;letter-spacing:3px;font-size:20px;font-family:ui-monospace,Menlo,monospace;margin:8px 0}

@@ -33,7 +33,7 @@ public final class FajrCompanion {
    JSONArray days = l.optJSONArray("days"); if (days == null || days.length() > 7) throw new JSONException("days");
    for (int d = 0; d < days.length(); d++) { int v = days.getInt(d); if (v < 0 || v > 6) throw new JSONException("day"); }
    JSONArray members = l.optJSONArray("members"); if (members == null || members.length() > 30) throw new JSONException("members");
-   for (int m = 0; m < members.length(); m++) if (!members.getJSONObject(m).optString("phone").matches("\\+?[0-9]{3,18}")) throw new JSONException("phone");
+   for (int m = 0; m < members.length(); m++) if (!members.getJSONObject(m).optString("id").matches("[A-Za-z0-9]{6,128}")) throw new JSONException("member");
   }
   return config;
  }
@@ -167,9 +167,7 @@ public final class FajrCompanion {
 
  public static JSONObject status(Context c) throws JSONException {
   JSONObject j = new JSONObject().put("platform", "android")
-   .put("calls", c.checkSelfPermission(Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED && c.checkSelfPermission(Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED)
    .put("notifications", PrayerScheduler.notifications(c)).put("exact", PrayerScheduler.exact(c))
-   .put("telephony", c.getPackageManager().hasSystemFeature(PackageManager.FEATURE_TELEPHONY))
    .put("next", prefs(c).getLong("next", 0)).put("nextList", prefs(c).getString("nextList", ""));
   if (Build.VERSION.SDK_INT >= 34) j.put("fullScreen", notes(c).canUseFullScreenIntent());
   return j;

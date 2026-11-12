@@ -33,12 +33,8 @@
          Remove this permission and the updater for a Google Play build. -->
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
-    <!-- صحبة الفجر: dial the user's chosen contacts one after another at Fajr, and know when each call ends -->
-    <uses-permission android:name="android.permission.CALL_PHONE" />
-    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <!-- صحبة الفجر: Fajr alarm and the in-app wake ring shown over the lock screen -->
     <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
-    <!-- Calling is optional so tablets without a SIM still install the app -->
-    <uses-feature android:name="android.hardware.telephony" android:required="false" />
 
     <!-- Qibla compass sensors are optional so the app still installs on devices without them -->
     <uses-feature android:name="android.hardware.sensor.compass" android:required="false" />
@@ -69,6 +65,13 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <!-- صحبة الفجر invite: mushafi-app://wake/<code> -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="mushafi-app" android:host="wake" />
             </intent-filter>
         </activity>
 
@@ -149,6 +152,19 @@
                 <action android:name="android.app.action.SCHEDULE_EXACT_ALARM_PERMISSION_STATE_CHANGED" />
             </intent-filter>
         </receiver>
+
+        <activity
+            android:name="com.mushafi.app.WakeCallActivity"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:launchMode="singleInstance"
+            android:showWhenLocked="true"
+            android:turnScreenOn="true"
+            android:theme="@android:style/Theme.DeviceDefault.NoActionBar" />
+
+        <receiver
+            android:name="com.mushafi.app.WakeActionReceiver"
+            android:exported="false" />
 
         <receiver
             android:name="com.mushafi.app.FajrAlarmReceiver"

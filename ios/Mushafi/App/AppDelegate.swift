@@ -2,6 +2,7 @@ import AVFoundation
 import BackgroundTasks
 import UIKit
 import UserNotifications
+import FirebaseMessaging
 
 @main
 final class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterDelegate {
@@ -14,6 +15,7 @@ final class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationC
 
         CloudSync.configureIfPossible()   // needs GoogleService-Info.plist; the app works without it
         CloudSync.shared.start()
+        WakeClient.shared.configure(application)
 
         UNUserNotificationCenter.current().delegate = self
         PrayerService.shared.refreshAuthorization { PrayerService.shared.schedule(); ReminderService.shared.schedule() }
@@ -23,6 +25,10 @@ final class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationC
             Self.handleRefresh(task)
         }
         return true
+    }
+
+    func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+        if CloudSync.isAvailable { Messaging.messaging().apnsToken = deviceToken }
     }
 
     func applicationDidEnterBackground(_ application: UIApplication) {
@@ -66,6 +72,19 @@ final class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationC
     func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse,
                                 withCompletionHandler completionHandler: @escaping () -> Void) {
         let info = response.notification.request.content.userInfo
+        if let type = info["type"] as? String, type == "wake" || type == "wakeEnd" {
+            let callId = info["callId"] as? String
+            if type == "wake" {
+                switch response.actionIdentifier {
+                case WakeClient.declineAction: WakeClient.shared.respond(callId, "declined") { completionHandler() }; return
+                case UNNotificationDismissActionIdentifier: break
+                default: WakeClient.shared.respond(callId, "answered") { completionHandler() }; return
+                }
+            } else if response.actionIdentifier == UNNotificationDefaultActionIdentifier {
+                DispatchQueue.main.async { WakeClient.shared.pendingOpen = true; AppRouter.shared.notifyPage("onWakeLink") }
+            }
+            completionHandler(); return
+        }
         switch info["open"] as? String {
         case "prayer":
             DispatchQueue.main.async { AppRouter.shared.open("prayer") }

@@ -18,7 +18,7 @@ final class NativeBridge: NSObject, WKScriptMessageHandler {
             "surahSnapshot",
             "initializeDailyReminderConsent", "setDailyReminderConsent", "consumeFridayReminder", "consumeDailyReminderOpen",
             "saveKhatmaPlan", "khatmaStatus", "consumeKhatmaOpen",
-            "fajrSave", "fajrStatus", "fajrConsumeLaunch", "setPrayerMute",
+            "fajrSave", "fajrStatus", "fajrConsumeLaunch", "setPrayerMute", "wakeStatus", "wakeConsumeLink",
         ]
         if CloudSync.isAvailable { list += ["cloudSnapshot", "cloudMatchesAck"] }
         return list
@@ -35,7 +35,7 @@ final class NativeBridge: NSObject, WKScriptMessageHandler {
             "startQibla", "stopQibla", "requestHomeWeather",
             "requestPrayerNotifications", "openPrayerSystemSettings", "previewPrayerVoice", "stopPrayerVoice",
             "testPrayerNotification", "openWidgets", "openLiveBroadcast",
-            "reverseGeocode", "fajrPickContact", "fajrDial", "fajrEndCall", "fajrKeepAwake", "fajrStopAlarm", "fajrRequestPermissions",
+            "reverseGeocode", "wakeRegister", "wakeCreateInvite", "wakeAcceptInvite", "wakePeers", "wakeRemovePeer", "wakeRing", "wakeCancel", "fajrKeepAwake", "fajrStopAlarm", "fajrRequestPermissions",
             "surahPlay", "surahPlaySession", "surahSetMode", "surahPause", "surahResume", "surahStop", "surahSkip", "surahSeek",
         ]
         if CloudSync.isAvailable {
@@ -46,7 +46,7 @@ final class NativeBridge: NSObject, WKScriptMessageHandler {
     }
 
     weak var shell: WebShellViewController? {
-        didSet { CloudSync.shared.presenter = shell; FajrCompanion.shared.presenter = shell }
+        didSet { CloudSync.shared.presenter = shell }
     }
 
     private let location = LocationService()
@@ -69,8 +69,7 @@ final class NativeBridge: NSObject, WKScriptMessageHandler {
         prayer.onPreview = { [weak self] playing in self?.shell?.callback("onPrayerPreview", playing) }
         surah.onState = { [weak self] json in self?.shell?.callbackRaw("onNativeSurah", json) }
         CloudSync.shared.onState = { [weak self] json in self?.shell?.callbackRaw("onNativeCloud", json) }
-        FajrCompanion.shared.onCall = { [weak self] json in self?.shell?.callbackRaw("onFajrCall", json) }
-        FajrCompanion.shared.onContact = { [weak self] json in self?.shell?.callbackRaw("onFajrContact", json) }
+        WakeClient.shared.onEvent = { [weak self] name, json in self?.shell?.callbackRaw(name, json) }
         ChallengeClient.shared.onReply = { [weak self] payload in self?.shell?.callback("onChallengeResponse", payload) }
     }
 
@@ -115,6 +114,8 @@ final class NativeBridge: NSObject, WKScriptMessageHandler {
         case "fajrSave": value = FajrCompanion.shared.save(a.string(0))
         case "fajrStatus": value = FajrCompanion.shared.status()
         case "fajrConsumeLaunch": value = FajrCompanion.shared.consumeLaunch()
+        case "wakeStatus": value = WakeClient.shared.status()
+        case "wakeConsumeLink": value = WakeClient.shared.consumeLink()
         case "cloudSnapshot": value = CloudSync.shared.snapshotJSON()
         case "cloudMatchesAck": value = CloudSync.shared.matchesAck(a.string(0))
         default: return nil
@@ -193,9 +194,13 @@ final class NativeBridge: NSObject, WKScriptMessageHandler {
                 self?.shell?.callback("onCityName", ["key": key, "name": name])
             }
         // صحبة الفجر
-        case "fajrPickContact": FajrCompanion.shared.pickContact()
-        case "fajrDial": surah.pause(); prayer.stopPreview(); FajrCompanion.shared.dial(a.string(0))
-        case "fajrEndCall": FajrCompanion.shared.cancelTracking(); shell?.callback("onFajrCall", ["state": "cancelled"])
+        case "wakeRegister": WakeClient.shared.register()
+        case "wakeCreateInvite": WakeClient.shared.createInvite()
+        case "wakeAcceptInvite": WakeClient.shared.acceptInvite(a.string(0))
+        case "wakePeers": WakeClient.shared.peers()
+        case "wakeRemovePeer": WakeClient.shared.removePeer(a.string(0))
+        case "wakeRing": WakeClient.shared.ring(a.string(0), token: a.string(1))
+        case "wakeCancel": WakeClient.shared.cancel(a.string(0))
         case "fajrKeepAwake": FajrCompanion.shared.keepAwake(a.bool(0)); updateIdleTimer()
         case "fajrStopAlarm": FajrCompanion.shared.stopAlarm()
         case "fajrRequestPermissions":
@@ -300,6 +305,13 @@ final class AppRouter {
 
     /// mushafi-app://open/<route>
     func handle(_ url: URL) -> Bool {
+        if url.scheme == "mushafi-app", url.host == "wake" {
+            let code = url.lastPathComponent.lowercased()
+            guard code.range(of: "^[a-z0-9]{10}$", options: .regularExpression) != nil else { return false }
+            WakeClient.shared.pendingLink = code
+            notifyPage("onWakeLink")
+            return true
+        }
         guard url.scheme == "mushafi-app", url.host == "open" else { return false }
         let route = url.path.trimmingCharacters(in: CharacterSet(charactersIn: "/"))
         guard ["prayer", "daily-verse", "daily-dhikr", "surah", "home"].contains(route) || Self.pageRoutes.contains(route) else { return false }
