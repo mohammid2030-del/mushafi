@@ -36,6 +36,8 @@ final class LaunchCurtain: UIView, WKNavigationDelegate {
         presentation.backgroundColor = .clear
         presentation.scrollView.backgroundColor = .clear
         presentation.scrollView.isScrollEnabled = false
+        // Fill the whole screen, under the status bar and home indicator too.
+        presentation.scrollView.contentInsetAdjustmentBehavior = .never
         presentation.isUserInteractionEnabled = false
         presentation.alpha = 0
         presentation.navigationDelegate = self
