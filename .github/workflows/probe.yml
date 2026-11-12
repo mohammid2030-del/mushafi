@@ -12,6 +12,23 @@ jobs:
       - name: IslamHouse categories
         run: |
           B=https://api3.islamhouse.com/v3/paV29H2gm56kvLPy
-          for p in "main/get-categories-tree/ar/json" "categories/main-categories/ar/json" "categories/list/ar/json" "categories/viewcat/0/ar/showall/json" "categories/viewcat/692/ar/showall/json" "categories/viewitems/692/books/ar/ar/1/3/json" "categories/viewitems/692/showall/ar/showall/json" "main/sitecontent/ar/ar/json" "main/get-object-categories/books/ar/json"; do
-            echo "== $p"; curl -sS -m 30 "$B/$p" | head -c 900; echo
+          curl -sS -m 30 "$B/main/get-categories-tree/ar/json" -o tree.json
+          python3 -c "
+          import json
+          t=json.load(open('tree.json'))
+          def walk(n,d=0):
+              if d>2: return
+              print('  '*d, n.get('id'), n.get('title'), len(n.get('sub_categories') or []))
+              for c in n.get('sub_categories') or []: walk(c,d+1)
+          walk(t)"
+          for p in "categories/viewitems/86219/books/ar/showall/json" "categories/viewitems/86219/showall/ar/books/json" "categories/viewitems/86219/books/ar/books/json" "categories/viewitems/86219/showall/ar/showall/json"; do
+            echo "== $p"; curl -sS -m 60 "$B/$p" -o o.json
+            python3 -c "
+          import json
+          try:
+            d=json.load(open('o.json'))
+            if isinstance(d,list):
+              import collections; print('list',len(d),collections.Counter(x.get('datatype') for x in d))
+            else: print('obj',str(d)[:300])
+          except Exception as e: print('not json', open('o.json').read()[:100])"
           done
