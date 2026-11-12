@@ -8,7 +8,8 @@ function muezzinAvatar(voice, size = '') {
 }
 function muezzinPickMarkup() {
   const voice = readPrayerData().settings?.voice || 'afasy';
-  return `<button class="mz-pick" onclick="openMuezzinSheet()" aria-label="اختيار المؤذن">${muezzinAvatar(voice)}<span class="mz-text"><small>المؤذن</small><strong>${esc(prayerVoices[voice] || '')}</strong></span>${uiIcon('down')}</button>`
+  const name = prayerVoices[voice] || '', short = voice === 'silent' ? 'صامت' : name.split(/\s+/).slice(-1)[0];
+  return `<button class="mz-pick" onclick="openMuezzinSheet()" aria-label="اختيار المؤذن: ${esc(name)}"><span class="mz-face">${muezzinAvatar(voice)}<span class="mz-badge">${uiIcon('down')}</span></span><span class="mz-short">${esc(short)}</span></button>`
 }
 function openMuezzinSheet() {
   const current = readPrayerData().settings?.voice || 'afasy';

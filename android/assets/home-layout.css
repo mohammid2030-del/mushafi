@@ -138,3 +138,4 @@ body.hl-sky-on:is([data-hl-sky="night"],[data-hl-sky="dawn"],[data-hl-sky="dusk"
 .hl-sound.off{color:var(--muted)}
 .hl-sound.past{cursor:default;opacity:.4}
 .hl-sound .ui-icon{width:20px;height:20px}
+.hl-sound,.hl-tile,.hl-item,.hl-link,.hl-chip,.hl-pill{-webkit-tap-highlight-color:transparent}.hl-sound:focus,.hl-tile:focus,.hl-item:focus{outline:none}

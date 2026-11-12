@@ -1,6 +1,6 @@
 .screen-heading.mz-heading{display:flex;align-items:center}
 .screen-heading.mz-heading>div{flex:1;min-width:0}
-.mz-pick{all:unset;box-sizing:border-box;cursor:pointer;display:flex;align-items:center;gap:8px;max-width:46%;padding:4px 2px;margin-inline-start:8px;color:var(--ink);flex:none}
+.mz-pick{all:unset;box-sizing:border-box;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;width:68px;padding:2px 0;margin-inline-start:6px;color:var(--ink);flex:none;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none}
 .mz-pick>.ui-icon{width:16px;height:16px;color:var(--muted);flex:none}
 .mz-text{display:flex;flex-direction:column;min-width:0;line-height:1.3;text-align:start}
 .mz-text small{font-size:11px;color:var(--gold);font-weight:600}
@@ -25,11 +25,14 @@
 .mz-play{all:unset;cursor:pointer;display:grid;place-items:center;width:40px;height:40px;border-radius:50%;color:var(--gold);background:color-mix(in srgb,var(--gold) 12%,transparent);flex:none}
 .mz-play.on{background:var(--gold);color:var(--paper)}
 .mz-play .ui-icon{width:18px;height:18px}
-.screen-heading.mz-heading h1{white-space:nowrap}
-.mz-pick{max-width:44%;gap:7px}
-.mz-pick .mz-avatar{width:40px;height:40px}
-.mz-text strong{font-size:12.5px}
-.mz-text small{font-size:10.5px}
+
+.mz-pick:focus{outline:none}.mz-pick:focus-visible .mz-avatar{box-shadow:0 0 0 2px var(--bg),0 0 0 4px var(--gold)}
+.mz-pick:active .mz-face{transform:scale(.94)}
+.mz-face{position:relative;display:block;transition:transform 150ms ease}
+.mz-pick .mz-avatar{width:48px;height:48px}
+.mz-badge{position:absolute;bottom:-2px;inset-inline-start:-2px;display:grid;place-items:center;width:19px;height:19px;border-radius:50%;background:var(--gold);color:var(--bg);box-shadow:0 0 0 2px var(--bg)}
+.mz-badge .ui-icon{width:12px;height:12px;stroke-width:2.4}
+.mz-short{max-width:100%;font:700 11.5px/1.3 var(--ui-font,AppArabic),sans-serif;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mz-choose,.mz-play{-webkit-tap-highlight-color:transparent}.mz-choose:focus,.mz-play:focus{outline:none}
 .mz-check{color:var(--bg)}
-@media (max-width:370px){.mz-text small{display:none}}
-.screen-heading.mz-heading h1{font-size:23px!important}.screen-heading.mz-heading{gap:10px}.mz-text strong{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;max-width:88px}
+.mz-badge .ui-icon{color:var(--bg)!important}body.dark .mz-badge{background:var(--gold)!important}
