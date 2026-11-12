@@ -1,0 +1,21 @@
+name: Probe
+# One-off checks of outside services from a runner with internet access.
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/probe.yml']
+  workflow_dispatch:
+jobs:
+  islamhouse:
+    runs-on: ubuntu-latest
+    steps:
+      - name: IslamHouse books API shape
+        run: |
+          B=https://api3.islamhouse.com/v3/paV29H2gm56kvLPy
+          for l in ar en ur bn tr; do
+            echo "== $l"; curl -sS -m 30 -D - "$B/main/books/$l/$l/1/2/json" -o b-$l.json | grep -i -E "^(HTTP|access-control|content-type|cache-control)"
+            python3 -c "import json,sys;d=json.load(open('b-$l.json'));print('top',list(d.keys()));print('links',d.get('links'));it=d['data'][0];print(json.dumps(it,ensure_ascii=False)[:2500])"
+          done
+          echo "== categories"; curl -sS -m 30 "$B/main/get-categories/showall/ar/ar/json" | head -c 1500; echo
+          echo "== search"; curl -sS -m 30 "$B/main/search/books/ar/ar/1/2/json?q=%D8%A7%D9%84%D8%B5%D9%84%D8%A7%D8%A9" | head -c 600; echo
+          echo "== pdf head"; U=$(python3 -c "import json;d=json.load(open('b-ar.json'));print([a['url'] for i in d['data'] for a in i.get('attachments',[]) if a.get('extension_type','').lower()=='pdf'][0])"); echo $U; curl -sS -m 30 -I "$U" | head -20
