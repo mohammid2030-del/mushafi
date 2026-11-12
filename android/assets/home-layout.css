@@ -231,3 +231,6 @@ body.hl-sky-on:is([data-hl-sky="night"],[data-hl-sky="dawn"],[data-hl-sky="dusk"
 .hl-sky.wx-snow:not(.night){--sky-ink:#f7f4ee;--sky-soft:rgba(247,244,238,.8);--sky-glass:rgba(255,255,255,.14);--sky-line:rgba(247,244,238,.3)}
 /* rain and snow stay in the sky above today's times, so the list stays easy to read */
 .hl-rain,.hl-snow{-webkit-mask-image:linear-gradient(180deg,#000 calc(var(--hl-lift,0px) + 360px),transparent calc(var(--hl-lift,0px) + 620px));mask-image:linear-gradient(180deg,#000 calc(var(--hl-lift,0px) + 360px),transparent calc(var(--hl-lift,0px) + 620px))}
+/* the content below rises into the fading sky, so there is no empty band */
+.hl-sky:has(.hl-sky-times){margin-bottom:-118px!important}
+.hl-sky-slot~*{position:relative;z-index:1}
