@@ -35,11 +35,8 @@ jobs:
         with: { node-version: 20 }
       - name: Deploy
         env:
-          GOOGLE_APPLICATION_CREDENTIALS_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          SA_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
         working-directory: firebase
         run: |
-          if [ -z "$GOOGLE_APPLICATION_CREDENTIALS_JSON" ]; then echo "::error::Add the FIREBASE_SERVICE_ACCOUNT secret first"; exit 1; fi
-          printf '%s' "$GOOGLE_APPLICATION_CREDENTIALS_JSON" > "$RUNNER_TEMP/sa.json"
-          export GOOGLE_APPLICATION_CREDENTIALS="$RUNNER_TEMP/sa.json"
-          npx --yes firebase-tools@14 deploy --only firestore:rules --project mushafiapp-1b3d7 --non-interactive --force
-          rm -f "$RUNNER_TEMP/sa.json"
+          if [ -z "$SA_JSON" ]; then echo "::error::Add the FIREBASE_SERVICE_ACCOUNT secret first"; exit 1; fi
+          node deploy-rules.mjs
