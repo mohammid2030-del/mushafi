@@ -256,9 +256,11 @@ final class WebShellViewController: UIViewController, WKNavigationDelegate, WKUI
 
     @objc private func appBecameActive() {
         ReminderService.shared.enter()
+        FajrCompanion.shared.appBecameActive()
         PrayerService.shared.refreshAuthorization { [weak self] in
             PrayerService.shared.schedule()
             ReminderService.shared.schedule()
+            FajrCompanion.shared.schedule()
             self?.callbackRaw("onPrayerNativeChanged", "")
         }
     }

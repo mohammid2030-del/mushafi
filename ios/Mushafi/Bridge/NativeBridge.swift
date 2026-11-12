@@ -17,6 +17,7 @@ final class NativeBridge: NSObject, WKScriptMessageHandler {
             "surahSnapshot",
             "initializeDailyReminderConsent", "setDailyReminderConsent", "consumeFridayReminder", "consumeDailyReminderOpen",
             "saveKhatmaPlan", "khatmaStatus", "consumeKhatmaOpen",
+            "fajrSave", "fajrStatus", "fajrConsumeLaunch",
         ]
         if CloudSync.isAvailable { list += ["cloudSnapshot", "cloudMatchesAck"] }
         return list
@@ -33,6 +34,7 @@ final class NativeBridge: NSObject, WKScriptMessageHandler {
             "startQibla", "stopQibla", "requestHomeWeather",
             "requestPrayerNotifications", "openPrayerSystemSettings", "previewPrayerVoice", "stopPrayerVoice",
             "testPrayerNotification", "openWidgets", "openLiveBroadcast",
+            "fajrPickContact", "fajrDial", "fajrEndCall", "fajrKeepAwake", "fajrStopAlarm", "fajrRequestPermissions",
             "surahPlay", "surahPlaySession", "surahSetMode", "surahPause", "surahResume", "surahStop", "surahSkip", "surahSeek",
         ]
         if CloudSync.isAvailable {
@@ -43,7 +45,7 @@ final class NativeBridge: NSObject, WKScriptMessageHandler {
     }
 
     weak var shell: WebShellViewController? {
-        didSet { CloudSync.shared.presenter = shell }
+        didSet { CloudSync.shared.presenter = shell; FajrCompanion.shared.presenter = shell }
     }
 
     private let location = LocationService()
@@ -66,6 +68,8 @@ final class NativeBridge: NSObject, WKScriptMessageHandler {
         prayer.onPreview = { [weak self] playing in self?.shell?.callback("onPrayerPreview", playing) }
         surah.onState = { [weak self] json in self?.shell?.callbackRaw("onNativeSurah", json) }
         CloudSync.shared.onState = { [weak self] json in self?.shell?.callbackRaw("onNativeCloud", json) }
+        FajrCompanion.shared.onCall = { [weak self] json in self?.shell?.callbackRaw("onFajrCall", json) }
+        FajrCompanion.shared.onContact = { [weak self] json in self?.shell?.callbackRaw("onFajrContact", json) }
         ChallengeClient.shared.onReply = { [weak self] payload in self?.shell?.callback("onChallengeResponse", payload) }
     }
 
@@ -106,6 +110,9 @@ final class NativeBridge: NSObject, WKScriptMessageHandler {
         case "khatmaStatus": value = ReminderService.shared.khatmaStatus()
         case "consumeKhatmaOpen": value = ReminderService.shared.consumeKhatmaOpen()
         case "surahSnapshot": value = surah.snapshot
+        case "fajrSave": value = FajrCompanion.shared.save(a.string(0))
+        case "fajrStatus": value = FajrCompanion.shared.status()
+        case "fajrConsumeLaunch": value = FajrCompanion.shared.consumeLaunch()
         case "cloudSnapshot": value = CloudSync.shared.snapshotJSON()
         case "cloudMatchesAck": value = CloudSync.shared.matchesAck(a.string(0))
         default: return nil
@@ -174,6 +181,16 @@ final class NativeBridge: NSObject, WKScriptMessageHandler {
         case "testPrayerNotification": if let problem = prayer.testNotification() { fileMessage(false, problem) }
         case "openWidgets": shell?.showWidgetHelp()
 
+        // صحبة الفجر
+        case "fajrPickContact": FajrCompanion.shared.pickContact()
+        case "fajrDial": surah.pause(); prayer.stopPreview(); FajrCompanion.shared.dial(a.string(0))
+        case "fajrEndCall": FajrCompanion.shared.cancelTracking(); shell?.callback("onFajrCall", ["state": "cancelled"])
+        case "fajrKeepAwake": FajrCompanion.shared.keepAwake(a.bool(0)); updateIdleTimer()
+        case "fajrStopAlarm": FajrCompanion.shared.stopAlarm()
+        case "fajrRequestPermissions":
+            if PrayerService.shared.notificationsAuthorized { PrayerService.openSettings() } else { prayer.requestPermission() }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in self?.shell?.callback("onFajrPermissions", true) }
+
         // Full-surah recitation
         case "surahPlay": prayer.stopPreview(); surah.play(reader: a.int(0) ?? 7, chapter: a.int(1) ?? 1, verse: a.int(2) ?? 0)
         case "surahPlaySession":
@@ -213,7 +230,7 @@ final class NativeBridge: NSObject, WKScriptMessageHandler {
     func orientationChanged(_ orientation: UIInterfaceOrientation) { compass.update(orientation: orientation) }
 
     private func updateIdleTimer() {
-        UIApplication.shared.isIdleTimerDisabled = reading || storyReading
+        UIApplication.shared.isIdleTimerDisabled = reading || storyReading || FajrCompanion.shared.awake
     }
 
     // MARK: - Decoding

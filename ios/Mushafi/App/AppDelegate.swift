@@ -50,6 +50,7 @@ final class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationC
             PrayerSource.refresh(PrayerSettings.load()) { _ in
                 PrayerService.shared.schedule()
                 ReminderService.shared.schedule()
+                FajrCompanion.shared.schedule()
                 DispatchQueue.main.asyncAfter(deadline: .now() + 2) { task.setTaskCompleted(success: true) }
             }
         }
@@ -72,6 +73,14 @@ final class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationC
             DispatchQueue.main.async {
                 ReminderService.shared.pendingDaily = (info["kind"] as? String ?? "", info["item"] as? String ?? "")
                 AppRouter.shared.notifyPage("openDailyReminderFromNotification")
+            }
+        case "fajr":
+            let list = info["list"] as? String ?? ""
+            DispatchQueue.main.async {
+                if list.range(of: "^[a-z0-9]{1,16}$", options: .regularExpression) != nil {
+                    FajrCompanion.shared.pendingLaunch = list
+                    AppRouter.shared.notifyPage("fajrCheckLaunch")
+                }
             }
         case "khatma":
             DispatchQueue.main.async {
