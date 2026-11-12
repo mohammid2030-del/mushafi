@@ -103,6 +103,8 @@ final class LocationService: NSObject, CLLocationManagerDelegate {
         active = false
         stopUpdates()
         var payload: [String: Any] = [:]
+        // Like Android: a fresh fix also moves prayer times, weather and qibla to «موقعي الحالي».
+        if let location { AutomaticLocation.shared.accept(location) }
         if let location {
             payload["latitude"] = location.coordinate.latitude
             payload["longitude"] = location.coordinate.longitude

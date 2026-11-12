@@ -18,7 +18,7 @@ final class NativeBridge: NSObject, WKScriptMessageHandler {
             "surahSnapshot",
             "initializeDailyReminderConsent", "setDailyReminderConsent", "consumeFridayReminder", "consumeDailyReminderOpen",
             "saveKhatmaPlan", "khatmaStatus", "consumeKhatmaOpen",
-            "fajrSave", "fajrStatus", "fajrConsumeLaunch", "setPrayerMute", "wakeStatus", "wakeConsumeLink",
+            "automaticLocationSnapshot", "fajrSave", "fajrStatus", "fajrConsumeLaunch", "setPrayerMute", "wakeStatus", "wakeConsumeLink",
         ]
         if CloudSync.isAvailable { list += ["cloudSnapshot", "cloudMatchesAck"] }
         return list
@@ -62,6 +62,7 @@ final class NativeBridge: NSObject, WKScriptMessageHandler {
         location.onResult = { [weak self] forQibla, payload in
             self?.shell?.callback(forQibla ? "onQiblaLocation" : "onPrayerLocation", payload)
         }
+        AutomaticLocation.shared.onChange = { [weak self] in self?.shell?.callback("onAutomaticLocationChanged") }
         compass.onUpdate = { [weak self] payload in self?.shell?.callback("onNativeQibla", payload) }
         backups.onMessage = { [weak self] ok, message in self?.fileMessage(ok, message) }
         backups.onLoaded = { [weak self] text in self?.shell?.callback("onMushafiBackupLoaded", text) }
@@ -96,6 +97,7 @@ final class NativeBridge: NSObject, WKScriptMessageHandler {
         case "isSystemDark": value = shell?.isSystemDark ?? false
         case "getUiLanguage": value = UiLanguage.device
         case "prayerSnapshot": value = prayer.snapshotJSON()
+        case "automaticLocationSnapshot": value = AutomaticLocation.shared.status()
         case "savePrayerSettings": value = prayer.save(a.string(0))
         case "syncDeviceState": value = prayer.syncDeviceState(a.string(0))
         case "consumePrayerOpen": value = AppRouter.shared.consume("prayer")

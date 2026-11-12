@@ -49,7 +49,7 @@ function hlSky(today, now) {
 /* ---------- sky header ---------- */
 function hlSkyMarkup(data) {
   const s = data?.settings || {};
-  if (!s.confirmed) return `<section class="hl-sky day hl-sky-setup"><div class="hl-sky-body"><span class="hl-sky-kicker">مواقيت الصلاة</span><h2>حدّد موقعك</h2><p>لتظهر مواقيت صلاتك وحالة يومك هنا</p><button class="hl-pill" onclick="prayerHome()">${uiIcon('pin')}<span>تحديد الموقع</span></button></div></section>`;
+  if (!s.confirmed) return `<section class="hl-sky day hl-sky-setup"><div class="hl-sky-body"><span class="hl-sky-kicker">مواقيت الصلاة</span><h2>حدّد موقعك</h2><p>لتظهر مواقيت صلاتك وحالة يومك هنا</p><button class="hl-pill" onclick="hlLocate()">${uiIcon('pin')}<span>تحديد الموقع</span></button></div></section>`;
   const now = Date.now(), today = hlToday(data, now), phase = typeof prayerPhase === 'function' ? prayerPhase(data, now) : null;
   if (data.error || !today || !phase) return `<section class="hl-sky day"><div class="hl-sky-body"><span class="hl-sky-kicker">مواقيت الصلاة</span><h2>تعذر حساب المواقيت</h2><p>${esc(data.error || 'راجع الموقع والمنطقة الزمنية')}</p><button class="hl-pill" onclick="prayerHome()">${uiIcon('settings')}<span>مراجعة الإعدادات</span></button></div></section>`;
   const events = hlEvents(data), current = events.filter(e => e.time <= now).at(-1);
@@ -281,6 +281,8 @@ function homeLayout() {
   hlLift();
   hlStart()
 }
+// «تحديد الموقع» on Home asks for the location straight away, then shows prayer times.
+function hlLocate() { try { requestAutomaticLocationPermission() } catch (e) {} prayerHome() }
 function hlWidgets() { if (window.AndroidReader?.openWidgets) AndroidReader.openWidgets(); else showSmallNotice('أضف ويدجت مصحفي من الشاشة الرئيسية لجهازك') }
 
 function hlRefresh() {

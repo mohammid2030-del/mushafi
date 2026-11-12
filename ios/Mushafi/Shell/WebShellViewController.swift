@@ -266,6 +266,7 @@ final class WebShellViewController: UIViewController, WKNavigationDelegate, WKUI
 
     @objc private func appEnteredBackground() {
         backgroundedAt = Date()
+        AutomaticLocation.shared.stop()
     }
 
     /// After 10 minutes away the app greets the reader with the opening screen and starts on Home,
@@ -282,6 +283,7 @@ final class WebShellViewController: UIViewController, WKNavigationDelegate, WKUI
     }
 
     @objc private func appBecameActive() {
+        AutomaticLocation.shared.start()
         ReminderService.shared.enter()
         PrayerService.shared.refreshAuthorization { [weak self] in
             PrayerService.shared.schedule()
