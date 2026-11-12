@@ -237,3 +237,6 @@ body.hl-sky-on:is([data-hl-sky="night"],[data-hl-sky="dawn"],[data-hl-sky="dusk"
 
 /* tablets scale the app with zoom (--ui-zoom); viewport units inside it must be scaled back */
 .hl-sky{width:calc(100vw / var(--ui-zoom,1))!important;margin-left:calc(50% - 50vw / var(--ui-zoom,1))!important;margin-right:calc(50% - 50vw / var(--ui-zoom,1))!important;padding-left:max(20px,calc(50vw / var(--ui-zoom,1) - 430px))!important;padding-right:max(20px,calc(50vw / var(--ui-zoom,1) - 430px))!important}
+/* on wide screens (tablets, unfolded, landscape) the sun path keeps a calm size */
+.hl-arc{max-width:560px;margin-left:auto!important;margin-right:auto!important}
+@media (orientation:landscape) and (max-height:820px){.hl-arc{max-width:430px}}

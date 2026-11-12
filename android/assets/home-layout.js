@@ -335,3 +335,8 @@ window.onMushafiResumeHome = function () {
   try { home() } catch (e) {}
   try { window.scrollTo(0, 0) } catch (e) {}
 };
+// When the system insets arrive after Home is drawn, run the sky up behind the status bar again.
+if (typeof window.onMushafiWindowInsets === 'function') {
+  const hlPreviousInsets = window.onMushafiWindowInsets;
+  window.onMushafiWindowInsets = function (...args) { const r = hlPreviousInsets.apply(this, args); try { if (view === 'home') hlLift() } catch (e) {} return r };
+}
