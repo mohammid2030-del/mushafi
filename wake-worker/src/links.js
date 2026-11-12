@@ -66,3 +66,19 @@ document.getElementById('copy').onclick=function(){var b=this;(navigator.clipboa
 </script></body></html>`;
   return new Response(html, { headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store', 'content-security-policy': "default-src 'none'; img-src 'self'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; base-uri 'none'; form-action 'none'", ...sec } });
 }
+
+// Book covers for الكتب, made in CI from each PDF's first page and kept on the repo's `covers` branch.
+const COVERS = 'https://raw.githubusercontent.com/mohammid2030-del/mushafi/covers';
+export async function cover(path, ctx) {
+  let m = path.match(/^\/covers\/(ar|en|ur|bn|tr)\.json$/), upstream, type, ttl;
+  if (m) { upstream = `${COVERS}/${m[1]}/index.json`; type = 'application/json'; ttl = 3600 }
+  else if ((m = path.match(/^\/cover\/(ar|en|ur|bn|tr)\/(\d{1,12})\.webp$/))) { upstream = `${COVERS}/${m[1]}/${m[2]}.webp`; type = 'image/webp'; ttl = 30 * 86400 }
+  else return null;
+  const cache = caches.default, key = new Request('https://cover.cache' + path);
+  const hit = await cache.match(key); if (hit) return hit;
+  const r = await fetch(upstream, { cf: { cacheTtl: ttl, cacheEverything: true } });
+  if (!r.ok) return new Response(type === 'application/json' ? '[]' : 'not found', { status: r.status === 404 ? 404 : 502, headers: { 'content-type': type === 'application/json' ? 'application/json' : 'text/plain', 'access-control-allow-origin': '*', 'cache-control': 'public, max-age=600' } });
+  const res = new Response(r.body, { headers: { 'content-type': type, 'access-control-allow-origin': '*', 'cache-control': `public, max-age=${ttl}`, 'x-content-type-options': 'nosniff' } });
+  ctx?.waitUntil?.(cache.put(key, res.clone()));
+  return res
+}

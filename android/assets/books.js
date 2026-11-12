@@ -6,6 +6,9 @@ const BOOKS_BASE = 'https://api3.islamhouse.com/v3/paV29H2gm56kvLPy';
 const BOOKS_PAGE = 24;
 const BOOKS_HOSTS = /^https:\/\/([a-z0-9-]+\.)*islamhouse\.com\//i;
 // Top categories that hold books (IslamHouse category tree ids).
+// Covers made from each PDF's first page (tools/book_covers.py), served by the wake worker.
+const BOOKS_COVERS = 'https://go.mushafi.workers.dev';
+let booksCoverIds = { lang: '', ids: new Set() };
 const BOOKS_CATS = [86219, 132381, 192525, 199946, 276187, 794, 5301, 764, 276190, 398193];
 let booksState = null, booksOrigin = 'home', booksCurrent = null;
 const booksDetails = new Map(), booksPending = new Map();
@@ -57,11 +60,29 @@ function booksQueue(job) {
   })
 }
 
+/* ---------- covers ---------- */
+function booksCoverUrl(b) {
+  if (b.image) return b.image;
+  const lang = booksState?.lang || booksLang();
+  return booksCoverIds.lang === lang && booksCoverIds.ids.has(+b.id) ? `${BOOKS_COVERS}/cover/${lang}/${b.id}.webp` : ''
+}
+async function booksLoadCovers(lang) {
+  const key = 'booksCovers_' + lang;
+  try { const c = JSON.parse(localStorage.getItem(key) || 'null'); if (c && Array.isArray(c.ids)) { booksCoverIds = { lang, ids: new Set(c.ids) }; if (Date.now() - c.at < 6 * 3600000) return } } catch (e) {}
+  try {
+    const r = await fetch(`${BOOKS_COVERS}/covers/${lang}.json`); if (!r.ok) return;
+    const ids = await r.json(); if (!Array.isArray(ids)) return;
+    booksCoverIds = { lang, ids: new Set(ids.map(Number)) };
+    try { localStorage.setItem(key, JSON.stringify({ at: Date.now(), ids })) } catch (e) {}
+    if (view === 'books') booksPaint(); else if (view === 'book') bookPaint()
+  } catch (e) {}
+}
+
 /* ---------- lists ---------- */
 function booksFresh(lang) {
   booksState = { lang, cat: 'all', cats: [], lists: {}, query: '' };
   try { const c = JSON.parse(localStorage.getItem('booksCats_' + lang) || 'null'); if (Array.isArray(c)) booksState.cats = c } catch (e) {}
-  booksLoadCats()
+  booksLoadCats(); booksLoadCovers(lang)
 }
 async function booksLoadCats() {
   const s = booksState;
@@ -129,14 +150,15 @@ function booksPickCat(cat) {
 function booksPaintChips() {
   const box = document.getElementById('books-chips'); if (!box || !booksState) return;
   const s = booksState, saved = booksSavedBooks().length;
-  const chips = [{ id: 'all', title: booksT('الكل') }, ...(saved ? [{ id: 'saved', title: booksT('المحفوظة') + ' · ' + booksNum(saved), icon: 'download' }] : []), ...s.cats];
-  box.innerHTML = chips.map(c => { const on = String(s.cat) === String(c.id); return `<button type="button" role="tab" class="books-chip${on ? ' on' : ''}" aria-selected="${on}" onclick="booksPickCat('${c.id}')"${typeof c.id === 'number' ? ' translate="no"' : ''}>${c.icon ? uiIcon(c.icon) : ''}<span>${esc(c.title)}</span></button>` }).join('');
+  const chips = [{ id: 'all', title: booksT('الكل') }, ...(saved ? [{ id: 'saved', title: booksT('المحفوظة'), count: saved, icon: 'download' }] : []), ...s.cats];
+  box.innerHTML = chips.map(c => { const on = String(s.cat) === String(c.id); return `<button type="button" role="tab" class="books-chip${on ? ' on' : ''}" aria-selected="${on}" onclick="booksPickCat('${c.id}')"${typeof c.id === 'number' ? ' translate="no"' : ''}>${c.icon ? uiIcon(c.icon) : ''}<span>${esc(c.title)}</span>${c.count ? `<b class="books-count">${booksNum(c.count)}</b>` : ''}</button>` }).join('');
   const on = box.querySelector('.on'); if (on && box.scrollWidth > box.clientWidth) on.scrollIntoView?.({ inline: 'center', block: 'nearest' })
 }
 function booksNorm(s) { return String(s || '').normalize('NFKD').replace(/[ً-ٰٟـ]/g, '').replace(/[أإآ]/g, 'ا').replace(/ة/g, 'ه').replace(/ى/g, 'ي').toLowerCase() }
 function booksCover(b, big) {
   const plain = `<span class="bk-plain"><i></i><b dir="auto">${esc(b.title)}</b>${b.author ? `<small dir="auto">${esc(b.author)}</small>` : ''}<i></i></span>`;
-  return `<span class="bk-cover${big ? ' big' : ''}${b.image ? ' has-img' : ''}" translate="no">${plain}${b.image ? `<img src="${esc(b.image)}" alt="" loading="lazy" decoding="async" onload="this.parentNode.classList.add('loaded')" onerror="this.parentNode.classList.remove('has-img');this.remove()">` : ''}</span>`
+  const src = booksCoverUrl(b);
+  return `<span class="bk-cover${big ? ' big' : ''}${src ? ' has-img' : ''}" translate="no">${plain}${src ? `<img src="${esc(src)}" alt="" loading="lazy" decoding="async" onload="this.parentNode.classList.add('loaded')" onerror="this.parentNode.classList.remove('has-img');this.remove()">` : ''}</span>`
 }
 function booksCard(b, saved) {
   return `<button type="button" class="bk-card${b.pending ? ' pending' : ''}" data-id="${b.id}" onclick="bookOpen(${b.id})">${booksCover(b)}<strong dir="auto" translate="no">${esc(b.title)}</strong><small dir="auto" translate="no">${esc(b.author || '')}</small>${saved ? `<em class="bk-badge">${uiIcon('download')}</em>` : ''}</button>`

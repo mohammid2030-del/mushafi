@@ -158,10 +158,10 @@ async function cleanup(env) {
   if (old.length) await fetch(base + ':commit', { method: 'POST', headers: { authorization: 'Bearer ' + token, 'content-type': 'application/json' }, body: JSON.stringify({ writes: old }) });
 }
 
-import { CODE_PATH, appleAssociation, androidAssociation, icon, invitePage } from './links.js';
+import { CODE_PATH, appleAssociation, androidAssociation, icon, invitePage, cover } from './links.js';
 
 export default {
-  async fetch(request, env) {
+  async fetch(request, env, ctx) {
     const url = new URL(request.url);
     try {
       if (request.method === 'POST' && url.pathname === '/notify') return await notify(request, env);
@@ -170,6 +170,7 @@ export default {
         if (url.pathname === '/.well-known/apple-app-site-association' || url.pathname === '/apple-app-site-association') return appleAssociation();
         if (url.pathname === '/.well-known/assetlinks.json') return androidAssociation();
         if (url.pathname === '/icon.png') return icon();
+        if (url.pathname.startsWith('/cover')) { const c = await cover(url.pathname, ctx); if (c) return c }
         const m = url.pathname.toLowerCase().match(CODE_PATH);
         if (m) return invitePage(m[1], request.headers.get('user-agent') || '');
       }

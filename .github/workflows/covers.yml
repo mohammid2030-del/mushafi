@@ -1,0 +1,36 @@
+name: Book covers
+# Makes covers for الكتب from the first page of IslamHouse PDFs that have none,
+# and keeps them on the `covers` branch (served to the app through the wake worker).
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['tools/book_covers.py', '.github/workflows/covers.yml']
+  schedule:
+    - cron: '23 2 * * 1'
+permissions:
+  contents: write
+concurrency: { group: covers, cancel-in-progress: false }
+jobs:
+  covers:
+    runs-on: ubuntu-latest
+    timeout-minutes: 345
+    steps:
+      - uses: actions/checkout@v4
+        with: { path: main }
+      - name: Covers branch
+        run: |
+          git clone --branch covers --single-branch "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" covers || {
+            mkdir covers && cd covers && git init -q -b covers && git remote add origin "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git"; }
+      - name: Tools
+        run: sudo apt-get install -y -qq poppler-utils python3-pil > /dev/null
+      - name: Make covers (saved every 40 minutes)
+        working-directory: covers
+        run: |
+          git config user.name "Mushafi covers"; git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          save() { git add -A . && git commit -qm "covers $(date -u +%F' '%H:%M)" && git push -q origin HEAD:covers || true; }
+          for round in 1 2 3 4 5 6 7; do
+            COVER_BUDGET_MIN=40 python3 ../main/tools/book_covers.py . > ../round.log 2>&1; tail -12 ../round.log
+            save
+            grep -q 'time budget reached' ../round.log || break
+          done
