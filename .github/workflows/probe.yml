@@ -1,0 +1,13 @@
+name: Probe
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/probe.yml']
+jobs:
+  covers:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          curl -sS -D - "https://go.mushafi.workers.dev/covers/ar.json" -o m.json | grep -i -E "^HTTP|content-type|access-control"; python3 -c "import json;d=json.load(open('m.json'));print('ids',len(d),d[:3])"
+          id=$(python3 -c "import json;print(json.load(open('m.json'))[0])")
+          curl -sS -D - "https://go.mushafi.workers.dev/cover/ar/$id.webp" -o c.webp | grep -i -E "^HTTP|content-type"; ls -la c.webp
