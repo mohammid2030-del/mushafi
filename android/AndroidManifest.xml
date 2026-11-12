@@ -73,6 +73,13 @@
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="mushafi-app" android:host="wake" />
             </intent-filter>
+            <!-- Short invite link https://go.mushafi.workers.dev/<code> (verified App Link) -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https" android:host="go.mushafi.workers.dev" android:pathPattern="/.........." />
+            </intent-filter>
         </activity>
 
         <!-- In-app charity page, started only by MainActivity with a validated route id -->

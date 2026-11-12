@@ -114,16 +114,38 @@ final class WakeClient: NSObject, MessagingDelegate {
         }
     }
 
+    private var peersWatch: ListenerRegistration?
+    private var peersFor = ""
+
+    /// Watches my people list, so an accepted invite shows up at once (onWakePeers, live:true after the first).
     func peers() {
         guard let u = user else { emit("onWakePeers", ["error": "signin"]); return }
-        db.collection("wakePeers").document(u.uid).collection("list").getDocuments { [weak self] q, error in
-            if error != nil { self?.emit("onWakePeers", ["error": "network"]); return }
-            let list: [[String: Any]] = (q?.documents ?? []).map { d in
-                ["uid": d.documentID, "name": d.data()["name"] as? String ?? "", "role": d.data()["role"] as? String ?? "",
-                 "since": Int64(((d.data()["since"] as? Timestamp)?.dateValue().timeIntervalSince1970 ?? 0) * 1000)]
+        let ref = db.collection("wakePeers").document(u.uid).collection("list")
+        if peersWatch != nil, peersFor == u.uid {
+            ref.getDocuments { [weak self] q, error in
+                if error != nil { self?.emit("onWakePeers", ["error": "network"]) } else if let q { self?.sendPeers(q, live: false) }
             }
-            self?.emit("onWakePeers", ["list": list])
+            return
         }
+        peersWatch?.remove()
+        peersFor = u.uid
+        var first = true
+        peersWatch = ref.addSnapshotListener { [weak self] q, error in
+            guard let self else { return }
+            guard let q, error == nil else {
+                self.peersWatch?.remove(); self.peersWatch = nil
+                self.emit("onWakePeers", ["error": "network"]); return
+            }
+            self.sendPeers(q, live: !first); first = false
+        }
+    }
+
+    private func sendPeers(_ q: QuerySnapshot, live: Bool) {
+        let list: [[String: Any]] = q.documents.map { d in
+            ["uid": d.documentID, "name": d.data()["name"] as? String ?? "", "role": d.data()["role"] as? String ?? "",
+             "since": Int64(((d.data()["since"] as? Timestamp)?.dateValue().timeIntervalSince1970 ?? 0) * 1000)]
+        }
+        emit("onWakePeers", ["list": list, "live": live])
     }
 
     func removePeer(_ peer: String?) {

@@ -12,7 +12,9 @@ final class WebShellViewController: UIViewController, WKNavigationDelegate, WKUI
     private let bridge = NativeBridge()
     private let assets = AssetSchemeHandler(root: AssetSchemeHandler.bundledRoot())
     private var webView: WKWebView!
-    private let launchCover = UIView()
+    private var launchCover: LaunchCurtain!
+    private var backgroundedAt: Date?
+    private var lastRouteAt = Date.distantPast
     private var darkTheme: Bool
     private var keyboardVisible = false
     private var launchTimeout: DispatchWorkItem?
@@ -82,19 +84,24 @@ final class WebShellViewController: UIViewController, WKNavigationDelegate, WKUI
 
         installBackSwipe()
 
-        launchCover.backgroundColor = currentBackground
+        launchCover = LaunchCurtain(dark: darkTheme, background: currentBackground)
         launchCover.frame = view.bounds
         launchCover.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        launchCover.onRetry = { [weak self] in self?.webView.reload() }
         view.addSubview(launchCover)
+        launchCover.show()
 
         let center = NotificationCenter.default
         center.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
         center.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
 
         center.addObserver(self, selector: #selector(appBecameActive), name: UIApplication.didBecomeActiveNotification, object: nil)
+        center.addObserver(self, selector: #selector(appEnteredBackground), name: UIApplication.didEnterBackgroundNotification, object: nil)
+        center.addObserver(self, selector: #selector(appWillEnterForeground), name: UIApplication.willEnterForegroundNotification, object: nil)
         center.addObserver(self, selector: #selector(publishWidgetState), name: UIApplication.willResignActiveNotification, object: nil)
         AppRouter.shared.onRoute = { [weak self] route in self?.route(route) }
         AppRouter.shared.onPageCallback = { [weak self] name in
+            self?.lastRouteAt = Date()
             guard let self, self.pageIsReady else { return }
             self.callbackRaw(name, "")
         }
@@ -172,17 +179,14 @@ final class WebShellViewController: UIViewController, WKNavigationDelegate, WKUI
                 break
             }
         }
-        guard launchCover.superview != nil else { return }
-        UIView.animate(withDuration: 0.2, animations: { self.launchCover.alpha = 0 }) { _ in
-            self.launchCover.removeFromSuperview()
-        }
+        launchCover.markReady()
     }
 
     func applyTheme(dark: Bool) {
         darkTheme = dark
         UserDefaults.standard.set(dark, forKey: Self.themeKey)
         view.backgroundColor = currentBackground
-        if launchCover.superview != nil { launchCover.backgroundColor = currentBackground }
+        launchCover?.setTheme(dark: dark, background: currentBackground)
         setNeedsStatusBarAppearanceUpdate()
     }
 
@@ -221,6 +225,7 @@ final class WebShellViewController: UIViewController, WKNavigationDelegate, WKUI
     private var pageIsReady = false
 
     private func route(_ route: String) {
+        lastRouteAt = Date()
         guard pageIsReady else { return }   // the page consumes pending routes itself at start-up
         switch route {
         case "prayer": callbackRaw("openPrayerFromNotification", "")
@@ -256,6 +261,23 @@ final class WebShellViewController: UIViewController, WKNavigationDelegate, WKUI
             if WidgetStore.save(state) {
                 WidgetCenter.shared.reloadTimelines(ofKind: WidgetStore.readingKind)
             }
+        }
+    }
+
+    @objc private func appEnteredBackground() {
+        backgroundedAt = Date()
+    }
+
+    /// After 10 minutes away the app greets the reader with the opening screen and starts on Home,
+    /// like Android (AppForegroundPolicy). A notification or widget link still wins.
+    @objc private func appWillEnterForeground() {
+        guard let away = backgroundedAt else { return }
+        backgroundedAt = nil
+        guard Date().timeIntervalSince(away) > 600, pageIsReady, !WakeCallViewController.isShowing else { return }
+        launchCover.show(ready: true)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) { [weak self] in
+            guard let self, Date().timeIntervalSince(self.lastRouteAt) > 2 else { return }
+            self.callbackRaw("onMushafiResumeHome", "")
         }
     }
 

@@ -1,4 +1,4 @@
-name = "mushafi-wake"
+name = "go"
 main = "src/index.js"
 compatibility_date = "2024-11-01"
 workers_dev = true

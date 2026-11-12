@@ -38,8 +38,11 @@ jobs:
           node check-cloudflare.mjs
           npx --yes wrangler@4 deploy | tee "$RUNNER_TEMP/deploy.log"
           printf '%s' "$SA_JSON" | npx --yes wrangler@4 secret put FIREBASE_SERVICE_ACCOUNT
-          URL=$(grep -oE 'https://mushafi-wake\.[a-z0-9-]+\.workers\.dev' "$RUNNER_TEMP/deploy.log" | head -1)
+          URL=$(grep -oE 'https://go\.[a-z0-9-]+\.workers\.dev' "$RUNNER_TEMP/deploy.log" | head -1)
           if [ -z "$URL" ]; then echo "::error::Could not read the worker URL (is a workers.dev subdomain set in Cloudflare?)"; exit 1; fi
           echo "Worker: $URL"
           curl -fsS "$URL/health"
           node publish-endpoint.mjs "$URL"
+          curl -fsS "$URL/.well-known/apple-app-site-association" > /dev/null
+          # The relay used to be called mushafi-wake; remove that old copy once (fine if already gone).
+          npx --yes wrangler@4 delete --name mushafi-wake --force 2>/dev/null || true

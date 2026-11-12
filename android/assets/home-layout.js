@@ -286,3 +286,13 @@ const hlPreviousPrayerChange = window.onPrayerNativeChanged;
 window.onPrayerNativeChanged = function (...args) { const r = typeof hlPreviousPrayerChange === 'function' ? hlPreviousPrayerChange.apply(this, args) : undefined; const sky = app.querySelector('.hl-sky-slot'); if (sky) { sky.dataset.sig = ''; hlRefresh() } return r };
 document.addEventListener('visibilitychange', () => { const sky = app.querySelector('.hl-sky-slot'); if (sky && !document.hidden) { sky.dataset.sig = ''; hlRefresh() } });
 if (view === 'home') homeLayout();
+
+/* After a long time in the background the app reopens on Home (native shells call this). */
+window.onMushafiResumeHome = function () {
+  if (document.documentElement.classList.contains('welcome-pending')) return;
+  try { if (document.querySelector('.feature-sheet')) closeFeatureSheet() } catch (e) {}
+  try { if (typeof closeHomeRecitation === 'function' && document.querySelector('.home-recitation-overlay')) closeHomeRecitation(false) } catch (e) {}
+  document.querySelectorAll('.sheet-overlay,.feature-sheet,.verse-toolbar').forEach(n => n.remove());
+  try { home() } catch (e) {}
+  try { window.scrollTo(0, 0) } catch (e) {}
+};

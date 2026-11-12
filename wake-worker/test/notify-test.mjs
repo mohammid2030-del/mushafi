@@ -36,3 +36,23 @@ docs['wakeProfiles/dan'] = { token: 'tok-dan', platform: 'ios', language: 'en' }
 docs['wakeCalls/call0000003'] = { from: 'alice', to: 'dan', fromName: 'Alice', state: 'ringing', createdAt: new Date().toISOString() };
 r = await call(idToken('alice'), 'call0000003'); assert(pushes.at(-1).apns.payload.aps.sound === 'wake-ring.caf' && pushes.at(-1).apns.payload.aps.alert.body.includes('Alice'), 'iOS ring alert');
 console.log('all good');
+
+// invite links
+{
+  const get = (path, ua = '') => worker.fetch(new Request('https://go.example' + path, { headers: { 'user-agent': ua } }), env);
+  let r = await get('/.well-known/apple-app-site-association');
+  const aasa = await r.json();
+  if (r.headers.get('content-type') !== 'application/json' || aasa.applinks.details[0].appIDs[0] !== 'ZAU49H7TB9.com.mohammedasif.mushafi') throw new Error('aasa');
+  r = await get('/.well-known/assetlinks.json');
+  if ((await r.json())[0].target.package_name !== 'com.mushafi.app') throw new Error('assetlinks');
+  r = await get('/k3m9xq2p7a', 'Mozilla/5.0 (Linux; Android 14)');
+  const page = await r.text();
+  if (!page.includes('intent://wake/k3m9xq2p7a') || !page.includes('k3m9xq2p7a')) throw new Error('invite page');
+  r = await get('/K3M9XQ2P7A', 'iPhone');
+  if (!(await r.text()).includes('mushafi-app://wake/k3m9xq2p7a')) throw new Error('invite page ios');
+  r = await get('/icon.png');
+  if (r.headers.get('content-type') !== 'image/png') throw new Error('icon');
+  r = await get('/abc');
+  if (r.status !== 404) throw new Error('404');
+  console.log('ok invite links');
+}

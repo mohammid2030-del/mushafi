@@ -158,12 +158,21 @@ async function cleanup(env) {
   if (old.length) await fetch(base + ':commit', { method: 'POST', headers: { authorization: 'Bearer ' + token, 'content-type': 'application/json' }, body: JSON.stringify({ writes: old }) });
 }
 
+import { CODE_PATH, appleAssociation, androidAssociation, icon, invitePage } from './links.js';
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
     try {
       if (request.method === 'POST' && url.pathname === '/notify') return await notify(request, env);
       if (url.pathname === '/' || url.pathname === '/health') return json({ ok: true, service: 'mushafi-wake' });
+      if (request.method === 'GET' || request.method === 'HEAD') {
+        if (url.pathname === '/.well-known/apple-app-site-association' || url.pathname === '/apple-app-site-association') return appleAssociation();
+        if (url.pathname === '/.well-known/assetlinks.json') return androidAssociation();
+        if (url.pathname === '/icon.png') return icon();
+        const m = url.pathname.toLowerCase().match(CODE_PATH);
+        if (m) return invitePage(m[1], request.headers.get('user-agent') || '');
+      }
       return json({ error: 'not found' }, 404);
     } catch (e) { return json({ error: 'server' }, 500) }
   },

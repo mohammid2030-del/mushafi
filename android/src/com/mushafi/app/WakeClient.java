@@ -99,15 +99,30 @@ final class WakeClient {
   }).addOnFailureListener(e -> fail("onWakeAccept", "network", e));
  }
 
+ private ListenerRegistration peersWatch; private String peersFor = "";
+
+ /** Watches my people list, so an accepted invite shows up at once (onWakePeers, live:true after the first). */
  void peers() {
   final FirebaseUser u = user(); if (u == null) { fail("onWakePeers", "signin", null); return; }
-  db().collection("wakePeers").document(u.getUid()).collection("list").get().addOnSuccessListener(q -> {
-   JSONArray list = new JSONArray();
-   for (DocumentSnapshot d : q.getDocuments()) {
-    try { Timestamp since = d.getTimestamp("since"); list.put(new JSONObject().put("uid", d.getId()).put("name", d.getString("name")).put("role", d.getString("role")).put("since", since == null ? 0 : since.toDate().getTime())); } catch (JSONException ignored) {}
-   }
-   try { reply("onWakePeers", new JSONObject().put("list", list)); } catch (JSONException ignored) {}
-  }).addOnFailureListener(e -> fail("onWakePeers", "network", e));
+  if (peersWatch != null && peersFor.equals(u.getUid())) {
+   db().collection("wakePeers").document(u.getUid()).collection("list").get().addOnSuccessListener(q -> sendPeers(q, false)).addOnFailureListener(e -> fail("onWakePeers", "network", e));
+   return;
+  }
+  if (peersWatch != null) peersWatch.remove();
+  peersFor = u.getUid();
+  final boolean[] first = {true};
+  peersWatch = db().collection("wakePeers").document(u.getUid()).collection("list").addSnapshotListener((q, e) -> {
+   if (e != null || q == null) { if (peersWatch != null) { peersWatch.remove(); peersWatch = null; } fail("onWakePeers", "network", e); return; }
+   sendPeers(q, !first[0]); first[0] = false;
+  });
+ }
+
+ private void sendPeers(QuerySnapshot q, boolean live) {
+  JSONArray list = new JSONArray();
+  for (DocumentSnapshot d : q.getDocuments()) {
+   try { Timestamp since = d.getTimestamp("since"); list.put(new JSONObject().put("uid", d.getId()).put("name", d.getString("name")).put("role", d.getString("role")).put("since", since == null ? 0 : since.toDate().getTime())); } catch (JSONException ignored) {}
+  }
+  try { reply("onWakePeers", new JSONObject().put("list", list).put("live", live)); } catch (JSONException ignored) {}
  }
 
  void removePeer(String peer) {

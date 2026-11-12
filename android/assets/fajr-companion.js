@@ -195,7 +195,8 @@ function fajrListCard(l) {
 }
 
 /* ---------- people: invites and the Mushafi users on each side ---------- */
-const WAKE_SITE = 'https://mohammid2030-del.github.io/mushafi-support/wake.html';
+// Short invite link; opens Mushafi directly (Universal Links / App Links), served by the wake worker.
+const WAKE_SITE = 'https://go.mushafi.workers.dev/';
 let fajrPeers = null, fajrPeersBusy = false;
 function fajrPeersOf(role) { return (fajrPeers || []).filter(p => p.role === role) }
 function fajrLoadPeers() {
@@ -207,11 +208,14 @@ window.onWakePeers = function (r) {
   fajrPeersBusy = false;
   try { r = typeof r === 'string' ? JSON.parse(r) : r } catch (e) { return }
   if (r?.error) { if (!fajrPeers) fajrPeers = []; fajrRepaintPeople(); return }
+  const before = fajrPeers ? new Set(fajrPeers.map(p => p.uid)) : null;
   fajrPeers = (r.list || []).filter(p => /^[A-Za-z0-9]{6,128}$/.test(p.uid)).map(p => ({ uid: p.uid, name: String(p.name || '').slice(0, 60) || 'مستخدم مصحفي', role: p.role, since: p.since || 0 }));
   // keep names in lists fresh, and drop people who are no longer linked
   const c = fajrLoad(), allowed = new Map(fajrPeersOf('canWake').map(p => [p.uid, p.name])); let changed = false;
   for (const l of c.lists) { const before = l.members.length; l.members = l.members.filter(m => allowed.has(m.id)).map(m => ({ id: m.id, name: allowed.get(m.id) })); if (l.members.length !== before) changed = true; if (!l.members.length && l.enabled) { l.enabled = false; changed = true } }
   if (changed) fajrStore(c);
+  // live update: someone just accepted my invite
+  if (before && r.live) { const joined = fajrPeersOf('canWake').filter(p => !before.has(p.uid)); if (joined.length) showSmallNotice(fajrT('قبل {0} دعوتك، وتقدر الحين تصحّيه للفجر', joined[0].name)) }
   fajrRepaintPeople()
 };
 function fajrRepaintPeople() { if (view === 'fajr-people') fajrPeopleHome(); else if (view === 'fajr-edit' && fajrDraft) fajrRerender(); else if (view === 'fajr') fajrHome() }
@@ -223,7 +227,7 @@ function fajrInvite() {
 window.onWakeInvite = function (r) {
   try { r = typeof r === 'string' ? JSON.parse(r) : r } catch (e) { return }
   if (!r?.code) { showSmallNotice(r?.error === 'signin' ? 'سجّل دخولك أولًا' : 'تعذّر إنشاء الدعوة، تحقق من الإنترنت'); return }
-  const link = WAKE_SITE + '?c=' + r.code;
+  const link = WAKE_SITE + r.code;
   const text = fajrT('{0} يطلب أن يصحّيك لصلاة الفجر من تطبيق مصحفي.', r.name || '') + '\n' + fajrT('اقبل الدعوة من هنا:') + '\n' + link + '\n' + fajrT('أو أدخل هذا الرمز في مصحفي ← صحبة الفجر: {0}', r.code);
   if (window.AndroidReader?.shareText) AndroidReader.shareText(text); else { try { navigator.clipboard?.writeText(text) } catch (e) {} showSmallNotice('نُسخ رابط الدعوة') }
 };
