@@ -151,3 +151,10 @@ body.hl-sky-on:is([data-hl-sky="night"],[data-hl-sky="dawn"],[data-hl-sky="dusk"
 .hl-place-weather span{font-variant-numeric:tabular-nums}
 .hl-sky-body{padding-top:10px}
 .hl-place button{min-height:30px!important;min-width:0!important}
+/* place + weather as plain text on the sky, no capsule */
+.hl-place{background:none!important;border:0!important;padding:0!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;gap:2px}
+.hl-place>i{height:13px;opacity:.7}
+.hl-place button{padding:4px 10px!important;font-size:13.5px!important;font-weight:700!important}
+.hl-place .ui-icon,.hl-place .weather-symbol{opacity:1!important}
+.hl-sky:is(.night,.dawn,.dusk) .hl-place button{text-shadow:0 1px 8px rgba(0,0,0,.25)}
+.hl-sky:not(.night):not(.dawn):not(.dusk) .hl-place button{text-shadow:0 1px 6px rgba(255,255,255,.35)}
