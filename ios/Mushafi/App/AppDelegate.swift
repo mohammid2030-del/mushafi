@@ -66,6 +66,16 @@ final class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationC
 
     func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification,
                                 withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+        let info = notification.request.content.userInfo
+        switch info["type"] as? String {
+        case "wake":
+            // App is open: go straight to the ring screen instead of a banner.
+            WakeCallViewController.show(callId: info["callId"] as? String, name: info["fromName"] as? String)
+            completionHandler([.list]); return
+        case "wakeEnd":
+            WakeCallViewController.close(callId: info["callId"] as? String)
+        default: break
+        }
         completionHandler([.banner, .list, .sound])
     }
 
@@ -77,8 +87,11 @@ final class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationC
             if type == "wake" {
                 switch response.actionIdentifier {
                 case WakeClient.declineAction: WakeClient.shared.respond(callId, "declined") { completionHandler() }; return
+                case WakeClient.answerAction: WakeClient.shared.respond(callId, "answered") { completionHandler() }; return
                 case UNNotificationDismissActionIdentifier: break
-                default: WakeClient.shared.respond(callId, "answered") { completionHandler() }; return
+                default:
+                    // Tapping the banner opens the full ring screen with «ردّ» / «رفض».
+                    DispatchQueue.main.async { WakeCallViewController.show(callId: callId, name: info["fromName"] as? String) }
                 }
             } else if response.actionIdentifier == UNNotificationDefaultActionIdentifier {
                 DispatchQueue.main.async { WakeClient.shared.pendingOpen = true; AppRouter.shared.notifyPage("onWakeLink") }

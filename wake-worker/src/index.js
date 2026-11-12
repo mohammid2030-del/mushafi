@@ -4,11 +4,11 @@
 // Secret: FIREBASE_SERVICE_ACCOUNT (the service-account JSON from Firebase, set from GitHub in CI).
 
 const TEXT = {
-  ar: { title: 'صحبة الفجر', ring: '{0} يصحّيك للفجر', missed: 'مكالمة صحبة فائتة من {0}' },
-  en: { title: 'Fajr Companion', ring: '{0} is waking you for Fajr', missed: 'Missed wake-up call from {0}' },
-  ur: { title: 'فجر کی رفاقت', ring: '{0} آپ کو فجر کے لیے جگا رہے ہیں', missed: '{0} کی رفاقت کال چھوٹ گئی' },
-  bn: { title: 'ফজরের সঙ্গী', ring: '{0} আপনাকে ফজরে জাগাচ্ছেন', missed: '{0}-এর মিসড কল' },
-  tr: { title: 'Sabah Arkadaşı', ring: '{0} seni sabah namazına kaldırıyor', missed: '{0} cevapsız uyandırma araması' },
+  ar: { hint: 'اضغط للرد أو الرفض', title: 'صحبة الفجر', ring: '{0} يصحّيك للفجر', missed: 'مكالمة صحبة فائتة من {0}' },
+  en: { hint: 'Tap to answer or decline', title: 'Fajr Companion', ring: '{0} is waking you for Fajr', missed: 'Missed wake-up call from {0}' },
+  ur: { hint: 'جواب یا انکار کے لیے ٹیپ کریں', title: 'فجر کی رفاقت', ring: '{0} آپ کو فجر کے لیے جگا رہے ہیں', missed: '{0} کی رفاقت کال چھوٹ گئی' },
+  bn: { hint: 'উত্তর বা প্রত্যাখ্যান করতে ট্যাপ করুন', title: 'ফজরের সঙ্গী', ring: '{0} আপনাকে ফজরে জাগাচ্ছেন', missed: '{0}-এর মিসড কল' },
+  tr: { hint: 'Yanıtlamak veya reddetmek için dokun', title: 'Sabah Arkadaşı', ring: '{0} seni sabah namazına kaldırıyor', missed: '{0} cevapsız uyandırma araması' },
 };
 const t = (lang, key, name) => (TEXT[lang] || TEXT.ar)[key].replace('{0}', name);
 const END_STATES = ['missed', 'cancelled', 'answered', 'declined'];
@@ -106,7 +106,7 @@ function ringMessage(p, callId, call) {
     data,
     apns: {
       headers: { 'apns-priority': '10', 'apns-push-type': 'alert', 'apns-collapse-id': callId, 'apns-expiration': String(Math.floor(Date.now() / 1000) + 60) },
-      payload: { aps: { alert: { title: t(lang, 'title', name), body: t(lang, 'ring', name) }, sound: 'wake-ring.caf', category: 'WAKE_CALL', 'interruption-level': 'time-sensitive', 'thread-id': 'wake' } },
+      payload: { aps: { alert: { title: t(lang, 'title', name), subtitle: t(lang, 'hint', name), body: t(lang, 'ring', name) }, sound: 'wake-ring.caf', category: 'WAKE_CALL', 'interruption-level': 'time-sensitive', 'thread-id': 'wake' } },
     },
   };
   return { data, android: { priority: 'high', ttl: '60s' } };
