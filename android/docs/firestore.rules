@@ -2,6 +2,7 @@ rules_version = '2';
 service cloud.firestore {
  match /databases/{database}/documents {
   function owner(uid) { return request.auth != null && request.auth.uid == uid; }
+  function signedIn() { return request.auth != null; }
   function validState() {
    let d = request.resource.data;
    return d.keys().hasAll(['payload','revision','updatedAt','device'])
@@ -17,6 +18,86 @@ service cloud.firestore {
    allow update: if owner(uid) && validState() && request.resource.data.revision == resource.data.revision + 1;
    allow delete: if owner(uid);
   }
+
+  // ---- صحبة الفجر: in-app wake rings between consenting Mushafi users ----
+  function shortText(v, max) { return v is string && v.size() >= 1 && v.size() <= max; }
+
+  // Push tokens; only the Cloud Function reads them.
+  match /wakeProfiles/{uid} {
+   allow read: if false;
+   allow create, update: if owner(uid)
+    && request.resource.data.keys().hasOnly(['name','token','platform','language','updatedAt'])
+    && shortText(request.resource.data.name, 60)
+    && (request.resource.data.token == null || (request.resource.data.token is string && request.resource.data.token.size() <= 4096))
+    && request.resource.data.platform in ['android','ios']
+    && request.resource.data.language is string && request.resource.data.language.size() <= 5
+    && request.resource.data.updatedAt == request.time;
+   allow delete: if owner(uid);
+  }
+
+  // Invite: "allow me to wake you for Fajr"; valid for 7 days.
+  match /wakeInvites/{code} {
+   allow get: if signedIn() && code.size() == 10;
+   allow list: if false;
+   allow create: if signedIn() && code.size() == 10
+    && request.resource.data.keys().hasOnly(['from','fromName','createdAt','expiresAt'])
+    && request.resource.data.from == request.auth.uid
+    && shortText(request.resource.data.fromName, 60)
+    && request.resource.data.createdAt == request.time
+    && request.resource.data.expiresAt is timestamp
+    && request.resource.data.expiresAt <= request.time + duration.value(8, 'd');
+   allow delete: if signedIn() && resource.data.from == request.auth.uid;
+  }
+
+  // Each side keeps its own view of the pair.
+  //  wakePeers/{me}/list/{other}.role == 'wakesMe'  -> other may ring me (written by me: my consent)
+  //  wakePeers/{me}/list/{other}.role == 'canWake'  -> I may ring other (written by other when accepting)
+  match /wakePeers/{uid}/list/{peer} {
+   allow read: if owner(uid);
+   allow create: if signedIn() && peer != uid
+    && request.resource.data.keys().hasOnly(['role','name','invite','since'])
+    && shortText(request.resource.data.name, 60)
+    && request.resource.data.since == request.time
+    && request.resource.data.invite is string && request.resource.data.invite.size() == 10
+    && exists(/databases/$(database)/documents/wakeInvites/$(request.resource.data.invite))
+    && get(/databases/$(database)/documents/wakeInvites/$(request.resource.data.invite)).data.expiresAt > request.time
+    && (
+      // accepter records that the inviter may wake them
+      (owner(uid) && request.resource.data.role == 'wakesMe'
+        && get(/databases/$(database)/documents/wakeInvites/$(request.resource.data.invite)).data.from == peer)
+      ||
+      // accepter adds themself to the inviter's list
+      (request.auth.uid == peer && request.resource.data.role == 'canWake'
+        && get(/databases/$(database)/documents/wakeInvites/$(request.resource.data.invite)).data.from == uid)
+    );
+   allow update: if false;
+   allow delete: if signedIn() && (request.auth.uid == uid || request.auth.uid == peer);
+  }
+
+  // One ring. Caller creates; callee answers/declines; caller cancels; either side marks missed.
+  match /wakeCalls/{call} {
+   allow get: if signedIn() && (resource.data.from == request.auth.uid || resource.data.to == request.auth.uid);
+   allow list: if signedIn() && (resource.data.from == request.auth.uid || resource.data.to == request.auth.uid);
+   allow create: if signedIn()
+    && request.resource.data.keys().hasOnly(['from','to','fromName','state','createdAt','updatedAt'])
+    && request.resource.data.from == request.auth.uid
+    && request.resource.data.to is string && request.resource.data.to != request.auth.uid
+    && shortText(request.resource.data.fromName, 60)
+    && request.resource.data.state == 'ringing'
+    && request.resource.data.createdAt == request.time
+    && request.resource.data.updatedAt == request.time
+    && exists(/databases/$(database)/documents/wakePeers/$(request.resource.data.to)/list/$(request.auth.uid))
+    && get(/databases/$(database)/documents/wakePeers/$(request.resource.data.to)/list/$(request.auth.uid)).data.role == 'wakesMe';
+   allow update: if signedIn() && resource.data.state == 'ringing'
+    && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['state','updatedAt'])
+    && request.resource.data.updatedAt == request.time
+    && (
+      (request.auth.uid == resource.data.to && request.resource.data.state in ['answered','declined','missed'])
+      || (request.auth.uid == resource.data.from && request.resource.data.state in ['cancelled','missed'])
+    );
+   allow delete: if false;
+  }
+
   match /{document=**} { allow read, write: if false; }
  }
 }
