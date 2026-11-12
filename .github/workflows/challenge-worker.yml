@@ -1,0 +1,40 @@
+name: Challenge worker
+# «تحدي مصحفي» API: tests on every change, deploys to Cloudflare Workers (D1) from main.
+on:
+  push:
+    branches: [main]
+    paths: ['android/services/challenge/**', '.github/workflows/challenge-worker.yml']
+  workflow_dispatch:
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: android/services/challenge
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: node test.mjs
+      - run: node cf-build.mjs
+      - name: Deploy to Cloudflare
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          set -o pipefail
+          node ../../../wake-worker/check-cloudflare.mjs
+          d1() { curl -fsS -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/d1/database$1" "${@:2}"; }
+          LIST=$(d1 "?name=mushafi-challenge") || { echo "::error::The Cloudflare token cannot use D1. Edit the token and add: Account → D1 → Edit"; exit 1; }
+          ID=$(printf '%s' "$LIST" | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{const r=(JSON.parse(s).result||[]).find(x=>x.name==='mushafi-challenge');process.stdout.write(r?r.uuid:'')})")
+          if [ -z "$ID" ]; then
+            ID=$(d1 "" -X POST -H 'content-type: application/json' --data '{"name":"mushafi-challenge"}' | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>process.stdout.write(JSON.parse(s).result.uuid))")
+            echo "Created D1 database"
+          fi
+          sed -i "s/__D1_ID__/$ID/" wrangler.toml
+          npx --yes wrangler@4 d1 migrations apply mushafi-challenge --remote
+          npx --yes wrangler@4 deploy | tee "$RUNNER_TEMP/deploy.log"
+          URL=$(grep -oE 'https://challenge\.[a-z0-9-]+\.workers\.dev' "$RUNNER_TEMP/deploy.log" | head -1)
+          echo "Worker: $URL"
+          for i in 1 2 3 4 5 6; do H=$(curl -fsS "$URL/health" || true); echo "$H"; case "$H" in *'"ok":true'*) exit 0;; esac; sleep 5; done
+          echo "::error::health check failed"; exit 1

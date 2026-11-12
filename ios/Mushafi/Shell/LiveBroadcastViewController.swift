@@ -6,7 +6,7 @@ import WebKit
 /// Navigation is limited to that page and the official embed.
 final class LiveBroadcastViewController: UIViewController, WKNavigationDelegate, WKUIDelegate {
     static let cities: Set<String> = ["makkah", "madinah"]
-    private static let host = "mushafi-support.mohammedasif241.chatgpt.site"
+    private static let host = "go.mushafi.workers.dev"
 
     private let city: String
     private let dark: Bool

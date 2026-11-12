@@ -5,7 +5,7 @@ import Foundation
 /// never into the page. Replies arrive at window.onChallengeResponse({requestId,status,data}).
 final class ChallengeClient {
     static let shared = ChallengeClient()
-    static let base = "https://mushafi-challenge.mohammedasif241.chatgpt.site"
+    static let base = "https://challenge.mushafi.workers.dev"
 
     var onReply: (([String: Any]) -> Void)?
     private let session: URLSession = {

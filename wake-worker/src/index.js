@@ -159,6 +159,7 @@ async function cleanup(env) {
 }
 
 import { CODE_PATH, appleAssociation, androidAssociation, icon, invitePage, cover } from './links.js';
+import { LIVE_PATH, livePage } from './live.js';
 
 export default {
   async fetch(request, env, ctx) {
@@ -171,6 +172,8 @@ export default {
         if (url.pathname === '/.well-known/assetlinks.json') return androidAssociation();
         if (url.pathname === '/icon.png') return icon();
         if (url.pathname.startsWith('/cover')) { const c = await cover(url.pathname, ctx); if (c) return c }
+        const live = url.pathname.match(LIVE_PATH);
+        if (live) return livePage(live[1], url.searchParams.get('theme'));
         const m = url.pathname.toLowerCase().match(CODE_PATH);
         if (m) return invitePage(m[1], request.headers.get('user-agent') || '');
       }

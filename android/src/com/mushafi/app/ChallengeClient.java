@@ -11,7 +11,7 @@ import java.util.concurrent.*;
 import org.json.JSONObject;
 /** Firebase credentials go directly to our fixed API; never into WebView JavaScript. */
 final class ChallengeClient {
- static final String BASE="https://mushafi-challenge.mohammedasif241.chatgpt.site";
+ static final String BASE="https://challenge.mushafi.workers.dev";
  private final Activity activity;private final WebView web;
  private final ThreadPoolExecutor executor=new ThreadPoolExecutor(1,2,20,TimeUnit.SECONDS,new ArrayBlockingQueue<>(8));
  private volatile boolean closed;

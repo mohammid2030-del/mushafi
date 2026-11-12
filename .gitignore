@@ -17,3 +17,4 @@ android/signing/upload.properties
 
 # Shared test-only signing key for CI debug builds (never used for store releases)
 !android/signing/test-debug.keystore
+android/services/challenge/cf/

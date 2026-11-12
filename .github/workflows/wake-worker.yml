@@ -19,7 +19,7 @@ jobs:
         with: { node-version: 20 }
       - run: node wake-worker/test/notify-test.mjs
   deploy:
-    if: github.event_name == 'workflow_dispatch' && inputs.deploy
+    if: github.event_name == 'push' || inputs.deploy
     needs: test
     runs-on: ubuntu-latest
     steps:

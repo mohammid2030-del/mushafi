@@ -1,0 +1,12 @@
+# «تحدي مصحفي» API on Cloudflare Workers → https://challenge.mushafi.workers.dev
+# Deployed by .github/workflows/challenge-worker.yml (database_id is filled in by CI).
+name = "challenge"
+main = "cf/index.js"
+compatibility_date = "2025-01-01"
+workers_dev = true
+
+[[d1_databases]]
+binding = "DB"
+database_name = "mushafi-challenge"
+database_id = "__D1_ID__"
+migrations_dir = "drizzle"
