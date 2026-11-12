@@ -1,137 +1,201 @@
 'use strict';
 /* الكتب — Islamic books from IslamHouse.com (دار الإسلام), in the app's language.
-   The list comes from the IslamHouse API; a book opens in the native PDF reader, which keeps
-   it on the device for reading without internet (AndroidReader.openBook / booksSaved / deleteBook). */
-const BOOKS_API = 'https://api3.islamhouse.com/v3/paV29H2gm56kvLPy/main/books';
-const BOOKS_PAGE = 20;
+   A shelf of covers by category; a book opens in the native PDF reader, which keeps it on the
+   device for reading without internet (AndroidReader.openBook / booksSaved / deleteBook). */
+const BOOKS_BASE = 'https://api3.islamhouse.com/v3/paV29H2gm56kvLPy';
+const BOOKS_PAGE = 24;
 const BOOKS_HOSTS = /^https:\/\/([a-z0-9-]+\.)*islamhouse\.com\//i;
+// Top categories that hold books (IslamHouse category tree ids).
+const BOOKS_CATS = [86219, 132381, 192525, 199946, 276187, 794, 5301, 764, 276190, 398193];
 let booksState = null, booksOrigin = 'home', booksCurrent = null;
+const booksDetails = new Map(), booksPending = new Map();
 
 function booksLang() { const l = typeof uiLocale === 'function' ? uiLocale() : 'ar'; return ['ar', 'en', 'ur', 'bn', 'tr'].includes(l) ? l : 'en' }
-function booksNative(name, ...args) { try { const f = window.AndroidReader?.[name]; return typeof f === 'function' ? f.apply(window.AndroidReader, args) : undefined } catch (e) { return undefined } }
-function booksSaved() { try { const l = JSON.parse(booksNative('booksSaved') || '[]'); return Array.isArray(l) ? l : [] } catch (e) { return [] } }
-function booksIsSaved(id) { return booksSaved().some(b => String(b.bookId || b.id) === String(id)) }
 function booksT(t) { return typeof uiTranslate === 'function' ? uiTranslate(t) : t }
-function booksSavedBooks() { const seen = new Set(); return booksSaved().filter(x => { const k = String(x.bookId || x.id); if (seen.has(k)) return false; seen.add(k); return true }).map(x => booksClean(x.raw || x)).filter(Boolean) }
+function booksNum(n) { return typeof ar === 'function' ? ar(n) : String(n) }
+function booksNative(name, ...args) { try { const f = window.AndroidReader?.[name]; return typeof f === 'function' ? f.apply(window.AndroidReader, args) : undefined } catch (e) { return undefined } }
+function booksSavedRaw() { try { const l = JSON.parse(booksNative('booksSaved') || '[]'); return Array.isArray(l) ? l : [] } catch (e) { return [] } }
+function booksSavedBooks() { const seen = new Set(); return booksSavedRaw().filter(x => { const k = String(x.bookId || x.id); if (seen.has(k)) return false; seen.add(k); return true }).map(x => booksClean(x.raw || x)).filter(Boolean) }
+function booksIsSaved(id) { return booksSavedRaw().some(b => String(b.bookId || b.id) === String(id)) }
 
+async function booksGet(path, timeout = 20000) {
+  const ctrl = typeof AbortController === 'function' ? new AbortController() : null, timer = ctrl && setTimeout(() => ctrl.abort(), timeout);
+  try { const r = await fetch(BOOKS_BASE + path, ctrl ? { signal: ctrl.signal } : {}); if (!r.ok) throw new Error('http ' + r.status); return await r.json() }
+  finally { clearTimeout(timer) }
+}
 function booksClean(raw) {
   if (!raw || !Number.isFinite(+raw.id)) return null;
-  const files = (raw.attachments || []).filter(a => String(a.extension_type || '').toLowerCase() === 'pdf' && BOOKS_HOSTS.test(a.url || ''))
-    .map((a, i) => ({ url: a.url, size: String(a.size || ''), label: String(a.description || '').trim() || '' + (i + 1) }));
-  if (!files.length) return null;
+  const files = (raw.attachments || raw.files || []).filter(a => (String(a.extension_type || 'pdf').toLowerCase() === 'pdf') && BOOKS_HOSTS.test(a.url || ''))
+    .map((a, i) => ({ url: a.url, size: String(a.size || ''), label: String(a.description || a.label || '').trim() || String(i + 1) }));
   const people = raw.prepared_by || [];
-  const author = people.find(p => p.kind === 'author' && p.title)?.title || people.find(p => p.title)?.title || '';
+  const author = raw.author || people.find(p => p.kind === 'author' && p.title)?.title || people.find(p => p.title)?.title || '';
   return {
     id: +raw.id, title: String(raw.title || '').trim().slice(0, 200), author: String(author).trim().slice(0, 120),
-    desc: String(raw.description || '').trim().slice(0, 1200), image: BOOKS_HOSTS.test(raw.image || '') ? raw.image : '',
-    files, important: raw.importance_level === 'critical' || raw.importance_level === 'high', lang: raw.translated_language || ''
+    desc: String(raw.description || raw.desc || '').trim().slice(0, 1500), image: BOOKS_HOSTS.test(raw.image || '') ? raw.image : '', files
   }
 }
-function booksCacheKey(lang) { return 'booksCache_' + lang }
-function booksFresh(lang) {
-  booksState = { lang, items: [], page: 0, pages: Infinity, loading: false, error: '', query: '', tab: booksState?.tab || 'all', total: 0 };
-  try {
-    const c = JSON.parse(localStorage.getItem(booksCacheKey(lang)) || 'null');
-    if (c && Array.isArray(c.items) && c.items.length) { booksState.items = c.items.map(booksClean).filter(Boolean); booksState.page = 0; booksState.cached = true; booksState.total = c.total || 0 }
-  } catch (e) {}
+/* ---------- book details (category lists only carry id + title) ---------- */
+function booksDetailKey(lang) { return 'booksDetails_' + lang }
+function booksDetailCache(lang) { try { return JSON.parse(localStorage.getItem(booksDetailKey(lang)) || '{}') || {} } catch (e) { return {} } }
+function booksRemember(lang, b) {
+  booksDetails.set(lang + ':' + b.id, b);
+  try { const c = booksDetailCache(lang), keys = Object.keys(c); c[b.id] = b; if (keys.length > 600) for (const k of keys.slice(0, 200)) delete c[k]; localStorage.setItem(booksDetailKey(lang), JSON.stringify(c)) } catch (e) {}
 }
-async function booksLoadMore() {
-  const s = booksState; if (!s || s.loading || s.page >= s.pages) return;
-  s.loading = true; s.error = ''; booksPaint();
-  const page = s.page + 1, ctrl = typeof AbortController === 'function' ? new AbortController() : null, timer = ctrl && setTimeout(() => ctrl.abort(), 20000);
-  try {
-    const r = await fetch(`${BOOKS_API}/${s.lang}/${s.lang}/${page}/${BOOKS_PAGE}/json`, ctrl ? { signal: ctrl.signal } : {});
-    if (!r.ok) throw new Error('http ' + r.status);
-    const data = await r.json();
-    if (booksState !== s) return;
-    const fresh = (data.data || []).map(booksClean).filter(Boolean);
-    if (page === 1) { s.items = []; s.cached = false; try { localStorage.setItem(booksCacheKey(s.lang), JSON.stringify({ at: Date.now(), total: data.links?.total_items || 0, items: data.data || [] })) } catch (e) {} }
-    const seen = new Set(s.items.map(b => b.id));
-    s.items.push(...fresh.filter(b => !seen.has(b.id)));
-    s.page = page; s.pages = +data.links?.pages_number || page; s.total = +data.links?.total_items || s.total;
-  } catch (e) {
-    if (booksState === s) s.error = navigator.onLine === false ? 'لا يوجد اتصال بالإنترنت؛ تظهر كتبك المحفوظة' : 'تعذر تحميل الكتب الآن؛ حاول مرة أخرى';
-  } finally { clearTimeout(timer); if (booksState === s) { s.loading = false; booksPaint() } }
+function booksKnown(lang, id) { return booksDetails.get(lang + ':' + id) || booksDetailCache(lang)[id] || null }
+function booksDetail(lang, id) {
+  const key = lang + ':' + id, known = booksKnown(lang, id);
+  if (known) return Promise.resolve(booksClean(known));
+  if (booksPending.has(key)) return booksPending.get(key);
+  const p = booksQueue(() => booksGet(`/main/get-item/${id}/${lang}/json`)).then(raw => { const b = booksClean(raw); if (b) booksRemember(lang, b); return b }).catch(() => null).finally(() => booksPending.delete(key));
+  booksPending.set(key, p); return p
+}
+let booksRunning = 0; const booksWaiting = [];
+function booksQueue(job) {
+  return new Promise((resolve, reject) => {
+    const run = () => { booksRunning++; job().then(resolve, reject).finally(() => { booksRunning--; const next = booksWaiting.shift(); if (next) next() }) };
+    booksRunning < 5 ? run() : booksWaiting.push(run)
+  })
 }
 
-/* ---------- screens ---------- */
+/* ---------- lists ---------- */
+function booksFresh(lang) {
+  booksState = { lang, cat: 'all', cats: [], lists: {}, query: '' };
+  try { const c = JSON.parse(localStorage.getItem('booksCats_' + lang) || 'null'); if (Array.isArray(c)) booksState.cats = c } catch (e) {}
+  booksLoadCats()
+}
+async function booksLoadCats() {
+  const s = booksState;
+  try {
+    const tree = await booksGet(`/main/get-categories-tree/${s.lang}/json`);
+    const top = (tree.sub_categories || []).filter(c => BOOKS_CATS.includes(+c.id) && c.title).map(c => ({ id: +c.id, title: String(c.title).trim() }));
+    top.sort((a, b) => BOOKS_CATS.indexOf(a.id) - BOOKS_CATS.indexOf(b.id));
+    if (booksState !== s || !top.length) return;
+    s.cats = top; try { localStorage.setItem('booksCats_' + s.lang, JSON.stringify(top)) } catch (e) {}
+    booksPaintChips()
+  } catch (e) {}
+}
+function booksList(key) { const s = booksState; return s.lists[key] || (s.lists[key] = { items: [], ids: null, page: 0, pages: Infinity, loading: false, error: '', total: 0, shown: BOOKS_PAGE }) }
+function booksNeedsLoad(cat) { const L = booksList(cat); return cat !== 'saved' && !L.loading && !L.error && (cat === 'all' ? L.page === 0 : !L.ids) }
+async function booksLoadMore() {
+  const s = booksState, key = s.cat, L = booksList(key);
+  if (key === 'saved' || L.loading) return;
+  if (key !== 'all' && L.ids) { L.shown += BOOKS_PAGE; booksPaint(); return }
+  if (key === 'all' && L.page >= L.pages) return;
+  L.loading = true; L.error = ''; booksPaint();
+  try {
+    if (key === 'all') {
+      const page = L.page + 1, data = await booksGet(`/main/books/${s.lang}/${s.lang}/${page}/${BOOKS_PAGE}/json`);
+      const fresh = (data.data || []).map(booksClean).filter(b => b && b.files.length);
+      fresh.forEach(b => booksRemember(s.lang, b));
+      const seen = new Set(L.items.map(b => b.id)); L.items.push(...fresh.filter(b => !seen.has(b.id)));
+      L.page = page; L.pages = +data.links?.pages_number || page; L.total = +data.links?.total_items || L.total;
+      if (page === 1) try { localStorage.setItem('booksAll_' + s.lang, JSON.stringify(L.items.slice(0, BOOKS_PAGE))) } catch (e) {}
+    } else {
+      const list = await booksGet(`/categories/viewitems/${key}/books/${s.lang}/showall/json`, 30000);
+      L.ids = (Array.isArray(list) ? list : []).filter(x => x && Number.isFinite(+x.id) && (!x.datatype || x.datatype === 'books')).map(x => ({ id: +x.id, title: String(x.title || '').trim() }));
+      L.total = L.ids.length;
+    }
+  } catch (e) {
+    L.error = navigator.onLine === false ? 'لا يوجد اتصال بالإنترنت؛ تظهر كتبك المحفوظة' : 'تعذر تحميل الكتب الآن؛ حاول مرة أخرى';
+    if (key === 'all' && !L.items.length) try { L.items = (JSON.parse(localStorage.getItem('booksAll_' + s.lang) || '[]') || []).map(booksClean).filter(Boolean) } catch (x) {}
+  } finally { L.loading = false; if (booksState === s) booksPaint() }
+}
+function booksRetry() { const L = booksList(booksState.cat); L.error = ''; booksLoadMore() }
+
+/* ---------- screen ---------- */
 function booksHome(origin) {
   if (origin) booksOrigin = origin;
   enterSection('books', booksOrigin === 'more' ? 'n-more' : 'n-home');
   const lang = booksLang();
   if (!booksState || booksState.lang !== lang) booksFresh(lang);
-  if (!booksSavedBooks().length && booksState.tab === 'saved') booksState.tab = 'all';
-  app.innerHTML = sectionHeading('الكتب', 'كتب إسلامية موثوقة، تقرؤها في التطبيق وتحفظها لما بعد', booksOrigin === 'more' ? 'moreHome()' : 'home()') +
-    `<div class="books-tools">
-      <label class="books-search">${uiIcon('search')}<input type="search" id="books-q" placeholder="ابحث بالعنوان أو المؤلف" autocomplete="off" enterkeyhint="search"></label>
-      <div class="books-tabs" role="tablist"><button type="button" role="tab" data-tab="all">كل الكتب</button><button type="button" role="tab" data-tab="saved">المحفوظة</button></div>
-    </div>
-    <div id="books-list" class="books-list" aria-live="polite"></div>
+  if (booksState.cat === 'saved' && !booksSavedBooks().length) booksState.cat = 'all';
+  app.innerHTML = sectionHeading('الكتب', 'مكتبة إسلامية موثوقة بلغتك، تقرؤها وتحفظها لما بعد', booksOrigin === 'more' ? 'moreHome()' : 'home()') +
+    `<label class="books-search">${uiIcon('search')}<input type="search" id="books-q" placeholder="ابحث باسم الكتاب أو مؤلفه" autocomplete="off" enterkeyhint="search"></label>
+    <div class="books-chips" id="books-chips" role="tablist"></div>
+    <div id="books-grid" class="books-grid" aria-live="polite"></div>
     <div id="books-more" class="books-more"></div>
     <p class="books-credit"><span>المصدر</span> <span translate="no">IslamHouse.com</span></p>`;
   const q = document.getElementById('books-q'); q.value = booksState.query || '';
   q.oninput = () => { booksState.query = q.value; booksPaint() };
-  app.querySelectorAll('.books-tabs button').forEach(b => b.onclick = () => { booksState.tab = b.dataset.tab; booksPaint() });
   uiLocalize?.(app);
-  booksPaint();
-  if (booksState.page === 0 && !booksState.loading) booksLoadMore();
+  booksPaintChips(); booksPaint();
+  if (booksNeedsLoad(booksState.cat)) booksLoadMore();
   revealSection()
 }
-function booksMatches(b, q) { if (!q) return true; const n = s => String(s || '').normalize('NFKD').replace(/[ً-ٰٟـ]/g, '').replace(/[أإآ]/g, 'ا').replace(/ة/g, 'ه').replace(/ى/g, 'ي').toLowerCase(); const t = n(q).trim(); return n(b.title).includes(t) || n(b.author).includes(t) }
+function booksPickCat(cat) {
+  booksState.cat = /^\d+$/.test(cat) ? +cat : cat; booksPaintChips(); booksPaint();
+  if (booksNeedsLoad(booksState.cat)) booksLoadMore()
+}
+function booksPaintChips() {
+  const box = document.getElementById('books-chips'); if (!box || !booksState) return;
+  const s = booksState, saved = booksSavedBooks().length;
+  const chips = [{ id: 'all', title: booksT('الكل') }, ...(saved ? [{ id: 'saved', title: booksT('المحفوظة') + ' · ' + booksNum(saved), icon: 'download' }] : []), ...s.cats];
+  box.innerHTML = chips.map(c => { const on = String(s.cat) === String(c.id); return `<button type="button" role="tab" class="books-chip${on ? ' on' : ''}" aria-selected="${on}" onclick="booksPickCat('${c.id}')"${typeof c.id === 'number' ? ' translate="no"' : ''}>${c.icon ? uiIcon(c.icon) : ''}<span>${esc(c.title)}</span></button>` }).join('');
+  const on = box.querySelector('.on'); if (on && box.scrollWidth > box.clientWidth) on.scrollIntoView?.({ inline: 'center', block: 'nearest' })
+}
+function booksNorm(s) { return String(s || '').normalize('NFKD').replace(/[ً-ٰٟـ]/g, '').replace(/[أإآ]/g, 'ا').replace(/ة/g, 'ه').replace(/ى/g, 'ي').toLowerCase() }
 function booksCover(b, big) {
-  if (b.image) return `<span class="book-cover${big ? ' big' : ''}"><img src="${esc(b.image)}" alt="" loading="lazy" onerror="this.parentNode.classList.add('plain');this.remove()"></span>`;
-  const hue = (b.id * 47) % 360;
-  return `<span class="book-cover plain${big ? ' big' : ''}" style="--h:${hue}"><b>${esc(String(b.title).trim().slice(0, 1))}</b><i></i></span>`
+  const plain = `<span class="bk-plain"><i></i><b dir="auto">${esc(b.title)}</b>${b.author ? `<small dir="auto">${esc(b.author)}</small>` : ''}<i></i></span>`;
+  return `<span class="bk-cover${big ? ' big' : ''}${b.image ? ' has-img' : ''}" translate="no">${plain}${b.image ? `<img src="${esc(b.image)}" alt="" loading="lazy" decoding="async" onload="this.parentNode.classList.add('loaded')" onerror="this.parentNode.classList.remove('has-img');this.remove()">` : ''}</span>`
 }
-function booksRow(b, saved) {
-  return `<button type="button" class="book-row" onclick="bookOpen(${b.id})">${booksCover(b)}<span class="book-row-text"><strong translate="no" dir="auto">${esc(b.title)}</strong>${b.author ? `<small translate="no" dir="auto">${esc(b.author)}</small>` : ''}<em>${saved ? `<span class="book-saved">${uiIcon('check')}<span>محفوظ</span></span>` : ''}<bdi dir="ltr">${esc(b.files[0].size)}</bdi>${b.files.length > 1 ? ' · ' + booksNum(b.files.length) + ' ' + (b.files.length === 2 ? 'جزءان' : 'أجزاء') : ''}</em></span></button>`
+function booksCard(b, saved) {
+  return `<button type="button" class="bk-card${b.pending ? ' pending' : ''}" data-id="${b.id}" onclick="bookOpen(${b.id})">${booksCover(b)}<strong dir="auto" translate="no">${esc(b.title)}</strong><small dir="auto" translate="no">${esc(b.author || '')}</small>${saved ? `<em class="bk-badge">${uiIcon('download')}</em>` : ''}</button>`
 }
-function booksNum(n) { return typeof ar === 'function' ? ar(n) : String(n) }
 function booksPaint() {
-  const s = booksState, list = document.getElementById('books-list'), more = document.getElementById('books-more');
-  if (!s || !list || view !== 'books') return;
-  const saved = booksSavedBooks(), savedIds = new Set(saved.map(b => String(b.id)));
-  app.querySelectorAll('.books-tabs button').forEach(b => { const on = b.dataset.tab === s.tab; b.classList.toggle('on', on); b.setAttribute('aria-selected', on) });
-  const savedTab = app.querySelector('.books-tabs [data-tab=saved]'); if (savedTab) savedTab.textContent = saved.length ? `${booksT('المحفوظة')} · ${booksNum(saved.length)}` : booksT('المحفوظة');
-  const source = s.tab === 'saved' ? saved : s.items;
-  const shown = source.filter(b => booksMatches(b, s.query));
-  if (s.tab === 'saved' && !saved.length) list.innerHTML = `<div class="books-empty">${uiIcon('download')}<strong>لا توجد كتب محفوظة بعد</strong><p>أي كتاب تفتحه يُحفظ في جهازك لتقرأه دون إنترنت</p></div>`;
-  else if (!shown.length && !s.loading) list.innerHTML = s.query ? `<div class="books-empty">${uiIcon('search')}<strong>لا نتائج في الكتب المعروضة</strong><p>${s.tab === 'all' && s.page < s.pages ? 'حمّل المزيد ثم ابحث مرة أخرى' : 'جرّب كلمة أخرى'}</p></div>` : (s.error ? '' : '');
-  else list.innerHTML = shown.map(b => booksRow(b, savedIds.has(String(b.id)))).join('');
-  if (s.loading && !shown.length) list.innerHTML = Array.from({ length: 6 }, () => '<div class="book-row skeleton"><span class="book-cover"></span><span class="book-row-text"><i></i><i></i></span></div>').join('');
-  if (more) {
-    if (s.tab === 'saved') more.innerHTML = '';
-    else if (s.error) more.innerHTML = `<p class="books-error">${esc(s.error)}</p><button type="button" class="books-load" onclick="booksLoadMore()">إعادة المحاولة</button>`;
-    else if (s.loading && shown.length) more.innerHTML = '<div class="books-spinner" aria-label="جارٍ التحميل"></div>';
-    else if (s.page < s.pages && s.page > 0) more.innerHTML = `<button type="button" class="books-load" onclick="booksLoadMore()">عرض المزيد${s.total ? ` <small>${booksNum(shown.length)} / ${booksNum(s.total)}</small>` : ''}</button>`;
-    else more.innerHTML = '';
-    if (s.tab === 'all' && !s.error && !s.loading && s.page > 0 && s.page < s.pages && 'IntersectionObserver' in window) {
-      const btn = more.querySelector('.books-load'); if (btn) { const io = new IntersectionObserver(e => { if (e[0].isIntersecting) { io.disconnect(); booksLoadMore() } }, { rootMargin: '300px' }); io.observe(btn) }
-    }
+  const s = booksState, grid = document.getElementById('books-grid'), more = document.getElementById('books-more');
+  if (!s || !grid || view !== 'books') return;
+  const savedList = booksSavedBooks(), savedIds = new Set(savedList.map(b => b.id)), L = booksList(s.cat), q = booksNorm(s.query).trim();
+  let books;
+  if (s.cat === 'saved') books = savedList;
+  else if (s.cat === 'all') books = L.items;
+  else books = (L.ids || []).map(x => { const k = booksKnown(s.lang, x.id); return k ? booksClean(k) : { id: x.id, title: x.title, author: '', image: '', files: [], pending: true } });
+  if (q) books = books.filter(b => booksNorm(b.title).includes(q) || booksNorm(b.author).includes(q));
+  const total = books.length;
+  if (s.cat !== 'all' && s.cat !== 'saved') books = books.slice(0, L.shown);
+  if (L.loading && !books.length && s.cat !== 'saved') grid.innerHTML = Array.from({ length: 9 }, () => '<div class="bk-card skeleton"><span class="bk-cover"></span><i></i><i></i></div>').join('');
+  else if (!books.length) {
+    const title = s.cat === 'saved' ? 'لا توجد كتب محفوظة بعد' : q ? 'لا نتائج' : L.error ? '' : 'لا توجد كتب في هذا القسم بلغتك';
+    const hint = s.cat === 'saved' ? 'أي كتاب تفتحه يُحفظ في جهازك لتقرأه دون إنترنت' : q ? (s.cat === 'all' && L.page < L.pages ? 'البحث في الكتب المعروضة؛ اختر قسمًا أو اعرض المزيد' : 'جرّب كلمة أخرى') : '';
+    grid.innerHTML = title ? `<div class="books-empty">${uiIcon(s.cat === 'saved' ? 'download' : q ? 'search' : 'book')}<strong>${title}</strong>${hint ? `<p>${hint}</p>` : ''}</div>` : '';
   }
-  uiLocalize?.(list); uiLocalize?.(more)
+  else grid.innerHTML = books.map(b => booksCard(b, savedIds.has(b.id))).join('');
+  uiLocalize?.(grid);
+  // category lists carry only titles: fill in covers and authors as they arrive
+  if (s.cat !== 'all' && s.cat !== 'saved') books.filter(b => b.pending).forEach(b => booksDetail(s.lang, b.id).then(d => {
+    if (!d || booksState !== s || view !== 'books') return;
+    const card = grid.querySelector(`.bk-card[data-id="${b.id}"]`); if (card) card.outerHTML = booksCard(d, savedIds.has(d.id))
+  }));
+  if (more) {
+    let html = '', auto = false;
+    if (L.error && s.cat !== 'saved') html = `<p class="books-error">${esc(L.error)}</p><button type="button" class="books-load" onclick="booksRetry()">إعادة المحاولة</button>`;
+    else if (L.loading && books.length) html = '<div class="books-spinner" aria-label="جارٍ التحميل"></div>';
+    else if (s.cat === 'all' && L.page > 0 && L.page < L.pages && !q) { html = '<button type="button" class="books-load" onclick="booksLoadMore()">عرض المزيد</button>'; auto = true }
+    else if (s.cat !== 'all' && s.cat !== 'saved' && L.ids && total > L.shown) { html = `<button type="button" class="books-load" onclick="booksLoadMore()">عرض المزيد <small>${booksNum(L.shown)} / ${booksNum(total)}</small></button>`; auto = true }
+    more.innerHTML = html; uiLocalize?.(more);
+    const btn = auto && more.querySelector('.books-load');
+    if (btn && 'IntersectionObserver' in window) { const io = new IntersectionObserver(e => { if (e[0].isIntersecting) { io.disconnect(); booksLoadMore() } }, { rootMargin: '500px' }); io.observe(btn) }
+  }
 }
 
-function bookFind(id) {
-  id = +id;
-  return booksState?.items.find(b => b.id === id) || booksSavedBooks().find(b => b.id === id) || null
-}
-function bookOpen(id) {
-  const b = bookFind(id); if (!b) return;
+/* ---------- one book ---------- */
+async function bookOpen(id) {
+  id = +id; const lang = booksState?.lang || booksLang();
+  let b = booksKnown(lang, id); b = b ? booksClean(b) : (booksSavedBooks().find(x => x.id === id) || null);
+  if (!b || !b.files.length) { showSmallNotice?.('جارٍ فتح الكتاب…'); b = await booksDetail(lang, id); if (!b) { showSmallNotice?.('تعذر فتح الكتاب؛ تحقق من الاتصال'); return } }
+  if (!b.files.length) { showSmallNotice?.('هذا الكتاب غير متاح بصيغة PDF'); return }
   booksCurrent = b;
   enterSection('book', booksOrigin === 'more' ? 'n-more' : 'n-home');
-  bookPaint();
-  revealSection()
+  bookPaint(); revealSection()
 }
 function bookPaint() {
   const b = booksCurrent; if (!b || view !== 'book') return;
-  const saved = booksIsSaved(b.id);
+  const saved = booksIsSaved(b.id), one = b.files.length === 1;
   app.innerHTML = sectionHeading('الكتب', '', 'booksHome()') +
     `<article class="book-detail">${booksCover(b, true)}
       <h1 dir="auto" translate="no">${esc(b.title)}</h1>${b.author ? `<p class="book-author" dir="auto" translate="no">${esc(b.author)}</p>` : ''}
-      <div class="book-actions">${b.files.length === 1 ? `<button type="button" class="book-read" onclick="bookRead(0)">${uiIcon('book')}<span>${saved ? 'اقرأ' : 'اقرأ الكتاب'}</span></button>` : ''}
-        ${saved ? `<span class="book-saved big">${uiIcon('check')}<span>محفوظ في جهازك للقراءة دون إنترنت</span></span><button type="button" class="book-delete" onclick="bookDelete()">${uiIcon('trash')}<span>حذف من الجهاز</span></button>` : `<p class="book-note">${b.files.length === 1 ? '<bdi dir="ltr">' + esc(b.files[0].size) + '</bdi> · ' : ''}<span>يُحفظ في جهازك عند فتحه، لتقرأه دون إنترنت</span></p>`}</div>
-      ${b.files.length > 1 ? `<h2>أجزاء الكتاب</h2><div class="book-files">${b.files.map((f, i) => `<button type="button" class="book-file" onclick="bookRead(${i})">${uiIcon('book')}<span dir="auto" translate="no">${esc(f.label)}</span><small translate="no" dir="ltr">${esc(f.size)}</small></button>`).join('')}</div>` : ''}
+      <div class="book-actions">${one ? `<button type="button" class="book-read" onclick="bookRead(0)">${uiIcon('book')}<span>${saved ? 'متابعة القراءة' : 'اقرأ الكتاب'}</span></button>` : ''}
+        ${saved ? `<span class="book-saved">${uiIcon('check')}<span>محفوظ في جهازك للقراءة دون إنترنت</span></span><button type="button" class="book-delete" onclick="bookDelete()">${uiIcon('trash')}<span>حذف من الجهاز</span></button>` : `<p class="book-note">${one ? '<bdi dir="ltr">' + esc(b.files[0].size) + '</bdi> · ' : ''}<span>يُحفظ في جهازك عند فتحه، لتقرأه دون إنترنت</span></p>`}</div>
+      ${one ? '' : `<h2>أجزاء الكتاب</h2><div class="book-files">${b.files.map((f, i) => `<button type="button" class="book-file" onclick="bookRead(${i})">${uiIcon('book')}<span dir="auto" translate="no">${esc(f.label)}</span><small dir="ltr" translate="no">${esc(f.size)}</small></button>`).join('')}</div>`}
       ${b.desc ? `<h2>عن الكتاب</h2><p class="book-desc" dir="auto" translate="no">${esc(b.desc)}</p>` : ''}
       <p class="books-credit"><span>المصدر</span> <span translate="no">IslamHouse.com</span></p></article>`;
   uiLocalize?.(app)
@@ -149,7 +213,7 @@ function bookDelete() {
   setTimeout(() => { bookPaint(); showSmallNotice?.('حُذف الكتاب من جهازك') }, 200)
 }
 // The native side reports downloads and deletions.
-window.onBooksChanged = function () { if (view === 'books') booksPaint(); else if (view === 'book') bookPaint() };
+window.onBooksChanged = function () { if (view === 'books') { booksPaintChips(); booksPaint() } else if (view === 'book') bookPaint() };
 
 if (typeof handleBack === 'function') {
   const booksPreviousBack = handleBack;
