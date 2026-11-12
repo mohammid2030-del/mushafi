@@ -33,6 +33,13 @@
          Remove this permission and the updater for a Google Play build. -->
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
+    <!-- صحبة الفجر: dial the user's chosen contacts one after another at Fajr, and know when each call ends -->
+    <uses-permission android:name="android.permission.CALL_PHONE" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
+    <!-- Calling is optional so tablets without a SIM still install the app -->
+    <uses-feature android:name="android.hardware.telephony" android:required="false" />
+
     <!-- Qibla compass sensors are optional so the app still installs on devices without them -->
     <uses-feature android:name="android.hardware.sensor.compass" android:required="false" />
     <uses-feature android:name="android.hardware.sensor.accelerometer" android:required="false" />
@@ -135,6 +142,20 @@
             android:exported="false">
             <intent-filter>
                 <action android:name="com.mushafi.app.DAILY_REMINDER" />
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+                <action android:name="android.intent.action.TIME_SET" />
+                <action android:name="android.intent.action.TIMEZONE_CHANGED" />
+                <action android:name="android.app.action.SCHEDULE_EXACT_ALARM_PERMISSION_STATE_CHANGED" />
+            </intent-filter>
+        </receiver>
+
+        <receiver
+            android:name="com.mushafi.app.FajrAlarmReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.mushafi.app.FAJR_EVENT" />
+                <action android:name="com.mushafi.app.FAJR_DISMISS" />
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
                 <action android:name="android.intent.action.TIME_SET" />
