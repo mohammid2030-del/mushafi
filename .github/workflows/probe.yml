@@ -9,17 +9,19 @@ jobs:
     steps:
       - shell: bash
         run: |
+          sudo apt-get install -y -qq poppler-utils >/dev/null 2>&1 || true
           B=https://api3.islamhouse.com/v3/paV29H2gm56kvLPy
-          for l in ar en ur bn tr; do
-            n=0; img=0
-            for p in 1 2 3 4 5 20 60 120; do curl -sS -m 30 "$B/main/books/$l/$l/$p/25/json" -o b.json || continue
-              read a b < <(python3 -c "
-          import json
-          try: d=json.load(open('b.json'))['data']; print(len(d),sum(1 for x in d if x.get('image')))
-          except Exception: print(0,0)"); n=$((n+a)); img=$((img+b)); done
-            echo "$l books=$n with_image=$img"
-          done
-          curl -sS -m 30 "$B/main/get-item/2847055/ar/json" | python3 -c "import json,sys;d=json.load(sys.stdin);print('detail image:',d.get('image'),'keys',list(d.keys()))"
-          U=https://d1.islamhouse.com/data/ar/ih_books/single/ar-guidance-of-quranic-parables.pdf
-          curl -sS -I -m 30 "$U" | grep -i -E "accept-ranges|content-length|access-control"
-          curl -sS -m 30 "https://islamhouse.com/ar/books/2847055/" -o page.html; grep -o 'https://[^"]*\.\(jpg\|png\|webp\)' page.html | sort -u | head -10
+          : > urls.txt
+          for p in 1 7 40 90; do curl -sS -m 30 "$B/main/books/ar/ar/$p/25/json" | python3 -c "
+          import json,sys
+          for x in json.load(sys.stdin)['data']:
+            for a in x.get('attachments',[]):
+              if a.get('extension_type','').lower()=='pdf': print(x['id'], a['url'], a.get('size')); break" >> urls.txt; done
+          wc -l urls.txt
+          ok=0; full=0; n=0; tot=0
+          while read id url size; do n=$((n+1))
+            curl -sS -m 60 -r 0-1048575 "$url" -o part.pdf
+            if pdftoppm -f 1 -l 1 -scale-to 300 -png part.pdf c >/dev/null 2>&1 && ls c*.png >/dev/null 2>&1; then ok=$((ok+1)); fi; rm -f c*.png
+            if [ $n -le 8 ]; then s=$(date +%s%N); curl -sS -m 120 "$url" -o full.pdf; e=$(( ($(date +%s%N)-s)/1000000 )); b=$(stat -c%s full.pdf); tot=$((tot+b)); pdftoppm -f 1 -l 1 -scale-to 300 -png full.pdf f && full=$((full+1)); echo "$id ${b}B ${e}ms"; rm -f f*.png; fi
+          done < urls.txt
+          echo "first-1MB renders: $ok / $n ; full renders $full/8 ; bytes $tot"
