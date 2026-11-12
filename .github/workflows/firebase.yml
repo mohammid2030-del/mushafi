@@ -1,0 +1,49 @@
+name: Firebase
+on:
+  push:
+    branches: [main]
+    paths: ['firebase/**', '.github/workflows/firebase.yml']
+  workflow_dispatch:
+    inputs:
+      deploy:
+        description: 'Deploy Firestore rules and Cloud Functions to mushafiapp-1b3d7'
+        type: boolean
+        default: true
+jobs:
+  rules:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: 21 }
+      - name: Test Firestore rules (emulator)
+        working-directory: firebase/tests
+        run: |
+          npm install --no-audit --no-fund
+          npx firebase emulators:exec --only firestore --project demo-mushafi "node wake-rules-test.cjs"
+      - name: Check functions load
+        working-directory: firebase/functions
+        run: |
+          npm install --no-audit --no-fund
+          node -e "require('./index.js'); console.log('functions load')"
+  deploy:
+    if: github.event_name == 'workflow_dispatch' && inputs.deploy
+    needs: rules
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - name: Deploy
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        working-directory: firebase
+        run: |
+          if [ -z "$GOOGLE_APPLICATION_CREDENTIALS_JSON" ]; then echo "::error::Add the FIREBASE_SERVICE_ACCOUNT secret first"; exit 1; fi
+          printf '%s' "$GOOGLE_APPLICATION_CREDENTIALS_JSON" > "$RUNNER_TEMP/sa.json"
+          export GOOGLE_APPLICATION_CREDENTIALS="$RUNNER_TEMP/sa.json"
+          (cd functions && npm install --no-audit --no-fund)
+          npx --yes firebase-tools@14 deploy --only firestore:rules,functions --project mushafiapp-1b3d7 --non-interactive --force
+          rm -f "$RUNNER_TEMP/sa.json"
