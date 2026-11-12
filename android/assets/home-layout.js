@@ -60,8 +60,7 @@ function hlSkyMarkup(data) {
   return `<section class="hl-sky ${hlSky(today, now)}" aria-label="حالة يومك">
     <span class="hl-stars" aria-hidden="true"></span>
     <div class="hl-sky-top">
-      <button class="hl-chip" onclick="prayerHome()" aria-label="الموقع">${uiIcon('pin')}<span>${esc(s.city || '')}</span></button>
-      ${weather}
+      <div class="hl-place"><button class="hl-place-city" onclick="prayerHome()" aria-label="الموقع">${uiIcon('pin')}<span>${esc(hlCityName(s))}</span></button>${weather ? '<i aria-hidden="true"></i>' + weather : ''}</div>
     </div>
     <div class="hl-sky-body">
       <span class="hl-sky-kicker">أنت الآن في وقت</span>
@@ -72,11 +71,45 @@ function hlSkyMarkup(data) {
     ${hlSilhouette()}
   </section>`
 }
+/* ---------- the city we are in (automatic location has no name of its own) ---------- */
+const HL_AUTO_NAMES = ['موقعي الحالي', 'الموقع الحالي', 'Current location'];
+function hlCityKey(s) { return Number.isFinite(s.latitude) && Number.isFinite(s.longitude) ? s.latitude.toFixed(2) + ',' + s.longitude.toFixed(2) + '|' + uiLocale() : '' }
+function hlCityName(s) {
+  const name = String(s.city || '').trim();
+  if (name && !HL_AUTO_NAMES.includes(name)) return name;
+  const key = hlCityKey(s); if (!key) return name || 'موقعي';
+  const cache = readJSON('hlCityName', {});
+  if (cache.key === key && cache.name) return cache.name;
+  hlRequestCity(s, key);
+  // nearest known city while the device looks the name up
+  let best = null, dist = Infinity;
+  for (const [city, lat, lon] of (typeof prayerCities !== 'undefined' ? prayerCities : [])) {
+    const d = Math.hypot(lat - s.latitude, (lon - s.longitude) * Math.cos(s.latitude * Math.PI / 180)) * 111;
+    if (d < dist) { dist = d; best = city }
+  }
+  return best && dist < 45 ? best : (name || 'موقعي')
+}
+let hlCityPending = '';
+function hlRequestCity(s, key) {
+  if (hlCityPending === key || !window.AndroidReader?.reverseGeocode) return;
+  hlCityPending = key;
+  try { AndroidReader.reverseGeocode(s.latitude, s.longitude, uiLocale(), key) } catch (e) {}
+}
+window.onCityName = function (result) {
+  try { result = typeof result === 'string' ? JSON.parse(result) : result } catch (e) { return }
+  if (!result?.key || result.key !== hlCityPending) return;
+  hlCityPending = '';
+  const name = String(result.name || '').trim().slice(0, 40);
+  if (!name) return;
+  saveJSON('hlCityName', { key: result.key, name });
+  const sky = app.querySelector('.hl-sky-slot'); if (sky) { sky.dataset.sig = ''; hlRefresh() }
+};
+
 function hlWeatherChip() {
   try {
     const loc = homeWeatherLocation(), c = loc && homeWeatherCache(loc.key);
     if (!c) return '';
-    return `<button class="hl-chip" onclick="openWeatherCredits()" aria-label="الطقس">${homeWeatherIcon(c.symbol)}<span dir="ltr">${ar(Math.round(c.temperature))}°</span></button>`
+    return `<button class="hl-place-weather" onclick="openWeatherCredits()" aria-label="الطقس">${homeWeatherIcon(c.symbol)}<span dir="ltr">${ar(Math.round(c.temperature))}°</span></button>`
   } catch (e) { return '' }
 }
 // Sun path from Fajr (right) to Isha (left); dots mark each prayer, the marker shows now.
@@ -147,7 +180,7 @@ function hlTimesMarkup(data) {
     </div>`
   }).join('');
   return `<section class="hl-times">
-    <div class="hl-times-head"><div><strong>${esc(greg)}</strong><small>${esc(hijri)}${s.city ? ' · ' + esc(s.city) : ''}</small></div><button class="hl-link" onclick="prayerHome()"><span>كل المواقيت</span>${uiIcon('arrow')}</button></div>
+    <div class="hl-times-head"><div><strong>${esc(greg)}</strong><small>${esc(hijri)}${s.city ? ' · ' + esc(hlCityName(s)) : ''}</small></div><button class="hl-link" onclick="prayerHome()"><span>كل المواقيت</span>${uiIcon('arrow')}</button></div>
     <div class="hl-rows">${rows}</div>
     ${!nextKey && phase ? `<div class="hl-tomorrow"><span><span>${phase.kind === 'iqama' ? 'إقامة ' + prayerNames[phase.key] : prayerNames[phase.key]}</span> <span>غدًا</span></span><span class="hl-time">${prayerClock(phase.target, zone)}</span><small>${hlRemain(phase.target - now)}</small></div>` : ''}
   </section>`

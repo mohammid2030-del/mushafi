@@ -1,5 +1,6 @@
 import UIKit
 import WebKit
+import CoreLocation
 
 /// iOS implementation of the Android `AndroidReader` JavaScript interface.
 ///
@@ -34,7 +35,7 @@ final class NativeBridge: NSObject, WKScriptMessageHandler {
             "startQibla", "stopQibla", "requestHomeWeather",
             "requestPrayerNotifications", "openPrayerSystemSettings", "previewPrayerVoice", "stopPrayerVoice",
             "testPrayerNotification", "openWidgets", "openLiveBroadcast",
-            "fajrPickContact", "fajrDial", "fajrEndCall", "fajrKeepAwake", "fajrStopAlarm", "fajrRequestPermissions",
+            "reverseGeocode", "fajrPickContact", "fajrDial", "fajrEndCall", "fajrKeepAwake", "fajrStopAlarm", "fajrRequestPermissions",
             "surahPlay", "surahPlaySession", "surahSetMode", "surahPause", "surahResume", "surahStop", "surahSkip", "surahSeek",
         ]
         if CloudSync.isAvailable {
@@ -182,6 +183,15 @@ final class NativeBridge: NSObject, WKScriptMessageHandler {
         case "testPrayerNotification": if let problem = prayer.testNotification() { fileMessage(false, problem) }
         case "openWidgets": shell?.showWidgetHelp()
 
+        case "reverseGeocode":
+            guard let lat = a.double(0), let lon = a.double(1), abs(lat) <= 90, abs(lon) <= 180,
+                  let key = a.string(3), key.count <= 60 else { return }
+            let language = (a.string(2) ?? "ar").range(of: "^[a-z]{2}$", options: .regularExpression) != nil ? a.string(2)! : "ar"
+            CLGeocoder().reverseGeocodeLocation(CLLocation(latitude: lat, longitude: lon), preferredLocale: Locale(identifier: language)) { [weak self] marks, _ in
+                let mark = marks?.first
+                let name = mark?.locality ?? mark?.subAdministrativeArea ?? mark?.administrativeArea ?? ""
+                self?.shell?.callback("onCityName", ["key": key, "name": name])
+            }
         // صحبة الفجر
         case "fajrPickContact": FajrCompanion.shared.pickContact()
         case "fajrDial": surah.pause(); prayer.stopPreview(); FajrCompanion.shared.dial(a.string(0))
