@@ -158,3 +158,76 @@ body.hl-sky-on:is([data-hl-sky="night"],[data-hl-sky="dawn"],[data-hl-sky="dusk"
 .hl-place .ui-icon,.hl-place .weather-symbol{opacity:1!important}
 .hl-sky:is(.night,.dawn,.dusk) .hl-place button{text-shadow:0 1px 8px rgba(0,0,0,.25)}
 .hl-sky:not(.night):not(.dawn):not(.dusk) .hl-place button{text-shadow:0 1px 6px rgba(255,255,255,.35)}
+
+/* ===== one sky from the top down through today's times, melting into the page ===== */
+.hl-sky{min-height:0!important;padding-bottom:150px!important;background-size:100% calc(var(--hl-lift,0px) + 600px)!important;background-repeat:no-repeat!important;background-color:var(--sky-end,#f0c79a)!important;
+  --hl-fade:linear-gradient(180deg,#000 0,#000 calc(100% - 230px),rgba(0,0,0,.94) calc(100% - 196px),rgba(0,0,0,.82) calc(100% - 162px),rgba(0,0,0,.64) calc(100% - 128px),rgba(0,0,0,.43) calc(100% - 94px),rgba(0,0,0,.24) calc(100% - 62px),rgba(0,0,0,.09) calc(100% - 32px),transparent 100%);
+  -webkit-mask-image:var(--hl-fade)!important;mask-image:var(--hl-fade)!important}
+.hl-sky.day{--sky-end:#f0c79a}.hl-sky.dawn{--sky-end:#f1c99c}.hl-sky.afternoon{--sky-end:#efbf88}.hl-sky.dusk{--sky-end:#e9a46b}.hl-sky.night{--sky-end:#2a2633}
+.hl-sky::before{inset:calc(var(--hl-lift,0px) + 40px) auto auto 50%!important}
+.hl-stars{bottom:auto!important;height:calc(var(--hl-lift,0px) + 560px)}
+.hl-arc{position:relative!important;bottom:auto!important;display:block;margin:6px 0 0}
+.hl-sky-times{position:relative;z-index:2;margin-top:2px;--ink:var(--sky-ink);--muted:var(--sky-soft);color:var(--sky-ink)}
+.hl-sky:not(.night):not(.dawn):not(.dusk) .hl-sky-times{--gold:#7a5a22}
+.hl-sky.night .hl-sky-times,.hl-sky.dusk .hl-sky-times,.hl-sky.dawn .hl-sky-times{--gold:#ecd29c}
+.hl-sky-times .hl-times{margin:0;padding-bottom:0}
+.hl-sky-times .hl-dot{box-shadow:none!important}
+.hl-sky-times .hl-times-head small{color:var(--sky-soft)}
+
+/* ===== weather in the sky ===== */
+.hl-wx{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.hl-wx::before{content:"";position:absolute;inset:0;background:var(--wx-tint,transparent)}
+.hl-sky.wx-partly{--wx-tint:rgba(150,160,172,.08)}
+.hl-sky.wx-cloudy,.hl-sky.wx-fog{--wx-tint:rgba(128,138,150,.30)}
+.hl-sky.wx-lightrain,.hl-sky.wx-snow{--wx-tint:rgba(110,122,138,.36)}
+.hl-sky.wx-rain{--wx-tint:rgba(92,104,122,.46)}
+.hl-sky.wx-heavyrain{--wx-tint:rgba(70,80,98,.56)}
+.hl-sky.wx-thunder{--wx-tint:rgba(48,52,70,.62)}
+.hl-sky.night.wx{--wx-tint:rgba(8,8,14,.22)}
+.hl-sky.wx:is(.wx-cloudy,.wx-fog,.wx-lightrain,.wx-rain,.wx-heavyrain,.wx-thunder,.wx-snow)::before{opacity:.25}
+.hl-sky.wx-partly::before{opacity:.85}
+.hl-sky.wx:is(.wx-cloudy,.wx-rain,.wx-heavyrain,.wx-thunder) .hl-stars{opacity:0!important}
+.hl-sky.wx:is(.wx-lightrain,.wx-rain,.wx-heavyrain,.wx-thunder){--sky-ink:#f7f4ee;--sky-soft:rgba(247,244,238,.8);--sky-glass:rgba(255,255,255,.14);--sky-line:rgba(247,244,238,.3);--sun:#f3ead8}
+.hl-sky.wx:is(.wx-lightrain,.wx-rain,.wx-heavyrain,.wx-thunder):not(.night) .hl-sky-times{--gold:#f1dcaa}
+/* clouds */
+.hl-cloud{position:absolute;width:var(--w,200px);height:auto;fill:var(--cloud,rgba(255,255,255,.8));filter:blur(var(--blur,2.5px)) drop-shadow(0 8px 14px rgba(40,50,70,.10));opacity:var(--o,.78);animation:hlDrift var(--t,70s) ease-in-out infinite alternate}
+.hl-cloud.c1{--w:210px;top:calc(var(--hl-lift,0px) + 120px);left:-70px;--t:64s}
+.hl-cloud.c2{--w:190px;top:calc(var(--hl-lift,0px) + 30px);right:-60px;--t:82s;animation-direction:alternate-reverse;--o:.7}
+.hl-cloud.c3{--w:170px;top:calc(var(--hl-lift,0px) + 330px);right:-60px;--t:58s;--o:.66;--blur:3px}
+.hl-cloud.c4{--w:240px;top:calc(var(--hl-lift,0px) + 270px);left:-110px;--t:95s;--o:.62;--blur:3.5px}
+.hl-cloud.c5{--w:230px;top:calc(var(--hl-lift,0px) - 10px);left:30%;--t:74s;--o:.55;--blur:4px}
+.hl-cloud.sun-veil{left:50%;right:auto;top:calc(var(--hl-lift,0px) + 150px);--w:180px;margin-left:10px;--o:.62;--blur:4px}
+.hl-sky.wx-cloudy{--cloud:rgba(236,238,242,.86)}
+.hl-sky.wx:is(.wx-lightrain,.wx-snow){--cloud:rgba(200,206,214,.9)}
+.hl-sky.wx-rain{--cloud:rgba(168,176,188,.92)}
+.hl-sky.wx:is(.wx-heavyrain,.wx-thunder){--cloud:rgba(118,124,140,.94)}
+.hl-sky.night.wx{--cloud:rgba(78,76,94,.72)}
+.hl-sky.night.wx:is(.wx-rain,.wx-heavyrain,.wx-thunder){--cloud:rgba(52,52,66,.9)}
+.hl-sky.wx-fog .hl-cloud{filter:blur(6px);opacity:.6}
+@keyframes hlDrift{from{transform:translateX(-26px)}to{transform:translateX(30px)}}
+/* rain, snow, fog, lightning */
+.hl-rain,.hl-snow{position:absolute;inset:-10% -10% 0;background-image:url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='90' height='120'><g stroke='%23ffffff' stroke-width='1.3' stroke-linecap='round'><line x1='10' y1='4' x2='7' y2='24' opacity='.8'/><line x1='42' y1='38' x2='39' y2='56' opacity='.6'/><line x1='70' y1='10' x2='67' y2='29' opacity='.75'/><line x1='25' y1='72' x2='22' y2='91' opacity='.7'/><line x1='58' y1='86' x2='55' y2='106' opacity='.8'/><line x1='84' y1='58' x2='81' y2='76' opacity='.55'/></g></svg>");animation:hlFall .55s linear infinite}
+.hl-rain.back{background-size:60px 80px;opacity:.45;animation-duration:.8s}
+.hl-rain.front{opacity:.75}
+.hl-sky:not(.night) .hl-rain{filter:brightness(.82)}
+.hl-sky.wx-lightrain .hl-rain.front{opacity:.4}.hl-sky.wx-lightrain .hl-rain.back{opacity:.22}
+.hl-sky.wx-heavyrain .hl-rain,.hl-sky.wx-thunder .hl-rain{animation-duration:.38s}.hl-sky.wx-heavyrain .hl-rain.back,.hl-sky.wx-thunder .hl-rain.back{opacity:.6;animation-duration:.55s}
+@keyframes hlFall{from{background-position:0 0}to{background-position:-14px 120px}}
+.hl-snow{background-image:url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='110' height='110'><g fill='%23ffffff'><circle cx='12' cy='14' r='2.2' opacity='.9'/><circle cx='60' cy='30' r='1.6' opacity='.7'/><circle cx='92' cy='8' r='2.4' opacity='.85'/><circle cx='34' cy='66' r='1.8' opacity='.75'/><circle cx='80' cy='78' r='2.1' opacity='.9'/><circle cx='18' cy='98' r='1.5' opacity='.6'/></g></svg>");animation:hlSnow 9s linear infinite}
+.hl-snow.back{background-size:70px 70px;opacity:.55;animation-duration:14s}
+@keyframes hlSnow{from{background-position:0 0}to{background-position:40px 110px}}
+.hl-fog{position:absolute;left:-25%;width:150%;height:110px;border-radius:50%;background:rgba(255,255,255,.34);filter:blur(22px);animation:hlDrift 40s ease-in-out infinite alternate}
+.hl-fog.f1{top:calc(var(--hl-lift,0px) + 230px)}.hl-fog.f2{top:calc(var(--hl-lift,0px) + 380px);animation-direction:alternate-reverse;opacity:.8}
+.hl-flash{position:absolute;inset:0;background:#fff;opacity:0;animation:hlFlash 9s infinite}
+@keyframes hlFlash{0%,86%{opacity:0}87%{opacity:.5}88%{opacity:.06}89.5%{opacity:.36}92%,100%{opacity:0}}
+@media (prefers-reduced-motion:reduce){.hl-cloud,.hl-rain,.hl-snow,.hl-fog{animation:none!important}.hl-flash{display:none}}
+
+/* weather skies by day (night keeps its own sky, only veiled) */
+.hl-sky.wx-cloudy:not(.night),.hl-sky.wx-fog:not(.night){background-image:linear-gradient(180deg,#a9b4bf 0%,#c6ccd1 48%,#d6d5cf 100%)!important;--sky-end:#d6d5cf;--wx-tint:transparent}
+.hl-sky.wx-lightrain:not(.night),.hl-sky.wx-snow:not(.night){background-image:linear-gradient(180deg,#71808f 0%,#8d98a3 50%,#9ea4aa 100%)!important;--sky-end:#9ea4aa;--wx-tint:transparent}
+.hl-sky.wx-rain:not(.night){background-image:linear-gradient(180deg,#58667a 0%,#717d8c 50%,#80878f 100%)!important;--sky-end:#80878f;--wx-tint:transparent}
+.hl-sky.wx-heavyrain:not(.night){background-image:linear-gradient(180deg,#434e60 0%,#5a6474 50%,#666b74 100%)!important;--sky-end:#666b74;--wx-tint:transparent}
+.hl-sky.wx-thunder:not(.night){background-image:linear-gradient(180deg,#2f3545 0%,#454b5a 50%,#525560 100%)!important;--sky-end:#525560;--wx-tint:transparent}
+.hl-sky.wx-snow:not(.night){--sky-ink:#f7f4ee;--sky-soft:rgba(247,244,238,.8);--sky-glass:rgba(255,255,255,.14);--sky-line:rgba(247,244,238,.3)}
+/* rain and snow stay in the sky above today's times, so the list stays easy to read */
+.hl-rain,.hl-snow{-webkit-mask-image:linear-gradient(180deg,#000 calc(var(--hl-lift,0px) + 360px),transparent calc(var(--hl-lift,0px) + 620px));mask-image:linear-gradient(180deg,#000 calc(var(--hl-lift,0px) + 360px),transparent calc(var(--hl-lift,0px) + 620px))}

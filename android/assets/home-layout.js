@@ -49,16 +49,17 @@ function hlSky(today, now) {
 /* ---------- sky header ---------- */
 function hlSkyMarkup(data) {
   const s = data?.settings || {};
-  if (!s.confirmed) return `<section class="hl-sky day hl-sky-setup"><div class="hl-sky-body"><span class="hl-sky-kicker">مواقيت الصلاة</span><h2>حدّد موقعك</h2><p>لتظهر مواقيت صلاتك وحالة يومك هنا</p><button class="hl-pill" onclick="prayerHome()">${uiIcon('pin')}<span>تحديد الموقع</span></button></div>${hlSilhouette()}</section>`;
+  if (!s.confirmed) return `<section class="hl-sky day hl-sky-setup"><div class="hl-sky-body"><span class="hl-sky-kicker">مواقيت الصلاة</span><h2>حدّد موقعك</h2><p>لتظهر مواقيت صلاتك وحالة يومك هنا</p><button class="hl-pill" onclick="prayerHome()">${uiIcon('pin')}<span>تحديد الموقع</span></button></div></section>`;
   const now = Date.now(), today = hlToday(data, now), phase = typeof prayerPhase === 'function' ? prayerPhase(data, now) : null;
-  if (data.error || !today || !phase) return `<section class="hl-sky day"><div class="hl-sky-body"><span class="hl-sky-kicker">مواقيت الصلاة</span><h2>تعذر حساب المواقيت</h2><p>${esc(data.error || 'راجع الموقع والمنطقة الزمنية')}</p><button class="hl-pill" onclick="prayerHome()">${uiIcon('settings')}<span>مراجعة الإعدادات</span></button></div>${hlSilhouette()}</section>`;
+  if (data.error || !today || !phase) return `<section class="hl-sky day"><div class="hl-sky-body"><span class="hl-sky-kicker">مواقيت الصلاة</span><h2>تعذر حساب المواقيت</h2><p>${esc(data.error || 'راجع الموقع والمنطقة الزمنية')}</p><button class="hl-pill" onclick="prayerHome()">${uiIcon('settings')}<span>مراجعة الإعدادات</span></button></div></section>`;
   const events = hlEvents(data), current = events.filter(e => e.time <= now).at(-1);
   const pill = phase.kind === 'iqama'
     ? `<span>إقامة ${prayerNames[phase.key]}</span> <span>${hlLeft(phase.target - now, true)}</span>`
     : `<span>${prayerNames[phase.key]}</span> <span>${hlLeft(phase.target - now, true)}</span>`;
-  const weather = hlWeatherChip();
-  return `<section class="hl-sky ${hlSky(today, now)}" aria-label="حالة يومك">
+  const weather = hlWeatherChip(), sky = hlSky(today, now), wx = hlWeatherKind(), dark = /night|dawn|dusk/.test(sky);
+  return `<section class="hl-sky ${sky}${wx ? ' wx wx-' + wx : ''}" aria-label="حالة يومك">
     <span class="hl-stars" aria-hidden="true"></span>
+    ${hlWeatherLayer(wx, dark)}
     <div class="hl-sky-top">
       <div class="hl-place"><button class="hl-place-city" onclick="prayerHome()" aria-label="الموقع">${uiIcon('pin')}<span>${esc(hlCityName(s))}</span></button>${weather ? '<i aria-hidden="true"></i>' + weather : ''}</div>
     </div>
@@ -68,7 +69,7 @@ function hlSkyMarkup(data) {
       <button class="hl-pill" onclick="prayerHome()">${uiIcon('clock')}${pill}</button>
     </div>
     ${hlArc(today, now)}
-    ${hlSilhouette()}
+    <div class="hl-sky-times">${hlTimesMarkup(data)}</div>
   </section>`
 }
 /* ---------- the city we are in (automatic location has no name of its own) ---------- */
@@ -112,6 +113,39 @@ function hlWeatherChip() {
     return `<button class="hl-place-weather" onclick="openWeatherCredits()" aria-label="الطقس">${homeWeatherIcon(c.symbol)}<span dir="ltr">${ar(Math.round(c.temperature))}°</span></button>`
   } catch (e) { return '' }
 }
+/* ---------- the sky follows the weather (MET Norway symbol codes from the weather cache) ---------- */
+function hlWeatherKind() {
+  try {
+    if (window.hlWeatherPreview) return window.hlWeatherPreview;
+    const loc = homeWeatherLocation(), c = loc && homeWeatherCache(loc.key), s = String(c?.symbol || '');
+    if (!s) return '';
+    if (/thunder/.test(s)) return 'thunder';
+    if (/snow/.test(s)) return 'snow';
+    if (/sleet/.test(s)) return 'rain';
+    if (/heavyrain/.test(s)) return 'heavyrain';
+    if (/lightrain/.test(s)) return 'lightrain';
+    if (/rain/.test(s)) return 'rain';
+    if (/fog/.test(s)) return 'fog';
+    if (/^cloudy/.test(s)) return 'cloudy';
+    if (/partlycloudy/.test(s)) return 'partly';
+    if (/fair/.test(s)) return 'fair';
+    return 'clear'
+  } catch (e) { return '' }
+}
+function hlCloud(cls) {
+  return `<svg class="hl-cloud ${cls}" viewBox="0 0 220 90" aria-hidden="true"><path d="M30 78h150a32 32 0 0 0 4-63.7A44 44 0 0 0 103 18a30 30 0 0 0-48 18A22 22 0 0 0 30 78Z"/></svg>`
+}
+function hlWeatherLayer(kind, dark) {
+  if (!kind || kind === 'clear') return '';
+  const clouds = { fair: ['c1'], partly: ['c1 sun-veil', 'c2'], cloudy: ['c1', 'c2', 'c3', 'c4'], fog: ['c2', 'c3'],
+    lightrain: ['c1', 'c2', 'c3'], rain: ['c1', 'c2', 'c3', 'c4'], heavyrain: ['c1', 'c2', 'c3', 'c4', 'c5'],
+    thunder: ['c1', 'c2', 'c3', 'c4', 'c5'], snow: ['c1', 'c2', 'c3'] }[kind] || [];
+  const rain = /rain|thunder/.test(kind) ? '<span class="hl-rain back"></span><span class="hl-rain front"></span>' : '';
+  const snow = kind === 'snow' ? '<span class="hl-snow back"></span><span class="hl-snow front"></span>' : '';
+  const fog = kind === 'fog' ? '<span class="hl-fog f1"></span><span class="hl-fog f2"></span>' : '';
+  const flash = kind === 'thunder' ? '<span class="hl-flash"></span>' : '';
+  return `<div class="hl-wx" aria-hidden="true">${clouds.map(hlCloud).join('')}${fog}${rain}${snow}${flash}</div>`
+}
 // Sun path from Fajr (right) to Isha (left); dots mark each prayer, the marker shows now.
 function hlArc(today, now) {
   const P0 = [338, 132], P1 = [180, 18], P2 = [22, 132];
@@ -151,7 +185,7 @@ function hlToggleMute(key, at, on) {
   try { window.AndroidReader?.setPrayerMute?.(JSON.stringify(list)) } catch (e) {}
   window.AndroidReader?.haptic?.(0);
   showSmallNotice(muted ? `عاد أذان ${prayerNames[key]}` : `أذان ${prayerNames[key]} صامت اليوم، والإشعار يصلك`);
-  const times = app.querySelector('.hl-times-slot'); if (times) { times.innerHTML = hlTimesMarkup(readPrayerData()); uiLocalize?.(times) }
+  const times = app.querySelector('.hl-sky-times'); if (times) { times.innerHTML = hlTimesMarkup(readPrayerData()); uiLocalize?.(times) }
 }
 // keep the device in step after restarts
 setTimeout(() => { try { window.AndroidReader?.setPrayerMute?.(JSON.stringify(hlMutes())) } catch (e) {} }, 1200);
@@ -211,7 +245,7 @@ function homeLayout() {
   const rest = [...app.children];   // notices and anything another module added
   const data = readPrayerData();
   const frag = document.createElement('div');
-  frag.innerHTML = `<div class="hl-sky-slot">${hlSkyMarkup(data)}</div><div class="hl-times-slot">${hlTimesMarkup(data)}</div>
+  frag.innerHTML = `<div class="hl-sky-slot">${hlSkyMarkup(data)}</div>
     <div class="hl-quick">${hlTile('book', 'المصحف', 'hlOpenMushaf()')}${hlTile('clock', 'مواقيت الصلاة', 'prayerHome()')}${hlTile('compass', 'القبلة', 'openQibla()')}<span class="hl-smart-slot"></span></div>
     <div class="hl-reading-slot"></div>
     <div class="hl-rest"></div>
@@ -268,7 +302,8 @@ function hlLift() {
   slot.style.setProperty('--hl-lift', top + 'px');
   slot.style.marginTop = -top + 'px';
   const phase = slot.querySelector('.hl-sky')?.classList;
-  document.body.dataset.hlSky = ['night', 'dawn', 'dusk', 'afternoon'].find(k => phase?.contains(k)) || 'day';
+  const wet = ['wx-lightrain', 'wx-rain', 'wx-heavyrain', 'wx-thunder', 'wx-snow'].some(k => phase?.contains(k));
+  document.body.dataset.hlSky = wet ? 'night' : ['night', 'dawn', 'dusk', 'afternoon'].find(k => phase?.contains(k)) || 'day';
   document.body.classList.add('hl-sky-on')
 }
 function hlStart() { clearInterval(hlTimer); hlTimer = setInterval(hlRefresh, 15000) }
