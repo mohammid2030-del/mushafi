@@ -49,7 +49,9 @@ final class SurahPlayer: NSObject {
         duration = defaults.integer(forKey: "surah.duration")
         if duration > 0 && position >= duration - 500 { position = 0 }
         if timelineRevision != (defaults.string(forKey: "surah.timelineRevision") ?? "") { position = 0 }
-        status = position > 0 ? "paused" : "stopped"
+        // A fresh start never brings back an old recitation: the mini player appears only for audio started in this run.
+        position = 0
+        status = "stopped"
         playbackMode = Self.normalize(defaults.string(forKey: "surah.mode"))
         loadTimings()
         updateKey()
@@ -205,6 +207,7 @@ final class SurahPlayer: NSObject {
         releasePlayer()
         status = "stopped"
         message = ""
+        position = 0   // closing the player forgets where it was
         persist()
         updateNowPlaying()
         publish()
