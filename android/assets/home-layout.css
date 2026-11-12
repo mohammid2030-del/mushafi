@@ -3,7 +3,7 @@
 
 /* sky */
 .hl-sky{--sky-ink:#1d3328;--sky-soft:rgba(29,51,40,.66);--sky-glass:rgba(255,255,255,.34);--sky-line:rgba(29,51,40,.18);--sun:#fffaf0;
-  position:relative;overflow:hidden;width:100vw;max-width:none;margin:-8px calc(50% - 50vw) 0;border-radius:0;padding:18px max(20px,calc(50vw - 430px)) 0;min-height:392px;box-sizing:border-box;-webkit-mask-image:linear-gradient(180deg,transparent 0,#000 46px);mask-image:linear-gradient(180deg,transparent 0,#000 46px);color:var(--sky-ink);
+  position:relative;overflow:hidden;width:100vw;max-width:none;margin:0 calc(50% - 50vw) 0;border-radius:0;padding:18px max(20px,calc(50vw - 430px)) 0;min-height:392px;box-sizing:border-box;-webkit-mask-image:linear-gradient(180deg,transparent 0,#000 46px);mask-image:linear-gradient(180deg,transparent 0,#000 46px);color:var(--sky-ink);
   background:linear-gradient(180deg,#a9c6d2 0%,#d9dccf 46%,#f2d6ad 78%,#f0c79a 100%);isolation:isolate}
 .hl-sky::before{content:"";position:absolute;inset:auto auto 30% 50%;width:340px;height:340px;transform:translateX(-50%);border-radius:50%;background:radial-gradient(circle,rgba(255,244,222,.55),transparent 62%);z-index:-1}
 .hl-sky.dawn{background:linear-gradient(180deg,#3b4a68 0%,#8c8aa0 42%,#e6b38e 82%,#f1c99c 100%);--sky-ink:#fff6e6;--sky-soft:rgba(255,246,230,.78);--sky-glass:rgba(255,255,255,.16);--sky-line:rgba(255,246,230,.3)}
@@ -112,4 +112,12 @@ body.dark .hl-badge{color:#14231b}
 .hl-sky .hl-sky-kicker,.hl-sky .hl-sky-body p{color:var(--sky-soft)!important}
 .hl-sky :is(.hl-chip,.hl-pill),.hl-sky :is(.hl-chip,.hl-pill) :is(span,.ui-icon,svg){color:var(--sky-ink)!important}
 .hl-sky{-webkit-mask-image:linear-gradient(180deg,transparent 0,#000 70px);mask-image:linear-gradient(180deg,transparent 0,#000 70px)}
-.hl-sky{padding-top:56px}.hl-sky-body{padding-top:10px}
+
+/* sky behind header + status bar */
+.hl-sky-slot{position:relative;z-index:0}
+.hl-sky{margin-top:0;padding-top:calc(var(--hl-lift,0px) + 14px)!important;min-height:calc(var(--hl-lift,0px) + 338px);-webkit-mask-image:none!important;mask-image:none!important}
+body.hl-sky-on .app-header{background:transparent!important;position:relative;z-index:5}
+body.hl-sky-on{background-color:var(--bg)}
+body.hl-sky-on[data-hl-sky="day"] .app-header,body.hl-sky-on[data-hl-sky="afternoon"] .app-header{--ink:#1d3328;--muted:rgba(29,51,40,.68);--gold:#7a5a22;color:#1d3328}
+body.hl-sky-on:is([data-hl-sky="night"],[data-hl-sky="dawn"],[data-hl-sky="dusk"]) .app-header{--ink:#fff6e6;--muted:rgba(255,246,230,.75);--gold:#f0d29a;color:#fff6e6}
+.hl-sky-body{padding-top:6px}

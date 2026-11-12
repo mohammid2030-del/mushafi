@@ -189,6 +189,7 @@ function homeLayout() {
   keep.forEach(el => { el.classList.add('hl-hidden'); frag.append(el) });
   app.replaceChildren(...frag.childNodes);
   uiLocalize?.(app);
+  hlLift();
   hlStart()
 }
 function hlWidgets() { if (window.AndroidReader?.openWidgets) AndroidReader.openWidgets(); else showSmallNotice('أضف ويدجت مصحفي من الشاشة الرئيسية لجهازك') }
@@ -201,10 +202,25 @@ function hlRefresh() {
   sky.dataset.sig = signature;
   sky.innerHTML = hlSkyMarkup(data);
   if (times) times.innerHTML = hlTimesMarkup(data);
-  uiLocalize?.(sky); if (times) uiLocalize?.(times)
+  uiLocalize?.(sky); if (times) uiLocalize?.(times);
+  hlLift()
+}
+// The sky runs up behind the header and the status bar, so the top of Home is one scene.
+function hlLift() {
+  const slot = app.querySelector('.hl-sky-slot'); if (!slot || view !== 'home') { document.body.classList.remove('hl-sky-on'); return }
+  slot.style.marginTop = '0px';
+  const top = slot.getBoundingClientRect().top + scrollY;
+  slot.style.setProperty('--hl-lift', top + 'px');
+  slot.style.marginTop = -top + 'px';
+  const phase = slot.querySelector('.hl-sky')?.classList;
+  document.body.dataset.hlSky = ['night', 'dawn', 'dusk', 'afternoon'].find(k => phase?.contains(k)) || 'day';
+  document.body.classList.add('hl-sky-on')
 }
 function hlStart() { clearInterval(hlTimer); hlTimer = setInterval(hlRefresh, 15000) }
 
+const hlPreviousEnter = enterSection;
+enterSection = function (...args) { document.body.classList.remove('hl-sky-on'); return hlPreviousEnter.apply(this, args) };
+addEventListener('resize', () => { if (view === 'home') hlLift() });
 const hlPreviousHome = home;
 home = function (...args) { const r = hlPreviousHome.apply(this, args); try { homeLayout() } catch (e) { console.error(e) } return r };
 if (typeof renderHomeWeather === 'function') {
