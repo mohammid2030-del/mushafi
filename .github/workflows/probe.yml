@@ -1,0 +1,21 @@
+name: Probe
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/probe.yml']
+jobs:
+  covers:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          B=https://api3.islamhouse.com/v3/paV29H2gm56kvLPy
+          for l in ar en ur bn tr; do
+            n=0; img=0
+            for p in 1 2 3 4 5 20 60 120; do curl -sS -m 30 "$B/main/books/$l/$l/$p/50/json" -o b.json || continue
+              read a b < <(python3 -c "import json;d=json.load(open('b.json'))['data'];print(len(d),sum(1 for x in d if x.get('image')))"); n=$((n+a)); img=$((img+b)); done
+            echo "$l books=$n with_image=$img"
+          done
+          curl -sS -m 30 "$B/main/get-item/2847055/ar/json" | python3 -c "import json,sys;d=json.load(sys.stdin);print('detail image:',d.get('image'),'keys',list(d.keys()))"
+          U=https://d1.islamhouse.com/data/ar/ih_books/single/ar-guidance-of-quranic-parables.pdf
+          curl -sS -I -m 30 "$U" | grep -i -E "accept-ranges|content-length|access-control"
+          curl -sS -m 30 "https://islamhouse.com/ar/books/2847055/" -o page.html; grep -o 'https://[^"]*\.\(jpg\|png\|webp\)' page.html | sort -u | head -10
