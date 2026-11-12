@@ -1,4 +1,5 @@
 name: Firebase
+# Tests the Firestore rules on every change; deploys them on demand.
 on:
   push:
     branches: [main]

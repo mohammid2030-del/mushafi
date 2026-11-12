@@ -1,4 +1,5 @@
 name: Wake worker
+# Tests the ring relay on every change; deploys it to Cloudflare on demand.
 on:
   push:
     branches: [main]

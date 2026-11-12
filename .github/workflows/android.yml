@@ -1,6 +1,7 @@
 name: Android
 
 # Builds the Android app on every change so both platforms stay in step.
+# The APK is also published as the android-test release.
 # The debug APK is attached to the run (Actions → this run → Artifacts) for testing on a phone.
 on:
   workflow_dispatch:
