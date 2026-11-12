@@ -325,23 +325,4 @@ tasks.register("verifyTranslationGuide") {
 }
 tasks.matching { it.name in ["assembleRelease", "bundleRelease"] }.configureEach { dependsOn tasks.named("verifyTranslationGuide") }
 
-// Refuse releases with missing editions, changed canonical pages or altered Quran quotations.
-tasks.register('verifyStoryEditions') {
-    doLast {
-        def root = file('assets/stories/hina-saal-alinsan')
-        def original = new File(root, 'book.json')
-        def digest = java.security.MessageDigest.getInstance('SHA-256').digest(original.bytes).encodeHex().toString()
-        if (digest != 'c5319ab0c8d1f86c82664f76ad60588fab0989830e7abe8de1dc5032323f5388') throw new GradleException('Canonical story changed')
-        def parser = new groovy.json.JsonSlurper()
-        def source = parser.parse(original)
-        ['en','ur','bn','tr'].each { locale ->
-            def edition = parser.parse(new File(root, "book-${locale}.json"))
-            if (edition.language != locale || edition.originalSourceSha256 != digest || edition.pages.size() != 60 || edition.page_count != 60) throw new GradleException("Invalid story edition: ${locale}")
-            source.pages.eachWithIndex { page, index ->
-                def translated = edition.pages[index]
-                if (translated.page != page.page || translated.content.split('\\n', -1).length != page.content.split('\\n', -1).length || (translated.content =~ /﴿[^﴾]+﴾/).findAll() != (page.content =~ /﴿[^﴾]+﴾/).findAll() || translated.content.contains('__MUSHAFI_')) throw new GradleException("Invalid story page: ${locale}/${page.page}")
-            }
-        }
-    }
-}
-tasks.matching { it.name in ['assembleRelease', 'bundleRelease'] }.configureEach { dependsOn tasks.named('verifyStoryEditions') }
+

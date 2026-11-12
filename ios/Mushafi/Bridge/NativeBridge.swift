@@ -18,7 +18,7 @@ final class NativeBridge: NSObject, WKScriptMessageHandler {
             "surahSnapshot",
             "initializeDailyReminderConsent", "setDailyReminderConsent", "consumeFridayReminder", "consumeDailyReminderOpen",
             "saveKhatmaPlan", "khatmaStatus", "consumeKhatmaOpen",
-            "automaticLocationSnapshot", "fajrSave", "fajrStatus", "fajrConsumeLaunch", "setPrayerMute", "wakeStatus", "wakeConsumeLink",
+            "automaticLocationSnapshot", "booksSaved", "fajrSave", "fajrStatus", "fajrConsumeLaunch", "setPrayerMute", "wakeStatus", "wakeConsumeLink",
         ]
         if CloudSync.isAvailable { list += ["cloudSnapshot", "cloudMatchesAck"] }
         return list
@@ -35,7 +35,7 @@ final class NativeBridge: NSObject, WKScriptMessageHandler {
             "startQibla", "stopQibla", "requestHomeWeather",
             "requestPrayerNotifications", "openPrayerSystemSettings", "previewPrayerVoice", "stopPrayerVoice",
             "testPrayerNotification", "openWidgets", "openLiveBroadcast",
-            "reverseGeocode", "wakeRegister", "wakeCreateInvite", "wakeAcceptInvite", "wakePeers", "wakeRemovePeer", "wakeRing", "wakeCancel", "fajrKeepAwake", "fajrStopAlarm", "fajrRequestPermissions",
+            "openBook", "deleteBook", "reverseGeocode", "wakeRegister", "wakeCreateInvite", "wakeAcceptInvite", "wakePeers", "wakeRemovePeer", "wakeRing", "wakeCancel", "fajrKeepAwake", "fajrStopAlarm", "fajrRequestPermissions",
             "surahPlay", "surahPlaySession", "surahSetMode", "surahPause", "surahResume", "surahStop", "surahSkip", "surahSeek",
         ]
         if CloudSync.isAvailable {
@@ -98,6 +98,7 @@ final class NativeBridge: NSObject, WKScriptMessageHandler {
         case "getUiLanguage": value = UiLanguage.device
         case "prayerSnapshot": value = prayer.snapshotJSON()
         case "automaticLocationSnapshot": value = AutomaticLocation.shared.status()
+        case "booksSaved": value = BookStore.json()
         case "savePrayerSettings": value = prayer.save(a.string(0))
         case "syncDeviceState": value = prayer.syncDeviceState(a.string(0))
         case "consumePrayerOpen": value = AppRouter.shared.consume("prayer")
@@ -169,6 +170,8 @@ final class NativeBridge: NSObject, WKScriptMessageHandler {
         case "requestQiblaLocation": location.request(forQibla: true)
         case "cancelPrayerLocation": location.cancel()
         case "openLocationSettings": ExternalLinks.openAppSettings()
+        case "openBook": openBook(a.string(0))
+        case "deleteBook": BookStore.delete(a.string(0)); shell?.callback("onBooksChanged")
         case "startQibla": compass.start(orientation: shell?.currentOrientation ?? .portrait)
         case "stopQibla": compass.stop()
         case "requestHomeWeather":
@@ -246,6 +249,14 @@ final class NativeBridge: NSObject, WKScriptMessageHandler {
     func viewDidDisappear() { compass.stop() }
 
     func orientationChanged(_ orientation: UIInterfaceOrientation) { compass.update(orientation: orientation) }
+
+    /// الكتب: open (and keep) a book from IslamHouse in the native PDF reader.
+    private func openBook(_ json: String?) {
+        guard let json, let data = json.data(using: .utf8), let book = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any],
+              let shell, let reader = BookReaderViewController(book: book, dark: UserDefaults.standard.bool(forKey: "mushafi.launchDark")) else { return }
+        reader.onClose = { [weak shell] in shell?.callback("onBooksChanged") }
+        shell.topPresenter.present(reader, animated: true)
+    }
 
     private func updateIdleTimer() {
         UIApplication.shared.isIdleTimerDisabled = reading || storyReading || FajrCompanion.shared.awake

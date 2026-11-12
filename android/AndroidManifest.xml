@@ -83,6 +83,13 @@
         </activity>
 
         <!-- In-app charity page, started only by MainActivity with a validated route id -->
+        <!-- الكتب: PDF reader for books from IslamHouse, started only by MainActivity -->
+        <activity
+            android:name="com.mushafi.app.BookReaderActivity"
+            android:exported="false"
+            android:theme="@style/MushafiBaseTheme"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|uiMode|keyboardHidden" />
+
         <activity
             android:name="com.mushafi.app.CharityBrowserActivity"
             android:exported="false"
