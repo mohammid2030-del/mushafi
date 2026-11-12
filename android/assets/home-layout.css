@@ -234,3 +234,6 @@ body.hl-sky-on:is([data-hl-sky="night"],[data-hl-sky="dawn"],[data-hl-sky="dusk"
 /* the content below rises into the fading sky, so there is no empty band */
 .hl-sky:has(.hl-sky-times){margin-bottom:-118px!important}
 .hl-sky-slot~*{position:relative;z-index:1}
+
+/* tablets scale the app with zoom (--ui-zoom); viewport units inside it must be scaled back */
+.hl-sky{width:calc(100vw / var(--ui-zoom,1))!important;margin-left:calc(50% - 50vw / var(--ui-zoom,1))!important;margin-right:calc(50% - 50vw / var(--ui-zoom,1))!important;padding-left:max(20px,calc(50vw / var(--ui-zoom,1) - 430px))!important;padding-right:max(20px,calc(50vw / var(--ui-zoom,1) - 430px))!important}

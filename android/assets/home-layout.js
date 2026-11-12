@@ -300,7 +300,9 @@ function hlRefresh() {
 function hlLift() {
   const slot = app.querySelector('.hl-sky-slot'); if (!slot || view !== 'home') { document.body.classList.remove('hl-sky-on'); return }
   slot.style.marginTop = '0px';
-  const top = slot.getBoundingClientRect().top + scrollY;
+  // On tablets the page is zoomed: convert screen pixels back into the slot's own CSS pixels.
+  const rect = slot.getBoundingClientRect(), zoom = slot.offsetWidth ? rect.width / slot.offsetWidth : 1;
+  const top = (rect.top + scrollY) / (zoom > 0.5 && zoom < 3 ? zoom : 1);
   slot.style.setProperty('--hl-lift', top + 'px');
   slot.style.marginTop = -top + 'px';
   const phase = slot.querySelector('.hl-sky')?.classList;
