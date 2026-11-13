@@ -6,8 +6,8 @@ enum ExternalLinks {
         "quran.com", "sunnah.com", "islamhouse.com", "dorar.net",
         "binbaz.org.sa", "www.diyanet.gov.tr", "saadalkhathlan.com",
     ]
-    private static let supportBase = "https://mohammid2030-del.github.io/mushafi-support/"
-    static let supportEmail = "appmushafi@gmail.com"
+    private static let supportBase = "https://mushafiapp.com/"
+    static let supportEmail = "support@mushafiapp.com"
 
     static func openSource(_ text: String?) {
         guard let text, let url = URL(string: text), url.scheme == "https",
@@ -35,7 +35,7 @@ enum ExternalLinks {
 
     static func openSupportPage(_ page: String?) {
         guard let page, ["privacy", "support", "delete-account"].contains(page) else { return }
-        open(supportBase + (page == "privacy" ? "privacy.html" : ""))
+        open(supportBase + (page == "privacy" ? "privacy" : ""))
     }
 
     /// Opens the user's mail app with a message to the developer already addressed and filled in.
