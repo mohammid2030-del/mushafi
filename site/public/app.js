@@ -100,6 +100,20 @@
       });
       sec.addEventListener('pointerleave', function () { stage.style.setProperty('--tx', 0); stage.style.setProperty('--ty', 0); });
     }
+    /* Light / dark: every device switches together (tap again to return to the mix). */
+    var modes = document.querySelectorAll('.dv-mode'), cur = '';
+    var setMode = function (m) {
+      cur = m;
+      modes.forEach(function (b) { b.setAttribute('aria-pressed', b.dataset.mode === m ? 'true' : 'false'); });
+      stage.querySelectorAll('img[data-light]').forEach(function (img, i) {
+        var orig = img.dataset.orig || (img.dataset.orig = img.getAttribute('data-shot'));
+        var want = m ? img.getAttribute('data-' + m) : orig;
+        if (img.getAttribute('data-shot') === want) return;
+        img.setAttribute('data-shot', want);
+        setTimeout(function () { if (window.mushafiI18n) window.mushafiI18n.setShot(img); }, i * 90);
+      });
+    };
+    modes.forEach(function (b) { b.addEventListener('click', function () { setMode(cur === b.dataset.mode ? '' : b.dataset.mode); }); });
     document.querySelectorAll('.dv-flag').forEach(function (b) {
       b.addEventListener('click', function () { if (window.mushafiI18n) window.mushafiI18n.apply(b.getAttribute('data-lang')); });
     });

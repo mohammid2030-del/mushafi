@@ -66,10 +66,10 @@ function hlSkyMarkup(data) {
     </div>
     <div class="hl-sky-body">
       ${night
-        ? `<p class="hl-verse hl-words" data-hl-slot="head" data-hl-key="fajr-verse" lang="ar" translate="no">${hlWords('﴿وَقُرْآنَ الْفَجْرِ | إِنَّ قُرْآنَ الْفَجْرِ كَانَ مَشْهُودًا﴾')}<small>الإسراء · ٧٨</small></p>`
+        ? `<p class="hl-verse hl-words" data-hl-slot="head" data-hl-key="fajr-verse" lang="ar" dir="rtl" translate="no">${hlWords('﴿وَقُرْآنَ الْفَجْرِ | إِنَّ قُرْآنَ الْفَجْرِ كَانَ مَشْهُودًا﴾')}<small>الإسراء · ٧٨</small></p>`
         : `<div class="hl-now hl-words" data-hl-slot="head" data-hl-key="now-${current ? current.key : 'isha'}"><span class="hl-sky-kicker">أنت الآن في وقت</span><h2>${current ? prayerNames[current.key] : prayerNames.isha}</h2></div>`}
       <button class="hl-pill" onclick="prayerHome()">${uiIcon('clock')}${pill}</button>
-      ${dua ? `<p class="hl-dua hl-words" data-hl-slot="dua" data-hl-key="dua-${dua.key}" lang="ar" translate="no">${hlWords(dua.text)}<small>${dua.source}</small></p>` : ''}
+      ${dua ? `<p class="hl-dua hl-words" data-hl-slot="dua" data-hl-key="dua-${dua.key}" lang="ar" dir="rtl" translate="no">${hlWords(dua.text)}<small>${dua.source}</small></p>` : ''}
     </div>
     ${hlArc(today, now)}
     <div class="hl-sky-times">${hlTimesMarkup(data)}</div>
