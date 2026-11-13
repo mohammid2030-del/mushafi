@@ -471,3 +471,41 @@ html[lang=en] .sec-head h2,html[lang=tr] .sec-head h2{letter-spacing:-.015em}
 @media (min-width:64rem){.skyshow .trio{max-width:44rem}}
 .nav.solid.on-dark{background:rgba(11,14,26,.72);box-shadow:0 1px 0 rgba(232,207,150,.10);color:#f4ecda}
 .nav.solid.on-dark .brand b{color:#f4ecda}
+
+/* ── Device frames modelled on the real hardware: titanium/aluminium rim, thin black glass bezel,
+      Dynamic Island, side buttons, front camera and the fold's crease. Sizes in cqw of each device. */
+.dv{container-type:inline-size;padding:0!important;background:linear-gradient(135deg,#77777c 0%,#3a3a3e 10%,#232326 30%,#1b1b1e 55%,#2c2c30 80%,#68686d 100%)!important;box-shadow:inset 0 0 0 1px rgba(255,255,255,.22),inset 0 0 0 2px rgba(0,0,0,.6),0 2.6rem 3.6rem -1.4rem rgba(0,0,0,.8),0 .8rem 1.4rem -.4rem rgba(0,0,0,.45)!important}
+.dv::before,.dv::after{display:none!important}
+.dv .glass{position:absolute;background:#020203;overflow:hidden;box-shadow:inset 0 0 0 1px rgba(255,255,255,.05)}
+.dv .glass img{position:absolute;object-fit:cover;width:auto!important;height:auto!important}
+.dv .glass::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:linear-gradient(118deg,rgba(255,255,255,.10) 0%,rgba(255,255,255,.03) 28%,transparent 45%);z-index:3}
+.dv .btn{position:absolute;display:block;background:linear-gradient(90deg,#2a2a2d,#6d6d72 45%,#2a2a2d);border-radius:2cqw;z-index:-1}
+
+/* iPhone (6.3", titanium) */
+.dv-ph{border-radius:17cqw!important}
+.dv-ph .glass{inset:1.1cqw;border-radius:15.9cqw}
+.dv-ph .glass img{inset:2.4cqw;width:calc(100% - 4.8cqw)!important;height:calc(100% - 4.8cqw)!important;border-radius:13.6cqw}
+.dv-ph .island{position:absolute;top:4.6cqw;left:50%;width:27cqw;height:7.6cqw;transform:translateX(-50%);border-radius:99px;background:#000;z-index:4;box-shadow:inset 0 0 0 .3cqw rgba(255,255,255,.03)}
+.dv-ph .island::after{content:"";position:absolute;right:16%;top:50%;width:2.6cqw;height:2.6cqw;transform:translateY(-50%);border-radius:50%;background:radial-gradient(circle at 40% 40%,#2c3550,#06070b 60%)}
+.dv-ph .act{left:-.8cqw;top:15%;width:1.2cqw;height:4%}
+.dv-ph .vu{left:-.8cqw;top:22%;width:1.2cqw;height:7%}
+.dv-ph .vd{left:-.8cqw;top:30.5%;width:1.2cqw;height:7%}
+.dv-ph .pw{right:-.8cqw;top:25%;width:1.2cqw;height:10.5%}
+.dv-ph .cc{right:-.4cqw;top:56%;width:.8cqw;height:8%;background:linear-gradient(90deg,#1a1a1c,#3c3c40)}
+
+/* iPad Pro 13" (landscape, space black aluminium) */
+.dv-ipad{border-radius:4.3cqw!important;padding:0!important}
+.dv-ipad .glass{inset:.55cqw;border-radius:3.8cqw}
+.dv-ipad .glass img{inset:2.3cqw;width:calc(100% - 4.6cqw)!important;height:calc(100% - 4.6cqw)!important;border-radius:1.9cqw}
+.dv-ipad .cam{position:absolute;top:1.05cqw;left:50%;width:.8cqw;height:.8cqw;transform:translateX(-50%);border-radius:50%;background:radial-gradient(circle at 40% 40%,#2c3550,#050608 65%);z-index:4}
+.dv-ipad .tb1{top:-.45cqw;right:7%;width:6%;height:.7cqw}
+.dv-ipad .tb2{top:-.45cqw;right:15%;width:9%;height:.7cqw}
+
+/* iPhone Fold, open (thin bezel, punch-hole camera, crease) */
+.dv-duo{border-radius:5.6cqw!important;padding:0!important}
+.dv-duo .glass{inset:.75cqw;border-radius:4.9cqw}
+.dv-duo .glass img{inset:1.6cqw;width:calc(100% - 3.2cqw)!important;height:calc(100% - 3.2cqw)!important;border-radius:3.6cqw}
+.dv-duo .cam{position:absolute;top:3cqw;right:22%;width:1.7cqw;height:1.7cqw;border-radius:50%;background:radial-gradient(circle at 40% 40%,#2c3550,#050608 65%);z-index:4}
+.dv-duo .crease{position:absolute;top:1.6cqw;bottom:1.6cqw;left:50%;width:1.6cqw;transform:translateX(-50%);background:linear-gradient(90deg,transparent,rgba(0,0,0,.18) 40%,rgba(255,255,255,.10) 55%,transparent);z-index:3;pointer-events:none}
+.dv-duo .tb1{top:-.55cqw;right:10%;width:5%;height:.9cqw}
+.dv-duo .tb2{top:-.55cqw;right:17%;width:8%;height:.9cqw}
