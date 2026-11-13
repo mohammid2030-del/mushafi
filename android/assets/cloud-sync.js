@@ -92,3 +92,8 @@ const deletionPreviousState=window.onNativeCloud;window.onNativeCloud=function(s
  });
  Object.defineProperty(window,'localStorage',{configurable:true,value:proxy});
 })();
+
+/* Accounts signed in with Apple see Apple, not Google, in the deletion wording. */
+(function(){const viaApple=()=>!!cloudState&&cloudState.signedWith==='apple';
+const baseRender=cloudRenderAccountBody;cloudRenderAccountBody=function(){baseRender();if(!viaApple())return;document.querySelectorAll('.account-delete-card p').forEach(p=>{if(p.textContent.indexOf('قوقل')>-1)p.textContent='يمكنك حذف حساب مصحفي وبياناته المتزامنة نهائيًا. لا يُحذف حساب Apple الخاص بك.'})};
+const baseConfirm=cloudConfirmDeleteAccount;cloudConfirmDeleteAccount=function(){baseConfirm();if(!viaApple())return;const box=document.getElementById('sheet-content');if(!box)return;box.querySelectorAll('p').forEach(p=>{if(p.textContent.indexOf('قوقل')>-1)p.textContent='العملية نهائية. حساب Apple نفسه يبقى كما هو، وستؤكد هويتك بتسجيل الدخول بـ Apple مرة أخرى.'});const b=box.querySelector('#account-delete-submit');if(b)b.textContent='التحقق بـ Apple وحذف حسابي'};})();

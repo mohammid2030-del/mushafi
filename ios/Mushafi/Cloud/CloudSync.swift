@@ -552,6 +552,7 @@ final class CloudSync: NSObject {
         if let user = auth.currentUser {
             j["name"] = user.displayName ?? ""
             j["email"] = user.email ?? ""
+            j["signedWith"] = user.providerData.map(\.providerID).contains("apple.com") ? "apple" : "google"
         }
         if !remote.isEmpty { j["remotePayload"] = remote }
         if !pending.isEmpty { j["pendingPayload"] = pending }
