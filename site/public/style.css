@@ -374,3 +374,9 @@ html[lang=en] .sec-head h2,html[lang=tr] .sec-head h2{letter-spacing:-.015em}
   .lang-grid .lang-tile:last-child{grid-column:auto}
   .lang-tile{padding:1.3rem 1.2rem 1.2rem;min-height:10rem}
 }
+
+/* screenshot language swap */
+.phone img{transition:opacity .22s ease,transform .5s var(--ease),filter .22s ease}
+.phone img.shot-out{opacity:0;transform:scale(.97);filter:blur(4px)}
+.phone img.shot-in{animation:shotIn .6s var(--ease)}
+@keyframes shotIn{from{opacity:0;transform:scale(1.03);filter:blur(6px)}to{opacity:1;transform:none;filter:none}}

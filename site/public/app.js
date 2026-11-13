@@ -15,13 +15,14 @@
     if (h >= 16.5 && h < 19) return 'dusk';
     return 'night';
   }
-  var SHOT = { night: '/img/home-night.webp', dawn: '/img/home-morning.webp', day: '/img/home-day.webp', dusk: '/img/home-day.webp' };
+  var SHOT = { night: 'home-night', dawn: 'home-morning', day: 'home-day', dusk: 'home-day' };
   var TEXT = { night: 'سماء الليل الآن، كما في التطبيق', dawn: 'سماء الفجر الآن، كما في التطبيق', day: 'سماء النهار الآن، كما في التطبيق', dusk: 'سماء الغروب الآن، كما في التطبيق' };
   function applyPhase() {
     var p = phaseFor(new Date());
     if (hero.dataset.phase === p) return;
     hero.dataset.phase = p;
-    shot.src = SHOT[p];
+    shot.setAttribute('data-shot', SHOT[p]);
+    if (window.mushafiI18n) window.mushafiI18n.setShot(shot, true); else shot.src = '/img/' + SHOT[p] + '.webp';
     label.textContent = tr(TEXT[p]);
     var light = p === 'night' || p === 'dusk';
     document.documentElement.style.setProperty('--navInk', light ? '#f4ecda' : '#163b2e');

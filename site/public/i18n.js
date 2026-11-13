@@ -591,7 +591,7 @@
 
   var SKIP = { SCRIPT: 1, STYLE: 1, NOSCRIPT: 1, SVG: 1 };
   var ATTRS = ['alt', 'aria-label', 'title', 'data-soon'];
-  var current = 'ar';
+  var current = 'ar', booted = false;
   var nodes = null, attrNodes = null, metaDesc = null, baseTitle = document.title;
 
   function skipped(el) {
@@ -648,10 +648,34 @@
       el.classList.toggle('on', on);
       if (el.getAttribute('role') === 'option') el.setAttribute('aria-selected', on ? 'true' : 'false');
     });
+    swapShots(lang, !booted);
     try { localStorage.setItem('mushafi-lang', lang); } catch (e) {}
     try { var u = new URL(location.href); if (lang === 'ar') u.searchParams.delete('lang'); else u.searchParams.set('lang', lang); history.replaceState(null, '', u.pathname + u.search + u.hash); } catch (e) {}
     document.dispatchEvent(new CustomEvent('mushafi:lang', { detail: lang }));
   }
+  // App screenshots follow the chosen language with a soft cross-fade.
+  function shotSrc(name, lang) { return lang === 'ar' ? '/img/' + name + '.webp' : '/img/' + lang + '/' + name + '.webp'; }
+  function setShot(img, lang, instant) {
+    var want = shotSrc(img.getAttribute('data-shot'), lang || current);
+    if (img.getAttribute('src') === want) return;
+    if (instant || !img.complete || img.loading === 'lazy' && !img.getBoundingClientRect().height) { img.src = want; return; }
+    var pre = new Image();
+    img.classList.add('shot-out');
+    pre.onload = pre.onerror = function () {
+      setTimeout(function () {
+        img.src = want;
+        var done = function () { img.classList.remove('shot-out'); img.classList.add('shot-in'); setTimeout(function () { img.classList.remove('shot-in'); }, 700); };
+        if (img.decode) img.decode().then(done, done); else done();
+      }, 220);
+    };
+    pre.src = want;
+  }
+  function swapShots(lang, instant) {
+    document.querySelectorAll('img[data-shot]').forEach(function (img, i) {
+      if (instant) setShot(img, lang, true); else setTimeout(function () { setShot(img, lang); }, Math.min(i, 8) * 40);
+    });
+  }
+
   function initial() {
     try { var q = new URL(location.href).searchParams.get('lang'); if (q && LANGS[q]) return q; } catch (e) {}
     try { var s = localStorage.getItem('mushafi-lang'); if (s && LANGS[s]) return s; } catch (e) {}
@@ -680,7 +704,7 @@
     });
   }
 
-  window.mushafiI18n = { t: function (s) { return t(s); }, lang: function () { return current; }, apply: apply };
-  function boot() { setupPicker(); apply(initial()); }
+  window.mushafiI18n = { t: function (s) { return t(s); }, lang: function () { return current; }, apply: apply, setShot: function (img, instant) { setShot(img, current, instant); } };
+  function boot() { setupPicker(); apply(initial()); booted = true; }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
 })();
