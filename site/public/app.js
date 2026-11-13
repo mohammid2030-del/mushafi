@@ -82,4 +82,26 @@
     });
     hero.addEventListener('pointerleave', function () { phone.style.transform = ''; });
   }
+  /* Devices showcase: rise in on view, drift with the pointer, flag chips switch language. */
+  var stage = document.getElementById('dvStage');
+  if (stage) {
+    var show = function () { stage.classList.add('in'); setTimeout(function () { stage.classList.add('live'); }, 1700); };
+    if (!('IntersectionObserver' in window) || reduce) show();
+    else {
+      var dio = new IntersectionObserver(function (en) { if (en[0].isIntersecting) { show(); dio.disconnect(); } }, { threshold: 0.2 });
+      dio.observe(stage);
+    }
+    var sec = document.getElementById('devices');
+    if (!reduce && window.matchMedia('(pointer:fine)').matches) {
+      sec.addEventListener('pointermove', function (e) {
+        var r = sec.getBoundingClientRect();
+        stage.style.setProperty('--tx', ((e.clientX - r.left) / r.width - 0.5).toFixed(3));
+        stage.style.setProperty('--ty', ((e.clientY - r.top) / r.height - 0.5).toFixed(3));
+      });
+      sec.addEventListener('pointerleave', function () { stage.style.setProperty('--tx', 0); stage.style.setProperty('--ty', 0); });
+    }
+    document.querySelectorAll('.dv-flag').forEach(function (b) {
+      b.addEventListener('click', function () { if (window.mushafiI18n) window.mushafiI18n.apply(b.getAttribute('data-lang')); });
+    });
+  }
 })();
