@@ -1,0 +1,43 @@
+/* Tafsir card — a calm floating card over the page, in both themes. */
+.sheet-overlay.tafsir-overlay{background:rgba(12,12,16,.14)!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;animation:tc-fade .22s ease-out}
+body.dark .sheet-overlay.tafsir-overlay{background:rgba(0,0,0,.30)!important}
+.tafsir-panel.tafsir-card{left:10px;right:10px;bottom:calc(10px + var(--app-safe-bottom,0px));width:auto;max-width:720px;margin:0 auto;border-radius:30px;border:1px solid rgba(183,146,75,.22);box-shadow:0 24px 70px rgba(20,14,4,.28),0 2px 0 rgba(255,255,255,.6) inset;animation:tc-up .32s cubic-bezier(.2,.8,.2,1);max-height:calc(98dvh - 20px - var(--app-safe-bottom,0px))}
+.tafsir-panel.tafsir-card.tafsir-card-stay{animation:none}
+body.dark .tafsir-panel.tafsir-card{background:#16181f;border-color:rgba(232,207,150,.18);box-shadow:0 24px 80px rgba(0,0,0,.6)}
+@keyframes tc-up{from{transform:translateY(40px);opacity:0}to{transform:none;opacity:1}}
+@keyframes tc-fade{from{opacity:0}}
+@keyframes tc-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+.tafsir-card .drawer-grip{height:22px;flex-basis:22px}
+.tafsir-card .drawer-size-buttons{display:none}
+.tafsir-card .sheet-title{border-bottom:0;padding:0 18px 6px}
+.tafsir-card .sheet-title h2{font-size:16px;font-weight:700}
+.tafsir-card .sheet-title h2 small{display:inline-block;margin:0 8px 0 0;padding:2px 10px;border-radius:999px;font-size:11px;font-weight:700;color:#a8843f;background:rgba(201,162,74,.12)}
+body.dark .tafsir-card .sheet-title h2 small{color:#e8cf96;background:rgba(232,207,150,.10)}
+.tafsir-card .sheet-title>button{width:36px;height:36px;min-width:36px;border-radius:50%;border:0!important;outline:none;box-shadow:none!important;background:rgba(127,127,127,.12);color:var(--ink);font-size:20px;line-height:1}
+
+.tafsir-card .tafsir-scroll{padding:4px 18px 16px}
+.tafsir-card .tafsir-scroll>*{animation:tc-in .28s ease-out both}
+.tafsir-card .tafsir-scroll>*:nth-child(2){animation-delay:.04s}.tafsir-card .tafsir-scroll>*:nth-child(3){animation-delay:.08s}.tafsir-card .tafsir-scroll>*:nth-child(4){animation-delay:.12s}
+.tafsir-verse{position:relative;text-align:center;padding:16px 16px 12px;border-radius:20px;background:linear-gradient(180deg,rgba(201,162,74,.10),rgba(201,162,74,.04));border:1px solid rgba(201,162,74,.22)}
+body.dark .tafsir-verse{background:linear-gradient(180deg,rgba(232,207,150,.08),rgba(232,207,150,.02));border-color:rgba(232,207,150,.16)}
+.tafsir-verse-text{font:calc(var(--tafsir-font) + 7px)/2.05 Quran,serif;color:var(--ink);margin:0;max-height:38vh;overflow:auto}
+.tafsir-verse-ref{display:inline-block;margin-top:4px;font-size:12px;color:#a8843f}
+body.dark .tafsir-verse-ref{color:#e8cf96}
+.tafsir-card .tafsir-source{padding:14px 2px 2px;font-size:13px;font-weight:700;color:#a8843f;border:0}
+body.dark .tafsir-card .tafsir-source{color:#e8cf96}
+.tafsir-card .source-offline{font-size:11px;font-weight:600;padding:3px 10px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
+.tafsir-card .tafsir-text{font:var(--tafsir-font)/2.05 var(--ui-font,AppArabic),Tahoma,sans-serif;padding:8px 2px 6px;color:var(--ink)}
+.tafsir-card .tafsir-note{font-size:11px;color:var(--muted);opacity:.8;margin:6px 2px 0}
+
+.tafsir-card .tafsir-footer{display:flex;flex-wrap:wrap;align-items:center;gap:8px;background:transparent!important;border-top:1px solid var(--line);box-shadow:none;padding:10px 14px 12px;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+.tafsir-card .tafsir-navigation{flex:1 1 100%;gap:8px}
+.tafsir-card .tafsir-navigation button{min-height:44px;border-radius:14px;font:600 14px var(--ui-font,AppArabic),Tahoma,sans-serif}
+.tafsir-card .tafsir-navigation button:nth-child(2){background:linear-gradient(180deg,#f0d9a2,#c9a24a)!important;color:#2a1f08!important;border:0!important;box-shadow:0 6px 18px rgba(201,162,74,.3)}
+.tafsir-card .tafsir-quick-actions{flex:1 1 auto;padding:0;gap:6px}
+.tafsir-card .tafsir-quick-actions button{min-height:36px;border-radius:12px;font:12px var(--ui-font,AppArabic),Tahoma,sans-serif}
+.tafsir-card .tafsir-font-tools{flex:0 0 auto;padding:0;gap:6px}
+.tafsir-card .tafsir-font-tools>span:first-child{display:none}
+.tafsir-card .tafsir-font-tools button{min-width:36px;height:36px;border-radius:12px;font-size:15px}
+.tafsir-card[data-snap="0"] .tafsir-font-tools,.tafsir-card[data-snap="0"] .tafsir-quick-actions{display:none}
+@media (prefers-reduced-motion:reduce){.tafsir-panel.tafsir-card,.tafsir-card .tafsir-scroll>*,.sheet-overlay.tafsir-overlay{animation:none}}
