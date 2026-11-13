@@ -19,7 +19,7 @@ enum WeatherService {
         }
         var request = URLRequest(url: url)
         let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "1"
-        request.setValue("Mushafi/\(version) (iOS) https://mohammid2030-del.github.io/mushafi-support/",
+        request.setValue("Mushafi/\(version) (iOS) https://mushafiapp.com/",
                          forHTTPHeaderField: "User-Agent")
 
         session.dataTask(with: request) { data, response, _ in
