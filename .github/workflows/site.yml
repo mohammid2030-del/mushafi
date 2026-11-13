@@ -24,7 +24,7 @@ jobs:
           URL=https://mushafiapp.com
           for i in $(seq 1 30); do curl -fsS -o /dev/null "$URL/" && break; echo "waiting for $URL ($i)"; sleep 10; done
           curl -fsS -o /dev/null -w "home %{http_code}\n" "$URL/"
-          curl -fsS -o /dev/null -w "www %{http_code} -> %{redirect_url}\n" "https://www.mushafiapp.com/" || true
-          curl -sS -o /dev/null -w "old %{http_code} -> %{redirect_url}\n" "$OLD/"
+          echo "--- www"; curl -sSI "https://www.mushafiapp.com/" | grep -iE "^HTTP|^location" || true
+          echo "--- old"; curl -sSI "https://app.mushafi.workers.dev/" | grep -iE "^HTTP|^location" || true
           curl -fsS -o /dev/null -w "privacy %{http_code}\n" "$URL/privacy"
           curl -sS -I "$URL/download/android" | grep -i "^location"; curl -sS -IL "$URL/download/android" | grep -iE "^HTTP|content-length"
