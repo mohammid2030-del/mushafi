@@ -131,11 +131,11 @@ function hlDua(today, now) {
   for (const k of ['fajr', 'dhuhr', 'asr', 'maghrib', 'isha']) if (Number.isFinite(today[k]) && now >= today[k] - 30 * 60000) key = k;
   return { key, ...HL_DUAS[key] }
 }
-// From 10 pm until an hour before Fajr the head of the sky shows ﴿وقرآن الفجر…﴾.
+// From 10 pm until the Fajr adhan the head of the sky shows ﴿وقرآن الفجر…﴾.
 function hlNightVerse(data, today, now) {
   if (!today) return false;
   const hour = +new Intl.DateTimeFormat('en-GB', { timeZone: hlZone(data), hour: '2-digit', hour12: false }).format(new Date(now)) % 24;
-  return hour >= 22 || now < today.fajr - 60 * 60000
+  return hour >= 22 || now < today.fajr
 }
 function hlWords(text) { let i = 0; return String(text).split('|').map(line => `<span class="hl-line">${line.trim().split(/\s+/).map(w => `<span style="--i:${i++}">${esc(w)}</span>`).join(' ')}</span>`).join('<br>') }
 // Words rise in one by one when a new dua or the verse appears, and again when the app opens.
