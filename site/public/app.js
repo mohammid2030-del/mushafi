@@ -4,6 +4,8 @@
   var shot = document.getElementById('heroShot');
   var label = document.getElementById('phaseLabel');
   var nav = document.getElementById('nav');
+  function tr(s) { return window.mushafiI18n ? window.mushafiI18n.t(s) : s; }
+  document.addEventListener('mushafi:lang', function () { label.textContent = tr(TEXT[hero.dataset.phase] || TEXT.day); });
 
   /* The hero sky follows the visitor's own clock, like the home screen in the app. */
   function phaseFor(d) {
@@ -20,7 +22,7 @@
     if (hero.dataset.phase === p) return;
     hero.dataset.phase = p;
     shot.src = SHOT[p];
-    label.textContent = TEXT[p];
+    label.textContent = tr(TEXT[p]);
     var light = p === 'night' || p === 'dusk';
     document.documentElement.style.setProperty('--navInk', light ? '#f4ecda' : '#163b2e');
   }
@@ -64,7 +66,8 @@
   document.querySelectorAll('.rail-nav button').forEach(function (b) {
     b.addEventListener('click', function () {
       var step = rail.querySelector('figure').offsetWidth + 34;
-      rail.scrollBy({ left: Number(b.dataset.dir) * step * 2, behavior: 'smooth' });
+      var fwd = b.dataset.dir === 'next' ? 1 : -1, rtl = document.documentElement.dir === 'rtl';
+      rail.scrollBy({ left: fwd * (rtl ? -1 : 1) * step * 2, behavior: 'smooth' });
     });
   });
 
