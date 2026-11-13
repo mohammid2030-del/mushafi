@@ -529,3 +529,15 @@ html[lang=en] .sec-head h2,html[lang=tr] .sec-head h2{letter-spacing:-.015em}
 .dv .hw,.phone .hw{display:none!important}
 .dv,.phone{background:#0d0d10!important;box-shadow:0 0 0 1px rgba(255,255,255,.10),0 2.4rem 3.4rem -1.4rem rgba(0,0,0,.55),0 .6rem 1.2rem -.4rem rgba(0,0,0,.3)!important}
 .dv .glass,.phone .glass{background:#0d0d10!important;box-shadow:none!important}
+/* the bezel is drawn by .glass itself (its cqw resolve against the device),
+   so the outer body never disagrees with the screen corners */
+.dv,.phone{background:transparent!important;box-shadow:none!important}
+.dv .glass,.phone .glass{inset:0!important;background:#0d0d10!important;box-shadow:0 0 0 1px rgba(255,255,255,.10),0 2.4rem 3.4rem -1.4rem rgba(0,0,0,.55),0 .6rem 1.2rem -.4rem rgba(0,0,0,.3)!important}
+.dv-ph .glass,.phone .glass{border-radius:17cqw!important}
+.dv-ipad .glass{border-radius:4.3cqw!important}
+.dv-duo .glass{border-radius:5.6cqw!important}
+/* tilted mushaf phones: keep their tops intact, crop only at the bottom */
+.card-shots{overflow:visible!important}
+.card-shots .phone{top:1rem}
+.tilt-l{top:2.25rem!important}
+@media (min-width:40rem){.card-shots .phone{top:2rem}.tilt-l{top:3.5rem!important}}
