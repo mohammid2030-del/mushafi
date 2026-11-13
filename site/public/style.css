@@ -469,3 +469,5 @@ html[lang=en] .sec-head h2,html[lang=tr] .sec-head h2{letter-spacing:-.015em}
   .orb{top:12%}
 }
 @media (min-width:64rem){.skyshow .trio{max-width:44rem}}
+.nav.solid.on-dark{background:rgba(11,14,26,.72);box-shadow:0 1px 0 rgba(232,207,150,.10);color:#f4ecda}
+.nav.solid.on-dark .brand b{color:#f4ecda}

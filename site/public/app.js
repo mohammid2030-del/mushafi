@@ -30,7 +30,27 @@
   setInterval(applyPhase, 60000);
 
   /* Solid nav after the hero starts scrolling away. */
-  function onScroll() { nav.classList.toggle('solid', window.scrollY > 40); }
+  /* The bar takes the tone of whatever section is beneath it: night glass over dark sections,
+     paper glass over light ones, so it never sits as a pale band over the night sky. */
+  function underNavIsDark() {
+    var y = nav.getBoundingClientRect().bottom + 2;
+    var el = document.elementFromPoint(window.innerWidth / 2, y);
+    var sec = el && el.closest('section, footer');
+    if (!sec) return true;
+    if (sec.classList.contains('features') || sec.classList.contains('skyshow')) return false;
+    if (sec === hero) {
+      var p = hero.dataset.phase;
+      if (p === 'night' || p === 'dusk') return true;
+      var r = hero.getBoundingClientRect();
+      return (y - r.top) / r.height > 0.5;
+    }
+    return true;
+  }
+  function onScroll() {
+    var solid = window.scrollY > 40;
+    nav.classList.toggle('solid', solid);
+    nav.classList.toggle('on-dark', solid && underNavIsDark());
+  }
   onScroll();
   window.addEventListener('scroll', onScroll, { passive: true });
 
