@@ -21,8 +21,7 @@
     var p = phaseFor(new Date());
     if (hero.dataset.phase === p) return;
     hero.dataset.phase = p;
-    shot.setAttribute('data-shot', SHOT[p]);
-    if (window.mushafiI18n) window.mushafiI18n.setShot(shot, true); else shot.src = '/img/' + SHOT[p] + '.webp';
+    if (shot) { shot.setAttribute('data-shot', SHOT[p]); if (window.mushafiI18n) window.mushafiI18n.setShot(shot, true); else shot.src = '/img/' + SHOT[p] + '.webp'; }
     label.textContent = tr(TEXT[p]);
     var light = p === 'night' || p === 'dusk';
     document.documentElement.style.setProperty('--navInk', light ? '#f4ecda' : '#163b2e');
@@ -66,7 +65,7 @@
   var rail = document.getElementById('rail');
   document.querySelectorAll('.rail-nav button').forEach(function (b) {
     b.addEventListener('click', function () {
-      var step = rail.querySelector('figure').offsetWidth + 34;
+      if (!rail) return; var step = rail.querySelector('figure').offsetWidth + 34;
       var fwd = b.dataset.dir === 'next' ? 1 : -1, rtl = document.documentElement.dir === 'rtl';
       rail.scrollBy({ left: fwd * (rtl ? -1 : 1) * step * 2, behavior: 'smooth' });
     });
@@ -74,7 +73,7 @@
 
   /* Gentle tilt of the hero phone with the pointer (desktop only). */
   var phone = document.getElementById('heroPhone');
-  if (!reduce && window.matchMedia('(pointer:fine)').matches) {
+  if (phone && !reduce && window.matchMedia('(pointer:fine)').matches) {
     hero.addEventListener('pointermove', function (e) {
       var r = hero.getBoundingClientRect();
       var x = (e.clientX - r.left) / r.width - 0.5, y = (e.clientY - r.top) / r.height - 0.5;
@@ -91,7 +90,7 @@
       var dio = new IntersectionObserver(function (en) { if (en[0].isIntersecting) { show(); dio.disconnect(); } }, { threshold: 0.2 });
       dio.observe(stage);
     }
-    var sec = document.getElementById('devices');
+    var sec = hero;
     if (!reduce && window.matchMedia('(pointer:fine)').matches) {
       sec.addEventListener('pointermove', function (e) {
         var r = sec.getBoundingClientRect();

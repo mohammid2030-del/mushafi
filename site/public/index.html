@@ -26,10 +26,10 @@
       <span><b>مصحفي</b><small>قرآن، ذكر، طمأنينة</small></span>
     </a>
     <nav class="links" aria-label="أقسام الموقع">
-      <a href="#devices">الأجهزة</a>
       <a href="#features">المزايا</a>
-      <a href="#sky">السماء</a>
       <a href="#fajr">صحبة الفجر</a>
+      <a href="#sky">السماء</a>
+      <a href="#download">التحميل</a>
     </nav>
     <div class="nav-end">
       <div class="lang" id="lang">
@@ -62,7 +62,7 @@
     <div class="cloud c1"></div><div class="cloud c2"></div><div class="cloud c3"></div>
     <div class="hero-fade"></div>
   </div>
-  <div class="wrap hero-grid">
+  <div class="wrap hero-in">
     <div class="hero-copy">
       <p class="kicker reveal"><span class="dot"></span><span id="phaseLabel" data-noi18n>السماء الآن كما في التطبيق</span></p>
       <h1 class="reveal">مصحفي</h1>
@@ -83,49 +83,32 @@
         <span>للأندرويد الآن: <b>حمّل ملف APK — اضغط هنا</b></span>
       </a>
     </div>
-    <div class="hero-visual reveal">
-      <div class="halo"></div>
-      <div class="phone phone-hero" id="heroPhone"><img data-shot="home-day" id="heroShot" src="/img/home-day.webp" alt="الشاشة الرئيسية في مصحفي" width="660" height="1434"></div>
-      <div class="float f1"><span class="fi">☾</span><span><small>لكل صلاة</small><b>أذان بصوت مؤذنك المفضّل</b></span></div>
-      <div class="float f2"><span class="fi">✦</span><span><small>دون إنترنت</small><b>٦٠٤ صفحة برسم المصحف</b></span></div>
-    </div>
-  </div>
-  <a class="scroll-cue" href="#devices" aria-label="انزل للأسفل"><span></span></a>
-</section>
-
-<!-- ═══ DEVICES ═══ -->
-<section class="devices" id="devices">
-  <div class="dv-glow" aria-hidden="true"></div>
-  <div class="mini-sky" aria-hidden="true"><div class="stars"></div></div>
-  <div class="wrap">
-    <header class="sec-head light reveal">
-      <span class="eyebrow">على كل أجهزتك</span>
-      <h2>آيفون، وآيفون Duo، وآيباد</h2>
-      <p>تصميم يتكيّف مع كل شاشة، بالوضعين الفاتح والداكن — جرّب بنفسك.</p>
-    </header>
-    <div class="dv-stage" id="dvStage">
-      <div class="dv dv-ipad"><img data-shot="ipad" data-light="ipad" data-dark="ipad-dark" loading="lazy" src="/img/ipad.webp" alt="مصحفي على الآيباد" width="1400" height="1050"></div>
-      <div class="dv dv-duo"><img data-shot="duo" data-light="duo-light" data-dark="duo" loading="lazy" src="/img/duo.webp" alt="مصحفي على آيفون Duo" width="1400" height="985"></div>
-      <div class="dv dv-ph dv-ph1"><img data-shot="mushaf-dark" data-light="mushaf" data-dark="mushaf-dark" loading="lazy" src="/img/mushaf-dark.webp" alt="المصحف على الآيفون" width="660" height="1434"></div>
-      <div class="dv dv-ph dv-ph2"><img data-shot="home-morning" data-light="home-morning" data-dark="home-night" loading="lazy" src="/img/home-morning.webp" alt="الرئيسية على الآيفون" width="660" height="1434"></div>
-    </div>
-    <div class="dv-theme reveal" role="group" aria-label="المظهر">
-      <button type="button" class="dv-mode" data-mode="light" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.8v2.1M12 19.1v2.1M2.8 12h2.1M19.1 12h2.1M5.5 5.5 7 7M17 17l1.5 1.5M5.5 18.5 7 17M17 7l1.5-1.5"/></svg>فاتح</button>
-      <button type="button" class="dv-mode" data-mode="dark" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.5 14.6A8 8 0 0 1 9.4 4.5a8 8 0 1 0 10.1 10.1Z"/></svg>داكن</button>
-    </div>
-    <div class="dv-meta reveal">
-      <div class="dv-langs">
-        <span class="dv-lh">يدعم ٥ لغات</span>
-        <div class="dv-flags">
-          <button type="button" class="dv-flag" data-lang="ar"><span class="fl" aria-hidden="true">🇸🇦</span><span lang="ar">العربية</span></button>
-          <button type="button" class="dv-flag" data-lang="en"><span class="fl" aria-hidden="true">🇬🇧</span><span lang="en">English</span></button>
-          <button type="button" class="dv-flag" data-lang="ur"><span class="fl" aria-hidden="true">🇵🇰</span><span lang="ur">اردو</span></button>
-          <button type="button" class="dv-flag" data-lang="bn"><span class="fl" aria-hidden="true">🇧🇩</span><span lang="bn">বাংলা</span></button>
-          <button type="button" class="dv-flag" data-lang="tr"><span class="fl" aria-hidden="true">🇹🇷</span><span lang="tr">Türkçe</span></button>
+    <div class="showcase">
+      <div class="dv-stage" id="dvStage">
+        <div class="dv dv-ipad"><img data-shot="ipad" data-light="ipad" data-dark="ipad-dark" src="/img/ipad.webp" alt="مصحفي على الآيباد" width="1400" height="1050"></div>
+        <div class="dv dv-duo"><img data-shot="duo" data-light="duo-light" data-dark="duo" src="/img/duo.webp" alt="مصحفي على آيفون Duo" width="1400" height="985"></div>
+        <div class="dv dv-ph dv-ph1"><img data-shot="mushaf-dark" data-light="mushaf" data-dark="mushaf-dark" src="/img/mushaf-dark.webp" alt="المصحف على الآيفون" width="660" height="1434"></div>
+        <div class="dv dv-ph dv-ph2"><img data-shot="home-morning" data-light="home-morning" data-dark="home-night" src="/img/home-morning.webp" alt="الرئيسية على الآيفون" width="660" height="1434"></div>
+      </div>
+      <div class="dock reveal">
+        <div class="dv-theme" role="group" aria-label="المظهر">
+          <button type="button" class="dv-mode" data-mode="light" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.8v2.1M12 19.1v2.1M2.8 12h2.1M19.1 12h2.1M5.5 5.5 7 7M17 17l1.5 1.5M5.5 18.5 7 17M17 7l1.5-1.5"/></svg>فاتح</button>
+          <button type="button" class="dv-mode" data-mode="dark" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.5 14.6A8 8 0 0 1 9.4 4.5a8 8 0 1 0 10.1 10.1Z"/></svg>داكن</button>
+        </div>
+        <span class="dock-sep" aria-hidden="true"></span>
+        <div class="dock-langs"><span class="dv-lh">يدعم ٥ لغات</span>
+          <div class="dv-flags">
+            <button type="button" class="dv-flag" data-lang="ar"><span class="fl" aria-hidden="true">🇸🇦</span><span lang="ar">العربية</span></button>
+            <button type="button" class="dv-flag" data-lang="en"><span class="fl" aria-hidden="true">🇬🇧</span><span lang="en">English</span></button>
+            <button type="button" class="dv-flag" data-lang="ur"><span class="fl" aria-hidden="true">🇵🇰</span><span lang="ur">اردو</span></button>
+            <button type="button" class="dv-flag" data-lang="bn"><span class="fl" aria-hidden="true">🇧🇩</span><span lang="bn">বাংলা</span></button>
+            <button type="button" class="dv-flag" data-lang="tr"><span class="fl" aria-hidden="true">🇹🇷</span><span lang="tr">Türkçe</span></button>
+          </div>
         </div>
       </div>
     </div>
   </div>
+  <a class="scroll-cue" href="#verse" aria-label="انزل للأسفل"><span></span></a>
 </section>
 
 <!-- ═══ NIGHT VERSE ═══ -->
@@ -205,22 +188,6 @@
   </div>
 </section>
 
-<!-- ═══ WEATHER SKY ═══ -->
-<section class="skyshow" id="sky">
-  <div class="wrap">
-    <header class="sec-head light reveal">
-      <span class="eyebrow">تفصيل لن تجده في غيره</span>
-      <h2>سماءٌ تحاكي وقتك وطقسك</h2>
-      <p>الرئيسية ليست صورة ثابتة: تشرق مع الشروق، وتمطر حين تمطر في مدينتك، وتهدأ نجومها في الليل.</p>
-    </header>
-    <div class="trio">
-      <figure class="reveal"><div class="phone phone-md"><img data-shot="home-day" loading="lazy" src="/img/home-day.webp" alt="سماء صافية" width="660" height="1434"></div><figcaption><i class="w-sun"></i>صحو</figcaption></figure>
-      <figure class="reveal mid"><div class="phone phone-md"><img data-shot="home-rain" loading="lazy" src="/img/home-rain.webp" alt="سماء ممطرة" width="660" height="1434"></div><figcaption><i class="w-rain"></i>مطر</figcaption></figure>
-      <figure class="reveal"><div class="phone phone-md"><img data-shot="home-night" loading="lazy" src="/img/home-night.webp" alt="سماء الليل" width="660" height="1434"></div><figcaption><i class="w-moon"></i>ليل</figcaption></figure>
-    </div>
-  </div>
-</section>
-
 <!-- ═══ FAJR COMPANION ═══ -->
 <section class="fajr" id="fajr">
   <div class="pattern" aria-hidden="true"></div>
@@ -242,14 +209,18 @@
   </div>
 </section>
 
-<!-- ═══ PROMISES ═══ -->
-<section class="promises">
+<!-- ═══ WEATHER SKY ═══ -->
+<section class="skyshow" id="sky">
   <div class="wrap">
-    <div class="promise-grid">
-      <div class="promise reveal"><b>مجاني بالكامل</b><span>كل المزايا متاحة للجميع</span></div>
-      <div class="promise reveal"><b>بدون إعلانات</b><span>لا شيء يقطع خلوتك</span></div>
-      <div class="promise reveal"><b>خصوصيتك أولًا</b><span>لا تتبّع، والحساب اختياري</span></div>
-      <div class="promise reveal"><b>يعمل دون إنترنت</b><span>المصحف والأذكار والمواقيت</span></div>
+    <header class="sec-head reveal">
+      <span class="eyebrow">تفصيل لن تجده في غيره</span>
+      <h2>سماءٌ تحاكي وقتك وطقسك</h2>
+      <p>الرئيسية ليست صورة ثابتة: تشرق مع الشروق، وتمطر حين تمطر في مدينتك، وتهدأ نجومها في الليل.</p>
+    </header>
+    <div class="trio">
+      <figure class="reveal"><div class="phone phone-md"><img data-shot="home-day" loading="lazy" src="/img/home-day.webp" alt="سماء صافية" width="660" height="1434"></div><figcaption><i class="w-sun"></i>صحو</figcaption></figure>
+      <figure class="reveal mid"><div class="phone phone-md"><img data-shot="home-rain" loading="lazy" src="/img/home-rain.webp" alt="سماء ممطرة" width="660" height="1434"></div><figcaption><i class="w-rain"></i>مطر</figcaption></figure>
+      <figure class="reveal"><div class="phone phone-md"><img data-shot="home-night" loading="lazy" src="/img/home-night.webp" alt="سماء الليل" width="660" height="1434"></div><figcaption><i class="w-moon"></i>ليل</figcaption></figure>
     </div>
   </div>
 </section>
@@ -261,6 +232,12 @@
     <img class="dl-icon reveal" src="/img/icon.webp" alt="" width="112" height="112">
     <h2 class="reveal">ابدأ يومك مع مصحفي</h2>
     <p class="reveal">حمّله الآن على الآيفون والآيباد، وعلى الأندرويد مباشرة.</p>
+    <div class="promise-grid reveal">
+      <div class="promise"><span class="p-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12v8H4v-8M2.5 7.5h19V12h-19zM12 20V7.5M12 7.5H8a2.25 2.25 0 1 1 0-4.5c2.6 0 4 4.5 4 4.5Zm0 0h4a2.25 2.25 0 1 0 0-4.5c-2.6 0-4 4.5-4 4.5Z"/></svg></span><b>مجاني بالكامل</b><span>كل المزايا متاحة للجميع</span></div>
+      <div class="promise"><span class="p-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="m6 6 12 12"/></svg></span><b>بدون إعلانات</b><span>لا شيء يقطع خلوتك</span></div>
+      <div class="promise"><span class="p-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2.5"/><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5"/></svg></span><b>خصوصيتك أولًا</b><span>لا تتبّع، والحساب اختياري</span></div>
+      <div class="promise"><span class="p-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3l18 18M8.5 16.5a5 5 0 0 1 7 0M5 13a10 10 0 0 1 4.2-2.4M19 13a10 10 0 0 0-2.2-1.6M2 9.5a15 15 0 0 1 4.6-2.8M22 9.5A15 15 0 0 0 10.5 5.6"/><circle cx="12" cy="20" r=".6"/></svg></span><b>يعمل دون إنترنت</b><span>المصحف والأذكار والمواقيت</span></div>
+    </div>
     <div class="stores center reveal">
       <a class="store store-apple" href="https://apps.apple.com/app/id6832528924" target="_blank" rel="noopener">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M16.37 12.6c-.02-2.2 1.8-3.27 1.88-3.32-1.03-1.5-2.62-1.7-3.18-1.73-1.35-.14-2.64.8-3.33.8-.69 0-1.74-.78-2.87-.76-1.47.02-2.83.86-3.59 2.18-1.53 2.66-.39 6.6 1.1 8.75.73 1.05 1.6 2.24 2.73 2.2 1.1-.05 1.51-.71 2.84-.71 1.32 0 1.7.71 2.86.69 1.18-.02 1.93-1.07 2.65-2.13.84-1.22 1.18-2.4 1.2-2.47-.03-.01-2.3-.88-2.29-3.5ZM14.2 6.13c.6-.74 1.01-1.75.9-2.77-.87.04-1.93.58-2.55 1.31-.56.65-1.05 1.69-.92 2.69.97.07 1.96-.49 2.57-1.23Z"/></svg>
