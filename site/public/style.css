@@ -525,3 +525,7 @@ html[lang=en] .sec-head h2,html[lang=tr] .sec-head h2{letter-spacing:-.015em}
 .phone .pw{right:-.8cqw;top:25%;width:1.2cqw;height:10.5%}
 .phone .cc{right:-.4cqw;top:56%;width:.8cqw;height:8%;background:linear-gradient(90deg,#1a1a1c,#3c3c40)}
 .phone{isolation:isolate}
+/* clean frames: no side buttons, single smooth bezel */
+.dv .hw,.phone .hw{display:none!important}
+.dv,.phone{background:#0d0d10!important;box-shadow:0 0 0 1px rgba(255,255,255,.10),0 2.4rem 3.4rem -1.4rem rgba(0,0,0,.55),0 .6rem 1.2rem -.4rem rgba(0,0,0,.3)!important}
+.dv .glass,.phone .glass{background:#0d0d10!important;box-shadow:none!important}
