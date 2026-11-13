@@ -73,11 +73,12 @@
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="mushafi-app" android:host="wake" />
             </intent-filter>
-            <!-- Short invite link https://go.mushafi.workers.dev/<code> (verified App Link) -->
+            <!-- Short invite link https://go.mushafiapp.com/<code> (verified App Link; the old workers.dev host still opens) -->
             <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https" android:host="go.mushafiapp.com" android:pathPattern="/.........." />
                 <data android:scheme="https" android:host="go.mushafi.workers.dev" android:pathPattern="/.........." />
             </intent-filter>
         </activity>

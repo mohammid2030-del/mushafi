@@ -1,8 +1,12 @@
-# مصحفي public website → https://app.mushafi.workers.dev
+# مصحفي public website → https://mushafiapp.com (app.mushafi.workers.dev redirects here)
 name = "app"
 main = "src/index.js"
 compatibility_date = "2025-01-01"
 workers_dev = true
+routes = [
+  { pattern = "mushafiapp.com", custom_domain = true },
+  { pattern = "www.mushafiapp.com", custom_domain = true },
+]
 
 [assets]
 directory = "./public"

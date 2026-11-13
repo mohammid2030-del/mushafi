@@ -318,7 +318,7 @@ final class AppRouter {
 
     /// mushafi-app://open/<route>
     func handle(_ url: URL) -> Bool {
-        let shortLink = url.scheme == "https" && url.host == "go.mushafi.workers.dev"
+        let shortLink = url.scheme == "https" && (url.host == "go.mushafiapp.com" || url.host == "go.mushafi.workers.dev")
         if shortLink || (url.scheme == "mushafi-app" && url.host == "wake") {
             let code = url.lastPathComponent.lowercased()
             guard code.range(of: "^[a-z0-9]{10}$", options: .regularExpression) != nil else { return false }

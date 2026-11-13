@@ -197,7 +197,7 @@ function fajrListCard(l) {
 
 /* ---------- people: invites and the Mushafi users on each side ---------- */
 // Short invite link; opens Mushafi directly (Universal Links / App Links), served by the wake worker.
-const WAKE_SITE = 'https://go.mushafi.workers.dev/';
+const WAKE_SITE = 'https://go.mushafiapp.com/';
 let fajrPeers = null, fajrPeersBusy = false;
 function fajrPeersOf(role) { return (fajrPeers || []).filter(p => p.role === role) }
 function fajrLoadPeers() {

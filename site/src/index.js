@@ -26,6 +26,10 @@ async function serveApk(request) {
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
+    // One public address: the old workers.dev link and www both move to mushafiapp.com.
+    if (url.hostname !== 'mushafiapp.com' && url.hostname !== 'localhost') {
+      return Response.redirect('https://mushafiapp.com' + url.pathname + url.search, 301);
+    }
     if (url.pathname === '/download/android' || url.pathname === '/download/android/') {
       const build = await currentBuild();
       return new Response(null, { status: 302, headers: { location: `/download/android/${build}/Mushafi.apk`, 'cache-control': 'no-store' } });

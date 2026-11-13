@@ -44,5 +44,8 @@ jobs:
           curl -fsS "$URL/health"
           node publish-endpoint.mjs "$URL"
           curl -fsS "$URL/.well-known/apple-app-site-association" > /dev/null
+          for i in $(seq 1 30); do curl -fsS -o /dev/null https://go.mushafiapp.com/health && break; echo "waiting for go.mushafiapp.com ($i)"; sleep 10; done
+          curl -fsS https://go.mushafiapp.com/.well-known/apple-app-site-association | head -c 300; echo
+          curl -fsS -o /dev/null -w "assetlinks %{http_code}\n" https://go.mushafiapp.com/.well-known/assetlinks.json
           # The relay used to be called mushafi-wake; remove that old copy once (fine if already gone).
           npx --yes wrangler@4 delete --name mushafi-wake --force 2>/dev/null || true
