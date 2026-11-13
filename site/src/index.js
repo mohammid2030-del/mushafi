@@ -5,12 +5,12 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
     if (url.pathname === '/download/android' || url.pathname === '/download/android/') {
-      const upstream = await fetch(APK, { redirect: 'follow', cf: { cacheEverything: true, cacheTtl: 3600 } });
+      const upstream = await fetch(APK, { redirect: 'follow', cf: { cacheTtl: 0 } });
       if (!upstream.ok) return Response.redirect(url.origin + '/#download', 302);
       const headers = new Headers({
         'content-type': 'application/vnd.android.package-archive',
         'content-disposition': 'attachment; filename="Mushafi.apk"',
-        'cache-control': 'public, max-age=600',
+        'cache-control': 'no-cache',
         'x-content-type-options': 'nosniff',
       });
       const len = upstream.headers.get('content-length');
