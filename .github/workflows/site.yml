@@ -25,4 +25,4 @@ jobs:
           sleep 5
           curl -fsS -o /dev/null -w "home %{http_code}\n" "$URL/"
           curl -fsS -o /dev/null -w "privacy %{http_code}\n" "$URL/privacy"
-          curl -sS -I "$URL/download/android" | head -8
+          curl -sS -I "$URL/download/android" | grep -i "^location"; curl -sS -IL "$URL/download/android" | grep -iE "^HTTP|content-length"
