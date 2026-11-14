@@ -541,3 +541,20 @@ html[lang=en] .sec-head h2,html[lang=tr] .sec-head h2{letter-spacing:-.015em}
 .card-shots .phone{top:1rem}
 .tilt-l{top:2.25rem!important}
 @media (min-width:40rem){.card-shots .phone{top:2rem}.tilt-l{top:3.5rem!important}}
+
+/* follow / socials */
+.follow{margin:2.6rem auto 0;max-width:34rem;text-align:center}
+.follow h3{font-size:var(--t-lg,1.35rem);color:var(--gold2,#e8cf96);margin:0}
+.follow p{margin:.35rem 0 1.1rem;font-size:var(--t-sm,.95rem);opacity:.75}
+.follow-row{display:grid;grid-template-columns:1fr 1fr;gap:.8rem}
+.soc-card{display:flex;align-items:center;justify-content:center;gap:.75rem;padding:.95rem 1rem;border-radius:1.1rem;background:rgba(255,255,255,.06);border:1px solid rgba(232,207,150,.28);color:#f4ecda;text-decoration:none;transition:transform .2s,background .2s,border-color .2s}
+.soc-card:hover{transform:translateY(-2px);background:rgba(232,207,150,.12);border-color:rgba(232,207,150,.6)}
+.soc-card svg{width:1.6rem;height:1.6rem;flex:none}
+.soc-card span{display:flex;flex-direction:column;align-items:flex-start;line-height:1.25}
+.soc-card small{font-size:.75rem;opacity:.65;font-family:-apple-system,"Segoe UI",Roboto,sans-serif}
+.soc-card b{font-size:.92rem;font-family:-apple-system,"Segoe UI",Roboto,sans-serif;letter-spacing:.01em}
+@media (max-width:26rem){.follow-row{grid-template-columns:1fr}}
+.foot-soc{display:flex;gap:.7rem}
+.foot-soc a{width:2.6rem;height:2.6rem;display:grid;place-items:center;border-radius:50%;background:rgba(255,255,255,.06);border:1px solid rgba(232,207,150,.22);color:#f4ecda;transition:background .2s,color .2s}
+.foot-soc a:hover{background:rgba(232,207,150,.15);color:var(--gold2,#e8cf96)}
+.foot-soc svg{width:1.15rem;height:1.15rem}
