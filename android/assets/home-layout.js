@@ -343,6 +343,7 @@ function hlRefresh() {
 // The sky runs up behind the header and the status bar, so the top of Home is one scene.
 function hlLift() {
   const slot = app.querySelector('.hl-sky-slot'); if (!slot || view !== 'home') { document.body.classList.remove('hl-sky-on'); return }
+  hlBleed();
   slot.style.marginTop = '0px';
   // On tablets the page is zoomed: convert screen pixels back into the slot's own CSS pixels.
   const rect = slot.getBoundingClientRect(), zoom = slot.offsetWidth ? rect.width / slot.offsetWidth : 1;
@@ -354,6 +355,31 @@ function hlLift() {
   document.body.dataset.hlSky = wet ? 'night' : ['night', 'dawn', 'dusk', 'afternoon'].find(k => phase?.contains(k)) || 'day';
   document.body.classList.add('hl-sky-on')
 }
+
+/* Full-bleed sky measured in real screen pixels: viewport units inside the zoomed tablet
+   layout can resolve differently in WKWebView after navigating, so the sky is sized from the
+   actual viewport and re-checked on resize, rotation, return and scroll. */
+function hlBleed() {
+  const sky = app.querySelector('.hl-sky'); if (!sky || !sky.offsetWidth || view !== 'home') return;
+  const vw = document.documentElement.clientWidth, set = (p, v) => sky.style.setProperty(p, v, 'important');
+  sky.style.removeProperty('left');
+  let r = sky.getBoundingClientRect(); const k = sky.offsetWidth / r.width || 1;
+  const w = vw * k, P = sky.parentElement.getBoundingClientRect().width * k, m = (P - w) / 2, pad = Math.max(20, (w - 860) / 2);
+  set('width', w + 'px'); set('max-width', 'none'); set('margin-left', m + 'px'); set('margin-right', m + 'px'); set('padding-left', pad + 'px'); set('padding-right', pad + 'px');
+  r = sky.getBoundingClientRect(); if (Math.abs(r.left) > 0.5) set('left', (-r.left * k) + 'px');
+}
+let hlBleedQ = 0;
+function hlBleedCheck() {
+  if (hlBleedQ) return; hlBleedQ = requestAnimationFrame(() => { hlBleedQ = 0;
+    const sky = app.querySelector('.hl-sky'); if (!sky || view !== 'home') return;
+    const r = sky.getBoundingClientRect(), vw = document.documentElement.clientWidth;
+    if (Math.abs(r.left) > 1 || Math.abs(r.width - vw) > 1) hlBleed();
+  });
+}
+addEventListener('scroll', hlBleedCheck, { passive: true });
+addEventListener('orientationchange', () => setTimeout(hlBleed, 250));
+addEventListener('pageshow', () => setTimeout(hlBleed, 50));
+if (window.visualViewport) visualViewport.addEventListener('resize', hlBleedCheck);
 function hlStart() { clearInterval(hlTimer); hlTimer = setInterval(hlRefresh, 15000) }
 
 const hlPreviousEnter = enterSection;

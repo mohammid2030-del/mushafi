@@ -4,7 +4,7 @@ android {
  namespace 'com.mushafi.app'
  compileSdk 36
  buildToolsVersion '36.0.0'
- defaultConfig { applicationId 'com.mushafi.app'; minSdk 23; targetSdk 36; versionCode 182; versionName '3.1.32'; multiDexEnabled true; testInstrumentationRunner 'com.mushafi.qa.CloudInstrumentation' }
+ defaultConfig { applicationId 'com.mushafi.app'; minSdk 23; targetSdk 36; versionCode 183; versionName '3.1.33'; multiDexEnabled true; testInstrumentationRunner 'com.mushafi.qa.CloudInstrumentation' }
  sourceSets { main { manifest.srcFile 'AndroidManifest.xml'; java.srcDirs=['src']; res.srcDirs=['res']; assets.srcDirs=['assets'] } }
  sourceSets { debug.java.srcDirs=['qa/debug/java']; debug.manifest.srcFile 'qa/debug/AndroidManifest.xml'; androidTest.java.srcDirs=['qa/android']; androidTest.assets.srcDirs=['qa/assets'] }
  compileOptions { sourceCompatibility JavaVersion.VERSION_1_8; targetCompatibility JavaVersion.VERSION_1_8 }
