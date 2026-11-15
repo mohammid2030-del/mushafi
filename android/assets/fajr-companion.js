@@ -161,7 +161,7 @@ function fajrHome(origin) {
   if (!fajrSignedIn()) { fajrGate(); return }
   enterSection('fajr', fajrOrigin === 'more' ? 'n-more' : 'n-home');
   if (fajrPeers === null) fajrLoadPeers();
-  const config = fajrLoad(), next = fajrNext(config), st = fajrStatus(), platform = st.platform || (window.AndroidReader ? 'android' : 'web');
+  const config = fajrLoad(), next = fajrNext(config), st = fajrStatus(), platform = st.platform || (window.AndroidReader ? 'android' : 'web'); fajrPermSig = fajrPermSignature(st);
   const hero = next
     ? `<span class="fajr-kicker">الصحبة القادمة</span><strong class="fajr-hero-time">${fajrClock(next.at)}</strong><span class="fajr-hero-meta fajr-meta">${fajrBits([fajrDayLabel(next.at), `<bdi>${esc(next.list.name || 'قائمة الفجر')}</bdi>`, fajrIn(next.at)])}</span>`
     : `<span class="fajr-kicker">صحبة الفجر</span><strong class="fajr-hero-title">صحّيني معك للفجر</strong><span class="fajr-hero-meta">ادعُ من طلب منك إيقاظه، ويرنّ جواله من داخل مصحفي وقت الأذان</span>`;
@@ -374,7 +374,9 @@ function fajrDelete() {
   const c = fajrLoad(); c.lists = c.lists.filter(l => l.id !== fajrDraft.id); fajrStore(c); fajrDraft = null; showSmallNotice('حُذفت القائمة'); fajrHome()
 }
 function fajrTryNow() { fajrSaveDraft(true); fajrRun(fajrDraft.id, false, true) }
-function fajrAskPermissions() { fajrNative('fajrRequestPermissions') }
+function fajrAskPermissions() { fajrNative('fajrRequestPermissions') } var fajrPermSig = ''; function fajrPermSignature(st) { return [st.notifications, st.exact, st.fullScreen].join('|') }
+/* Returning from system settings: refresh the permission cards at once, without jumping or flashing */
+document.addEventListener('visibilitychange', () => { if (document.hidden || view !== 'fajr') return; setTimeout(() => { if (view !== 'fajr' || fajrPermSignature(fajrStatus()) === fajrPermSig) return; const y = scrollY; fajrHome(); scrollTo(0, y) }, 250) });
 window.onFajrPermissions = function () { if (view === 'fajr') fajrHome() };
 
 /* ---------- run: ring each person inside Mushafi ---------- */
