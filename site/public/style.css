@@ -328,10 +328,10 @@ a.store:hover{transform:translateY(-2px)}
 }
 
 /* ── languages ── */
-html[lang=en] body,html[lang=tr] body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,"Noto Sans",Inter,UI,sans-serif;letter-spacing:-.003em}
+html[lang=en] body,html[lang=tr] body,html[lang=fr] body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,"Noto Sans",Inter,UI,sans-serif;letter-spacing:-.003em}
 html[lang=bn] body{font-family:"Noto Sans Bengali","Hind Siliguri","Kohinoor Bangla","Bangla Sangam MN",-apple-system,"Segoe UI",Roboto,UI,sans-serif}
-html[lang=en] .hero h1,html[lang=tr] .hero h1,html[lang=bn] .hero h1{letter-spacing:-.025em;line-height:1.1;padding-bottom:.08em}
-html[lang=en] .sec-head h2,html[lang=tr] .sec-head h2{letter-spacing:-.015em}
+html[lang=en] .hero h1,html[lang=tr] .hero h1,html[lang=fr] .hero h1,html[lang=bn] .hero h1{letter-spacing:-.025em;line-height:1.1;padding-bottom:.08em}
+html[lang=en] .sec-head h2,html[lang=tr] .sec-head h2,html[lang=fr] .sec-head h2{letter-spacing:-.015em}
 [lang=bn] .lt-sample,[lang=bn]{line-height:1.8}
 .nav-end{display:flex;align-items:center;gap:.5rem}
 .lang{position:relative}
@@ -402,7 +402,7 @@ html[lang=en] .sec-head h2,html[lang=tr] .sec-head h2{letter-spacing:-.015em}
 .dv-flag:hover{background:rgba(255,255,255,.12)}
 .dv-flag.on{border-color:var(--gold2);background:rgba(232,207,150,.14)}
 .dv-flag .fl{font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif;font-size:1.1em;line-height:1}
-.dv-flag [lang=en],.dv-flag [lang=tr]{font-family:-apple-system,"Segoe UI",Roboto,sans-serif;font-weight:600}
+.dv-flag [lang=en],.dv-flag [lang=tr],.dv-flag [lang=fr]{font-family:-apple-system,"Segoe UI",Roboto,sans-serif;font-weight:600}
 .dv-flag [lang=bn]{font-family:"Noto Sans Bengali",-apple-system,sans-serif}
 @media (prefers-reduced-motion:reduce){.dv{transition:none}}
 .dv-stage.live .dv{transition:transform .6s var(--ease),opacity .9s;transition-delay:0s}
