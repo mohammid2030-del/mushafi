@@ -1,8 +1,32 @@
 {
-  "notesAr": ["اللغة الفرنسية متاحة الآن في التطبيق بالكامل", "ترجمة معاني القرآن بالفرنسية (حميد الله) تعمل دون إنترنت", "تحسينات عامة"],
-  "notesEn": ["French is now available across the whole app", "French translation of the meanings of the Quran (Hamidullah), works offline", "General improvements"],
-  "notesUr": ["فرانسیسی زبان اب پوری ایپ میں دستیاب ہے", "قرآن کے معانی کا فرانسیسی ترجمہ (حمید اللہ)، انٹرنیٹ کے بغیر", "عمومی بہتریاں"],
-  "notesBn": ["এখন পুরো অ্যাপে ফরাসি ভাষা পাওয়া যাচ্ছে", "কুরআনের অর্থের ফরাসি অনুবাদ (হামিদুল্লাহ), ইন্টারনেট ছাড়াই", "সাধারণ উন্নতি"],
-  "notesTr": ["Fransızca artık uygulamanın tamamında kullanılabilir", "Kur'an meallerinin Fransızca çevirisi (Hamidullah), internetsiz çalışır", "Genel iyileştirmeler"],
-  "notesFr": ["Le français est désormais disponible dans toute l'application", "Traduction des sens du Coran en français (Hamidullah), disponible hors ligne", "Améliorations générales"]
+  "notesAr": [
+    "تحسين اتجاه النصوص في الإنجليزية والبنغالية والتركية والفرنسية",
+    "اللغة الفرنسية وترجمة معاني القرآن (حميد الله) دون إنترنت",
+    "تحسينات عامة"
+  ],
+  "notesEn": [
+    "Improved text direction for English, Bangla, Turkish and French",
+    "French language and offline Hamidullah Quran meanings",
+    "General improvements"
+  ],
+  "notesUr": [
+    "انگریزی، بنگالی، ترکی اور فرانسیسی میں متن کی سمت بہتر",
+    "فرانسیسی زبان اور حمید اللہ کا ترجمۂ معانی بغیر انٹرنیٹ",
+    "عمومی بہتری"
+  ],
+  "notesBn": [
+    "ইংরেজি, বাংলা, তুর্কি ও ফরাসিতে লেখার দিক উন্নত করা হয়েছে",
+    "ফরাসি ভাষা ও অফলাইন হামিদুল্লাহ কুরআনের অর্থ",
+    "সাধারণ উন্নতি"
+  ],
+  "notesTr": [
+    "İngilizce, Bengalce, Türkçe ve Fransızcada metin yönü iyileştirildi",
+    "Fransızca dil ve çevrimdışı Hamidullah Kuran meali",
+    "Genel iyileştirmeler"
+  ],
+  "notesFr": [
+    "Sens du texte amélioré en anglais, bengali, turc et français",
+    "Langue française et traduction des sens du Coran (Hamidullah) hors ligne",
+    "Améliorations générales"
+  ]
 }
