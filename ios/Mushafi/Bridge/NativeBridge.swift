@@ -1,6 +1,7 @@
 import UIKit
 import WebKit
 import CoreLocation
+import StoreKit
 
 /// iOS implementation of the Android `AndroidReader` JavaScript interface.
 ///
@@ -36,6 +37,7 @@ final class NativeBridge: NSObject, WKScriptMessageHandler {
             "requestPrayerNotifications", "openPrayerSystemSettings", "previewPrayerVoice", "stopPrayerVoice",
             "testPrayerNotification", "openWidgets", "openLiveBroadcast",
             "openBook", "deleteBook", "reverseGeocode", "wakeRegister", "wakeCreateInvite", "wakeAcceptInvite", "wakePeers", "wakeRemovePeer", "wakeRing", "wakeCancel", "fajrKeepAwake", "fajrStopAlarm", "fajrRequestPermissions",
+            "requestAppReview", "openAppReview",
             "hajjStepPermission", "hajjStepsBegin", "hajjStepsEnd", "hajjStepsQuery", "hajjShareFile", "hajjSaveFile",
             "surahPlay", "surahPlaySession", "surahSetMode", "surahPause", "surahResume", "surahStop", "surahSkip", "surahSeek",
         ]
@@ -149,6 +151,16 @@ final class NativeBridge: NSObject, WKScriptMessageHandler {
             UIImpactFeedbackGenerator(style: style).impactOccurred()
         case "copyText": if let text = a.string(0), text.count <= 200_000 { UIPasteboard.general.string = text }
         case "shareText": if let text = a.string(0), text.count <= 200_000 { shell?.share(text) }
+
+        // App Store rating: the system prompt (Apple decides when it shows), or the review page
+        case "requestAppReview":
+            if let scene = shell?.view.window?.windowScene { SKStoreReviewController.requestReview(in: scene) }
+        case "openAppReview":
+            if let url = URL(string: "itms-apps://apps.apple.com/app/id6832528924?action=write-review") {
+                UIApplication.shared.open(url, options: [:]) { ok in
+                    if !ok, let web = URL(string: "https://apps.apple.com/app/id6832528924?action=write-review") { UIApplication.shared.open(web) }
+                }
+            }
 
         // Hajj & Umrah
         case "hajjStepPermission": HajjNative.shared.requestPermission()
