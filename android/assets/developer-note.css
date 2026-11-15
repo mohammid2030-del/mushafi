@@ -1,0 +1,19 @@
+.dev-note{display:flex;flex-direction:column;gap:16px;padding-bottom:calc(118px + var(--app-safe-bottom,0px));font-family:var(--ui-font,AppArabic),sans-serif}
+.dev-letter-card{position:relative;overflow:hidden;margin:6px 0 0;padding:28px 24px 22px;border-radius:30px;background:var(--fs-bg);border:1px solid var(--fs-line,var(--line));box-shadow:var(--fs-shadow,none);color:var(--ink)}
+.dev-letter-card::before{content:"";position:absolute;inset:-60px -60px auto auto;width:240px;height:240px;border-radius:50%;background:radial-gradient(circle,color-mix(in srgb,var(--gold) 16%,transparent),transparent 62%);pointer-events:none}
+.dev-letter-card::after{content:"“";position:absolute;inset-inline-end:18px;top:-14px;font:700 150px/1 Georgia,serif;color:color-mix(in srgb,var(--gold) 12%,transparent);pointer-events:none}
+.dev-letter-card>*{position:relative;z-index:1}
+.dev-kicker{font-size:12px;font-weight:600;color:var(--gold)}
+.dev-letter-card h2{margin:6px 0 12px;font-size:26px;font-weight:600;line-height:1.5}
+.dev-letter-card p{margin:0 0 10px;font-size:15.5px;line-height:2;color:color-mix(in srgb,var(--ink) 88%,transparent)}
+.dev-pillars{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 4px}
+.dev-pillars span{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;font-size:12px;border:1px solid color-mix(in srgb,var(--gold) 35%,transparent);color:var(--gold);background:color-mix(in srgb,var(--gold) 7%,transparent)}
+.dev-pillars .ui-icon{width:14px;height:14px}
+.dev-sig{display:flex;align-items:center;gap:12px;margin-top:18px;padding-top:16px;border-top:1px solid color-mix(in srgb,var(--gold) 18%,transparent)}
+.dev-av{display:grid;place-items:center;width:48px;height:48px;flex:none;border-radius:50%;background:linear-gradient(140deg,#e6cf9a,#c9a35a);color:#211b10;font:700 20px AppArabic,sans-serif}
+.dev-sig-txt{flex:1;display:flex;flex-direction:column;gap:2px}
+.dev-sig-txt b{font-size:16px;font-weight:600}.dev-sig-txt small{font-size:12px;color:var(--muted)}
+.dev-hand{font:400 34px/1 HLQuran,Quran,serif;color:var(--gold);transform:rotate(-6deg)}
+.dev-made{display:flex;align-items:center;gap:14px;padding:16px 18px;border-radius:24px;border:1px solid var(--line);background:var(--glass-card,var(--paper))}
+.dev-made .mushafi-brand-icon{width:52px;height:52px;flex:none;border-radius:15px}
+.dev-made span{display:flex;flex-direction:column;gap:3px}.dev-made b{font-size:14px;font-weight:600}.dev-made small{font-size:12.5px;line-height:1.7;color:var(--muted)}
