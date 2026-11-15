@@ -15,7 +15,17 @@ Object.assign(iconPaths, {
 
 const HAJJ_KEY = 'mushafi.hajj.v1';
 /* القسم عربي المحتوى حاليًا، فتُعرض الأرقام والتواريخ بالعربية دائمًا */
-const hjAr = n => String(n).replace(/\d/g, x => '٠١٢٣٤٥٦٧٨٩'[x]);
+const hjAr = n => (typeof uiLocale === 'function' && uiLocale() !== 'ar') ? String(n) : String(n).replace(/\d/g, x => '٠١٢٣٤٥٦٧٨٩'[x]);
+const HJ_LOCALES = { ar: 'ar-SA-u-ca-gregory-nu-arab', en: 'en-GB', ur: 'ur-PK-u-nu-latn', bn: 'bn-BD-u-nu-latn', tr: 'tr-TR', fr: 'fr-FR' };
+const hjLoc = () => HJ_LOCALES[typeof uiLocale === 'function' ? uiLocale() : 'ar'] || 'ar-SA-u-ca-gregory-nu-arab';
+/* كلمات يختلف معناها هنا عن معناها العام في قاموس التطبيق (مثل «الحج» اسم السورة) */
+const HJ_OVR = {"الحج": {"en": "Hajj", "fr": "Hajj", "tr": "Hac", "ur": "حج", "bn": "হজ"}, "إنهاء": {"en": "End", "fr": "Terminer", "tr": "Bitir", "ur": "ختم کریں", "bn": "শেষ করুন"}};
+const hjLang = () => typeof uiLocale === 'function' ? uiLocale() : 'ar';
+const hjT = s => (HJ_OVR[s] && HJ_OVR[s][hjLang()]) || (typeof uiTranslate === 'function' ? uiTranslate(s) : s);
+function hjOverride(root) { if (hjLang() === 'ar') return; const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT); let n; while ((n = w.nextNode())) { const t = n.nodeValue.trim(), o = HJ_OVR[t]; if (o && o[hjLang()]) n.nodeValue = n.nodeValue.replace(t, o[hjLang()]) } }
+/* نص بمتغيرات: يُترجم القالب كاملًا من القاموس ثم تُعوَّض القيم (حتى لا تختلط اللغات في سطر واحد) */
+function hjF(key, ...a) { let t = key; try { if (uiLocale() !== 'ar' && uiDictionary[key]) t = uiDictionary[key] } catch (e) {} return t.replace(/\{(\d+)\}/g, (_, i) => a[i] ?? '') }
+const hjPct = n => hjAr(n) + (typeof uiLocale === 'function' && uiLocale() !== 'ar' ? '%' : '٪');
 let hajjStore = null, hajjView = null, hajjTick = 0, hajjPoll = 0, hajjViewer = null, hajjBack = 'home()', hajjStepWaiters = [];
 
 /* ---------- التخزين ---------- */
@@ -103,12 +113,12 @@ function hajjTripTotals(trip) {
 }
 const hajjSrcLabel = { steps: 'تقديرية من خطوات الهاتف', phone: 'قياس الهاتف', rounds: 'تقديرية بحسب الأشواط' };
 function hajjClock(ms) { const s = Math.floor(ms / 1000), h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60), x = s % 60; return hjAr((h ? h + ':' + String(m).padStart(2, '0') : m) + ':' + String(x).padStart(2, '0')) }
-function hajjDuration(ms) { if (ms < 60000) return ms < 1000 ? hjAr(0) + ' دقيقة' : 'أقل من دقيقة'; const m = Math.round(ms / 60000), h = Math.floor(m / 60); return h ? hjAr(h) + ' س ' + hjAr(m % 60) + ' د' : hjAr(m) + ' دقيقة' }
+function hajjDuration(ms) { if (ms < 60000) return ms < 1000 ? hjF('{0} دقيقة', hjAr(0)) : hjT('أقل من دقيقة'); const m = Math.round(ms / 60000), h = Math.floor(m / 60); return h ? hjF('{0} س {1} د', hjAr(h), hjAr(m % 60)) : hjF('{0} دقيقة', hjAr(m)) }
 function hajjNum(n) { return hjAr(Math.round(n).toLocaleString('en-US')) }
-function hajjKm(m) { return m >= 1000 ? hjAr((m / 1000).toFixed(2)) + ' كم' : hjAr(Math.round(m)) + ' م' }
-function hajjDate(t) { try { return new Date(t).toLocaleDateString('ar-SA-u-ca-gregory-nu-arab', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }) } catch (e) { return new Date(t).toDateString() } }
-function hajjTime(t) { try { return new Date(t).toLocaleTimeString('ar-SA-u-nu-arab', { hour: 'numeric', minute: '2-digit' }) } catch (e) { return '' } }
-const hajjKindTitle = t => t.kind === 'umrah' ? 'العمرة' : t.kind === 'hajj' ? 'الحج — ' + (HAJJ_TYPES[t.type]?.title || '') : 'طواف وسعي';
+function hajjKm(m) { return m >= 1000 ? hjF('{0} كم', hjAr((m / 1000).toFixed(2))) : hjF('{0} م', hjAr(Math.round(m))) }
+function hajjDate(t) { try { return new Date(t).toLocaleDateString(hjLoc(), { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }) } catch (e) { return new Date(t).toDateString() } }
+function hajjTime(t) { try { return new Date(t).toLocaleTimeString(hjLoc(), { hour: 'numeric', minute: '2-digit' }) } catch (e) { return '' } }
+const hajjKindTitle = t => t.kind === 'umrah' ? hjT('العمرة') : t.kind === 'hajj' ? hjF('الحج — {0}', hjT(HAJJ_TYPES[t.type]?.title || '')) : hjT('طواف وسعي');
 
 /* ---------- التنقل ---------- */
 function hajjLeave() {
@@ -122,8 +132,9 @@ function hajjEnter(name, tab) { hajjLeave(); hajjView = name; enterSection('hajj
 function hajjGuideFor(trip) { return !trip ? 'hajjHome()' : trip.kind === 'visit' ? 'hajjVisitPage()' : `hajjGuide('${trip.kind === 'hajj' ? 'hajj' : 'umrah'}')` }
 function hajjRerender() { const f = { home: hajjHome, umrah: () => hajjGuide('umrah'), hajj: () => hajjGuide('hajj'), journey: hajjJourney, visit: hajjVisitPage, models: hajjModels, types: hajjTypePicker }[hajjView]; if (f) f(); else if (hajjView === 'trackers') hajjTracker(hajjCurrentKind) }
 /* المحتوى الشرعي لهذا القسم بالعربية حاليًا؛ نمنع الترجمة الآلية الجزئية حتى لا تختلط الكلمات */
-function hajjArabic(el) { el.setAttribute('translate', 'no'); el.setAttribute('lang', 'ar'); el.setAttribute('dir', 'rtl') }
-function hajjFinishRender() { app.querySelectorAll(':scope > .screen-heading, :scope > .hj-page').forEach(hajjArabic); if (typeof revealSection === 'function') revealSection() }
+/* تُترجم نصوص القسم عبر قاموس التطبيق؛ والأذكار ونيات النسك تبقى بنصها العربي */
+function hajjArabic(el) { el.removeAttribute('translate') }
+function hajjFinishRender() { app.querySelectorAll(':scope > .screen-heading, :scope > .hj-page').forEach(el => { hajjArabic(el); hjOverride(el) }); if (typeof revealSection === 'function') revealSection() }
 
 /* ---------- الصفحة الرئيسية للقسم ---------- */
 function hajjOpenSource(url) { if (!hajjNative.call('openSourceUrl', url)) window.open(url, '_blank', 'noopener') }
@@ -142,7 +153,7 @@ function hajjStartTrip(kind) {
 function hajjConfirmEndTrip() {
   const trip = hajjActiveTrip(); if (!trip) return;
   const act = hajjActivity(trip);
-  hajjDialog('إنهاء الرحلة؟', (act ? 'لديك نشاط جارٍ، سيُنهى ويُحفظ ما أتممته منه. ' : '') + 'سيتوقف حساب الخطوات، ويُحفظ ملخص رحلتك في سجلك.', 'إنهاء وحفظ', async () => {
+  hajjDialog('إنهاء الرحلة؟', (act ? hjT('لديك نشاط جارٍ، سيُنهى ويُحفظ ما أتممته منه.') + ' ' : '') + hjT('سيتوقف حساب الخطوات، ويُحفظ ملخص رحلتك في سجلك.'), 'إنهاء وحفظ', async () => {
     if (act) hajjEndActivity(trip, act);
     await hajjQuerySteps();
     trip.endedAt = Date.now(); hajjStore.active = null; hajjSave();
@@ -157,12 +168,12 @@ function hajjStartActivity(kind, stage) {
   const trip = hajjActiveTrip(); if (!trip) { showSmallNotice('ابدأ الرحلة أولًا'); return }
   const running = hajjActivity(trip);
   if (running && (running.kind !== kind || running.stage !== stage)) {
-    hajjDialog('نشاط آخر جارٍ', 'أنهِ ' + (running.kind === 'tawaf' ? 'الطواف' : 'السعي') + ' الجاري أولًا، أو تابعه الآن.', 'متابعته', () => hajjTracker(running.kind));
+    hajjDialog('نشاط آخر جارٍ', hjF('أنهِ {0} الجاري أولًا، أو تابعه الآن.', hjT(running.kind === 'tawaf' ? 'الطواف' : 'السعي')), 'متابعته', () => hajjTracker(running.kind));
     return;
   }
   if (!running) {
     const prev = trip.activities.filter(a => a.kind === kind && a.stage === stage).pop();
-    if (prev && prev.rounds.length >= 7) { hajjDialog((kind === 'tawaf' ? 'الطواف' : 'السعي') + ' مكتمل', 'سجّلت سبعة أشواط لهذه المرحلة. هل تريد البدء من جديد؟', 'ابدأ من جديد', () => hajjNewActivity(trip, kind, stage)); return }
+    if (prev && prev.rounds.length >= 7) { hajjDialog(hjF('{0} مكتمل', hjT(kind === 'tawaf' ? 'الطواف' : 'السعي')), 'سجّلت سبعة أشواط لهذه المرحلة. هل تريد البدء من جديد؟', 'ابدأ من جديد', () => hajjNewActivity(trip, kind, stage)); return }
     hajjNewActivity(trip, kind, stage);
     return;
   }
@@ -197,7 +208,7 @@ function hajjPathDialog() {
   const trip = hajjActiveTrip(), a = hajjActivity(trip); if (!a) return;
   document.querySelector('.hj-dialog')?.remove();
   const d = document.createElement('div'); d.className = 'hj-dialog';
-  d.innerHTML = `<div class="hj-dialog-card"><h3>مسار طوافك</h3><p>يُستخدم لعرض الحلقة على المجسم، ولتقدير المسافة إن لم تتوفر الخطوات.</p><div class="hj-options">${Object.entries(HAJJ_TAWAF_PATHS).map(([k, p]) => `<button class="hj-option ${a.path === k ? 'on' : ''}" data-k="${k}"><b>${p.title}</b><small>نحو ${hjAr(Math.round(2 * Math.PI * p.radius))} م للشوط</small></button>`).join('')}</div></div>`;
+  d.innerHTML = `<div class="hj-dialog-card"><h3>مسار طوافك</h3><p>يُستخدم لعرض الحلقة على المجسم، ولتقدير المسافة إن لم تتوفر الخطوات.</p><div class="hj-options">${Object.entries(HAJJ_TAWAF_PATHS).map(([k, p]) => `<button class="hj-option ${a.path === k ? 'on' : ''}" data-k="${k}"><b>${p.title}</b><small>${hjF('نحو {0} م للشوط', hjAr(Math.round(2 * Math.PI * p.radius)))}</small></button>`).join('')}</div></div>`;
   hajjArabic(d);
   d.addEventListener('click', e => { const b = e.target.closest('[data-k]'); if (e.target === d) d.remove(); if (!b) return; d.remove();
     a.path = b.dataset.k; hajjLoad().settings.path = a.path; hajjSave();
@@ -221,16 +232,16 @@ function hajjRoundDone() {
   const n = a.rounds.length;
   if (hajjViewer) a.kind === 'tawaf' ? Hajj3D.setTawafPath(hajjViewer, a.path, n, n < 7) : Hajj3D.setSaiProgress(hajjViewer, n, n < 7);
   if (n === 7) { try { navigator.vibrate?.([120, 80, 120]) } catch (e) {} showSmallNotice(a.kind === 'sai' ? 'اكتمل الشوط السابع عند المروة' : 'اكتمل الشوط السابع') }
-  else showSmallNotice('سُجّل الشوط ' + hjAr(n));
+  else showSmallNotice(hjF('سُجّل الشوط {0}', hjAr(n)));
   hajjQuerySteps(); hajjRefreshLive();
 }
 function hajjUndoRound() {
   const trip = hajjActiveTrip(), a = hajjActivity(trip); if (!a || !a.rounds.length) return;
   const n = a.rounds.length;
-  hajjDialog('تصحيح عدد الأشواط', 'سيُحذف الشوط ' + hjAr(n) + ' ويصبح الشوط الحالي ' + hjAr(n) + '. إن شككت في العدد فابنِ على الأقل.', 'نعم، صحّح', () => {
+  hajjDialog('تصحيح عدد الأشواط', hjF('سيُحذف الشوط {0} ويصبح الشوط الحالي {1}. إن شككت في العدد فابنِ على الأقل.', hjAr(n), hjAr(n)), 'نعم، صحّح', () => {
     a.rounds.pop(); hajjSave();
     if (hajjViewer) a.kind === 'tawaf' ? Hajj3D.setTawafPath(hajjViewer, a.path, a.rounds.length, !a.pausedAt) : Hajj3D.setSaiProgress(hajjViewer, a.rounds.length, !a.pausedAt);
-    showSmallNotice('صُحّح العدد: الشوط الحالي ' + hjAr(a.rounds.length + 1)); hajjRefreshLive();
+    showSmallNotice(hjF('صُحّح العدد: الشوط الحالي {0}', hjAr(a.rounds.length + 1))); hajjRefreshLive();
   });
 }
 let hajjPauseBusy = false;
@@ -246,9 +257,9 @@ async function hajjPauseToggle() {
 function hajjFinishActivity(skipConfirm) {
   const trip = hajjActiveTrip(), a = hajjActivity(trip); if (!a) return;
   const name = a.kind === 'tawaf' ? 'الطواف' : 'السعي';
-  const end = async () => { await hajjQuerySteps(); hajjEndActivity(trip, a); showSmallNotice('حُفظ ' + name); if (trip.kind === 'visit') hajjVisitPage(); else hajjGuide(trip.kind === 'hajj' ? 'hajj' : 'umrah') };
+  const end = async () => { await hajjQuerySteps(); hajjEndActivity(trip, a); showSmallNotice(hjF('حُفظ {0}', hjT(name))); if (trip.kind === 'visit') hajjVisitPage(); else hajjGuide(trip.kind === 'hajj' ? 'hajj' : 'umrah') };
   if (skipConfirm === true || a.rounds.length >= 7) { end(); return }
-  hajjDialog('إنهاء ' + name + '؟', 'سجّلت ' + hjAr(a.rounds.length) + ' من ٧ أشواط. سيُحفظ ما أتممته، ولن يُعد ' + name + ' مكتملًا.', 'إنهاء', end);
+  hajjDialog(hjF('إنهاء {0}؟', hjT(name)), hjF('سجّلت {0} من ٧ أشواط. سيُحفظ ما أتممته، ولن يُعد {1} مكتملًا.', hjAr(a.rounds.length), hjT(name)), hjT('إنهاء'), end);
 }
 
 /* ---------- نافذة تأكيد ---------- */
@@ -319,7 +330,7 @@ document.addEventListener('visibilitychange', () => { if (!document.hidden && ha
 
 /* ---------- مكونات بصرية بأسلوب مصحفي ---------- */
 function hjHero({ kicker = '', title = '', meta = '', verse = '', body = '', cls = '' }) {
-  return `<section class="hj-hero ${cls}">${kicker ? `<span class="hj-kicker">${kicker}</span>` : ''}${title ? `<strong class="hj-hero-title">${title}</strong>` : ''}${meta ? `<span class="hj-hero-meta">${meta}</span>` : ''}${body}${verse ? `<p class="hj-verse">﴿${verse}﴾</p>` : ''}</section>`;
+  return `<section class="hj-hero ${cls}">${kicker ? `<span class="hj-kicker">${kicker}</span>` : ''}${title ? `<strong class="hj-hero-title">${title}</strong>` : ''}${meta ? `<span class="hj-hero-meta">${meta}</span>` : ''}${body}${verse ? `<p class="hj-verse" translate="no" lang="ar" dir="rtl">﴿${verse}﴾</p>` : ''}</section>`;
 }
 function hjLabel(title, aside = '') { return `<div class="section-label"><h2>${title}</h2>${aside ? `<span class="hj-label-aside">${aside}</span>` : ''}</div>` }
 function hjMenu(rows) { return `<div class="content-card menu-list hj-menu">${rows.join('')}</div>` }
@@ -338,13 +349,13 @@ function hajjHome(origin) {
   let resume = '';
   if (trip) {
     const stages = trip.kind === 'visit' ? [] : hajjStagesFor(trip.kind, trip.type), done = stages.filter(s => trip.stages[s.id]).length, pct = stages.length ? Math.round(done / stages.length * 100) : 0;
-    resume = `<button class="hj-resume" onclick="${act ? `hajjTracker('${act.kind}')` : hajjGuideFor(trip)}"><span class="hj-live-dot"></span><span class="hj-resume-text"><small>رحلة جارية</small><strong>${hajjKindTitle(trip)}</strong><em>${act ? (act.kind === 'tawaf' ? 'الطواف' : 'السعي') + ' · الشوط ' + hjAr(Math.min(act.rounds.length + 1, 7)) + ' من ٧' : stages.length ? hjAr(done) + ' من ' + hjAr(stages.length) + ' مراحل' : 'بدأت ' + hajjTime(trip.startedAt)}</em>${stages.length ? `<i class="hj-bar"><i style="width:${pct}%"></i></i>` : ''}</span>${uiIcon('arrow')}</button>`;
+    resume = `<button class="hj-resume" onclick="${act ? `hajjTracker('${act.kind}')` : hajjGuideFor(trip)}"><span class="hj-live-dot"></span><span class="hj-resume-text"><small>رحلة جارية</small><strong>${hajjKindTitle(trip)}</strong><em>${act ? hjF('{0} · الشوط {1} من ٧', hjT(act.kind === 'tawaf' ? 'الطواف' : 'السعي'), hjAr(Math.min(act.rounds.length + 1, 7))) : stages.length ? hjF('{0} من {1} مراحل', hjAr(done), hjAr(stages.length)) : hjF('بدأت {0}', hajjTime(trip.startedAt))}</em>${stages.length ? `<i class="hj-bar"><i style="width:${pct}%"></i></i>` : ''}</span>${uiIcon('arrow')}</button>`;
   }
   app.innerHTML = sectionHeading('الحج والعمرة', 'دليلك في المناسك خطوة بخطوة', hajjBack) + `<div class="hj-page">
     ${hjHero({ kicker: 'الحج والعمرة', title: 'لبيك اللهم لبيك', meta: 'المناسك بترتيبها الصحيح، مع عدّ أشواط الطواف والسعي، وحفظ رحلتك على جهازك', verse: 'وَأَتِمُّوا الْحَجَّ وَالْعُمْرَةَ لِلَّهِ' })}
     ${resume}
     <div class="hj-paths">
-      <button class="hj-path" onclick="hajjGuide('umrah')">${HJ_ART.umrah}<strong>العمرة</strong><small>من الإحرام حتى التحلل</small><em>${hjAr(UMRAH_STAGES.length)} مراحل</em></button>
+      <button class="hj-path" onclick="hajjGuide('umrah')">${HJ_ART.umrah}<strong>العمرة</strong><small>من الإحرام حتى التحلل</small><em>${hjF('{0} مراحل', hjAr(UMRAH_STAGES.length))}</em></button>
       <button class="hj-path hajj" onclick="hajjOpenHajj()">${HJ_ART.hajj}<strong>الحج</strong><small>التمتع والإفراد والقران</small><em>من يوم التروية حتى الوداع</em></button>
     </div>
     ${hjLabel('أدوات الرحلة')}
@@ -367,7 +378,7 @@ function hajjTypePicker() {
     ${hjHero({ kicker: 'أنواع النسك', title: 'بأي نسك تحج؟', meta: 'الأنساك الثلاثة مشروعة، وتختلف في الهدي وعدد مرات الطواف والسعي، وفي التحلل بعد العمرة' })}
     <div class="hj-types">${Object.entries(HAJJ_TYPES).map(([k, t]) => `<button class="hj-type ${last === k ? 'last' : ''}" onclick="hajjPickType('${k}')">
       <span class="hj-type-top"><strong>${t.title}</strong>${last === k ? '<em>اختيارك السابق</em>' : ''}<span class="hj-type-go">${uiIcon('arrow')}</span></span>
-      <span class="hj-intent">${t.intent}</span>
+      <span class="hj-intent" translate="no" lang="ar" dir="rtl">${t.intent}</span>
       <span class="hj-type-brief">${t.brief}</span>
       <span class="hj-type-tags"><i class="${k === 'ifrad' ? '' : 'on'}">${k === 'ifrad' ? 'لا هدي عليه' : 'يجب الهدي'}</i><i>${k === 'tamattu' ? 'طوافان وسعيان' : 'طواف وسعي واحد'}</i><i>${k === 'tamattu' ? 'يتحلل بعد العمرة' : 'يبقى محرمًا إلى يوم النحر'}</i></span>
       ${t.note ? `<small>${t.note}</small>` : ''}
@@ -388,21 +399,21 @@ function hajjGuide(kind) {
   if (kind === 'hajj' && !type) return hajjTypePicker();
   hajjEnter(kind);
   const stages = hajjStagesFor(kind, type), done = trip ? stages.filter(x => trip.stages[x.id]).length : 0;
-  const title = kind === 'umrah' ? 'العمرة' : 'حج ' + HAJJ_TYPES[type].title;
+  const title = kind === 'umrah' ? hjT('العمرة') : hjF('حج {0}', hjT(HAJJ_TYPES[type].title));
   const back = kind === 'hajj' && !trip ? 'hajjTypePicker()' : 'hajjHome()';
   const openId = trip ? (hajjFirstOpen(trip, kind, type) || '') : stages[0].id;
   let hero;
   if (trip) hero = hajjTripHero(trip, stages, done);
-  else if (active) hero = hjHero({ kicker: kind === 'umrah' ? 'العمرة' : 'الحج', title, meta: 'لديك رحلة جارية (' + hajjKindTitle(active) + '). أنهِها من صفحتها لتبدأ رحلة جديدة.' });
+  else if (active) hero = hjHero({ kicker: kind === 'umrah' ? 'العمرة' : 'الحج', title, meta: hjF('لديك رحلة جارية ({0}). أنهِها من صفحتها لتبدأ رحلة جديدة.', hajjKindTitle(active)) });
   else hero = hjHero({
-    kicker: kind === 'umrah' ? 'دليل العمرة' : 'نسكك: ' + HAJJ_TYPES[type].title, title: kind === 'umrah' ? 'عمرتك خطوة بخطوة' : title,
+    kicker: kind === 'umrah' ? 'دليل العمرة' : hjF('نسكك: {0}', hjT(HAJJ_TYPES[type].title)), title: kind === 'umrah' ? 'عمرتك خطوة بخطوة' : title,
     meta: kind === 'umrah' ? 'إحرام، فطواف، فسعي، ثم حلق أو تقصير' : HAJJ_TYPES[type].brief,
-    body: `<button class="hj-hero-cta" onclick="hajjStartTrip('${kind}')">${uiIcon('play')}<span>ابدأ رحلة ${kind === 'umrah' ? 'العمرة' : 'الحج'}</span></button><span class="hj-hero-fine">يحفظ تقدمك وأشواطك ووقتك وخطواتك على جهازك فقط</span>`
+    body: `<button class="hj-hero-cta" onclick="hajjStartTrip('${kind}')">${uiIcon('play')}<span>${hjF('ابدأ رحلة {0}', hjT(kind === 'umrah' ? 'العمرة' : 'الحج'))}</span></button><span class="hj-hero-fine">يحفظ تقدمك وأشواطك ووقتك وخطواتك على جهازك فقط</span>`
   });
   app.innerHTML = sectionHeading(title, kind === 'umrah' ? 'من الإحرام حتى التحلل' : 'المناسك من البداية حتى النهاية', back) + `<div class="hj-page">
     ${hero}
     ${trip ? hajjStepsNotice(trip) : ''}
-    ${hjLabel('المراحل', trip ? hjAr(done) + ' من ' + hjAr(stages.length) : hjAr(stages.length) + ' مراحل')}
+    ${hjLabel('المراحل', trip ? hjF('{0} من {1}', hjAr(done), hjAr(stages.length)) : hjF('{0} مراحل', hjAr(stages.length)))}
     <div class="hj-timeline">${stages.map((st, i) => hajjStageCard(st, i, trip, type, kind, st.id === openId)).join('')}</div>
     <p class="hj-foot">لا يُخص شوط من الطواف أو السعي بدعاء معيّن؛ والأذكار هنا ثابتة بأدلتها.</p>
   </div>`;
@@ -411,8 +422,8 @@ function hajjGuide(kind) {
 function hajjTripHero(trip, stages, done) {
   const t = hajjTripTotals(trip), pct = Math.round(done / stages.length * 100);
   return `<section class="hj-hero hj-trip-hero">
-    <span class="hj-kicker"><i class="hj-live-dot"></i>رحلتك الجارية · منذ ${hajjTime(trip.startedAt)}</span>
-    <div class="hj-trip-row"><strong class="hj-hero-title">${hjAr(done)} من ${hjAr(stages.length)} مراحل</strong><span class="hj-pct">${hjAr(pct)}٪</span></div>
+    <span class="hj-kicker"><i class="hj-live-dot"></i>${hjF('رحلتك الجارية · منذ {0}', hajjTime(trip.startedAt))}</span>
+    <div class="hj-trip-row"><strong class="hj-hero-title">${hjF('{0} من {1} مراحل', hjAr(done), hjAr(stages.length))}</strong><span class="hj-pct">${hjPct(pct)}</span></div>
     <i class="hj-bar big"><i style="width:${pct}%"></i></i>
     <div class="hj-stats4">${hjStat(t.steps == null ? '—' : hajjNum(t.steps), 'خطوة')}${hjStat(hajjKm(t.dist), 'المسافة')}${hjStat(hjAr(t.tawaf), 'طواف')}${hjStat(hjAr(t.sai), 'سعي')}</div>
     <div class="hj-hero-actions"><button onclick="hajjReport('${trip.id}')">${uiIcon('chart')}الملخص</button><button class="end" onclick="hajjConfirmEndTrip()">${uiIcon('flag')}إنهاء الرحلة</button></div>
@@ -434,7 +445,7 @@ function hajjStageCard(st, i, trip, type, kind, open) {
   const saiNotNeeded = st.saiStage && type !== 'tamattu' && trip && hajjDidQudumSai(trip);
   const tabs = [
     st.steps?.length && ['how', 'الصفة', `<ol class="hj-ol">${st.steps.map(x => `<li>${x}</li>`).join('')}</ol>`],
-    st.dhikr?.length && ['dhikr', 'الأذكار', st.dhikr.map(k => HAJJ_DHIKR[k]).filter(Boolean).map(d => `<blockquote class="hj-dhikr"><p>${d.text}</p><cite>${d.ref}</cite></blockquote>`).join('')],
+    st.dhikr?.length && ['dhikr', 'الأذكار', st.dhikr.map(k => HAJJ_DHIKR[k]).filter(Boolean).map(d => `<blockquote class="hj-dhikr"><p translate="no" lang="ar" dir="rtl">${d.text}</p><p class="hj-meaning">${d.text}</p><cite>${d.ref}</cite></blockquote>`).join('')],
     st.mistakes?.length && ['err', 'أخطاء شائعة', `<ul class="hj-ul warn">${st.mistakes.map(x => `<li>${x}</li>`).join('')}</ul>`],
     st.rules?.length && ['rules', 'أحكام', `<ul class="hj-ul">${st.rules.map(x => `<li>${x}</li>`).join('')}</ul>`]
   ].filter(Boolean);
@@ -447,7 +458,7 @@ function hajjStageCard(st, i, trip, type, kind, open) {
     </button>
     <div class="hj-st-body"><div class="hj-st-inner"><div class="hj-st-content">
       <p class="hj-brief">${st.brief}</p>
-      ${byType ? `<p class="hj-callout">${uiIcon('flag')}<span><b>في ${HAJJ_TYPES[type].title}:</b> ${byType}</span></p>` : ''}
+      ${byType ? `<p class="hj-callout">${uiIcon('flag')}<span><b>${hjF('في {0}:', hjT(HAJJ_TYPES[type].title))}</b> ${byType}</span></p>` : ''}
       ${saiNotNeeded ? `<p class="hj-callout ok">${uiIcon('check')}<span>سجّلتَ سعيًا بعد طواف القدوم، فلا سعي عليك الآن.</span></p>` : ''}
       ${primary ? `<div class="hj-tracks">${primary}</div>` : ''}
       ${tabs.length ? `<div class="hj-tabs" role="tablist">${tabs.map((t, n) => `<button role="tab" class="${n ? '' : 'on'}" onclick="hajjTab(this,'${t[0]}')">${t[1]}</button>`).join('')}</div><div class="hj-panels">${tabs.map((t, n) => `<div class="hj-panel ${n ? '' : 'on'}" data-p="${t[0]}">${t[2]}</div>`).join('')}</div>` : ''}
@@ -473,9 +484,9 @@ function hajjTab(btn, key) {
 }
 function hajjTrackerLabel(trip, kind, stage) {
   const a = trip.activities.filter(x => x.kind === kind && x.stage === stage).pop(), name = kind === 'tawaf' ? 'الطواف' : 'السعي';
-  if (a && !a.endedAt) return 'متابعة ' + name + ' · الشوط ' + hjAr(Math.min(a.rounds.length + 1, 7));
-  if (a && a.rounds.length >= 7) return name + ' مكتمل ✓';
-  return 'ابدأ ' + name;
+  if (a && !a.endedAt) return hjF('متابعة {0} · الشوط {1}', hjT(name), hjAr(Math.min(a.rounds.length + 1, 7)));
+  if (a && a.rounds.length >= 7) return hjF('{0} مكتمل ✓', hjT(name));
+  return hjF('ابدأ {0}', hjT(name));
 }
 function hajjFirstOpen(trip, kind, type) { return hajjStagesFor(kind, type).find(s => !trip.stages[s.id])?.id }
 function hajjDidQudumSai(trip) { return trip.activities.some(a => a.kind === 'sai' && a.stage === 'qudum' && a.rounds.length >= 7) }
@@ -537,13 +548,13 @@ function hajjRefreshLive() {
   const steps = hajjActSteps(trip, a), dist = hajjActDistance(trip, a);
   $('hj-steps').textContent = steps == null ? '—' : hajjNum(steps);
   $('hj-dist').textContent = hajjKm(dist.m);
-  $('hj-pct').textContent = hjAr(Math.round(n / 7 * 100)) + '٪';
-  $('hj-src').textContent = (steps == null ? (trip.stepsSession ? 'بانتظار مستشعر الخطوات · ' : 'الخطوات غير مفعّلة · ') : 'الخطوات من مستشعر الهاتف · ') + 'المسافة ' + hajjSrcLabel[dist.src];
+  $('hj-pct').textContent = hjPct(Math.round(n / 7 * 100));
+  $('hj-src').textContent = hjT(steps == null ? (trip.stepsSession ? 'بانتظار مستشعر الخطوات' : 'الخطوات غير مفعّلة') : 'الخطوات من مستشعر الهاتف') + ' · ' + hjF('المسافة {0}', hjT(hajjSrcLabel[dist.src]));
   const curStart = n ? a.rounds[n - 1].active : 0, curMs = hajjActiveMs(a) - curStart;
   const raml = n < 3 && ['tawaf', 'umrah', 'qudum'].includes(a.stage);
-  $('hj-dir').innerHTML = n >= 7 ? `<span class="hj-kicker">تم بحمد الله</span><b>اكتمل ${isT ? 'الطواف' : 'السعي'}</b>` : isT
-    ? `<span class="hj-kicker">الشوط ${hjAr(n + 1)} من ٧</span><b>${n === 6 ? 'الشوط الأخير' : 'حول الكعبة'}</b><span>${raml ? 'يُسن الرمل للرجال في الأشواط الثلاثة الأولى' : 'ابدأ من محاذاة الحجر الأسود وانتهِ إليها'}</span><em>${uiIcon('clock')}${hajjClock(curMs)}</em>`
-    : `<span class="hj-kicker">الشوط ${hjAr(n + 1)} من ٧</span><b>${n % 2 === 0 ? 'من الصفا إلى المروة' : 'من المروة إلى الصفا'}</b><span>${n === 6 ? 'الشوط الأخير، ينتهي عند المروة' : 'أسرع بين العلمين الأخضرين (للرجال)'}</span><em>${uiIcon('clock')}${hajjClock(curMs)}</em>`;
+  $('hj-dir').innerHTML = n >= 7 ? `<span class="hj-kicker">تم بحمد الله</span><b>${hjF('اكتمل {0}', hjT(isT ? 'الطواف' : 'السعي'))}</b>` : isT
+    ? `<span class="hj-kicker">${hjF('الشوط {0} من ٧', hjAr(n + 1))}</span><b>${n === 6 ? 'الشوط الأخير' : 'حول الكعبة'}</b><span>${raml ? 'يُسن الرمل للرجال في الأشواط الثلاثة الأولى' : 'ابدأ من محاذاة الحجر الأسود وانتهِ إليها'}</span><em>${uiIcon('clock')}${hajjClock(curMs)}</em>`
+    : `<span class="hj-kicker">${hjF('الشوط {0} من ٧', hjAr(n + 1))}</span><b>${n % 2 === 0 ? 'من الصفا إلى المروة' : 'من المروة إلى الصفا'}</b><span>${n === 6 ? 'الشوط الأخير، ينتهي عند المروة' : 'أسرع بين العلمين الأخضرين (للرجال)'}</span><em>${uiIcon('clock')}${hajjClock(curMs)}</em>`;
   const paused = !!a.pausedAt;
   $('hj-pause').innerHTML = uiIcon(paused ? 'play' : 'pause') + `<span>${paused ? 'استئناف' : 'إيقاف مؤقت'}</span>`;
   $('hj-pause').classList.toggle('on', paused);
@@ -552,12 +563,12 @@ function hajjRefreshLive() {
   const box = $('hj-rounds');
   if (box.dataset.n !== String(n)) {
     box.dataset.n = n;
-    box.innerHTML = n ? hjLabel('الأشواط المكتملة', hjAr(n) + ' من ٧') + hjMenu(a.rounds.map((r, i) => `<div class="hj-round"><span class="hj-round-n">${hjAr(i + 1)}</span><span>${a.kind === 'sai' ? (i % 2 === 0 ? 'الصفا ← المروة' : 'المروة ← الصفا') : 'الشوط ' + hjAr(i + 1)}</span><b>${hajjClock(r.ms)}</b></div>`).reverse()) : '';
+    box.innerHTML = n ? hjLabel('الأشواط المكتملة', hjF('{0} من ٧', hjAr(n))) + hjMenu(a.rounds.map((r, i) => `<div class="hj-round"><span class="hj-round-n">${hjAr(i + 1)}</span><span>${a.kind === 'sai' ? (i % 2 === 0 ? 'الصفا ← المروة' : 'المروة ← الصفا') : hjF('الشوط {0}', hjAr(i + 1))}</span><b>${hajjClock(r.ms)}</b></div>`).reverse()) : '';
   }
   const done = $('hj-complete');
   if (n >= 7 && done.hidden) {
     done.hidden = false;
-    done.innerHTML = `<span class="hj-complete-ico">${uiIcon('check')}</span><strong>${isT ? 'تقبّل الله طوافك' : 'انتهى سعيك عند المروة'}</strong><p>${isT ? 'صلِّ ركعتين خلف مقام إبراهيم إن تيسر، أو في أي مكان من المسجد، واشرب من ماء زمزم.' : 'تقبّل الله منك.' + (trip.kind === 'umrah' || a.stage === 'umrah' ? ' الخطوة التالية: الحلق أو التقصير.' : '')}</p><button class="hj-main small" onclick="hajjFinishActivity(true)">${uiIcon('check')}<span>حفظ ${isT ? 'الطواف' : 'السعي'}</span></button>`;
+    done.innerHTML = `<span class="hj-complete-ico">${uiIcon('check')}</span><strong>${isT ? 'تقبّل الله طوافك' : 'انتهى سعيك عند المروة'}</strong><p>${isT ? 'صلِّ ركعتين خلف مقام إبراهيم إن تيسر، أو في أي مكان من المسجد، واشرب من ماء زمزم.' : hjT('تقبّل الله منك.') + (trip.kind === 'umrah' || a.stage === 'umrah' ? ' ' + hjT('الخطوة التالية: الحلق أو التقصير.') : '')}</p><button class="hj-main small" onclick="hajjFinishActivity(true)">${uiIcon('check')}<span>${hjF('حفظ {0}', hjT(isT ? 'الطواف' : 'السعي'))}</span></button>`;
   } else if (n < 7) done.hidden = true;
 }
 
@@ -595,13 +606,13 @@ function hajjJourney() {
   }
   const active = hajjActiveTrip();
   app.innerHTML = sectionHeading('رحلتي في الحرم', 'بياناتك محفوظة على جهازك فقط', 'hajjHome()') + `<div class="hj-page">
-    ${hjHero({ kicker: 'إجمالي ما قطعته', title: hajjKm(sum.dist), meta: trips.length ? hjAr(trips.length) + ' ' + (trips.length === 1 ? 'رحلة' : 'رحلات') + ' · ' + hajjDuration(sum.ms) + ' من الطواف والسعي' : 'ابدأ رحلة العمرة أو الحج لتظهر إحصاءاتك هنا',
+    ${hjHero({ kicker: 'إجمالي ما قطعته', title: hajjKm(sum.dist), meta: trips.length ? hjF(trips.length === 1 ? '{0} رحلة · {1} من الطواف والسعي' : '{0} رحلات · {1} من الطواف والسعي', hjAr(trips.length), hajjDuration(sum.ms)) : 'ابدأ رحلة العمرة أو الحج لتظهر إحصاءاتك هنا',
       body: `<div class="hj-stats4">${hjStat(hajjNum(sum.steps), 'خطوة')}${hjStat(hjAr(sum.tawaf), 'شوط طواف')}${hjStat(hjAr(sum.sai), 'شوط سعي')}${hjStat(sum.ms > 60000 ? hjAr((actDist / 1000 / (sum.ms / 3600000)).toFixed(1)) : '—', 'كم/س متوسط')}</div>` })}
     ${active ? `<button class="hj-resume" onclick="${hajjGuideFor(active)}"><span class="hj-live-dot"></span><span class="hj-resume-text"><small>رحلة جارية</small><strong>${hajjKindTitle(active)}</strong></span>${uiIcon('arrow')}</button>` : hjMenu([listAction('kaaba', 'طواف أو سعي منفرد', 'لمن يطوف تطوعًا أو يريد عدّ الأشواط فقط', 'hajjStartVisit()')])}
-    ${days.size ? hjLabel('الإحصائيات اليومية') + hjMenu([...days.values()].sort((a, b) => b.at - a.at).map(d => `<div class="hj-day"><span class="hj-day-ico">${uiIcon('chart')}</span><span class="hj-day-text"><strong>${hajjDate(d.at)}</strong><small>طواف ${hjAr(d.tawaf)} · سعي ${hjAr(d.sai)} أشواط${d.steps ? ' · ' + hajjNum(d.steps) + ' خطوة' : ''}</small></span><span class="hj-day-val"><b>${hajjKm(d.dist)}</b><small>${hajjDuration(d.ms)}</small></span></div>`)) : ''}
+    ${days.size ? hjLabel('الإحصائيات اليومية') + hjMenu([...days.values()].sort((a, b) => b.at - a.at).map(d => `<div class="hj-day"><span class="hj-day-ico">${uiIcon('chart')}</span><span class="hj-day-text"><strong>${hajjDate(d.at)}</strong><small>${hjF('طواف {0} · سعي {1} أشواط', hjAr(d.tawaf), hjAr(d.sai))}${d.steps ? ' · ' + hjF('{0} خطوة', hajjNum(d.steps)) : ''}</small></span><span class="hj-day-val"><b>${hajjKm(d.dist)}</b><small>${hajjDuration(d.ms)}</small></span></div>`)) : ''}
     ${hjLabel('الرحلات', trips.length ? hjAr(trips.length) : '')}
-    ${trips.length ? hjMenu(all.map(({ t, x }) => listAction(t.kind === 'hajj' ? 'flag' : 'kaaba', hajjKindTitle(t) + (t.endedAt ? '' : ' · جارية'), hajjDate(t.startedAt) + ' · ' + hajjKm(x.dist), `hajjReport('${t.id}')`))) : `<div class="hj-empty">${uiIcon('walk')}<strong>لا توجد رحلات بعد</strong><p>ابدأ رحلة العمرة أو الحج من صفحتها، وسيُحفظ كل شيء هنا</p></div>`}
-    <p class="hj-foot">الخطوات من مستشعر الهاتف، والمسافة تقديرية من الخطوات × طول خطوتك (${hjAr(s.settings.stride.toFixed(2))} م) أو بحسب الأشواط. لا يُستخدم GPS داخل الحرم. <button class="hj-link" onclick="hajjStrideDialog()">تعديل طول الخطوة</button></p>
+    ${trips.length ? hjMenu(all.map(({ t, x }) => listAction(t.kind === 'hajj' ? 'flag' : 'kaaba', hajjKindTitle(t) + (t.endedAt ? '' : ' · ' + hjT('جارية')), hajjDate(t.startedAt) + ' · ' + hajjKm(x.dist), `hajjReport('${t.id}')`))) : `<div class="hj-empty">${uiIcon('walk')}<strong>لا توجد رحلات بعد</strong><p>ابدأ رحلة العمرة أو الحج من صفحتها، وسيُحفظ كل شيء هنا</p></div>`}
+    <p class="hj-foot">${hjF('الخطوات من مستشعر الهاتف، والمسافة تقديرية من الخطوات × طول خطوتك ({0} م) أو بحسب الأشواط. لا يُستخدم GPS داخل الحرم.', hjAr(s.settings.stride.toFixed(2)))} <button class="hj-link" onclick="hajjStrideDialog()">تعديل طول الخطوة</button></p>
   </div>`;
   hajjFinishRender();
 }
@@ -618,7 +629,7 @@ function hajjVisitPage() {
   hajjEnter('visit');
   const t = hajjTripTotals(trip);
   app.innerHTML = sectionHeading('طواف وسعي', 'عدّ الأشواط والوقت والخطوات', 'hajjHome()') + `<div class="hj-page">
-    <section class="hj-hero hj-trip-hero"><span class="hj-kicker"><i class="hj-live-dot"></i>جارية منذ ${hajjTime(trip.startedAt)}</span>
+    <section class="hj-hero hj-trip-hero"><span class="hj-kicker"><i class="hj-live-dot"></i>${hjF('جارية منذ {0}', hajjTime(trip.startedAt))}</span>
       <div class="hj-stats4">${hjStat(t.steps == null ? '—' : hajjNum(t.steps), 'خطوة')}${hjStat(hajjKm(t.dist), 'المسافة')}${hjStat(hjAr(t.tawaf), 'طواف')}${hjStat(hjAr(t.sai), 'سعي')}</div>
       <div class="hj-hero-actions"><button onclick="hajjReport('${trip.id}')">${uiIcon('chart')}الملخص</button><button class="end" onclick="hajjConfirmEndTrip()">${uiIcon('flag')}إنهاء</button></div></section>
     ${hajjStepsNotice(trip)}
@@ -637,13 +648,13 @@ function hajjReport(id) {
   const x = hajjTripTotals(trip), stages = trip.kind === 'visit' ? [] : hajjStagesFor(trip.kind, trip.type), doneStages = stages.filter(s => trip.stages[s.id]);
   app.innerHTML = sectionHeading('ملخص رحلتي الإيمانية', hajjKindTitle(trip), trip.endedAt ? 'hajjJourney()' : hajjGuideFor(trip)) + `<div class="hj-page">
     <section class="hj-hero hj-report-hero">
-      <div class="hj-report-brand">${typeof mushafiBrandIcon === 'function' ? mushafiBrandIcon() : ''}<span><span class="hj-kicker">${hajjKindTitle(trip)}</span><strong class="hj-hero-title">${hajjDate(trip.startedAt)}</strong><span class="hj-hero-meta">${hajjTime(trip.startedAt)} — ${trip.endedAt ? hajjTime(trip.endedAt) : 'جارية'} · ${hajjDuration(x.span)}</span></span></div>
-      <div class="hj-big"><b>${hajjKm(x.dist)}</b><small>إجمالي المسافة · ${hajjSrcLabel[x.src]}</small></div>
+      <div class="hj-report-brand">${typeof mushafiBrandIcon === 'function' ? mushafiBrandIcon() : ''}<span><span class="hj-kicker">${hajjKindTitle(trip)}</span><strong class="hj-hero-title">${hajjDate(trip.startedAt)}</strong><span class="hj-hero-meta">${hajjTime(trip.startedAt)} — ${trip.endedAt ? hajjTime(trip.endedAt) : hjT('جارية')} · ${hajjDuration(x.span)}</span></span></div>
+      <div class="hj-big"><b>${hajjKm(x.dist)}</b><small>${hjF('إجمالي المسافة · {0}', hjT(hajjSrcLabel[x.src]))}</small></div>
       <div class="hj-stats4">${hjStat(x.steps == null ? '—' : hajjNum(x.steps), 'خطوة')}${hjStat(hajjDuration(x.ms), 'طواف وسعي')}${hjStat(hjAr(x.tawaf), 'شوط طواف')}${hjStat(hjAr(x.sai), 'شوط سعي')}</div>
-      ${stages.length ? `<div class="hj-tags-wrap"><span class="hj-kicker">المراحل المنجزة · ${hjAr(doneStages.length)} من ${hjAr(stages.length)}</span><div class="hj-tags">${stages.map(s => `<span class="${trip.stages[s.id] ? 'on' : ''}">${trip.stages[s.id] ? uiIcon('check') : ''}${s.title}</span>`).join('')}</div></div>` : ''}
-      <p class="hj-verse">﴿وَأَتِمُّوا الْحَجَّ وَالْعُمْرَةَ لِلَّهِ﴾</p>
+      ${stages.length ? `<div class="hj-tags-wrap"><span class="hj-kicker">${hjF('المراحل المنجزة · {0} من {1}', hjAr(doneStages.length), hjAr(stages.length))}</span><div class="hj-tags">${stages.map(s => `<span class="${trip.stages[s.id] ? 'on' : ''}">${trip.stages[s.id] ? uiIcon('check') : ''}${s.title}</span>`).join('')}</div></div>` : ''}
+      <p class="hj-verse" translate="no" lang="ar" dir="rtl">﴿وَأَتِمُّوا الْحَجَّ وَالْعُمْرَةَ لِلَّهِ﴾</p>
     </section>
-    ${trip.activities.length ? hjLabel('الأنشطة') + hjMenu(trip.activities.map(a => `<div class="hj-day"><span class="hj-day-ico">${uiIcon(a.kind === 'tawaf' ? 'kaaba' : 'route')}</span><span class="hj-day-text"><strong>${a.kind === 'tawaf' ? 'طواف' : 'سعي'} · ${hjAr(a.rounds.length)} من ٧</strong><small>${hajjTime(a.startedAt)}${hajjActSteps(trip, a) ? ' · ' + hajjNum(hajjActSteps(trip, a)) + ' خطوة' : ''}</small></span><span class="hj-day-val"><b>${hajjClock(hajjActiveMs(a))}</b><small>${hajjKm(hajjActDistance(trip, a).m)}</small></span></div>`)) : ''}
+    ${trip.activities.length ? hjLabel('الأنشطة') + hjMenu(trip.activities.map(a => `<div class="hj-day"><span class="hj-day-ico">${uiIcon(a.kind === 'tawaf' ? 'kaaba' : 'route')}</span><span class="hj-day-text"><strong>${hjF('{0} · {1} من ٧', hjT(a.kind === 'tawaf' ? 'طواف' : 'سعي'), hjAr(a.rounds.length))}</strong><small>${hajjTime(a.startedAt)}${hajjActSteps(trip, a) ? ' · ' + hjF('{0} خطوة', hajjNum(hajjActSteps(trip, a))) : ''}</small></span><span class="hj-day-val"><b>${hajjClock(hajjActiveMs(a))}</b><small>${hajjKm(hajjActDistance(trip, a).m)}</small></span></div>`)) : ''}
     ${hjLabel('حفظ ومشاركة')}
     ${hjMenu([listAction('share', 'مشاركة كصورة', 'بطاقة جاهزة للنشر بشعار مصحفي', `hajjExport('${trip.id}','image','share')`), listAction('share', 'مشاركة كملف PDF', 'للطباعة أو الإرسال', `hajjExport('${trip.id}','pdf','share')`), listAction('download', 'حفظ في الجهاز', 'صورة PNG', `hajjExport('${trip.id}','image','save')`), listAction('download', 'حفظ PDF في الجهاز', 'ملف PDF', `hajjExport('${trip.id}','pdf','save')`)])}
     ${trip.endedAt ? `<button class="hj-link danger" onclick="hajjDeleteTrip('${trip.id}')">حذف هذه الرحلة من السجل</button>` : ''}
@@ -654,7 +665,8 @@ function hajjReport(id) {
 /* بطاقة الملخص للمشاركة — بهوية مصحفي */
 function hajjLoadImg(src) { return new Promise(res => { const im = new Image(); im.onload = () => res(im); im.onerror = () => res(null); im.src = src }) }
 async function hajjReportCanvas(trip) {
-  try { await Promise.all([document.fonts?.load('700 40px AppArabic'), document.fonts?.load('40px Quran')]) } catch (e) {}
+  const lang = typeof uiLocale === 'function' ? uiLocale() : 'ar', rtl = lang === 'ar' || lang === 'ur', fam = lang === 'bn' ? 'UiBengali, system-ui' : rtl ? 'AppArabic' : 'system-ui, AppArabic';
+  try { await Promise.all([document.fonts?.load('700 40px AppArabic'), document.fonts?.load('40px Quran'), lang === 'bn' ? document.fonts?.load('700 40px UiBengali') : null]) } catch (e) {}
   const icon = await hajjLoadImg('images/mushafi-official-icon.png');
   const W = 1080, H = 1350, c = document.createElement('canvas'); c.width = W; c.height = H;
   const g = c.getContext('2d'), x = hajjTripTotals(trip), stages = trip.kind === 'visit' ? [] : hajjStagesFor(trip.kind, trip.type);
@@ -666,28 +678,29 @@ async function hajjReportCanvas(trip) {
   for (let y = -60; y < H + 120; y += 120) for (let xx = -60; xx < W + 120; xx += 120) { g.beginPath(); for (let k = 0; k < 2; k++) { g.save(); g.translate(xx, y); g.rotate(k * Math.PI / 4); g.strokeRect(-34, -34, 68, 68); g.restore() } g.stroke() }
   g.restore();
   const rr = (x0, y0, w, h, r) => { g.beginPath(); g.moveTo(x0 + r, y0); g.arcTo(x0 + w, y0, x0 + w, y0 + h, r); g.arcTo(x0 + w, y0 + h, x0, y0 + h, r); g.arcTo(x0, y0 + h, x0, y0, r); g.arcTo(x0, y0, x0 + w, y0, r); g.closePath() };
-  g.direction = 'rtl'; g.textAlign = 'center'; g.textBaseline = 'alphabetic';
-  const F = (w, s, fam = 'AppArabic') => `${w} ${s}px ${fam}, sans-serif`;
+  g.direction = rtl ? 'rtl' : 'ltr'; g.textAlign = 'center'; g.textBaseline = 'alphabetic';
+  const F = (w, s, f = fam) => `${w} ${s}px ${f}, sans-serif`;
+  const fit = (t, max, size, w = 400, f = fam) => { let z = size; g.font = F(w, z, f); while (z > 14 && g.measureText(t).width > max) { z -= 2; g.font = F(w, z, f) } return z };
   // الشعار
   if (icon) { g.save(); rr(W / 2 - 66, 84, 132, 132, 32); g.clip(); g.drawImage(icon, W / 2 - 66, 84, 132, 132); g.restore(); g.strokeStyle = 'rgba(217,184,116,.45)'; g.lineWidth = 2; rr(W / 2 - 66, 84, 132, 132, 32); g.stroke() }
-  g.fillStyle = GOLD; g.font = F(600, 30); g.fillText('مصحفي', W / 2, 262);
-  g.fillStyle = INK; g.font = F(700, 70); g.fillText('ملخص رحلتي الإيمانية', W / 2, 358);
-  g.fillStyle = GOLD; g.font = F(500, 40); g.fillText(hajjKindTitle(trip), W / 2, 420);
-  g.fillStyle = SOFT; g.font = F(400, 30); g.fillText(hajjDate(trip.startedAt), W / 2, 470); g.font = F(400, 26); g.fillText('\u200f' + hajjTime(trip.startedAt) + ' — ' + (trip.endedAt ? hajjTime(trip.endedAt) : 'جارية'), W / 2, 510);
+  g.fillStyle = GOLD; g.font = F(600, 30); g.fillText(hjT('مصحفي'), W / 2, 262);
+  g.fillStyle = INK; fit(hjT('ملخص رحلتي الإيمانية'), W - 160, 70, 700); g.fillText(hjT('ملخص رحلتي الإيمانية'), W / 2, 358);
+  g.fillStyle = GOLD; g.font = F(500, 40); g.fillText(hjT(hajjKindTitle(trip)), W / 2, 420);
+  g.fillStyle = SOFT; g.font = F(400, 30); g.fillText(hajjDate(trip.startedAt), W / 2, 470); g.font = F(400, 26); g.fillText((rtl ? '\u200f' : '') + hajjTime(trip.startedAt) + ' — ' + (trip.endedAt ? hajjTime(trip.endedAt) : hjT('جارية')), W / 2, 510);
   // البطاقة الرئيسية
   g.fillStyle = 'rgba(255,255,255,.045)'; rr(80, 548, W - 160, 240, 40); g.fill(); g.strokeStyle = 'rgba(217,184,116,.22)'; g.lineWidth = 2; g.stroke();
-  g.fillStyle = SOFT; g.font = F(400, 28); g.fillText('إجمالي المسافة', W / 2, 610);
+  g.fillStyle = SOFT; g.font = F(400, 28); g.fillText(hjT('إجمالي المسافة'), W / 2, 610);
   g.fillStyle = INK; g.font = F(700, 96); g.fillText(hajjKm(x.dist), W / 2, 706);
-  g.fillStyle = 'rgba(247,240,223,.45)'; g.font = F(400, 22); g.fillText(hajjSrcLabel[x.src], W / 2, 762);
-  const cells = [['الخطوات', x.steps == null ? '—' : hajjNum(x.steps)], ['المدة', hajjDuration(x.span)], ['أشواط الطواف', hjAr(x.tawaf)], ['أشواط السعي', hjAr(x.sai)]];
+  g.fillStyle = 'rgba(247,240,223,.45)'; g.font = F(400, 22); g.fillText(hjT(hajjSrcLabel[x.src]), W / 2, 762);
+  const cells = [[hjT('الخطوات'), x.steps == null ? '—' : hajjNum(x.steps)], [hjT('المدة'), hjT(hajjDuration(x.span))], [hjT('أشواط الطواف'), hjAr(x.tawaf)], [hjT('أشواط السعي'), hjAr(x.sai)]];
   const cw = (W - 160 - 3 * 20) / 4;
-  cells.forEach(([k, v], i) => { const x0 = W - 80 - (i + 1) * cw - i * 20; g.fillStyle = 'rgba(255,255,255,.04)'; rr(x0, 814, cw, 144, 28); g.fill(); g.fillStyle = INK; g.font = F(700, v.length > 8 ? 34 : 44); g.fillText(v, x0 + cw / 2, 884); g.fillStyle = SOFT; g.font = F(400, 22); g.fillText(k, x0 + cw / 2, 930) });
+  cells.forEach(([k, v], i) => { const x0 = rtl ? W - 80 - (i + 1) * cw - i * 20 : 80 + i * (cw + 20); g.fillStyle = 'rgba(255,255,255,.04)'; rr(x0, 814, cw, 144, 28); g.fill(); g.fillStyle = INK; fit(v, cw - 24, 44, 700); g.fillText(v, x0 + cw / 2, 884); g.fillStyle = SOFT; fit(k, cw - 20, 22); g.fillText(k, x0 + cw / 2, 930) });
   if (stages.length) {
     const done = stages.filter(s => trip.stages[s.id]);
-    g.fillStyle = GOLD; g.font = F(600, 28); g.fillText('المراحل المنجزة  ' + hjAr(done.length) + ' من ' + hjAr(stages.length), W / 2, 1008);
+    g.fillStyle = GOLD; g.font = F(600, 28); g.fillText(hjF('المراحل المنجزة: {0} من {1}', hjAr(done.length), hjAr(stages.length)), W / 2, 1008);
     g.font = F(500, 24); let y = 1034, line = [], widthOf = arr => arr.reduce((s, t) => s + g.measureText(t).width + 56, -16);
-    const rows = []; for (const s of stages) { const nl = [...line, s.title]; if (widthOf(nl) > W - 160 && line.length) { rows.push(line); line = [s.title] } else line = nl } if (line.length) rows.push(line);
-    for (const row of rows.slice(0, 2)) { let xr = W / 2 + widthOf(row) / 2; for (const t of row) { const on = trip.stages[stages.find(s => s.title === t).id], tw = g.measureText(t).width + 40; g.fillStyle = on ? 'rgba(63,154,112,.22)' : 'rgba(255,255,255,.05)'; rr(xr - tw, y, tw, 46, 23); g.fill(); g.fillStyle = on ? '#8fd6b0' : SOFT; g.fillText(t, xr - tw / 2, y + 32); xr -= tw + 16 } y += 60 }
+    const rows = []; for (const s of stages) { const nl = [...line, hjT(s.title)]; if (widthOf(nl) > W - 160 && line.length) { rows.push(line); line = [hjT(s.title)] } else line = nl } if (line.length) rows.push(line);
+    for (const row of rows.slice(0, 2)) { let xr = W / 2 + widthOf(row) / 2; for (const t of (rtl ? row : [...row].reverse())) { const on = trip.stages[stages.find(s => hjT(s.title) === t).id], tw = g.measureText(t).width + 40; g.fillStyle = on ? 'rgba(63,154,112,.22)' : 'rgba(255,255,255,.05)'; rr(xr - tw, y, tw, 46, 23); g.fill(); g.fillStyle = on ? '#8fd6b0' : SOFT; g.fillText(t, xr - tw / 2, y + 32); xr -= tw + 16 } y += 60 }
   }
   g.fillStyle = GOLD; g.font = F(400, 44, 'Quran'); g.fillText('﴿وَأَتِمُّوا الْحَجَّ وَالْعُمْرَةَ لِلَّهِ﴾', W / 2, H - 118);
   g.fillStyle = 'rgba(247,240,223,.42)'; g.font = F(400, 22); g.fillText('mushafiapp.com  ·  App Store', W / 2, H - 64);

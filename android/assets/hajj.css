@@ -233,3 +233,7 @@ body:not(.dark) .hj-3d-note{color:rgba(40,34,24,.6)}
 @keyframes hjIn{from{opacity:0;transform:translateY(6px)}}
 @media (min-width:700px){.hj-stage3d{height:clamp(320px,48vh,520px)}}
 @media (prefers-reduced-motion:reduce){.hj-live-dot,.hj-complete,.hj-dialog,.hj-dialog-card,.hj-panel.on{animation:none}.hj-st-body,.hj-st-content,.hj-st-chev{transition:none}}
+
+.hj-meaning{margin:8px 0 0;font-size:13px;line-height:1.85;color:var(--ink);opacity:.85}
+html[lang=ar] .hj-meaning,html:not([lang]) .hj-meaning{display:none}
+.hj-dhikr p[lang=ar]{font-family:Quran,serif}
