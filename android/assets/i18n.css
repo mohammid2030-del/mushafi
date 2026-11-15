@@ -33,3 +33,10 @@ html[dir=ltr] .routine-complete .devotion-open{padding:19px 18px 19px 46px!impor
 html[dir=ltr] .routine-complete .devotion-open strong{padding-left:0;padding-right:27px}
 html[dir=ltr] .devotion-open>strong{direction:ltr;unicode-bidi:plaintext;text-align:start}
 html[dir=ltr] .devotion-open>.devotion-kind,html[dir=ltr] .devotion-open>small{text-align:start}
+/* LTR: toggle knob travels toward the end edge; tap target sits over the switch */
+html[dir=ltr] .prayer-toggle input:checked+.prayer-switch:after{transform:translateX(18px)}
+html[dir=ltr] .prayer-toggle>input{left:auto;right:0}
+/* LTR: Latin labels are longer — stack label above its picker instead of squeezing it */
+html[dir=ltr] .prayer-field:has(select){flex-direction:column;align-items:stretch;gap:10px}
+html[dir=ltr] .prayer-field:has(select)>span:first-child{flex:none}
+html[dir=ltr] .prayer-field select{max-width:none;width:100%}
