@@ -50,6 +50,7 @@ jobs:
         run: |
           set -o pipefail
           chmod +x gradlew
+          bash ../ios/scripts/sync-version.sh
           ./gradlew --no-daemon --stacktrace verifyUiLocales assembleDebug 2>&1 | tee "$RUNNER_TEMP/build.log"
 
       - name: Errors

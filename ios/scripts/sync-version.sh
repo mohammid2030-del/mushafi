@@ -14,6 +14,8 @@ if [[ -z "$name" || -z "$code" ]]; then
 fi
 
 perl -pi -e "s/MARKETING_VERSION: \"[^\"]*\"/MARKETING_VERSION: \"$name\"/; s/CURRENT_PROJECT_VERSION: \"[^\"]*\"/CURRENT_PROJECT_VERSION: \"$code\"/" "$project"
+# The version shown in the app ("Mushafi · Version …") follows the same number.
+perl -pi -e "s/const APP_VERSION='[^']*'/const APP_VERSION='$name'/" "$root/android/assets/app-shell.js"
 echo "iOS version set to $name ($code)"
 echo "MUSHAFI_VERSION_NAME=$name" >> "${GITHUB_ENV:-/dev/null}"
 echo "MUSHAFI_VERSION_CODE=$code" >> "${GITHUB_ENV:-/dev/null}"
