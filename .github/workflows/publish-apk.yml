@@ -23,4 +23,21 @@ jobs:
           gh api -H "Accept: application/octet-stream" "repos/$GITHUB_REPOSITORY/releases/assets/$ID" > Mushafi.apk
           ls -la Mushafi.apk
           gh release delete android-latest --repo "$GITHUB_REPOSITORY" --yes --cleanup-tag 2>/dev/null || true
-          gh release create android-latest Mushafi.apk --repo "$GITHUB_REPOSITORY" --title "Mushafi Android" --notes "Android download for the Mushafi website." --latest=false
+          # Update manifest read by the in-app updater through mushafiapp.com/api/app-update.
+          SHA=${{ github.event.workflow_run.head_sha || github.sha }}
+          gh api "repos/$GITHUB_REPOSITORY/contents/android/build.gradle?ref=$SHA" -q .content | base64 -d > build.gradle
+          gh api "repos/$GITHUB_REPOSITORY/contents/android/update-notes.json?ref=$SHA" -q .content 2>/dev/null | base64 -d > notes.json || echo '{}' > notes.json
+          python3 - <<'PY'
+          import json, re, hashlib, os
+          g = open('build.gradle').read()
+          code = int(re.search(r"versionCode\s+(\d+)", g).group(1)); name = re.search(r"versionName\s+'([^']+)'", g).group(1)
+          data = open('Mushafi.apk', 'rb').read()
+          try: notes = json.load(open('notes.json'))
+          except Exception: notes = {}
+          m = {'packageName': 'com.mushafi.app', 'available': True, 'versionCode': code, 'versionName': name, 'minSdk': 23,
+               'url': f'https://mushafiapp.com/download/Mushafi-{name}.apk', 'size': len(data), 'sha256': hashlib.sha256(data).hexdigest()}
+          m.update({k: v for k, v in notes.items() if k.startswith('notes') and isinstance(v, list)})
+          json.dump(m, open('app-update.json', 'w'), ensure_ascii=False)
+          print(json.dumps({k: m[k] for k in ('versionCode', 'versionName', 'size', 'sha256', 'url')}))
+          PY
+          gh release create android-latest Mushafi.apk app-update.json --repo "$GITHUB_REPOSITORY" --title "Mushafi Android" --notes "Android download for the Mushafi website." --latest=false

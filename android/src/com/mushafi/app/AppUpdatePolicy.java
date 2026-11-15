@@ -4,7 +4,7 @@ import java.io.*;
 import java.security.MessageDigest;
 /** Strict release metadata and byte checks, independent of UI/network implementation. */
 public final class AppUpdatePolicy {
- public static final String HOST="mushafi.mohammedasif241.chatgpt.site",ORIGIN="https://"+HOST,MANIFEST=ORIGIN+"/api/app-update";
+ public static final String HOST="mushafiapp.com",ORIGIN="https://"+HOST,MANIFEST=ORIGIN+"/api/app-update";
  public final int code,minSdk;public final String version,url,sha256;public final long size;
  public AppUpdatePolicy(int code,String version,int minSdk,String url,String sha256,long size){
   if(code<1||version==null||!version.matches("[0-9]{1,4}(\\.[0-9]{1,4}){1,3}")||minSdk<23||minSdk>100||size<1000000||size>250L*1024*1024||sha256==null||!sha256.matches("[0-9a-f]{64}"))throw new IllegalArgumentException("Invalid release metadata");

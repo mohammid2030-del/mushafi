@@ -1,5 +1,7 @@
 // مصحفي — public website on Cloudflare Workers (static assets + the Android download).
 const APK = 'https://github.com/mohammid2030-del/mushafi/releases/download/android-latest/Mushafi.apk';
+// Update manifest for the in-app updater (written by the Publish APK workflow next to the APK).
+const MANIFEST = 'https://github.com/mohammid2030-del/mushafi/releases/download/android-latest/app-update.json';
 
 // /download/android redirects to a URL that names the current build, so phones never reuse an old cached file.
 async function currentBuild() {
@@ -33,6 +35,17 @@ export default {
     if (url.pathname === '/download/android' || url.pathname === '/download/android/') {
       const build = await currentBuild();
       return new Response(null, { status: 302, headers: { location: `/download/android/${build}/Mushafi.apk`, 'cache-control': 'no-store' } });
+    }
+    // In-app updater: latest release metadata (version, size, sha256, notes).
+    if (url.pathname === '/api/app-update') {
+      const up = await fetch(MANIFEST, { redirect: 'follow', cf: { cacheTtl: 0 } });
+      if (!up.ok) return new Response('{"available":false}', { status: 503, headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store' } });
+      return new Response(await up.text(), { status: 200, headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store', 'x-content-type-options': 'nosniff' } });
+    }
+    // In-app updater download: /download/Mushafi-<version>.apk (the app checks size and sha256).
+    if (/^\/download\/Mushafi-\d{1,4}(\.\d{1,4}){1,3}\.apk$/.test(url.pathname)) {
+      const res = await serveApk(request);
+      return res || new Response('Not found', { status: 404 });
     }
     if (url.pathname.startsWith('/download/android/')) {
       const res = await serveApk(request);

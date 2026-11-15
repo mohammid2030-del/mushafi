@@ -2,7 +2,7 @@ import com.mushafi.app.AppUpdatePolicy;
 import com.mushafi.app.AppUpdateNoticePolicy;
 public final class NoticePolicyChecks {
  static void need(boolean yes,String name){if(!yes)throw new AssertionError(name);}
- public static void main(String[] args){AppUpdatePolicy r=new AppUpdatePolicy(167,"3.1.17",23,"https://mushafi.mohammedasif241.chatgpt.site/download/Mushafi-3.1.17.apk","a".repeat(64),118000000);
+ public static void main(String[] args){AppUpdatePolicy r=new AppUpdatePolicy(167,"3.1.17",23,"https://mushafiapp.com/download/Mushafi-3.1.17.apk","a".repeat(64),118000000);
  need(AppUpdateNoticePolicy.shouldNotify(r,166,36,0,true,true),"new compatible release");
  need(!AppUpdateNoticePolicy.shouldNotify(r,166,36,167,true,true),"dismissed release does not repeat");
  need(!AppUpdateNoticePolicy.shouldNotify(r,166,36,168,true,true),"older than notified release");
