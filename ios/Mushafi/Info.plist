@@ -56,6 +56,8 @@
 	<false/>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSMotionUsageDescription</key>
+	<string>يحسب مصحفي خطواتك أثناء الطواف والسعي فقط عندما تبدأ رحلة الحج أو العمرة، وتبقى البيانات على جهازك.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>يستخدم مصحفي موقعك لحساب مواقيت الصلاة واتجاه القبلة وحالة الطقس في مدينتك. يمكنك بدلاً من ذلك اختيار مدينتك يدويًا.</string>
 	<key>UIApplicationSceneManifest</key>

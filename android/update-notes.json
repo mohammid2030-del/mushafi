@@ -1,32 +1,32 @@
 {
   "notesAr": [
-    "تحسين اتجاه النصوص وإعدادات الصلاة في الإنجليزية والبنغالية والتركية والفرنسية",
-    "اللغة الفرنسية وترجمة معاني القرآن (حميد الله) دون إنترنت",
+    "قسم جديد: الحج والعمرة — دليل المناسك مع الطواف والسعي ثلاثي الأبعاد",
+    "عدّ الأشواط والوقت والخطوات، وملخص الرحلة كصورة أو PDF",
     "تحسينات عامة"
   ],
   "notesEn": [
-    "Improved text direction and prayer settings in English, Bangla, Turkish and French",
-    "French language and offline Hamidullah Quran meanings",
+    "New: Hajj & Umrah — rites guide with 3D tawaf and sa'i",
+    "Round counter, time and steps, plus a trip summary as image or PDF",
     "General improvements"
   ],
   "notesUr": [
-    "انگریزی، بنگالی، ترکی اور فرانسیسی میں متن کی سمت اور نماز کی ترتیبات بہتر",
-    "فرانسیسی زبان اور حمید اللہ کا ترجمۂ معانی بغیر انٹرنیٹ",
+    "نیا حصہ: حج و عمرہ — مناسک کی رہنمائی اور سہ جہتی طواف و سعی",
+    "چکر، وقت اور قدموں کا شمار، اور سفر کا خلاصہ تصویر یا PDF میں",
     "عمومی بہتری"
   ],
   "notesBn": [
-    "ইংরেজি, বাংলা, তুর্কি ও ফরাসিতে লেখার দিক ও নামাজের সেটিংস উন্নত",
-    "ফরাসি ভাষা ও অফলাইন হামিদুল্লাহ কুরআনের অর্থ",
+    "নতুন: হজ ও উমরাহ — ত্রিমাত্রিক তাওয়াফ ও সাঈসহ নির্দেশিকা",
+    "চক্কর, সময় ও পদক্ষেপ গণনা, ছবি বা PDF হিসেবে সারাংশ",
     "সাধারণ উন্নতি"
   ],
   "notesTr": [
-    "İngilizce, Bengalce, Türkçe ve Fransızcada metin yönü ve namaz ayarları iyileştirildi",
-    "Fransızca dil ve çevrimdışı Hamidullah Kuran meali",
+    "Yeni: Hac ve Umre — 3B tavaf ve sa'y ile menasik rehberi",
+    "Şavt, süre ve adım sayacı; resim veya PDF olarak yolculuk özeti",
     "Genel iyileştirmeler"
   ],
   "notesFr": [
-    "Sens du texte et réglages de prière améliorés en anglais, bengali, turc et français",
-    "Langue française et traduction des sens du Coran (Hamidullah) hors ligne",
+    "Nouveau : Hajj et Omra — guide des rites avec tawaf et sa'y en 3D",
+    "Compteur de tours, durée et pas, et résumé du voyage en image ou PDF",
     "Améliorations générales"
   ]
 }

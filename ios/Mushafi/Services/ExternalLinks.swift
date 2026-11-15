@@ -5,6 +5,7 @@ enum ExternalLinks {
     private static let sourceHosts: Set<String> = [
         "quran.com", "sunnah.com", "islamhouse.com", "dorar.net",
         "binbaz.org.sa", "www.diyanet.gov.tr", "saadalkhathlan.com",
+        "www.haj.gov.sa", "haj.gov.sa", "www.nusuk.sa", "nusuk.sa",
     ]
     private static let supportBase = "https://mushafiapp.com/"
     static let supportEmail = "support@mushafiapp.com"

@@ -36,6 +36,10 @@
     <!-- صحبة الفجر: Fajr alarm and the in-app wake ring shown over the lock screen -->
     <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
 
+    <!-- الحج والعمرة: the phone's step counter during a tawaf/sa'i session (asked only when the user starts tracking) -->
+    <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />
+    <uses-feature android:name="android.hardware.sensor.stepcounter" android:required="false" />
+
     <!-- Qibla compass sensors are optional so the app still installs on devices without them -->
     <uses-feature android:name="android.hardware.sensor.compass" android:required="false" />
     <uses-feature android:name="android.hardware.sensor.accelerometer" android:required="false" />

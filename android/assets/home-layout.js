@@ -2,7 +2,7 @@
 // Home arrangement: a sky header that follows the day's prayers, today's times, a quick row,
 // then features grouped in tiles. Every card still comes from its own module; this file only
 // places them, so their own updates (weather, smart shortcut, recitation, challenge) keep working.
-Object.assign(iconPaths, {
+Object.assign(iconPaths, {kaaba: '<path d="M4 7.5 12 4l8 3.5v9L12 20l-8-3.5z"/><path d="M4 7.5 12 11l8-3.5M12 11v9"/><path d="M4 10.5l8 3.5 8-3.5"/>', 
   pin: '<path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21Z"/><circle cx="12" cy="9.5" r="2.5"/>',
   compass: '<circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2.2 4.8-4.8 2.2 2.2-4.8 4.8-2.2Z"/>',
   live: '<rect x="3" y="6" width="18" height="13" rx="3"/><path d="m8 3 4 3 4-3"/><path d="m10.5 10 4 2.5-4 2.5v-5Z"/>',
@@ -293,7 +293,7 @@ function homeLayout() {
     <div class="hl-reading-slot"></div>
     <div class="hl-rest"></div>
     ${hlHead('المميزات')}
-    <div class="hl-grid">${hlTile('fajr', 'صحبة الفجر', "fajrHome('home')", 'جديد')}${hlTile('chart', 'ختمتي', 'khatmaHome()')}${hlTile('note', 'وردي اليومي', 'wardHome()')}${hlTile('beads', 'المسبحة', 'sebhaHome()')}${typeof challengeHome === 'function' ? hlTile('trophy', 'تحدّي مصحفي', 'challengeHome()') : ''}${typeof liveBroadcastHome === 'function' ? hlTile('live', 'البث المباشر', 'liveBroadcastHome()') : ''}</div>
+    <div class="hl-grid">${hlTile('kaaba', 'الحج والعمرة', "hajjHome('home')", 'جديد')}${hlTile('fajr', 'صحبة الفجر', "fajrHome('home')")}${hlTile('chart', 'ختمتي', 'khatmaHome()')}${hlTile('note', 'وردي اليومي', 'wardHome()')}${hlTile('beads', 'المسبحة', 'sebhaHome()')}${typeof challengeHome === 'function' ? hlTile('trophy', 'تحدّي مصحفي', 'challengeHome()') : ''}${typeof liveBroadcastHome === 'function' ? hlTile('live', 'البث المباشر', 'liveBroadcastHome()') : ''}</div>
     ${hlHead('علم وأدوات')}
     <div class="hl-grid">${hlTile('book', 'الكتب', "booksHome('home')")}${typeof openMuslimLibrary === 'function' ? hlTile('book', 'صحيح مسلم', 'openMuslimLibrary(true)') : ''}${hlTile('bookmark', 'مكتبتي', 'libraryHome()')}${hlTile('heart', 'الأذكار', 'duaHome()')}${hlTile('grid', 'ويدجت الشاشة', 'hlWidgets()')}${typeof openPrayerSettings === 'function' ? hlTile('settings', 'إعدادات الصلاة', 'openPrayerSettings()') : ''}</div>
     <div class="hl-recitation-slot"></div>

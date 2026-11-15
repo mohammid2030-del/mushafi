@@ -18,7 +18,7 @@ final class NativeBridge: NSObject, WKScriptMessageHandler {
             "surahSnapshot",
             "initializeDailyReminderConsent", "setDailyReminderConsent", "consumeFridayReminder", "consumeDailyReminderOpen",
             "saveKhatmaPlan", "khatmaStatus", "consumeKhatmaOpen",
-            "automaticLocationSnapshot", "booksSaved", "fajrSave", "fajrStatus", "fajrConsumeLaunch", "setPrayerMute", "wakeStatus", "wakeConsumeLink",
+            "automaticLocationSnapshot", "booksSaved", "fajrSave", "fajrStatus", "fajrConsumeLaunch", "setPrayerMute", "wakeStatus", "wakeConsumeLink", "hajjStepStatus",
         ]
         if CloudSync.isAvailable { list += ["cloudSnapshot", "cloudMatchesAck"] }
         return list
@@ -36,6 +36,7 @@ final class NativeBridge: NSObject, WKScriptMessageHandler {
             "requestPrayerNotifications", "openPrayerSystemSettings", "previewPrayerVoice", "stopPrayerVoice",
             "testPrayerNotification", "openWidgets", "openLiveBroadcast",
             "openBook", "deleteBook", "reverseGeocode", "wakeRegister", "wakeCreateInvite", "wakeAcceptInvite", "wakePeers", "wakeRemovePeer", "wakeRing", "wakeCancel", "fajrKeepAwake", "fajrStopAlarm", "fajrRequestPermissions",
+            "hajjStepPermission", "hajjStepsBegin", "hajjStepsEnd", "hajjStepsQuery", "hajjShareFile", "hajjSaveFile",
             "surahPlay", "surahPlaySession", "surahSetMode", "surahPause", "surahResume", "surahStop", "surahSkip", "surahSeek",
         ]
         if CloudSync.isAvailable {
@@ -46,7 +47,7 @@ final class NativeBridge: NSObject, WKScriptMessageHandler {
     }
 
     weak var shell: WebShellViewController? {
-        didSet { CloudSync.shared.presenter = shell }
+        didSet { CloudSync.shared.presenter = shell; HajjNative.shared.presenter = shell }
     }
 
     private let location = LocationService()
@@ -71,6 +72,7 @@ final class NativeBridge: NSObject, WKScriptMessageHandler {
         surah.onState = { [weak self] json in self?.shell?.callbackRaw("onNativeSurah", json) }
         CloudSync.shared.onState = { [weak self] json in self?.shell?.callbackRaw("onNativeCloud", json) }
         WakeClient.shared.onEvent = { [weak self] name, json in self?.shell?.callbackRaw(name, json) }
+        HajjNative.shared.emit = { [weak self] name, json in self?.shell?.callbackRaw(name, json) }
         ChallengeClient.shared.onReply = { [weak self] payload in self?.shell?.callback("onChallengeResponse", payload) }
     }
 
@@ -119,6 +121,7 @@ final class NativeBridge: NSObject, WKScriptMessageHandler {
         case "fajrConsumeLaunch": value = FajrCompanion.shared.consumeLaunch()
         case "wakeStatus": value = WakeClient.shared.status()
         case "wakeConsumeLink": value = WakeClient.shared.consumeLink()
+        case "hajjStepStatus": value = HajjNative.shared.status()
         case "cloudSnapshot": value = CloudSync.shared.snapshotJSON()
         case "cloudMatchesAck": value = CloudSync.shared.matchesAck(a.string(0))
         default: return nil
@@ -146,6 +149,13 @@ final class NativeBridge: NSObject, WKScriptMessageHandler {
             UIImpactFeedbackGenerator(style: style).impactOccurred()
         case "copyText": if let text = a.string(0), text.count <= 200_000 { UIPasteboard.general.string = text }
         case "shareText": if let text = a.string(0), text.count <= 200_000 { shell?.share(text) }
+
+        // Hajj & Umrah
+        case "hajjStepPermission": HajjNative.shared.requestPermission()
+        case "hajjStepsBegin": HajjNative.shared.begin()
+        case "hajjStepsEnd": HajjNative.shared.end()
+        case "hajjStepsQuery": HajjNative.shared.query()
+        case "hajjShareFile", "hajjSaveFile": HajjNative.shared.share(a.string(0), mime: a.string(1), name: a.string(2))
 
         // Links
         case "openSourceUrl": ExternalLinks.openSource(a.string(0))
