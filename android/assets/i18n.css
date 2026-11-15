@@ -25,3 +25,11 @@ html[lang=fr] .reading-hero .hero-ayah-text{min-width:min(140px,100%)}
 html[lang=fr] body:not(.reading) :is(h1,h2,h3){font-family:var(--ui-font),sans-serif;line-height:1.5}
 html[lang=fr] :is(.content-card,.feature-sheet,.menu-list,.welcome-copy){text-align:start}
 html[lang=fr] .language-option strong{line-height:1.7}
+/* LTR languages (en, bn, tr, fr): mirror absolutely-positioned adhkar list chrome */
+html[dir=ltr] .devotion-list-item .favorite-toggle{left:auto;right:8px}
+html[dir=ltr] .azkar-item-index{right:auto;left:12px}
+html[dir=ltr] .devotion-open{padding:18px 45px 16px 48px!important}
+html[dir=ltr] .routine-complete .devotion-open{padding:19px 18px 19px 46px!important}
+html[dir=ltr] .routine-complete .devotion-open strong{padding-left:0;padding-right:27px}
+html[dir=ltr] .devotion-open>strong{direction:ltr;unicode-bidi:plaintext;text-align:start}
+html[dir=ltr] .devotion-open>.devotion-kind,html[dir=ltr] .devotion-open>small{text-align:start}
