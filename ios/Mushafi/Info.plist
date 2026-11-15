@@ -23,6 +23,7 @@
 		<string>ur</string>
 		<string>bn</string>
 		<string>tr</string>
+		<string>fr</string>
 	</array>
 	<key>CFBundleName</key>
 	<string>$(PRODUCT_NAME)</string>

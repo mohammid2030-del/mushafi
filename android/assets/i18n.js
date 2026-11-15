@@ -1,6 +1,6 @@
 'use strict';
 // Display-only localization. Never rewrites app data, Quran, tafsir or personal text.
-const UI_LANGUAGES=[['ar','العربية','العربية'],['en','English','الإنجليزية'],['ur','اردو','الأردية'],['bn','বাংলা','البنغالية'],['tr','Türkçe','التركية']];
+const UI_LANGUAGES=[['ar','العربية','العربية'],['en','English','الإنجليزية'],['ur','اردو','الأردية'],['bn','বাংলা','البنغالية'],['tr','Türkçe','التركية'],['fr','Français','الفرنسية']];
 const uiLanguageCodes=new Set(UI_LANGUAGES.map(x=>x[0]));
 let uiLanguage='ar',uiDictionary={},uiPatterns=[],uiFragments=null,uiObserver=null,uiQueue=new Set(),uiScheduled=false,uiGeneration=0;
 const uiOriginalText=new WeakMap(),uiOriginalAttributes=new WeakMap();

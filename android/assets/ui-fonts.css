@@ -6,3 +6,5 @@ html[lang=ar]{--ui-font:AppArabic}
 @font-face{font-family:UiBengali;src:url('fonts/noto-sans-bengali-600.ttf') format('truetype');font-weight:500;font-style:normal;font-display:swap}@font-face{font-family:UiBengali;src:url('fonts/noto-sans-bengali-600.ttf') format('truetype');font-weight:700;font-style:normal;font-display:swap}
 
 html[lang=tr]{--ui-font:system-ui,AppArabic}
+/* French (LTR, Latin script) */
+html[lang=fr]{--ui-font:system-ui,AppArabic}

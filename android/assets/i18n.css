@@ -14,3 +14,14 @@ html[lang=ur]{--ui-font:AppArabic,system-ui}html[lang=ur] body:not(.reading) :is
 html[lang=bn] body:not(.reading) :is(h1,h2,h3){font-family:var(--ui-font),sans-serif;line-height:1.55}html[lang=bn] :is(button,input,select,textarea){font-family:var(--ui-font),sans-serif}html[lang=bn] :is(.content-card,.feature-sheet,.menu-list,.welcome-copy){text-align:start}html[lang=bn] .language-option strong{line-height:1.8}
 
 html[lang=tr] body:not(.reading) :is(h1,h2,h3){font-family:var(--ui-font),sans-serif;line-height:1.5}html[lang=tr] :is(.content-card,.feature-sheet,.menu-list,.welcome-copy){text-align:start}html[lang=tr] .language-option strong{line-height:1.7}
+/* French (LTR, Latin script) */
+html[lang=fr] .reading-hero .hero-book{left:auto;right:22px;transform:rotate(10deg)}
+html[lang=fr] .reading-hero .hero-rosette{left:auto;right:-42px}
+html[lang=fr] .reading-hero h2{font-size:clamp(20px,5.5vw,28px);font-weight:500;line-height:1.4;max-width:calc(100% - 76px)}
+html[lang=fr] .reading-hero .hero-ayah-preview{max-width:calc(100% - 76px)}
+html[lang=fr] .khatma-hero h1.khatma-surah-title{font-family:var(--ui-font,AppArabic),sans-serif;font-size:26px;line-height:1.5}
+html[lang=fr] .reading-hero h2,html[lang=fr] .reading-hero .hero-ayah-preview{max-width:calc(100% - 100px)}
+html[lang=fr] .reading-hero .hero-ayah-text{min-width:min(140px,100%)}
+html[lang=fr] body:not(.reading) :is(h1,h2,h3){font-family:var(--ui-font),sans-serif;line-height:1.5}
+html[lang=fr] :is(.content-card,.feature-sheet,.menu-list,.welcome-copy){text-align:start}
+html[lang=fr] .language-option strong{line-height:1.7}

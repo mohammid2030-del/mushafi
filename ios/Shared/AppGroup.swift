@@ -57,7 +57,7 @@ enum SharedResources {
 /// Port of Android's UiLocale: device language normalised to a supported UI language,
 /// texts looked up in the same locale catalogs the web UI uses (keyed by the Arabic text).
 enum UiLanguage {
-    static let supported: Set<String> = ["ar", "en", "ur", "bn", "tr"]
+    static let supported: Set<String> = ["ar", "en", "ur", "bn", "tr", "fr"]
     private static let key = "mushafi.uiLanguage"
     private static var catalogs: [String: [String: String]] = [:]
     private static let lock = NSLock()
