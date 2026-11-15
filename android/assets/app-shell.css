@@ -33,3 +33,7 @@ html.glass-theme body .mushafi-brand-icon{background:transparent!important;borde
 /* Search boxes: no inner focus square; the whole field shows focus instead */
 .search-field input:focus,.search-field input:focus-visible{outline:none!important;box-shadow:none!important}
 .search-field:focus-within{border-color:color-mix(in srgb,var(--gold) 55%,var(--line))!important}
+/* Native feel: no blue tap flash and no accidental text selection on UI; reading/copy text and fields stay selectable */
+html{-webkit-tap-highlight-color:transparent}
+body{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+:is(input,textarea,[contenteditable]:not([contenteditable=false]),.tafsir-text,.tafsir-verse-text,.muslim-full-text,.learn-body,.challenge-code,.library-audit-context),:is([contenteditable]:not([contenteditable=false]),.tafsir-text,.tafsir-verse-text,.muslim-full-text,.learn-body,.library-audit-context) *{-webkit-user-select:text;user-select:text;-webkit-touch-callout:default}
