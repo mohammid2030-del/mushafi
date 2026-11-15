@@ -1,0 +1,25 @@
+name: French meanings (Hamidullah)
+# Downloads Hamidullah's French translation from Quran.com once and commits it
+# into the app so it works offline, like the Mushaf.
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['android/tools/fetch-french-meanings.py', '.github/workflows/french-meanings.yml']
+permissions:
+  contents: write
+concurrency: { group: french-meanings, cancel-in-progress: false }
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 android/tools/fetch-french-meanings.py
+      - name: Commit
+        run: |
+          git config user.name "Mushafi bot"; git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add android/assets/quran-french-meanings.json android/docs/sources/fr.hamidullah.quran-com.json
+          git diff --cached --quiet && { echo "no changes"; exit 0; }
+          git commit -m "Bundle Hamidullah French meanings for offline reading (Quran.com resource 31)"
+          for i in 1 2 3; do git pull --rebase -q origin main && git push origin HEAD:main && exit 0; sleep 5; done; exit 1
