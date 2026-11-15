@@ -22,10 +22,11 @@ def get(url):
     raise SystemExit('failed: ' + url)
 
 def clean(t):
-    t = re.sub(r'<sup[^>]*>.*?</sup>', '', t, flags=re.S)      # footnote markers
+    t = re.sub(r'\s*<sup[^>]*>.*?</sup>', '', t, flags=re.S)  # footnote markers (and the space before them)
     t = re.sub(r'<[^>]+>', '', t)
     t = html.unescape(t)
-    return re.sub(r'\s+', ' ', t).strip()
+    t = re.sub(r'\s+', ' ', t).strip()
+    return re.sub(r' +([.,])', r'\1', t)  # no space before . or , left by removed markers
 
 raw, verses = {}, {}
 for c in range(1, 115):
