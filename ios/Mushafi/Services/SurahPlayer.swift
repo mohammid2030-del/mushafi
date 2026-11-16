@@ -473,7 +473,7 @@ final class SurahPlayer: NSObject {
     private func setupRemoteCommands() {
         let commands = MPRemoteCommandCenter.shared()
         commands.playCommand.addTarget { [weak self] _ in
-            guard let self else { return .commandFailed }
+            guard let self, !self.accessoryJustConnected else { return .commandFailed }
             self.resume()
             return .success
         }
@@ -481,6 +481,7 @@ final class SurahPlayer: NSObject {
         commands.togglePlayPauseCommand.addTarget { [weak self] _ in
             guard let self else { return .commandFailed }
             if self.status == "playing" || self.status == "loading" { self.pause() }
+            else if self.accessoryJustConnected { return .commandFailed }
             else { self.resume() }
             return .success
         }
@@ -500,9 +501,7 @@ final class SurahPlayer: NSObject {
 
     private func updateNowPlaying() {
         let center = MPNowPlayingInfoCenter.default()
-        // After stopping, keep the last surah as paused "Now Playing" so a car, Bluetooth or headset
-        // play button keeps reaching Mushafi and starts the recitation again.
-        guard status != "stopped" || hasPlayedThisRun else {
+        guard status != "stopped" else {
             center.nowPlayingInfo = nil
             if #available(iOS 13.0, *) { center.playbackState = .stopped }
             return
@@ -522,7 +521,6 @@ final class SurahPlayer: NSObject {
         if let art = readerArtwork() { info[MPMediaItemPropertyArtwork] = art }
         center.nowPlayingInfo = info
         center.playbackState = status == "playing" ? .playing : .paused
-        if status == "playing" { hasPlayedThisRun = true }
     }
 
     private func readerArtwork() -> MPMediaItemArtwork? {
@@ -633,11 +631,10 @@ final class SurahPlayer: NSObject {
 
     /// Headphones, Bluetooth or CarPlay often send "play" right after connecting. A recitation the
     /// user stopped must not start by itself, so remote play is ignored for a few seconds after a
-    /// new audio device appears. Pressing play on the lock screen afterwards works as usual.
+    /// new audio device appears (cars can send it many seconds after connecting). Pressing play on the lock screen afterwards works as usual.
     private var deviceArrivedAt = Date.distantPast
-    private var hasPlayedThisRun = false
     private var accessoryJustConnected: Bool {
-        status != "playing" && status != "loading" && Date().timeIntervalSince(deviceArrivedAt) < 6
+        status != "playing" && status != "loading" && Date().timeIntervalSince(deviceArrivedAt) < 60
     }
 
     @objc private func routeChanged(_ note: Notification) {
