@@ -37,10 +37,15 @@ function bookTurnPrepare(root,delta){const target=bookTurnDestination(delta);if(
 function bookTurnMove(root,dx){if(bookTurnLocked||pageTurnBusy)return;const delta=(dx>0?1:-1)*(root.classList.contains('ltr-book')?-1:1);let s=bookTurnState;if(s&&s.root===root&&s.delta!==delta){bookTurnCancelPreview(root);return}if(s&&s.root!==root){bookTurnDispose(s);s=null}if(!s)s=bookTurnPrepare(root,delta);if(!s)return;s.drag=Math.abs(dx);const spread=s.target.before.length===2&&s.target.after.length===2,width=s.width||root.clientWidth/(spread?2:1),raw=Math.acos(1-Math.min(1.98,Math.abs(dx)/Math.max(1,width)))/Math.PI;s.targetProgress=Math.min(spread?.82:.44,raw);bookTurnFollowDrag(s);}
 
 function bookTurnCancelPreview(root){const s=bookTurnState;if(!s||s.root!==root||s.phase!=='drag')return;if(!s.scene){bookTurnDispose(s);return}s.phase='cancel';bookTurnLocked=true;bookTurnAnimate(s,0,420).finally(()=>{bookTurnDispose(s);bookTurnLocked=false})}
+// Keep the finished sheet on screen until the real pages are rendered and painted,
+// so slower renders (translations, fonts) never expose a blank or stale frame.
+async function bookTurnSettle(s){const frame=()=>new Promise(r=>requestAnimationFrame(()=>r()));const until=performance.now()+1200,want=s.target.after.join(',');
+ while(performance.now()<until){const r=app.querySelector('.mushaf-reader');if(r&&r.isConnected&&[...r.querySelectorAll(':scope>.page-leaf')].map(l=>l.dataset.page).join(',')===want&&!r.dataset.bookTurning)break;await frame()}
+ try{await document.fonts?.ready}catch(e){}await frame();await frame()}
 const bookOriginalTurn=turnPage;
 turnPage=async function(delta){if(bookTurnLocked||pageTurnBusy||view!=='reader'||activeSheet||![1,-1].includes(delta))return;let s=bookTurnState;const root=app.querySelector('.mushaf-reader');if(!allowsMotion()||!bookTurnDestination(delta)){bookTurnAbort();return bookOriginalTurn(delta)}
  if(s&&(s.delta!==delta||s.root!==root)){bookTurnDispose(s);s=null}clearVerseSelection();if(!s)s=bookTurnPrepare(root,delta);if(!s)return bookOriginalTurn(delta);s.phase='finish';bookTurnLocked=true;
- try{const ready=await s.ready;if(!ready||!bookTurnValid(s)){if(s.failed)showSmallNotice('تعذر تجهيز الصفحة، أعد المحاولة');return}const done=await bookTurnAnimate(s,1,Math.max(620,Math.round(980*(1-s.progress))));if(!done||!bookTurnValid(s))return;bookTurnCommit=s;await bookOriginalTurn(delta);}catch(e){showSmallNotice('تعذر تجهيز الصفحة، أعد المحاولة')}finally{bookTurnCommit=null;bookTurnDispose(s);bookTurnLocked=false}};
+ try{const ready=await s.ready;if(!ready||!bookTurnValid(s)){if(s.failed)showSmallNotice('تعذر تجهيز الصفحة، أعد المحاولة');return}const done=await bookTurnAnimate(s,1,Math.max(620,Math.round(980*(1-s.progress))));if(!done||!bookTurnValid(s))return;bookTurnCommit=s;await bookOriginalTurn(delta);await bookTurnSettle(s);}catch(e){showSmallNotice('تعذر تجهيز الصفحة، أعد المحاولة')}finally{bookTurnCommit=null;bookTurnDispose(s);bookTurnLocked=false}};
 window.MushafiBookTurn={abort:bookTurnAbort,move:bookTurnMove,cancelPreview:bookTurnCancelPreview,isBusy:()=>bookTurnLocked};
 // Direct jumps/audio follow remain immediate and supersede an unfinished drag.
 const bookOriginalShow=showPage;showPage=function(...args){if(bookTurnState&&bookTurnCommit!==bookTurnState)bookTurnAbort();return bookOriginalShow.apply(this,args)};
