@@ -16,3 +16,4 @@
 .reader-top .reader-language-switch button{width:auto!important;height:auto!important;min-width:92px!important;min-height:34px!important;aspect-ratio:auto!important;flex:0 0 auto!important;white-space:nowrap!important;padding:6px 18px!important;border:0!important;border-radius:999px!important;background:transparent!important;line-height:1.4!important}
 .reader-top.has-language-switch{justify-content:space-between}
 .reader-top.has-language-switch .reader-language-switch{order:10;flex-basis:auto!important;margin-left:auto;margin-right:auto}
+.english-reader.ltr-book.spread{direction:ltr}.english-reader.ltr-book.spread .page-leaf:first-child{border-left:0;border-right:1px solid #b49a6626}
