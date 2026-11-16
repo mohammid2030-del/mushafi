@@ -473,7 +473,7 @@ final class SurahPlayer: NSObject {
     private func setupRemoteCommands() {
         let commands = MPRemoteCommandCenter.shared()
         commands.playCommand.addTarget { [weak self] _ in
-            guard let self, !self.accessoryJustConnected else { return .commandFailed }
+            guard let self else { return .commandFailed }
             self.resume()
             return .success
         }
@@ -481,7 +481,6 @@ final class SurahPlayer: NSObject {
         commands.togglePlayPauseCommand.addTarget { [weak self] _ in
             guard let self else { return .commandFailed }
             if self.status == "playing" || self.status == "loading" { self.pause() }
-            else if self.accessoryJustConnected { return .commandFailed }
             else { self.resume() }
             return .success
         }
@@ -501,7 +500,9 @@ final class SurahPlayer: NSObject {
 
     private func updateNowPlaying() {
         let center = MPNowPlayingInfoCenter.default()
-        guard status != "stopped" else {
+        // After stopping, keep the last surah as paused "Now Playing" so a car, Bluetooth or headset
+        // play button keeps reaching Mushafi and starts the recitation again.
+        guard status != "stopped" || hasPlayedThisRun else {
             center.nowPlayingInfo = nil
             if #available(iOS 13.0, *) { center.playbackState = .stopped }
             return
@@ -521,6 +522,7 @@ final class SurahPlayer: NSObject {
         if let art = readerArtwork() { info[MPMediaItemPropertyArtwork] = art }
         center.nowPlayingInfo = info
         center.playbackState = status == "playing" ? .playing : .paused
+        if status == "playing" { hasPlayedThisRun = true }
     }
 
     private func readerArtwork() -> MPMediaItemArtwork? {
@@ -633,6 +635,7 @@ final class SurahPlayer: NSObject {
     /// user stopped must not start by itself, so remote play is ignored for a few seconds after a
     /// new audio device appears. Pressing play on the lock screen afterwards works as usual.
     private var deviceArrivedAt = Date.distantPast
+    private var hasPlayedThisRun = false
     private var accessoryJustConnected: Bool {
         status != "playing" && status != "loading" && Date().timeIntervalSince(deviceArrivedAt) < 6
     }

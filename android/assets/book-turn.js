@@ -41,7 +41,9 @@ function bookTurnCancelPreview(root){const s=bookTurnState;if(!s||s.root!==root|
 // so slower renders (translations, fonts) never expose a blank or stale frame.
 async function bookTurnSettle(s){const frame=()=>new Promise(r=>requestAnimationFrame(()=>r()));const until=performance.now()+1200,want=s.target.after.join(',');
  while(performance.now()<until){const r=app.querySelector('.mushaf-reader');if(r&&r.isConnected&&[...r.querySelectorAll(':scope>.page-leaf')].map(l=>l.dataset.page).join(',')===want&&!r.dataset.bookTurning)break;await frame()}
- try{await document.fonts?.ready}catch(e){}await frame();await frame()}
+ try{await document.fonts?.ready}catch(e){}await frame();await frame();
+ // WebKit can show an unpainted (white) frame right after a large page swap; hold the sheet briefly, then fade it away.
+ await new Promise(r=>setTimeout(r,140));const sc=s.scene;if(sc&&sc.isConnected){sc.style.transition='opacity .16s ease';sc.style.opacity='0';await new Promise(r=>setTimeout(r,170))}}
 const bookOriginalTurn=turnPage;
 turnPage=async function(delta){if(bookTurnLocked||pageTurnBusy||view!=='reader'||activeSheet||![1,-1].includes(delta))return;let s=bookTurnState;const root=app.querySelector('.mushaf-reader');if(!allowsMotion()||!bookTurnDestination(delta)){bookTurnAbort();return bookOriginalTurn(delta)}
  if(s&&(s.delta!==delta||s.root!==root)){bookTurnDispose(s);s=null}clearVerseSelection();if(!s)s=bookTurnPrepare(root,delta);if(!s)return bookOriginalTurn(delta);s.phase='finish';bookTurnLocked=true;
