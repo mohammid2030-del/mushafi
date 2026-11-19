@@ -1,3 +1,4 @@
+@font-face{font-family:BasmalaQCF;src:url(fonts/p1.woff2) format("woff2");font-display:block}
 @font-face{font-family:SurahName;src:url(fonts/surah-name-v2.woff2) format("woff2");font-display:block}
 /* Surah heading: ornamental gold frame with the surah name inside (all reading modes) */
 .mushaf-reader .surah-heading{border:0;border-radius:0;background:none;overflow:visible;isolation:isolate;color:#111;font-size:clamp(20px,5.9vw,34px);-webkit-text-stroke:.015em currentColor;padding-bottom:.06em}
@@ -10,3 +11,10 @@
 .mushaf-reader .basmala-line{color:#0c0c0c;-webkit-text-stroke:.012em currentColor}
 .dark .mushaf-reader .qline,.dark .mushaf-reader .basmala-line{color:#fbf6ea;-webkit-text-stroke:.006em currentColor}
 .mushaf-reader .surah-heading .sn-glyph{font-family:SurahName;font-size:1.72em;line-height:1;-webkit-text-stroke:.012em currentColor;font-feature-settings:"liga" 1;white-space:nowrap;direction:ltr;position:relative;top:.04em}
+.mushaf-reader .basmala-line{-webkit-text-stroke:0}
+.mushaf-reader .basmala-line .bsm{display:inline-flex;direction:rtl;gap:.12em;font-family:BasmalaQCF;font-size:1.4em;line-height:1;color:#0c0c0c;-webkit-text-stroke:.012em currentColor}
+.mushaf-reader .basmala-line .bsm i{font-style:normal}
+.dark .mushaf-reader .basmala-line .bsm{color:#fbf6ea;-webkit-text-stroke:.006em currentColor}
+/* Gold verse-end medallions */
+.mushaf-reader .qword.aend{color:#8f6127;-webkit-text-stroke:.01em #8f6127;background:radial-gradient(circle at 50% 52%,#f6e7c6 0 30%,rgba(246,231,198,0) 34%);border-radius:50%}
+.dark .mushaf-reader .qword.aend{color:#d9b277;-webkit-text-stroke:.006em #d9b277;background:radial-gradient(circle at 50% 52%,rgba(217,178,119,.18) 0 30%,transparent 34%)}
