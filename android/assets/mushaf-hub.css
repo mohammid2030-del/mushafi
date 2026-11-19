@@ -1,0 +1,19 @@
+.mushaf-hub{display:flex;flex-direction:column;gap:14px;padding-bottom:calc(118px + var(--app-safe-bottom,0px))}
+.mh-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.mh-card,.mh-follow{appearance:none;font:inherit;color:var(--ink);text-align:center;border:1px solid var(--line);background:var(--glass-card,var(--paper));border-radius:26px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .15s}
+.mh-card:active,.mh-follow:active{transform:scale(.98)}
+.mh-card{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;min-height:178px;padding:22px 12px}
+.mh-icon{display:grid;place-items:center;width:56px;height:56px;margin-bottom:6px;border-radius:18px;background:color-mix(in srgb,var(--gold) 12%,transparent);border:1px solid color-mix(in srgb,var(--gold) 28%,transparent)}
+.mh-icon .ui-icon{width:30px;height:30px;color:var(--gold)}
+.mh-card b{font-size:20px;font-weight:600;line-height:1.4}
+.mh-card small{font-size:13px;color:var(--muted)}
+.mh-follow{display:block;width:100%;text-align:start;padding:20px 20px 18px}
+.mh-follow-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}
+.mh-follow-head h2{margin:0;font-size:20px;font-weight:600}
+.mh-chip{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:999px;font-size:12.5px;color:var(--gold);border:1px solid color-mix(in srgb,var(--gold) 30%,transparent);background:color-mix(in srgb,var(--gold) 8%,transparent)}
+.mh-chip .ui-icon{width:16px;height:16px}
+.mh-follow-row{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:12px}
+.mh-follow-row strong{font-size:17px;font-weight:600}
+.mh-pct{font-size:17px;font-weight:600;color:var(--gold)}
+.mh-bar{height:8px!important;border-radius:8px}.mh-bar>span{border-radius:8px}
+.mh-follow p{margin:12px 0 0;font-size:13.5px;color:var(--muted)}
