@@ -1,0 +1,10 @@
+/* Surah heading: ornamental gold frame with the surah name inside (all reading modes) */
+.mushaf-reader .surah-heading{border:0;border-radius:0;background:none;overflow:visible;isolation:isolate;color:#111;font-size:clamp(20px,5.9vw,34px);-webkit-text-stroke:.015em currentColor;padding-bottom:.06em}
+.mushaf-reader .surah-heading:after{content:none;display:none}
+.mushaf-reader .surah-heading:before{content:"";display:block;position:absolute;inset:-18% 0;transform:none;font-size:0;background:url('images/surah-frame.png') center/contain no-repeat;z-index:-1;pointer-events:none}
+.mushaf-reader.spread .surah-heading{font-size:clamp(15px,2.6vw,30px)}
+.dark .mushaf-reader .surah-heading{color:#f6efe0}
+/* Darker, crisper verse text */
+.mushaf-reader .qline{color:#0c0c0c;-webkit-text-stroke:.012em currentColor;paint-order:stroke fill}
+.mushaf-reader .basmala-line{color:#0c0c0c;-webkit-text-stroke:.012em currentColor}
+.dark .mushaf-reader .qline,.dark .mushaf-reader .basmala-line{color:#fbf6ea;-webkit-text-stroke:.006em currentColor}
