@@ -1,3 +1,4 @@
+@font-face{font-family:SurahName;src:url(fonts/surah-name-v2.woff2) format("woff2");font-display:block}
 /* Surah heading: ornamental gold frame with the surah name inside (all reading modes) */
 .mushaf-reader .surah-heading{border:0;border-radius:0;background:none;overflow:visible;isolation:isolate;color:#111;font-size:clamp(20px,5.9vw,34px);-webkit-text-stroke:.015em currentColor;padding-bottom:.06em}
 .mushaf-reader .surah-heading:after{content:none;display:none}
@@ -8,3 +9,4 @@
 .mushaf-reader .qline{color:#0c0c0c;-webkit-text-stroke:.012em currentColor;paint-order:stroke fill}
 .mushaf-reader .basmala-line{color:#0c0c0c;-webkit-text-stroke:.012em currentColor}
 .dark .mushaf-reader .qline,.dark .mushaf-reader .basmala-line{color:#fbf6ea;-webkit-text-stroke:.006em currentColor}
+.mushaf-reader .surah-heading .sn-glyph{font-family:SurahName;font-size:1.72em;line-height:1;-webkit-text-stroke:.012em currentColor;font-feature-settings:"liga" 1;white-space:nowrap;direction:ltr;position:relative;top:.04em}
