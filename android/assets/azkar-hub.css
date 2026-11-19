@@ -18,3 +18,4 @@
 .az-topics>button .ui-icon{width:20px;height:20px;flex:none;color:var(--gold)}
 .az-topics>button span{line-height:1.45}
 .az-hub .azkar-footnote{margin-top:22px}
+.az-sebha-open{display:flex;align-items:center;gap:13px;width:100%;margin:0 0 14px;padding:16px 18px;border-radius:22px;border:1px solid color-mix(in srgb,var(--gold) 35%,transparent);background:color-mix(in srgb,var(--gold) 8%,var(--paper));color:var(--ink);font:inherit;text-align:start;cursor:pointer}.az-sebha-open>.ui-icon:first-child{width:28px;height:28px;color:var(--gold)}.az-sebha-open span{flex:1}.az-sebha-open strong{display:block;font-size:16px;font-weight:600}.az-sebha-open small{display:block;margin-top:3px;font-size:12.5px;color:var(--muted)}.az-sebha-open>.ui-icon:last-child{width:16px;height:16px;color:var(--muted)}
