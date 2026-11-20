@@ -27,7 +27,7 @@ if mode == 'dump'
 end
 if mode == 'metadata'
   require 'json'
-  meta = JSON.parse(File.read(File.join(File.dirname(root), 'metadata.json')))
+  meta = JSON.parse(File.read('shots/metadata.json'))
   v.get_app_store_version_localizations.each do |l|
     m = meta[l.locale] or (puts "skip #{l.locale} (no text)"; next)
     attrs = {description: m['description'], keywords: m['keywords'], promotionalText: m['promotional_text'], marketingUrl: m['marketing_url'], supportUrl: m['support_url']}
