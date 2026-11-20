@@ -51,15 +51,64 @@ public class RadioPlaybackService extends Service implements AudioManager.OnAudi
   return START_NOT_STICKY;
  }
 
- private void start(String newId, String url, String newTitle, String newPlace) {
+ private final Handler main = new Handler(Looper.getMainLooper());
+ private String url = "";
+ private int generation, attempts;
+ private final Runnable stallCheck = () -> { if (player != null && "loading".equals(status)) retry(); };
+ private final Runnable steady = () -> attempts = 0;
+
+ private void start(String newId, String newUrl, String newTitle, String newPlace) {
   release();
   id = newId == null ? "" : newId;
   title = newTitle == null ? "" : newTitle;
   place = newPlace == null ? "" : newPlace;
+  url = newUrl == null ? "" : newUrl;
+  attempts = 0;
   status = "loading";
   goForeground();
-  if (url == null || !allowed(url)) { fail(); return; }
+  if (!allowed(url)) { fail(); return; }
   if (focus.requestAudioFocus(this, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN) != AudioManager.AUDIOFOCUS_REQUEST_GRANTED) { fail(); return; }
+  connect();
+ }
+
+ /** Radiojar answers with a short-lived redirect to an http:// node; the same node serves https, so the redirect is resolved here and kept on https (cleartext stays off). */
+ static String resolve(String source) {
+  String current = source;
+  for (int hop = 0; hop < 4; hop++) {
+   java.net.HttpURLConnection c = null;
+   try {
+    c = (java.net.HttpURLConnection) new java.net.URL(current).openConnection();
+    c.setInstanceFollowRedirects(false);
+    c.setConnectTimeout(8000); c.setReadTimeout(8000);
+    c.setRequestProperty("User-Agent", "Mushafi/Android");
+    c.setRequestProperty("Icy-MetaData", "0");
+    int code = c.getResponseCode();
+    if (code < 300 || code >= 400) return code < 300 ? current : null;
+    String next = c.getHeaderField("Location");
+    if (next == null) return null;
+    next = new java.net.URL(new java.net.URL(current), next).toString();
+    if (next.startsWith("http://")) next = "https://" + next.substring(7);
+    if (!allowed(next)) return null;
+    current = next;
+   } catch (Exception e) { return null; }
+   finally { if (c != null) c.disconnect(); }
+  }
+  return null;
+ }
+
+ private void connect() {
+  releasePlayer();
+  final int gen = ++generation;
+  status = "loading"; publish();
+  final String source = url;
+  new Thread(() -> {
+   final String stream = resolve(source);
+   main.post(() -> { if (gen == generation && !id.isEmpty()) play(gen, stream); });
+  }, "radio-resolve").start();
+ }
+
+ private void play(int gen, String stream) {
+  if (stream == null) { retry(); return; }
   try {
    final MediaPlayer next = new MediaPlayer();
    player = next;
@@ -67,19 +116,30 @@ public class RadioPlaybackService extends Service implements AudioManager.OnAudi
    next.setWakeMode(this, PowerManager.PARTIAL_WAKE_LOCK);
    Map<String, String> headers = new HashMap<>();
    headers.put("User-Agent", "Mushafi/Android");
-   next.setDataSource(this, Uri.parse(url), headers);
-   next.setOnPreparedListener(mp -> { if (player != mp) return; mp.start(); status = "playing"; publish(); });
+   next.setDataSource(this, Uri.parse(stream), headers);
+   next.setOnPreparedListener(mp -> { if (player != mp) return; mp.start(); status = "playing"; publish(); main.removeCallbacks(steady); main.postDelayed(steady, 30000); });
    next.setOnInfoListener((mp, what, extra) -> {
     if (player != mp) return false;
-    if (what == MediaPlayer.MEDIA_INFO_BUFFERING_START) { status = "loading"; publish(); }
-    else if (what == MediaPlayer.MEDIA_INFO_BUFFERING_END) { status = "playing"; publish(); }
+    if (what == MediaPlayer.MEDIA_INFO_BUFFERING_START) { status = "loading"; publish(); main.removeCallbacks(stallCheck); main.postDelayed(stallCheck, 12000); }
+    else if (what == MediaPlayer.MEDIA_INFO_BUFFERING_END) { main.removeCallbacks(stallCheck); status = "playing"; publish(); }
     return false;
    });
-   next.setOnErrorListener((mp, what, extra) -> { if (player == mp) fail(); return true; });
-   next.setOnCompletionListener(mp -> { if (player == mp) fail(); });
+   next.setOnErrorListener((mp, what, extra) -> { if (player == mp) retry(); return true; });
+   next.setOnCompletionListener(mp -> { if (player == mp) retry(); });
    next.prepareAsync();
-   publish();
-  } catch (Exception e) { fail(); }
+   main.removeCallbacks(stallCheck); main.postDelayed(stallCheck, 20000);
+  } catch (Exception e) { retry(); }
+ }
+
+ /** A live stream that drops or stalls reconnects on its own (fresh redirect each time) before giving up. */
+ private void retry() {
+  if (id.isEmpty()) return;
+  releasePlayer();
+  main.removeCallbacks(steady);
+  if (++attempts > 5) { fail(); return; }
+  status = "loading"; publish();
+  final int gen = ++generation;
+  main.postDelayed(() -> { if (gen == generation && !id.isEmpty()) connect(); }, Math.min(1000L * attempts, 4000L));
  }
 
  private void fail() { status = "error"; publish(); stopRadio(false); }
@@ -97,9 +157,16 @@ public class RadioPlaybackService extends Service implements AudioManager.OnAudi
   stopSelf();
  }
 
+ private void releasePlayer() {
+  main.removeCallbacks(stallCheck);
+  if (player != null) { try { player.reset(); player.release(); } catch (Exception ignored) {} player = null; }
+ }
+
  private void release() {
   pausedByFocus = false;
-  if (player != null) { try { player.reset(); player.release(); } catch (Exception ignored) {} player = null; }
+  generation++;
+  main.removeCallbacks(steady);
+  releasePlayer();
   try { focus.abandonAudioFocus(this); } catch (Exception ignored) {}
  }
 
