@@ -39,6 +39,17 @@ final class ReminderService {
     }
     private var anyDaily: Bool { consent || Self.optionalKinds.contains { kindEnabled($0) } }
 
+    /// True when the evening's next day is in Dhu al-Hijjah (white-days reminder moves to the 14th).
+    static func isDhulHijjahEve(_ at: Date, offset: Int) -> Bool {
+        var local = Calendar(identifier: .gregorian); local.timeZone = .current
+        guard let next = local.date(byAdding: .day, value: 1 + offset, to: at) else { return false }
+        let p = local.dateComponents([.year, .month, .day], from: next)
+        var utc = Calendar(identifier: .gregorian); utc.timeZone = TimeZone(identifier: "UTC")!
+        guard let noon = utc.date(from: DateComponents(year: p.year, month: p.month, day: p.day, hour: 12)) else { return false }
+        var hijri = Calendar(identifier: .islamicUmmAlQura); hijri.timeZone = TimeZone(identifier: "UTC")!
+        return hijri.component(.month, from: noon) == 12
+    }
+
     func setHijriOffset(_ value: Int?) -> Bool {
         defaults.set(max(-2, min(2, value ?? 0)), forKey: "reminders.hijriOffset")
         schedule()
@@ -144,7 +155,7 @@ final class ReminderService {
                 var utc = Calendar(identifier: .gregorian); utc.timeZone = TimeZone(identifier: "UTC")!
                 guard let noon = utc.date(from: DateComponents(year: parts.year, month: parts.month, day: parts.day, hour: 12)) else { continue }
                 let h = hijri.dateComponents([.day, .month], from: noon)
-                if h.day == 13, h.month != 9, h.month != 12 { list.append(Event(kind: "white", at: at(day, 18, 0))) }
+                if (h.day == 13 && h.month != 9 && h.month != 12) || (h.day == 14 && h.month == 12) { list.append(Event(kind: "white", at: at(day, 18, 0))) }
             }
         }
         // Friday dua 15 minutes before Maghrib, from the user's prayer settings.
@@ -220,6 +231,8 @@ final class ReminderService {
             return (t("أذكار الصباح"), t("ابدأ صباحك بذكر الله، وخصّص وقتًا لأذكار الصباح."), "")
         case "evening":
             return (t("أذكار المساء"), t("اختم نهارك بذكر الله، وخذ وقتًا لأذكار المساء."), "")
+        case "white" where Self.isDhulHijjahEve(event.at, offset: defaults.integer(forKey: "reminders.hijriOffset")):
+            return (t("غدًا ١٤ ذي الحجة"), t("الثالث عشر من أيام التشريق لا يُصام، ويمكنك صيام الرابع عشر والخامس عشر.") + "\n" + t("صوم ثلاثة أيام من كل شهر صوم الدهر كله. (صحيح البخاري ١٩٧٩)"), "")
         case "white":
             return (t("غدًا تبدأ الأيام البيض"), t("صوم ثلاثة أيام من كل شهر صوم الدهر كله. (صحيح البخاري ١٩٧٩)") + "\n" + t("الأيام البيض: الثالث عشر والرابع عشر والخامس عشر من الشهر الهجري."), "")
         default:
