@@ -341,9 +341,9 @@ function homeLayout() {
     <div class="hl-reading-slot"></div>
     <div class="hl-rest"></div>
     ${hlHead('المميزات')}
-    <div class="hl-grid">${hlTile('kaaba', 'الحج والعمرة', "hajjHome('home')", 'جديد')}${hlTile('fajr', 'صحبة الفجر', "fajrHome('home')")}${hlTile('chart', 'ختمتي', 'khatmaHome()')}${hlTile('note', 'وردي اليومي', 'wardHome()')}${hlTile('beads', 'المسبحة', 'sebhaHome()')}${typeof challengeHome === 'function' ? hlTile('trophy', 'تحدّي مصحفي', 'challengeHome()') : ''}${typeof liveBroadcastHome === 'function' ? hlTile('live', 'البث المباشر', 'liveBroadcastHome()') : ''}</div>
+    <div class="hl-grid" id="hl-features">${hlTile('kaaba', 'الحج والعمرة', "hajjHome('home')", 'جديد')}${hlTile('fajr', 'صحبة الفجر', "fajrHome('home')")}${hlTile('chart', 'ختمتي', 'khatmaHome()')}${hlTile('note', 'وردي اليومي', 'wardHome()')}${hlTile('beads', 'المسبحة', 'sebhaHome()')}${typeof challengeHome === 'function' ? hlTile('trophy', 'تحدّي مصحفي', 'challengeHome()') : ''}${typeof liveBroadcastHome === 'function' ? hlTile('live', 'البث المباشر', 'liveBroadcastHome()') : ''}</div>
     ${hlHead('علم وأدوات')}
-    <div class="hl-grid">${hlTile('book', 'الكتب', "booksHome('home')")}${typeof openMuslimLibrary === 'function' ? hlTile('book', 'صحيح مسلم', 'openMuslimLibrary(true)') : ''}${hlTile('bookmark', 'مكتبتي', 'libraryHome()')}${hlTile('heart', 'الأذكار', 'duaHome()')}${hlTile('grid', 'ويدجت الشاشة', 'hlWidgets()')}${typeof openPrayerSettings === 'function' ? hlTile('settings', 'إعدادات الصلاة', 'openPrayerSettings()') : ''}</div>
+    <div class="hl-grid" id="hl-tools">${hlTile('book', 'الكتب', "booksHome('home')")}${typeof openMuslimLibrary === 'function' ? hlTile('book', 'صحيح مسلم', 'openMuslimLibrary(true)') : ''}${hlTile('bookmark', 'مكتبتي', 'libraryHome()')}${hlTile('heart', 'الأذكار', 'duaHome()')}${hlTile('grid', 'ويدجت الشاشة', 'hlWidgets()')}${typeof openPrayerSettings === 'function' ? hlTile('settings', 'إعدادات الصلاة', 'openPrayerSettings()') : ''}</div>
     <div class="hl-recitation-slot"></div>
     <div class="hl-dua-slot"></div>
     <div class="hl-charity-slot"></div>
@@ -356,7 +356,7 @@ function homeLayout() {
   if (reading) {
     const resume = !!localStorage.lastPage, title = reading.querySelector('h2')?.textContent || '', meta = reading.querySelector('p')?.textContent.replace(/\s+/g, ' ').trim() || '';
     const go = reading.querySelector('.hero-continue')?.getAttribute('onclick') || 'hlOpenMushaf()';
-    readingRow = hlNode(`<div class="hl-list">${hlRow('book', resume ? 'تابع القراءة' : 'ابدأ القراءة', esc(title + (meta ? ' · ' + meta : '')), go)}</div>`)
+    readingRow = hlNode(`<div class="hl-list" id="hl-reading">${hlRow('book', resume ? 'تابع القراءة' : 'ابدأ القراءة', esc(title + (meta ? ' · ' + meta : '')), go)}</div>`)
   }
   put('.hl-reading-slot', readingRow);
   put('.hl-recitation-slot', recitation ? hlNode(`<div class="hl-list">${hlRow('headphones', 'المشغل', 'القراء والسور والتنزيلات والحفظ', 'recitationHub()')}${charity ? hlRow('charity', 'باب الخير', 'أقسام إحسان ومشاريعه وأوقافه، في مكان واحد', 'charityHome()') : ''}</div>`) : null, hlHead('استماع وعطاء'));
