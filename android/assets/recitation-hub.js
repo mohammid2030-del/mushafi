@@ -6,7 +6,20 @@ iconPaths.skipNext = '<path d="M6 5l10 7-10 7z"/><path d="M18 5v14"/>';
 iconPaths.skipPrev = '<path d="M18 5L8 12l10 7z"/><path d="M6 5v14"/>';
 function rhLast() { try { const v = JSON.parse(localStorage.rhLastListen || 'null'); return v && surahCatalog[v.reader] && chapters[v.chapter - 1] ? v : null } catch (e) { return null } }
 const rhPrevStart = startFullSurah;
-startFullSurah = function (reader, chapter, ...rest) { try { localStorage.rhLastListen = JSON.stringify({ reader, chapter }) } catch (e) {} return rhPrevStart.call(this, reader, chapter, ...rest) };
+startFullSurah = function (reader, chapter, ...rest) { try { const old = rhLast(); localStorage.rhLastListen = JSON.stringify(old && old.reader === +reader && old.chapter === +chapter && rhResuming ? old : { reader: +reader, chapter: +chapter }) } catch (e) {} return rhPrevStart.call(this, reader, chapter, ...rest) };
+// Remember where the listener is, so "continue listening" resumes there even after the app was closed.
+let rhResuming = false;
+function rhSavePosition() {
+  try {
+    if (typeof fullSurahActive !== 'function' || !fullSurahActive() || !surahState.reader || !surahState.chapter) return;
+    const pos = +surahState.position || 0, dur = +surahState.duration || 0, ended = dur && pos > dur - 4000;
+    const verse = +String(surahState.key || '').split(':')[1] || 0;
+    localStorage.rhLastListen = JSON.stringify({ reader: +surahState.reader, chapter: +surahState.chapter, position: ended ? 0 : pos, duration: dur, verse: ended ? 0 : verse, at: Date.now() });
+  } catch (e) {}
+}
+setInterval(() => { if (!document.hidden) rhSavePosition() }, 3000);
+document.addEventListener('visibilitychange', () => { if (document.hidden) rhSavePosition() });
+
 /* سجل «شغلتها مؤخرًا» */
 function rhRecent() { try { return (JSON.parse(localStorage.rhRecent || '[]') || []).filter(v => surahCatalog[v.reader] && chapters[v.chapter - 1]).slice(0, 6) } catch (e) { return [] } }
 function rhRemember(reader, chapter) { try { const list = rhRecent().filter(v => !(v.reader === reader && v.chapter === chapter)); list.unshift({ reader, chapter }); localStorage.rhRecent = JSON.stringify(list.slice(0, 6)) } catch (e) {} }
@@ -18,16 +31,39 @@ function rhFollowMarkup() {
   const live = typeof fullSurahActive === 'function' && fullSurahActive(), last = live ? { reader: surahState.reader, chapter: surahState.chapter } : rhLast();
   if (!last) return '';
   const pct = live && surahState.duration ? Math.min(100, surahState.position / surahState.duration * 100) : 0, playing = live && ['playing', 'loading'].includes(surahState.status);
-  const sub = live && surahState.position ? mhT('سورة {0} · الدقيقة {1}', chapters[last.chapter - 1].name_arabic, mediaTime(surahState.position)) : mhT('سورة {0}', chapters[last.chapter - 1].name_arabic);
+  const at = live ? surahState.position : last.position, sub = at > 5000 ? mhT('سورة {0} · الدقيقة {1}', chapters[last.chapter - 1].name_arabic, mediaTime(at)) : mhT('سورة {0}', chapters[last.chapter - 1].name_arabic);
+  const pctSaved = !live && last.duration && last.position ? Math.min(100, last.position / last.duration * 100) : 0;
   return `<section class="rh-mini${playing ? ' on' : ''}" aria-label="متابعة الاستماع">
-    <button class="rh-mini-main" onclick="${live ? 'fullSurahPlayerHome()' : `startFullSurah(${last.reader},${last.chapter},'listen')`}">${rhPortrait(last.reader, 'round')}<span class="rh-mini-text"><small>${live ? (playing ? 'يُتلى الآن' : 'متوقف مؤقتًا') : 'متابعة الاستماع'}</small><strong>${esc(fullReaderName(last.reader))}</strong><em translate="no" data-rh-sub>${sub}</em><span class="rh-mini-bar"><i style="width:${pct}%"></i></span></span></button>
+    <button class="rh-mini-main" onclick="${live ? 'fullSurahPlayerHome()' : 'rhResume()'}">${rhPortrait(last.reader, 'round')}<span class="rh-mini-text"><small>${live ? (playing ? 'يُتلى الآن' : 'متوقف مؤقتًا') : 'متابعة الاستماع'}</small><strong>${esc(fullReaderName(last.reader))}</strong><em translate="no" data-rh-sub>${sub}</em><span class="rh-mini-bar"><i style="width:${pct || pctSaved}%"></i></span></span></button>
     <button class="rh-mini-play" aria-label="${playing ? 'إيقاف مؤقت' : 'تشغيل'}" onclick="rhToggle()">${uiIcon(playing ? 'pause' : 'play')}</button></section>`;
+}
+// Continue from the saved place: the verse where timings exist, otherwise the exact minute.
+function rhResume() {
+  const l = rhLast(); if (!l) return;
+  rhRadioStop();
+  const mode = localStorage.surahViewMode === 'read' ? 'read' : 'listen', pos = +l.position || 0;
+  const timed = typeof surahHasVerseTimings === 'function' && surahHasVerseTimings(l.reader, l.chapter);
+  rhResuming = true;
+  try {
+    if (timed && l.verse > 1) { startFullSurah(l.reader, l.chapter, mode, l.verse); return }
+    startFullSurah(l.reader, l.chapter, mode);
+  } finally { rhResuming = false }
+  if (pos > 5000) {
+    const until = Date.now() + 15000;
+    const seek = () => {
+      if (!fullSurahActive() || surahState.reader !== l.reader || surahState.chapter !== l.chapter || Date.now() > until) return;
+      if (surahState.duration > 0 && ['playing', 'paused'].includes(surahState.status)) { seekFullSurah(Math.max(0, pos - 2000)); return }
+      setTimeout(seek, 250);
+    };
+    setTimeout(seek, 300);
+  }
+  setTimeout(rhRefresh, 250);
 }
 function rhToggle() {
   const live = fullSurahActive();
   if (live && ['playing', 'loading'].includes(surahState.status)) pauseFullSurah();
   else if (live && surahState.status === 'paused') { rhRadioStop(); resumeFullSurah() }
-  else { const l = rhLast(); if (l) startFullSurah(l.reader, l.chapter, 'listen') }
+  else rhResume()
   setTimeout(rhRefresh, 250);
 }
 function rhOpenReader(id) { surahReader = id; try { localStorage.surahReader = id } catch (e) {} openHomeRecitation('chapters') }
