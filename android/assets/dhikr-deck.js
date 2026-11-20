@@ -51,8 +51,8 @@ function dkCardMarkup(d, i, depth) {
   const ring = 2 * Math.PI * 17, frac = Math.min(1, c / t);
   return `<article class="dk-card${done ? ' is-done' : ''}" data-depth="${depth}" style="--depth:${depth}" ${depth ? 'aria-hidden="true"' : ''}>
     <div class="dk-head"><span class="dk-kind">${dkKind(d)}</span><span class="dk-num">${ar(i + 1)} <i>/ ${ar(n)}</i></span></div>
-    <h2 class="dk-title">${esc(d.title)}</h2>
-    <div class="dk-body"><div class="devotion-text dk-text${d.kind === 'quran' ? ' dhikr-quran' : ''}" data-dk-text="${d.id}" lang="ar" dir="rtl" translate="no" style="font-size:${dkSize(d)}px"></div></div>
+    <h2 class="dk-title">${esc(d.title)}</h2>${d.routineEvidence?.disputed ? '<span class="dk-grade">في تصحيحه خلاف · انظر المصدر</span>' : ''}
+    <div class="dk-body"><div class="devotion-text dk-text${d.kind === 'quran' ? ' dhikr-quran' : ''}${String(d.text).length <= 120 ? ' dk-short' : ''}" data-dk-text="${d.id}" lang="ar" dir="rtl" translate="no" style="font-size:${dkSize(d)}px"></div></div>
     <div class="dk-foot">
       <button class="dk-ref" data-dk-source>${uiIcon('book')}<span translate="no" dir="rtl">${esc(d.reference)}</span></button>
       <div class="dk-actions">
@@ -165,7 +165,7 @@ function dkBind(card) {
 }
 function dkIndexSheet() {
   const box = featureSheet('فهرس أذكار القسم', 'dk-index-sheet');
-  box.innerHTML = '<div class="dk-index-list">' + dk.items.map((d, i) => `<button data-i="${i}" class="${i === dk.index ? 'is-current' : ''}${dkDone(d) ? ' is-done' : ''}"><span class="dk-index-n">${dkDone(d) ? uiIcon('check') : ar(i + 1)}</span><span><strong translate="no" dir="rtl">${esc(d.title)}</strong><small>${dkKind(d)}${d.count ? ' · ' + dkTimes(d.count) : ''}</small></span></button>`).join('') + '</div>';
+  box.innerHTML = '<div class="dk-index-list">' + dk.items.map((d, i) => `<button data-i="${i}" class="${i === dk.index ? 'is-current' : ''}${dkDone(d) ? ' is-done' : ''}"><span class="dk-index-n">${dkDone(d) ? uiIcon('check') : ar(i + 1)}</span><span><strong translate="no" dir="rtl">${esc(d.title)}</strong><small>${dkKind(d)}${d.count ? ' — ' + dkTimes(d.count) : ''}</small></span></button>`).join('') + '</div>';
   box.querySelectorAll('[data-i]').forEach(b => b.onclick = () => { const i = +b.dataset.i; closeFeatureSheet(); dk.index = i; dkRender(i >= dk.index ? 1 : -1) });
   dkLocalize(box);
 }

@@ -87,3 +87,5 @@ body.dark .dk-index-n{color:#e8cf96}
 html[dir=ltr] .dk-card[data-depth="0"]{direction:rtl}
 html[dir=ltr] .dk-head,html[dir=ltr] .dk-foot,html[dir=ltr] .dk-count{direction:ltr}
 @media (prefers-reduced-motion:reduce){.dk-card,.dk-bar i,.dk-ring{transition:none}.dk-card.dk-enter-next,.dk-card.dk-enter-prev{animation:none}.dk-card.dk-leave-next,.dk-card.dk-leave-prev{transition:opacity .15s}}
+.dk-grade{align-self:flex-start;margin:-2px 2px 4px;padding:3px 10px;border-radius:99px;border:1px dashed var(--dk-edge);color:var(--muted);font:500 11px var(--ui-font,AppArabic),Tahoma,sans-serif;position:relative}
+.dk .dk-text.dk-short{text-align:center!important}
