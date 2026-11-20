@@ -101,10 +101,12 @@ function dkLayout() {
   const nav = document.querySelector('body>nav') || document.querySelector('nav'), r = nav ? nav.getBoundingClientRect() : null, navTop = r && r.height > 0 && getComputedStyle(nav).display !== 'none' ? r.top : innerHeight;
   const top = stack.getBoundingClientRect().top + scrollY - scrollY;
   const room = Math.max(330, Math.min(navTop, innerHeight) - top - 10);
-  stack.style.height = room + 'px';
+  const zoom = stack.offsetHeight ? stack.getBoundingClientRect().height / stack.offsetHeight || 1 : 1;
+  stack.style.height = Math.max(330, room / zoom) + 'px';
   stack.querySelectorAll('.dk-card').forEach(card => {
     const body = card.querySelector('.dk-body'), text = card.querySelector('.dk-text'); if (!body || !text) return;
-    let size = parseFloat(text.style.fontSize) || 24; const min = 16;
+    const base = +text.dataset.base || (text.dataset.base = parseFloat(text.style.fontSize) || 24), k = Math.min(1.8, Math.max(1, card.clientWidth / 370));
+    let size = Math.round(base * k); text.style.fontSize = size + 'px'; const min = 16;
     while (size > min && text.scrollHeight > body.clientHeight) { size -= 1; text.style.fontSize = size + 'px' }
     body.classList.toggle('is-scroll', text.scrollHeight > body.clientHeight + 2);
   });

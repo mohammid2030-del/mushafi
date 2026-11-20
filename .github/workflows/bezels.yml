@@ -13,6 +13,6 @@ jobs:
             if curl -fsSL "$base/$n.dmg" -o "dl/$n.dmg"; then echo "OK $n"; mkdir -p "x/$n"; 7z x -y "dl/$n.dmg" -o"x/$n" >/dev/null || true; else echo "MISS $n"; fi
           done
           find x -name '*.png' | sed 's/^/PNG /' | head -300
-          find x -name '*.png' -exec sh -c 'f="$1"; d=$(echo "$f" | cut -d/ -f2); mkdir -p "out/$d"; cp "$f" "out/$d/"' _ {} \;
+          find x -path '*PNG*' -name '*.png' | while read -r f; do b=$(basename "$f" | tr -d '"()' | tr ' ' '_'); cp "$f" "out/$b"; done; ls out
       - uses: actions/upload-artifact@v4
         with: {name: bezels, path: out}
