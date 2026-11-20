@@ -16,12 +16,15 @@ jobs:
       - uses: ruby/setup-ruby@v1
         with: {ruby-version: '3.3'}
       - run: gem install fastlane --no-document >/dev/null
-      - env:
+      - name: App Store Connect API key
+        env:
           ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
           ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
           ASC_KEY_P8_BASE64: ${{ secrets.ASC_KEY_P8_BASE64 }}
+        run: ios/scripts/install-asc-key.sh
+      - env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
           MODE: ${{ inputs.mode }}
           NEW_VERSION: ${{ inputs.new_version }}
-        run: |
-          export ASC_KEY_PATH="$RUNNER_TEMP/key.p8"; echo "$ASC_KEY_P8_BASE64" | base64 -d > "$ASC_KEY_PATH"
-          ruby tools/asc-screenshots.rb
+        run: ruby tools/asc-screenshots.rb
