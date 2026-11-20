@@ -2,8 +2,8 @@
 // Presentation only. Page numbers, reading anchors and ward completion belong to
 // the existing turn/showPage chain and are changed once, after a completed turn.
 let bookTurnState=null,bookTurnCommit=null,bookTurnLocked=false;
-// The paper curl is one of three page-turn styles (curl, slide, instant); see page-turn-style.js.
-function pageTurnStyle(){const v=localStorage.pageTurnStyle;return ['curl','slide','none'].includes(v)?v:'curl'}
+// The paper curl is one of three page-turn styles (curl, slide, instant; slide by default); see page-turn-style.js.
+function pageTurnStyle(){const v=localStorage.pageTurnStyle;return ['curl','slide','none'].includes(v)?v:'slide'}
 function bookTurnOn(){return allowsMotion()&&pageTurnStyle()==='curl'}
 function bookTurnDestination(delta){if(view!=='reader'||![1,-1].includes(delta))return null;const before=visiblePageNumbers();let p;
  if(smartReading){p=delta>0?before.at(-1)+1:Math.max(smartReading.start,before[0]-(isSpreadView()?2:1));if(p>smartReading.end)return null;}
