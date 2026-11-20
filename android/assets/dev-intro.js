@@ -27,7 +27,7 @@ function devIntroShow(){
  root.querySelector('.di-skip').onclick=e=>{e.stopPropagation();finish()};
  // A tap while the letter is still being written completes it at once.
  root.addEventListener('click',()=>{if(!root.classList.contains('di-done'))reveal()});
- const cta=parseFloat(root.style.getPropertyValue('--cta'))||8;devIntroTimers=[setTimeout(reveal,(cta+.8)*1000)];
+ const cta=(parseFloat(root.style.getPropertyValue('--cta'))||8)*(matchMedia('(prefers-reduced-motion: reduce)').matches?.6:1);devIntroTimers=[setTimeout(reveal,(cta+.8)*1000)];
  requestAnimationFrame(()=>root.querySelector('.di-cta').focus({preventScroll:true}));
 }
 const devIntroStartWelcome=startWelcome;

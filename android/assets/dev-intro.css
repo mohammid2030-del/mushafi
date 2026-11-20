@@ -42,6 +42,25 @@ body.dark .di-glow{background:radial-gradient(ellipse at 50% 38%,color-mix(in sr
 @keyframes di-lift{to{opacity:0;transform:translateY(-34px) scale(.97);filter:blur(6px)}}
 @keyframes di-out{to{opacity:0}}
 @keyframes di-enter{from{opacity:0;transform:translateY(22px);filter:blur(4px)}to{opacity:1;transform:none;filter:none}}
-@media (prefers-reduced-motion:reduce){.dev-intro *,.dev-intro,.welcome-shell.welcome-enter *{animation-duration:.01s!important;animation-delay:0s!important}}
+/* Reduced motion: the same sequence, quicker, told only through soft fades (no blur, slide, draw or shine). */
+@media (prefers-reduced-motion:reduce){
+.dev-intro{--rm:.6}
+.dev-intro .di-glow,.dev-intro .di-pattern,.dev-intro .di-skip{animation:di-fade 1.2s ease forwards!important}
+.dev-intro .di-emblem{animation:di-fade .9s ease both!important}
+.dev-intro .di-emblem circle{stroke-dashoffset:0;opacity:0;animation:di-ring-soft 1.2s .3s ease forwards!important}
+.dev-intro .di-kicker{animation:di-fade .8s .7s ease forwards!important}
+.dev-intro .di-w{filter:none;transform:none;animation:di-fade .9s calc(var(--d) * var(--rm)) ease forwards!important}
+.dev-intro .di-sig{animation:di-fade .9s calc(var(--sig) * var(--rm)) ease forwards!important}
+.dev-intro .di-hand{clip-path:none;opacity:0;animation:di-fade 1.1s calc(var(--sig) * var(--rm) + .3s) ease forwards!important}
+.dev-intro .di-cta{transform:none;animation:di-fade .8s calc(var(--cta) * var(--rm)) ease forwards!important}
+.dev-intro .di-cta::after{display:none}
+.dev-intro.di-done .di-stage *,.dev-intro.di-done .di-cta,.dev-intro.di-done .di-skip{animation-delay:0s!important;animation-duration:.4s!important}
+.dev-intro.dev-intro.leaving{animation:di-out .8s .15s ease forwards!important}
+.dev-intro.leaving .di-stage.di-stage{animation:di-hide .5s ease forwards!important}
+.dev-intro.leaving .di-cta.di-cta,.dev-intro.leaving .di-skip.di-skip{animation:di-hide .3s ease forwards!important}
+body .welcome-shell.welcome-enter .welcome-top,body .welcome-shell.welcome-enter .welcome-step-context,body .welcome-shell.welcome-enter .welcome-progress,body .welcome-shell.welcome-enter .welcome-content>*>*,body .welcome-shell.welcome-enter .welcome-actions{animation:di-fade-in .8s ease both!important}
+body .welcome-shell.welcome-enter .welcome-top{animation-delay:.3s!important}body .welcome-shell.welcome-enter .welcome-content>*>*{animation-delay:.45s!important}body .welcome-shell.welcome-enter .welcome-actions{animation-delay:.6s!important}
+}
+@keyframes di-ring-soft{to{opacity:.75}}@keyframes di-fade-in{from{opacity:0}to{opacity:1}}
 .dev-intro:not(.di-done) .di-cta{pointer-events:none}
 .di-cta:focus{outline:none}.di-cta:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
