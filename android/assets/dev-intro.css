@@ -64,3 +64,4 @@ body .welcome-shell.welcome-enter .welcome-top{animation-delay:.3s!important}bod
 @keyframes di-ring-soft{to{opacity:.75}}@keyframes di-fade-in{from{opacity:0}to{opacity:1}}
 .dev-intro:not(.di-done) .di-cta{pointer-events:none}
 .di-cta:focus{outline:none}.di-cta:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+.dev-intro.di-wait,.dev-intro.di-wait *,.dev-intro.di-wait *::after{animation-play-state:paused!important}

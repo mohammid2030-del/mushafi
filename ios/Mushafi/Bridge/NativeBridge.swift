@@ -28,7 +28,7 @@ final class NativeBridge: NSObject, WKScriptMessageHandler {
     /// Fire-and-forget methods; results come back through `window.on…` callbacks.
     static var asyncMethods: [String] {
         var list = [
-            "startupReady", "setAppTheme", "setUiLanguage", "setReading", "setStoryReading",
+            "startupReady", "setLaunchWelcomed", "setAppTheme", "setUiLanguage", "setReading", "setStoryReading",
             "haptic", "copyText", "shareText",
             "openSourceUrl", "openWeatherReference", "openRecitationReference", "openSupportPage", "contactDeveloper", "openCharityPlatform",
             "exportAppBackup", "importAppBackup",
@@ -147,6 +147,7 @@ final class NativeBridge: NSObject, WKScriptMessageHandler {
         switch method {
         // Shell
         case "startupReady": shell?.pageReady()
+        case "setLaunchWelcomed": LaunchCurtain.setWelcomed(a.bool(0))
         case "setAppTheme": shell?.applyTheme(dark: a.bool(0))
         case "setUiLanguage": if let code = a.string(0) { UiLanguage.save(code); prayer.schedule() }
         case "setReading": reading = a.bool(0); updateIdleTimer(); shell?.readingMode = reading

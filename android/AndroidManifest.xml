@@ -120,6 +120,12 @@
             android:exported="false"
             android:foregroundServiceType="mediaPlayback" />
 
+        <!-- Live Quran radio streams -->
+        <service
+            android:name="com.mushafi.app.RadioPlaybackService"
+            android:exported="false"
+            android:foregroundServiceType="mediaPlayback" />
+
         <!-- Adhan audio started from the prayer alarm -->
         <service
             android:name="com.mushafi.app.AdhanPlaybackService"

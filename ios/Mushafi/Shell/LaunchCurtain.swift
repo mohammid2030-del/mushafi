@@ -19,6 +19,9 @@ final class LaunchCurtain: UIView, WKNavigationDelegate {
     var onDismissed: (() -> Void)?
     var onRetry: (() -> Void)?
     private let retry = UIButton(type: .system)
+    /// First run: the developer letter is the opening, so the curtain is only a plain surface until the page is ready.
+    private var quick: Bool { !UserDefaults.standard.bool(forKey: "launchWelcomed") }
+    static func setWelcomed(_ value: Bool) { UserDefaults.standard.set(value, forKey: "launchWelcomed") }
 
     init(dark: Bool, background: UIColor) {
         self.dark = dark
@@ -96,7 +99,7 @@ final class LaunchCurtain: UIView, WKNavigationDelegate {
         pageReady = ready
         started = Date()
         retry.isHidden = true
-        presentation.isHidden = false
+        presentation.isHidden = quick
         alpha = 1
         isHidden = false
         isShowing = true
@@ -112,9 +115,10 @@ final class LaunchCurtain: UIView, WKNavigationDelegate {
         if presentationReady {
             presentation.evaluateJavaScript("launchProgress(\(Int(time * 1000)),\(pageReady))", completionHandler: nil)
         }
-        if time >= Self.duration, pageReady, presentationReady || time >= Self.duration + 3 {
+        let done = quick ? pageReady : (time >= Self.duration && pageReady && (presentationReady || time >= Self.duration + 3))
+        if done {
             timer?.invalidate(); timer = nil
-            UIView.animate(withDuration: 0.5, animations: { self.alpha = 0 }) { _ in
+            UIView.animate(withDuration: quick ? 0.25 : 0.5, animations: { self.alpha = 0 }) { _ in
                 self.isHidden = true
                 self.isShowing = false
                 self.onDismissed?()

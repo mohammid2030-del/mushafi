@@ -38,25 +38,45 @@ const rhRadios = [
   { id: 'eg', title: 'إذاعة القرآن الكريم', place: 'من القاهرة', url: 'https://stream.radiojar.com/8s5u5tpdtwzuv' }
 ];
 let rhRadio = { id: '', audio: null, status: 'stopped' };
-function rhRadioStop() { if (rhRadio.audio) { try { rhRadio.audio.pause(); rhRadio.audio.removeAttribute('src'); rhRadio.audio.load() } catch (e) {} } rhRadio = { id: '', audio: null, status: 'stopped' }; rhPaintRadios() }
+// Android streams the radio natively (the page cannot reach the web there, and it keeps playing with the screen off).
+const rhRadioNative = () => typeof window.AndroidReader?.radioPlay === 'function';
+function rhRadioStop() {
+  if (rhRadio.audio) { try { rhRadio.audio.pause(); rhRadio.audio.removeAttribute('src'); rhRadio.audio.load() } catch (e) {} }
+  if (rhRadio.id && rhRadioNative()) { try { AndroidReader.radioStop() } catch (e) {} }
+  rhRadio = { id: '', audio: null, status: 'stopped' }; rhPaintRadios()
+}
+function rhRadioFailed() { showSmallNotice('تعذر تشغيل الإذاعة، تحقق من الاتصال بالإنترنت') }
+window.onNativeRadio = function (state) {
+  if (!state || !rhRadioNative()) return;
+  if (state.status === 'error') { if (rhRadio.id) { rhRadio = { id: '', audio: null, status: 'stopped' }; rhPaintRadios(); rhRadioFailed() } return }
+  if (state.status === 'stopped' || !state.id) { if (rhRadio.id) { rhRadio = { id: '', audio: null, status: 'stopped' }; rhPaintRadios() } return }
+  rhRadio = { id: state.id, audio: null, status: state.status === 'playing' ? 'playing' : 'loading' }; rhPaintRadios()
+};
 function rhRadioToggle(id) {
   if (rhRadio.id === id) { rhRadioStop(); return }
   rhRadioStop();
   const st = rhRadios.find(r => r.id === id); if (!st) return;
-  if (typeof fullSurahActive === 'function' && fullSurahActive() && ['playing', 'loading'].includes(surahState.status)) pauseFullSurah();
+  if (typeof fullSurahActive === 'function' && fullSurahActive() && ['playing', 'loading', 'paused'].includes(surahState.status)) { try { stopFullSurah() } catch (e) { pauseFullSurah() } }
   try { if (['playing', 'loading'].includes(inlineVerse.status)) pauseInlineVerse() } catch (e) {}
+  if (rhRadioNative()) {
+    rhRadio = { id, audio: null, status: 'loading' };
+    try { AndroidReader.radioPlay(st.id, st.url, st.title, st.place) } catch (e) { rhRadio = { id: '', audio: null, status: 'stopped' }; rhRadioFailed() }
+    rhPaintRadios(); setTimeout(rhRefresh, 200); return
+  }
   const audio = new Audio(); audio.preload = 'none'; audio.src = st.url;
   rhRadio = { id, audio, status: 'loading' };
   audio.addEventListener('playing', () => { if (rhRadio.audio === audio) { rhRadio.status = 'playing'; rhPaintRadios() } });
   audio.addEventListener('waiting', () => { if (rhRadio.audio === audio) { rhRadio.status = 'loading'; rhPaintRadios() } });
   audio.addEventListener('pause', () => { if (rhRadio.audio === audio) rhRadioStop() });
-  audio.addEventListener('error', () => { if (rhRadio.audio === audio) { rhRadioStop(); showSmallNotice('تعذر تشغيل الإذاعة، تحقق من الاتصال بالإنترنت') } });
+  audio.addEventListener('error', () => { if (rhRadio.audio === audio) { rhRadioStop(); rhRadioFailed() } });
   try { if ('mediaSession' in navigator) navigator.mediaSession.metadata = new MediaMetadata({ title: st.title, artist: st.place, album: 'مصحفي' }) } catch (e) {}
-  audio.play().catch(() => { if (rhRadio.audio === audio) { rhRadioStop(); showSmallNotice('تعذر تشغيل الإذاعة، تحقق من الاتصال بالإنترنت') } });
+  audio.play().catch(() => { if (rhRadio.audio === audio) { rhRadioStop(); rhRadioFailed() } });
   rhPaintRadios(); setTimeout(rhRefresh, 200);
 }
+// Reopening the app while a station plays: show it as playing.
+try { if (rhRadioNative()) { const s = JSON.parse(AndroidReader.radioSnapshot() || '{}'); if (s.id && s.status !== 'stopped') rhRadio = { id: s.id, audio: null, status: s.status === 'playing' ? 'playing' : 'loading' } } } catch (e) {}
 function rhRadioCard(r) {
-  const on = rhRadio.id === r.id, label = on ? (rhRadio.status === 'playing' ? 'إيقاف الاستماع' : 'جارٍ الاتصال…') : 'استماع مباشر';
+  const on = rhRadio.id === r.id, label = on ? (rhRadio.status === 'playing' ? 'إيقاف الاستماع' : 'جارٍ الاتصال بالبث…') : 'استماع مباشر';
   return `<article class="rh-radio${on ? ' on' : ''}" data-radio="${r.id}"><span class="rh-radio-art" aria-hidden="true">${uiIcon('radio')}</span><strong>${r.title}</strong><small>${r.place}</small><button onclick="rhRadioToggle('${r.id}')"><i class="rh-dot"></i>${uiIcon(on && rhRadio.status === 'playing' ? 'pause' : 'radio')}<span>${label}</span></button></article>`;
 }
 function rhPaintRadios() { const box = document.getElementById('rh-radios'); if (box) { box.innerHTML = rhRadios.map(rhRadioCard).join(''); try { uiLocalize(box) } catch (e) {} } }

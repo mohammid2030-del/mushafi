@@ -21,15 +21,22 @@ function devIntroMarkup(){
  </div>`}
 function devIntroShow(){
  const host=document.createElement('div');host.innerHTML=devIntroMarkup();const root=host.firstElementChild;document.body.append(root);
- const finish=()=>{if(root.classList.contains('leaving'))return;devIntroTimers.forEach(clearTimeout);localStorage.mushafiDevIntroSeen='1';root.classList.add('leaving');document.querySelector('.welcome-shell')?.classList.add('welcome-enter');try{window.AndroidReader?.haptic?.(0)}catch(e){}setTimeout(()=>{root.remove();document.querySelector('.welcome-shell')?.classList.remove('welcome-enter');document.querySelector('.welcome-shell h1')?.focus?.({preventScroll:true})},1300)};
+ const finish=()=>{if(root.classList.contains('leaving'))return;devIntroTimers.forEach(clearTimeout);localStorage.mushafiDevIntroSeen='1';devIntroSyncLaunch();root.classList.add('leaving');document.querySelector('.welcome-shell')?.classList.add('welcome-enter');try{window.AndroidReader?.haptic?.(0)}catch(e){}setTimeout(()=>{root.remove();document.querySelector('.welcome-shell')?.classList.remove('welcome-enter');document.querySelector('.welcome-shell h1')?.focus?.({preventScroll:true})},1300)};
  const reveal=()=>{root.classList.add('di-done')};
  root.querySelector('.di-cta').onclick=e=>{e.stopPropagation();finish()};
  root.querySelector('.di-skip').onclick=e=>{e.stopPropagation();finish()};
  // A tap while the letter is still being written completes it at once.
  root.addEventListener('click',()=>{if(!root.classList.contains('di-done'))reveal()});
- const cta=(parseFloat(root.style.getPropertyValue('--cta'))||8)*(matchMedia('(prefers-reduced-motion: reduce)').matches?.6:1);devIntroTimers=[setTimeout(reveal,(cta+.8)*1000)];
+ if(!devIntroLaunched)root.classList.add('di-wait');const cta=(parseFloat(root.style.getPropertyValue('--cta'))||8)*(matchMedia('(prefers-reduced-motion: reduce)').matches?.6:1);devIntroRestartTimer=()=>{devIntroTimers.forEach(clearTimeout);devIntroTimers=[setTimeout(reveal,(cta+.8)*1000)]};if(devIntroLaunched)devIntroRestartTimer();
  requestAnimationFrame(()=>root.querySelector('.di-cta').focus({preventScroll:true}));
 }
+// The native opening curtain is only a plain surface on first run; tell it which kind the next launch should get.
+function devIntroSyncLaunch(){try{window.AndroidReader?.setLaunchWelcomed?.(localStorage.mushafiDevIntroSeen==='1'||localStorage.mushafiWelcomeCompleted==='1')}catch(e){}}
+devIntroSyncLaunch();
+// Hold the letter until the curtain has lifted, so it is seen from its first word.
+let devIntroLaunched=!window.AndroidReader;
+const devIntroLaunchDone=window.onMushafiLaunchDone;window.onMushafiLaunchDone=function(...a){devIntroLaunched=true;document.querySelector('.dev-intro.di-wait')?.classList.remove('di-wait');devIntroRestartTimer();return devIntroLaunchDone?.apply(this,a)};
+let devIntroRestartTimer=()=>{};
 const devIntroStartWelcome=startWelcome;
 startWelcome=function(...args){const due=devIntroDue();devIntroStartWelcome.apply(this,args);if(due&&!document.querySelector('.dev-intro'))try{devIntroShow()}catch(e){document.querySelector('.dev-intro')?.remove()}};
 const devIntroBack=window.handleNativeBack;window.handleNativeBack=function(){const r=document.querySelector('.dev-intro:not(.leaving)');if(r){r.querySelector('.di-cta').click();return true}return devIntroBack?devIntroBack():false};
