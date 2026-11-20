@@ -1,0 +1,15 @@
+name: diag-radio
+on: { push: { branches: [diag-radio] } }
+jobs:
+  d:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          for u in https://stream.radiojar.com/0tpy1h0kxtzuv https://stream.radiojar.com/8s5u5tpdtwzuv; do
+            echo "=== $u"; curl -sS -o /dev/null -D - -A "Mushafi/Android" "$u" --max-time 5 | head -20 || true
+            loc=$(curl -sS -o /dev/null -w '%{redirect_url}' -A "Mushafi/Android" "$u" --max-time 5)
+            echo "LOC=$loc"; sleep 8
+            echo "--- retry location after 8s"; curl -sS -o /dev/null -D - -A x "$loc" --max-time 4 | head -8 || true
+            echo "--- range request"; curl -sS -o /dev/null -D - -H "Range: bytes=50000-" -A x "$loc" --max-time 4 | head -8 || true
+            echo "--- full follow 15s"; curl -sS -L -o /tmp/s.mp3 -A x "$u" --max-time 15 -w 'bytes=%{size_download} code=%{http_code}\n' || true
+          done
