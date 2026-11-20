@@ -30,37 +30,42 @@ async function scRender(content, format = 'story') {
   const bg = await scImage(f.src), c = document.createElement('canvas'); c.width = f.W; c.height = f.H;
   const g = c.getContext('2d');
   if (bg) g.drawImage(bg, 0, 0, f.W, f.H); else { g.fillStyle = '#121212'; g.fillRect(0, 0, f.W, f.H) }
-  const [x0, y0, x1, y1] = f.box, bw = x1 - x0, bh = y1 - y0, padX = bw * 0.09, padY = bh * 0.1, inner = bw - padX * 2;
-  const GOLD = '#dcbf86', INK = '#f6efe0', SOFT = 'rgba(246,239,224,.62)';
+  const [x0, y0, x1, y1] = f.box, bw = x1 - x0, bh = y1 - y0, padX = bw * 0.08, padY = bh * 0.085, inner = bw - padX * 2;
+  const GOLD = '#dcbf86', INK = '#f6efe0', CX = (x0 + x1) / 2;
   g.direction = 'rtl'; g.textAlign = 'center'; g.textBaseline = 'middle';
-  const kickerH = content.kicker ? Math.round(f.max * 0.62) : 0, refH = content.reference ? Math.round(f.max * 0.56) : 0;
-  const top = y0 + padY, bottom = y1 - padY, gap = f.max * 0.55;
-  const avail = bottom - top - (kickerH ? kickerH + gap : 0) - (refH ? refH * 1.6 + gap : 0);
-  // largest size at which the text fits the card
-  let size = f.max, lines = [], lh = 0;
-  for (; size >= f.min; size -= 2) {
-    g.font = `${size}px Quran, serif`; lh = size * 1.95; lines = scWrap(g, content.text, inner);
-    if (lines.length * lh <= avail) break;
+  const top = y0 + padY, bottom = y1 - padY, gap = Math.round(f.max * 0.5);
+  // Everything is measured and wrapped to the card's inner width, so nothing can run past its edges.
+  // kicker (title): one line, shrinks to fit
+  let kSize = 0;
+  if (content.kicker) { kSize = Math.round(f.max * 0.6); g.font = `600 ${kSize}px AppArabic, sans-serif`; while (kSize > 16 && g.measureText(content.kicker).width > inner) { kSize -= 1; g.font = `600 ${kSize}px AppArabic, sans-serif` } }
+  // reference: wraps to at most three lines, shrinking first
+  let rSize = 0, rLines = [];
+  if (content.reference) {
+    for (rSize = Math.round(f.max * 0.5); rSize >= 16; rSize -= 1) { g.font = `500 ${rSize}px AppArabic, sans-serif`; rLines = scWrap(g, content.reference, inner); if (rLines.length <= (rSize <= f.max * 0.4 ? 3 : 2)) break }
+    if (rLines.length > 3) { rLines = rLines.slice(0, 3); rLines[2] += ' …' }
   }
+  const rLH = rSize * 1.5, kBlock = kSize ? kSize * 1.3 + gap : 0, rBlock = rLines.length ? gap + rLines.length * rLH : 0;
+  const avail = bottom - top - kBlock - rBlock;
+  // the text itself: the largest size at which it fits what is left
+  let size = f.max, lines = [], lh = 0;
+  for (; size >= f.min; size -= 1) { g.font = `${size}px Quran, serif`; lh = size * 1.9; lines = scWrap(g, content.text, inner); if (lines.length * lh <= avail) break }
   if (size < f.min) {   // very long passage: keep what fits and mark the cut
-    size = f.min; g.font = `${size}px Quran, serif`; lh = size * 1.95; lines = scWrap(g, content.text, inner);
+    size = f.min; g.font = `${size}px Quran, serif`; lh = size * 1.9; lines = scWrap(g, content.text, inner);
     const keep = Math.max(1, Math.floor(avail / lh)); if (lines.length > keep) { lines = lines.slice(0, keep); lines[keep - 1] += ' …' }
   }
-  const block = (kickerH ? kickerH + gap : 0) + lines.length * lh + (refH ? gap + refH * 1.6 : 0);
-  let y = top + Math.max(0, (bottom - top - block) / 2);
-  if (kickerH) {
-    g.font = `600 ${kickerH}px AppArabic, sans-serif`; g.fillStyle = GOLD; g.fillText(content.kicker, (x0 + x1) / 2, y + kickerH / 2);
-    y += kickerH + gap;
-  }
-  g.font = `${size}px Quran, serif`; g.fillStyle = INK;
-  g.shadowColor = 'rgba(0,0,0,.35)'; g.shadowBlur = 8;
-  lines.forEach((line, i) => g.fillText(line, (x0 + x1) / 2, y + lh * (i + 0.5)));
+  let y = top + Math.max(0, (avail - lines.length * lh) / 2);
+  if (kSize) { g.font = `600 ${kSize}px AppArabic, sans-serif`; g.fillStyle = GOLD; g.fillText(content.kicker, CX, y + kSize * 0.65); y += kBlock }
+  g.font = `${size}px Quran, serif`; g.fillStyle = INK; g.shadowColor = 'rgba(0,0,0,.35)'; g.shadowBlur = 8;
+  lines.forEach((line, i) => g.fillText(line, CX, y + lh * (i + 0.5)));
   g.shadowBlur = 0; y += lines.length * lh;
-  if (refH) {
-    y += gap;
-    const w = Math.min(inner * 0.32, 220); g.strokeStyle = 'rgba(220,191,134,.45)'; g.lineWidth = 2; g.beginPath(); g.moveTo((x0 + x1) / 2 - w / 2, y); g.lineTo((x0 + x1) / 2 + w / 2, y); g.stroke();
-    g.font = `500 ${refH}px AppArabic, sans-serif`; g.fillStyle = GOLD; g.fillText(content.reference, (x0 + x1) / 2, y + refH * 1.0);
+  if (rLines.length) {
+    y += gap * 0.6;
+    const w = Math.min(inner * 0.3, 200); g.strokeStyle = 'rgba(220,191,134,.45)'; g.lineWidth = 2; g.beginPath(); g.moveTo(CX - w / 2, y); g.lineTo(CX + w / 2, y); g.stroke();
+    y += gap * 0.4;
+    g.font = `500 ${rSize}px AppArabic, sans-serif`; g.fillStyle = GOLD;
+    rLines.forEach((line, i) => g.fillText(line, CX, y + rLH * (i + 0.5)));
   }
+  content._fit = { size, rSize, kSize, cut: lines.some(l => l.endsWith(' …')) };
   scBrand(g, f.W / 2, f.brandY, format === 'story' ? 40 : 34);
   return c;
 }
@@ -98,6 +103,7 @@ function openShareCard(content, shareText, name = 'Mushafi') {
   box.innerHTML = `<div class="sc-sheet">
     <div class="sc-formats" role="radiogroup" aria-label="شكل الصورة">${[['story', 'عمودي', 'للحالة والستوري'], ['square', 'مربع', 'للمنشورات']].map(([id, t, s]) => `<button type="button" role="radio" data-sc="${id}"><b>${t}</b><small>${s}</small></button>`).join('')}</div>
     <div class="sc-preview"><div class="sc-spinner" aria-hidden="true"></div><img alt="" hidden></div>
+    <p class="sc-hint" hidden>النص طويل، فيُشارَك بالشكل العمودي ليبقى واضحًا وكاملًا</p>
     <div class="sc-actions"><button type="button" class="primary sc-share">${uiIcon('share')}<span>مشاركة الصورة</span></button><button type="button" class="sc-save">${uiIcon('download')}<span>حفظ الصورة</span></button></div>
     <button type="button" class="welcome-text-button sc-text">مشاركة كنص</button>
   </div>`;
@@ -115,7 +121,16 @@ function openShareCard(content, shareText, name = 'Mushafi') {
   box.querySelector('.sc-share').onclick = async () => { await scDeliver(await ready(), `${name}-${format}.png`, 'share') };
   box.querySelector('.sc-save').onclick = async () => { await scDeliver(await ready(), `${name}-${format}.png`, 'save'); if (!window.AndroidReader?.hajjSaveFile) showSmallNotice('حُفظت الصورة') };
   box.querySelector('.sc-text').onclick = () => { closeFeatureSheet(); shareText() };
-  paint();
+  // A long text would be too small (or cut) in the square: offer the portrait card only.
+  const probe = { ...content };
+  scRender(probe, 'square').then(() => {
+    const fit = probe._fit;
+    if (fit && (fit.cut || fit.size < SC_FORMATS.square.max * 0.55)) {
+      const sq = box.querySelector('[data-sc="square"]'); sq.disabled = true; sq.querySelector('small').textContent = 'للنصوص القصيرة';
+      box.querySelector('.sc-hint').hidden = false; format = 'story';
+      try { uiLocalize(box.querySelector('.sc-formats')); uiLocalize(box.querySelector('.sc-hint')) } catch (e) {}
+    }
+  }).catch(() => {}).then(paint);
 }
 
 // Verses

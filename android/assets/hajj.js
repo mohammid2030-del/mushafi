@@ -681,32 +681,39 @@ async function hajjReportCanvas(trip) {
   // heading
   g.fillStyle = INK; fit(hjT('ملخص رحلتي الإيمانية'), inner, 54, 700); g.fillText(hjT('ملخص رحلتي الإيمانية'), CX, Y0 + 100);
   g.fillStyle = GOLD; fit(hjT(hajjKindTitle(trip)), inner, 36, 600); g.fillText(hjT(hajjKindTitle(trip)), CX, Y0 + 154);
-  g.fillStyle = SOFT; g.font = F(400, 26); g.fillText(hajjDate(trip.startedAt) + '  ·  ' + (rtl ? '‏' : '') + hajjTime(trip.startedAt) + ' — ' + (trip.endedAt ? hajjTime(trip.endedAt) : hjT('جارية')), CX, Y0 + 200);
+  { const when = hajjDate(trip.startedAt) + '  ·  ' + (rtl ? '\u200f' : '') + hajjTime(trip.startedAt) + ' — ' + (trip.endedAt ? hajjTime(trip.endedAt) : hjT('جارية')); g.fillStyle = SOFT; fit(when, inner, 26); g.fillText(when, CX, Y0 + 200) }
   // distance
-  g.fillStyle = 'rgba(255,255,255,.05)'; rr(X0 + pad, Y0 + 236, inner, 200, 34); g.fill(); g.strokeStyle = 'rgba(220,191,134,.25)'; g.lineWidth = 2; g.stroke();
-  g.fillStyle = SOFT; g.font = F(400, 26); g.fillText(hjT('إجمالي المسافة'), CX, Y0 + 286);
-  g.fillStyle = INK; g.font = F(700, 84); g.fillText(hajjKm(x.dist), CX, Y0 + 372);
-  g.fillStyle = 'rgba(246,239,224,.45)'; g.font = F(400, 20); g.fillText(hjT(hajjSrcLabel[x.src]), CX, Y0 + 414);
+  const compact = stages.length > 8, dH = compact ? 172 : 200, sTop = Y0 + 236 + dH + 16, ch = compact ? 100 : 112;
+  g.fillStyle = 'rgba(255,255,255,.05)'; rr(X0 + pad, Y0 + 236, inner, dH, 34); g.fill(); g.strokeStyle = 'rgba(220,191,134,.25)'; g.lineWidth = 2; g.stroke();
+  g.fillStyle = SOFT; fit(hjT('إجمالي المسافة'), inner - 40, 26); g.fillText(hjT('إجمالي المسافة'), CX, Y0 + (compact ? 278 : 286));
+  g.fillStyle = INK; g.font = F(700, compact ? 72 : 84); g.fillText(hajjKm(x.dist), CX, Y0 + (compact ? 344 : 364));
+  g.fillStyle = 'rgba(246,239,224,.45)'; fit(hjT(hajjSrcLabel[x.src]), inner - 40, 20); g.fillText(hjT(hajjSrcLabel[x.src]), CX, Y0 + (compact ? 394 : 420));
   // four figures, 2 × 2
   const cells = [[hjT('الخطوات'), x.steps == null ? '—' : hajjNum(x.steps)], [hjT('المدة'), hjT(hajjDuration(x.span))], [hjT('أشواط الطواف'), hjAr(x.tawaf)], [hjT('أشواط السعي'), hjAr(x.sai)]];
-  const gap = 18, cw = (inner - gap) / 2, ch = 112;
+  const gap = compact ? 14 : 18, cw = (inner - gap) / 2;
   cells.forEach(([k, v], i) => {
-    const col = i % 2, row = Math.floor(i / 2), xx = rtl ? X1 - pad - (col + 1) * cw - col * gap : X0 + pad + col * (cw + gap), yy = Y0 + 452 + row * (ch + gap);
+    const col = i % 2, row = Math.floor(i / 2), xx = rtl ? X1 - pad - (col + 1) * cw - col * gap : X0 + pad + col * (cw + gap), yy = sTop + row * (ch + gap);
     g.fillStyle = 'rgba(255,255,255,.045)'; rr(xx, yy, cw, ch, 26); g.fill();
-    g.fillStyle = INK; fit(v, cw - 30, 44, 700); g.fillText(v, xx + cw / 2, yy + 58); g.fillStyle = SOFT; fit(k, cw - 24, 22); g.fillText(k, xx + cw / 2, yy + 92);
+    g.fillStyle = INK; fit(v, cw - 30, 44, 700); g.fillText(v, xx + cw / 2, yy + ch * 0.52); g.fillStyle = SOFT; fit(k, cw - 24, 22); g.fillText(k, xx + cw / 2, yy + ch * 0.82);
   });
   // stages
-  let y = Y0 + 452 + 2 * ch + gap + 46;
+  let y = sTop + 2 * ch + gap + 44;
   if (stages.length) {
     const done = stages.filter(s => trip.stages[s.id]);
-    g.fillStyle = GOLD; g.font = F(600, 26); g.fillText(hjF('المراحل المنجزة: {0} من {1}', hjAr(done.length), hjAr(stages.length)), CX, y);
-    g.font = F(500, 21); y += 22;
-    const widthOf = arr => arr.reduce((sum, t) => sum + g.measureText(t).width + 46, -12), rows = []; let line = [];
-    for (const st of stages) { const nl = [...line, hjT(st.title)]; if (widthOf(nl) > inner && line.length) { rows.push(line); line = [hjT(st.title)] } else line = nl } if (line.length) rows.push(line);
-    for (const row of rows.slice(0, 2)) {
+    { const t = hjF('المراحل المنجزة: {0} من {1}', hjAr(done.length), hjAr(stages.length)); g.fillStyle = GOLD; fit(t, inner, 26, 600); g.fillText(t, CX, y) }
+    y += 22;
+    // every stage is shown: the chips shrink until they fit in the rows left above the verse
+    const widthOf = arr => arr.reduce((sum, t) => sum + g.measureText(t).width + 46, -12);
+    let chip = 21, rows = [], rowH = 54;
+    for (; chip >= 14; chip--) {
+      g.font = F(500, chip); rowH = Math.round(chip * 2 + 12); rows = []; let line = [];
+      for (const st of stages) { const nl = [...line, hjT(st.title)]; if (widthOf(nl) > inner && line.length) { rows.push(line); line = [hjT(st.title)] } else line = nl } if (line.length) rows.push(line);
+      if (y + rows.length * rowH <= Y1 - 92) break;
+    }
+    for (const row of rows) {
       let xr = CX + widthOf(row) / 2;
-      for (const t of (rtl ? row : [...row].reverse())) { const on = trip.stages[stages.find(st => hjT(st.title) === t).id], tw = g.measureText(t).width + 34; g.fillStyle = on ? 'rgba(220,191,134,.2)' : 'rgba(255,255,255,.05)'; rr(xr - tw, y, tw, 42, 21); g.fill(); g.fillStyle = on ? GOLD : SOFT; g.fillText(t, xr - tw / 2, y + 29); xr -= tw + 12 }
-      y += 54;
+      for (const t of (rtl ? row : [...row].reverse())) { const on = trip.stages[stages.find(st => hjT(st.title) === t).id], tw = g.measureText(t).width + 34, bh = rowH - 12; g.fillStyle = on ? 'rgba(220,191,134,.2)' : 'rgba(255,255,255,.05)'; rr(xr - tw, y, tw, bh, bh / 2); g.fill(); g.fillStyle = on ? GOLD : SOFT; g.fillText(t, xr - tw / 2, y + bh * 0.68); xr -= tw + 12 }
+      y += rowH;
     }
   }
   g.fillStyle = GOLD; g.font = F(400, 38, 'Quran'); g.fillText('﴿وَأَتِمُّوا الْحَجَّ وَالْعُمْرَةَ لِلَّهِ﴾', CX, Y1 - 40);
