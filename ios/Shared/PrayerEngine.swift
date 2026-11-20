@@ -11,7 +11,7 @@ enum PrayerError: Error { case invalid(String) }
 struct PrayerSettings {
     static let keys = ["fajr", "dhuhr", "asr", "maghrib", "isha"]
     static let names = ["الفجر", "الظهر", "العصر", "المغرب", "العشاء"]
-    static let voices = ["afasy", "nafees", "mansour", "mustafa", "silent"]
+    static let voices = ["afasy", "nafees", "mansour", "mustafa", "announce", "silent"]
     static let methods = ["AUTO", "UMM_AL_QURA", "MUSLIM_WORLD_LEAGUE", "EGYPTIAN", "KARACHI", "DUBAI", "KUWAIT", "QATAR", "SINGAPORE", "NORTH_AMERICA"]
 
     private(set) var json: [String: Any]

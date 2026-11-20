@@ -136,7 +136,7 @@ final class PrayerService: NSObject {
     func previewVoice(_ voice: String?) {
         stopPreview()
         guard let voice, PrayerSettings.voices.contains(voice), voice != "silent",
-              let url = Bundle.main.url(forResource: "adhan_\(voice)", withExtension: "caf") else { return }
+              let url = Bundle.main.url(forResource: Self.soundFile(voice, key: "fajr", at: nil), withExtension: "caf") else { return }
         do {
             try AVAudioSession.sharedInstance().setActive(true)
             let player = try AVAudioPlayer(contentsOf: url)
@@ -163,7 +163,7 @@ final class PrayerService: NSObject {
         let content = UNMutableNotificationContent()
         content.title = UiLanguage.text("تجربة تنبيه الصلاة")
         content.body = UiLanguage.text("تنبيه تجريبي، وليس دخول وقت الصلاة")
-        content.sound = sound(for: settings, kind: "adhan")
+        content.sound = sound(for: settings, kind: "adhan", key: "fajr", at: nil)
         content.userInfo = ["open": "prayer"]
         let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
         center.add(UNNotificationRequest(identifier: Self.testId, content: content, trigger: trigger))
@@ -257,18 +257,26 @@ final class PrayerService: NSObject {
             content.title = UiLanguage.text("موعد إقامة صلاة {0}", name)
             content.body = UiLanguage.text("حان وقت إقامة صلاة {0}", name)
         }
-        content.sound = e.kind == "adhan" && PrayerMute.muted(e.key, at: e.at) ? nil : sound(for: s, kind: e.kind)
+        content.sound = e.kind == "adhan" && PrayerMute.muted(e.key, at: e.at) ? nil : sound(for: s, kind: e.kind, key: e.key, at: Date(timeIntervalSince1970: TimeInterval(e.at) / 1000))
         content.threadIdentifier = "prayer"
         content.userInfo = ["open": "prayer", "key": e.key, "kind": e.kind]
         if #available(iOS 15.0, *) { content.interruptionLevel = .timeSensitive }
         return content
     }
 
-    private func sound(for s: PrayerSettings, kind: String) -> UNNotificationSound? {
+    private func sound(for s: PrayerSettings, kind: String, key: String, at: Date?) -> UNNotificationSound? {
         guard kind == "adhan" else { return .default }
         let voice = s.voice
         if voice == "silent" { return nil }
-        return UNNotificationSound(named: UNNotificationSoundName("adhan_\(voice).caf"))
+        return UNNotificationSound(named: UNNotificationSoundName("\(Self.soundFile(voice, key: key, at: at)).caf"))
+    }
+
+    /// The bundled file for a voice; the time announcement has one clip per prayer, and Friday noon says Jumuah.
+    static func soundFile(_ voice: String, key: String, at: Date?) -> String {
+        guard voice == "announce" else { return "adhan_\(voice)" }
+        var name = PrayerSettings.keys.contains(key) ? key : "dhuhr"
+        if name == "dhuhr", Calendar(identifier: .gregorian).component(.weekday, from: at ?? Date()) == 6 { name = "jumuah" }
+        return "announce_\(name)"
     }
 }
 

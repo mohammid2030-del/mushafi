@@ -1,14 +1,16 @@
 'use strict';
 // Muezzin on the prayer-times page: who calls the adhan, changed in one tap.
 const MUEZZIN_PHOTOS = { afasy: 'images/mishary-alafasy.png', nafees: 'images/ahmad-alnafees.png' };
+if (typeof iconPaths === 'object' && !iconPaths.clock) iconPaths.clock = '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>';
 function muezzinAvatar(voice, size = '') {
   if (voice === 'silent') return `<span class="mz-avatar mz-icon ${size}">${uiIcon('mute')}</span>`;
+  if (voice === 'announce') return `<span class="mz-avatar mz-icon ${size}">${uiIcon('clock')}</span>`;
   const photo = MUEZZIN_PHOTOS[voice];
   return photo ? `<span class="mz-avatar ${size}"><img src="${photo}" alt="" loading="lazy"></span>` : `<span class="mz-avatar mz-icon ${size}">${uiIcon('mosque')}</span>`
 }
 function muezzinPickMarkup() {
   const voice = readPrayerData().settings?.voice || 'afasy';
-  const name = prayerVoices[voice] || '', short = voice === 'silent' ? 'صامت' : name.split(/\s+/).slice(-1)[0];
+  const name = prayerVoices[voice] || '', short = voice === 'silent' ? 'صامت' : voice === 'announce' ? 'تنبيه' : name.split(/\s+/).slice(-1)[0];
   return `<button class="mz-pick" onclick="openMuezzinSheet()" aria-label="اختيار المؤذن: ${esc(name)}"><span class="mz-face">${muezzinAvatar(voice)}<span class="mz-badge">${uiIcon('down')}</span></span><span class="mz-short">${esc(short)}</span></button>`
 }
 function openMuezzinSheet() {

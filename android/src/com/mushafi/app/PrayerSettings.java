@@ -7,7 +7,7 @@ import java.util.*;
 public final class PrayerSettings {
  public static final String[] KEYS={"fajr","dhuhr","asr","maghrib","isha"};
  public static final String[] NAMES={"الفجر","الظهر","العصر","المغرب","العشاء"};
- public static final String[] VOICES={"afasy","nafees","mansour","mustafa","silent"};
+ public static final String[] VOICES={"afasy","nafees","mansour","mustafa","announce","silent"};
  public static final String[] METHODS={"AUTO","UMM_AL_QURA","MUSLIM_WORLD_LEAGUE","EGYPTIAN","KARACHI","DUBAI","KUWAIT","QATAR","SINGAPORE","NORTH_AMERICA"};
  public JSONObject json;
  public PrayerSettings(JSONObject input) throws JSONException {
