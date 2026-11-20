@@ -75,11 +75,11 @@ body.dark .pp-list .hi time{color:var(--gold)}
 body.dark .pp-cell.sel{background:var(--gold);color:#1b1a14}body.dark .pp-cell.sel small{color:rgba(27,26,20,.7)}
 .pp-cell.occ-eid{background:color-mix(in srgb,var(--gold) 16%,transparent)}
 .pp-cell.occ-eid.sel{background:var(--green)}
-.pp-cell.occ-major i,.pp-legend .major,.pp-occasions .occ-major>i,.pp-occ.occ-major{--occ:#3f8a68}
-.pp-cell.occ-fast i,.pp-legend .fast,.pp-occasions .occ-fast>i,.pp-occ.occ-fast{--occ:#c08a3e}
+.pp-cell.occ-major i,.pp-legend .major,.pp-occasions .occ-major>i,.pp-occ.occ-major{--occ:#7a5a22}
+.pp-cell.occ-fast i,.pp-legend .fast,.pp-occasions .occ-fast>i,.pp-occ.occ-fast{--occ:#d4a24a}
 .pp-cell.occ-eid i,.pp-legend .eid,.pp-occasions .occ-eid>i,.pp-occ.occ-eid{--occ:#b8954f}
-.pp-cell.occ-white i,.pp-legend .white,.pp-occ.occ-white{--occ:#9fb3a8}
-.pp-cell.occ-info i,.pp-occasions .occ-info>i,.pp-occ.occ-info{--occ:#7e897e}
+.pp-cell.occ-white i,.pp-legend .white,.pp-occ.occ-white{--occ:#d9c9a3}
+.pp-cell.occ-info i,.pp-occasions .occ-info>i,.pp-occ.occ-info{--occ:#a39780}
 .pp-cell i{background:var(--occ,var(--gold))}.pp-cell.sel i{background:#fff}
 .pp-legend{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:12px;font-size:12px;color:var(--muted)}
 .pp-legend span{display:inline-flex;align-items:center;gap:6px}.pp-legend i{width:8px;height:8px;border-radius:50%;background:var(--occ)}
@@ -104,3 +104,10 @@ body.dark .pp-cell.sel{background:var(--gold);color:#1b1a14}body.dark .pp-cell.s
 .pp .pp-link>i{background:color-mix(in srgb,var(--gold) 12%,transparent)!important}
 .pp .pp-row.is-current{background:color-mix(in srgb,var(--gold) 10%,transparent)!important}
 .pp .pp-night-caption{background:color-mix(in srgb,var(--gold) 12%,transparent)}
+/* علامات المناسبات بدرجات الذهبي */
+.pp-cell.occ-eid{background:color-mix(in srgb,#b8954f 18%,transparent)}
+.pp-cell.occ-eid b{color:#8f6d33}body.dark .pp-cell.occ-eid b{color:var(--gold)}
+.pp-cell.occ-major{box-shadow:inset 0 0 0 1px color-mix(in srgb,#7a5a22 35%,transparent)}
+body.dark .pp-cell.occ-major i,body.dark .pp-legend .major,body.dark .pp-occasions .occ-major>i,body.dark .pp-occ.occ-major{--occ:#e6cf9a}
+body.dark .pp-cell.occ-white i,body.dark .pp-legend .white,body.dark .pp-occ.occ-white{--occ:#6f6450}
+.pp-cell.sel.occ-eid,.pp-cell.sel.occ-major{box-shadow:none}
