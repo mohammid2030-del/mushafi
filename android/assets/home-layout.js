@@ -341,7 +341,7 @@ function homeLayout() {
     <div class="hl-reading-slot"></div>
     <div class="hl-rest"></div>
     ${hlHead('المميزات')}
-    <div class="hl-grid" id="hl-features">${hlTile('kaaba', 'الحج والعمرة', "hajjHome('home')", 'جديد')}${hlTile('fajr', 'صحبة الفجر', "fajrHome('home')")}${hlTile('chart', 'ختمتي', 'khatmaHome()')}${hlTile('note', 'وردي اليومي', 'wardHome()')}${hlTile('beads', 'المسبحة', 'sebhaHome()')}${typeof challengeHome === 'function' ? hlTile('trophy', 'تحدّي مصحفي', 'challengeHome()') : ''}${typeof liveBroadcastHome === 'function' ? hlTile('live', 'البث المباشر', 'liveBroadcastHome()') : ''}</div>
+    <div class="hl-grid" id="hl-features">${hlTile('kaaba', 'الحج والعمرة', "hajjHome('home')", 'جديد')}${hlTile('fajr', 'صحبة الفجر', "fajrHome('home')")}${hlTile('chart', 'ختمتي', 'khatmaHome()')}${hlTile('note', 'وردي اليومي', 'wardHome()')}${hlTile('beads', 'المسبحة', 'sebhaHome()')}${typeof challengeHome === 'function' ? hlTile('trophy', 'تحدّي مصحفي', 'challengeHome()') : ''}</div>
     ${hlHead('علم وأدوات')}
     <div class="hl-grid" id="hl-tools">${hlTile('book', 'الكتب', "booksHome('home')")}${typeof openMuslimLibrary === 'function' ? hlTile('book', 'صحيح مسلم', 'openMuslimLibrary(true)') : ''}${hlTile('bookmark', 'مكتبتي', 'libraryHome()')}${hlTile('heart', 'الأذكار', 'duaHome()')}${hlTile('grid', 'ويدجت الشاشة', 'hlWidgets()')}${typeof openPrayerSettings === 'function' ? hlTile('settings', 'إعدادات الصلاة', 'openPrayerSettings()') : ''}</div>
     <div class="hl-recitation-slot"></div>
