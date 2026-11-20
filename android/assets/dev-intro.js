@@ -27,7 +27,7 @@ function devIntroShow(){
  root.querySelector('.di-skip').onclick=e=>{e.stopPropagation();finish()};
  // A tap while the letter is still being written completes it at once.
  root.addEventListener('click',()=>{if(!root.classList.contains('di-done'))reveal()});
- if(!devIntroLaunched)root.classList.add('di-wait');const cta=(parseFloat(root.style.getPropertyValue('--cta'))||8)*(matchMedia('(prefers-reduced-motion: reduce)').matches?.6:1);devIntroRestartTimer=()=>{devIntroTimers.forEach(clearTimeout);devIntroTimers=[setTimeout(reveal,(cta+.8)*1000)]};if(devIntroLaunched)devIntroRestartTimer();
+ if(!devIntroLaunched){root.classList.add('di-wait');setTimeout(devIntroRelease,10000)}const cta=(parseFloat(root.style.getPropertyValue('--cta'))||8)*(matchMedia('(prefers-reduced-motion: reduce)').matches?.6:1);devIntroRestartTimer=()=>{devIntroTimers.forEach(clearTimeout);devIntroTimers=[setTimeout(reveal,(cta+.8)*1000)]};if(devIntroLaunched)devIntroRestartTimer();
  requestAnimationFrame(()=>root.querySelector('.di-cta').focus({preventScroll:true}));
 }
 // The native opening curtain is only a plain surface on first run; tell it which kind the next launch should get.
@@ -35,7 +35,10 @@ function devIntroSyncLaunch(){try{window.AndroidReader?.setLaunchWelcomed?.(loca
 devIntroSyncLaunch();
 // Hold the letter until the curtain has lifted, so it is seen from its first word.
 let devIntroLaunched=!window.AndroidReader;
-const devIntroLaunchDone=window.onMushafiLaunchDone;window.onMushafiLaunchDone=function(...a){devIntroLaunched=true;document.querySelector('.dev-intro.di-wait')?.classList.remove('di-wait');devIntroRestartTimer();return devIntroLaunchDone?.apply(this,a)};
+function devIntroRelease(){if(devIntroLaunched&&!document.querySelector('.dev-intro.di-wait'))return;devIntroLaunched=true;document.querySelector('.dev-intro.di-wait')?.classList.remove('di-wait');devIntroRestartTimer()}
+// Wrap the launch hook only after every script has loaded: later scripts (home layout) assign their own handler.
+function devIntroHook(){const prev=window.onMushafiLaunchDone;if(prev&&prev.devIntro)return;const wrapped=function(...a){devIntroRelease();return prev?.apply(this,a)};wrapped.devIntro=true;window.onMushafiLaunchDone=wrapped}
+devIntroHook();window.addEventListener('DOMContentLoaded',devIntroHook);window.addEventListener('load',devIntroHook);
 let devIntroRestartTimer=()=>{};
 const devIntroStartWelcome=startWelcome;
 startWelcome=function(...args){const due=devIntroDue();devIntroStartWelcome.apply(this,args);if(due&&!document.querySelector('.dev-intro'))try{devIntroShow()}catch(e){document.querySelector('.dev-intro')?.remove()}};
