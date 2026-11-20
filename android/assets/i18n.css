@@ -45,3 +45,5 @@ html[dir=ltr] .prayer-toggle>input{left:auto;right:0}
 .prayer-toggle,.prayer-toggle *{-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none}
 .prayer-toggle>input:focus{outline:none}
 .prayer-toggle>input:focus:not(:focus-visible)+.prayer-switch{outline:none}
+html[lang=am] body:not(.reading) :is(h1,h2,h3){font-family:var(--ui-font),sans-serif;line-height:1.5}html[lang=am] :is(button,input,select,textarea){font-family:var(--ui-font),sans-serif}html[lang=am] :is(.content-card,.feature-sheet,.menu-list,.welcome-copy){text-align:start}html[lang=am] .language-option strong{line-height:1.7}
+html[lang=am] body{font-family:UiEthiopic,system-ui,AppArabic,sans-serif}

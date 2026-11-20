@@ -10,7 +10,7 @@ function muezzinAvatar(voice, size = '') {
 }
 function muezzinPickMarkup() {
   const voice = readPrayerData().settings?.voice || 'afasy';
-  const name = prayerVoices[voice] || '', short = voice === 'silent' ? 'صامت' : voice === 'announce' ? 'تنبيه' : name.split(/\s+/).slice(-1)[0];
+  const name = prayerVoices[voice] || '', short = voice === 'silent' ? 'صامت' : voice === 'announce' ? 'تنبيه' : (typeof uiTranslate==='function'?uiTranslate(name):name).split(/\s+/).slice(-1)[0];
   return `<button class="mz-pick" onclick="openMuezzinSheet()" aria-label="اختيار المؤذن: ${esc(name)}"><span class="mz-face">${muezzinAvatar(voice)}<span class="mz-badge">${uiIcon('down')}</span></span><span class="mz-short">${esc(short)}</span></button>`
 }
 function openMuezzinSheet() {

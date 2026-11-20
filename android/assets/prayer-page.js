@@ -103,7 +103,7 @@ function ppDuhaNight(data) {
   const s = data.settings, today = data.days[1], now = Date.now(), duhaDay = now < today.duhaEnd ? today : data.days[2], active = now >= duhaDay.duha && now < duhaDay.duhaEnd, night = prayerNight(data);
   return `<div class="pp-links">
     <div class="pp-link"><i>${uiIcon('sunrise')}</i><span><strong>${active ? 'وقت الضحى الآن' : duhaDay === today ? 'الضحى' : 'ضحى الغد'}</strong><small>من ${prayerClock(duhaDay.duha, s.timezone)} إلى ${prayerClock(duhaDay.duhaEnd, s.timezone)}</small></span></div>
-    <button class="pp-link" onclick="ppTab('night')"><i>${uiIcon('moonStar')}</i><span><strong>أوقات الليل</strong><small>الثلث الأخير يبدأ ${prayerClock(night.lastThird, s.timezone)}</small></span>${uiIcon('chevron')}</button>
+    <button class="pp-link" onclick="ppTab('night')"><i>${uiIcon('moonStar')}</i><span><strong>أوقات الليل</strong><small><span>بداية الثلث الأخير</span> <bdi>${prayerClock(night.lastThird, s.timezone)}</bdi></small></span>${uiIcon('chevron')}</button>
     <button class="pp-link" onclick="ppTab('month')"><i>${uiIcon('calendar')}</i><span><strong>مواقيت الشهر</strong><small>مع المناسبات الإسلامية</small></span>${uiIcon('chevron')}</button>
   </div>`;
 }

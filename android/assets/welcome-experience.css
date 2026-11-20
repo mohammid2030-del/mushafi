@@ -19,3 +19,4 @@ body.welcome-modern{background-color:var(--bg)}body.welcome-modern #full-surah-m
 .welcome-language-row strong{text-align:match-parent}
 
 .welcome-promise-row[lang=bn]{font-family:UiBengali,sans-serif}.welcome-promise-row[lang=en],.welcome-promise-row[lang=tr]{font-family:system-ui,sans-serif}.welcome-promise-row{min-height:36px;align-content:center}
+.welcome-greeting-copy[lang=am],.welcome-language-row strong[lang=am],.welcome-promise-row[lang=am]{font-family:UiEthiopic,sans-serif}

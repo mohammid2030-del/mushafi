@@ -8,3 +8,6 @@ html[lang=ar]{--ui-font:AppArabic}
 html[lang=tr]{--ui-font:system-ui,AppArabic}
 /* French (LTR, Latin script) */
 html[lang=fr]{--ui-font:system-ui,AppArabic}
+/* Amharic (LTR, Ethiopic script) — Noto Sans Ethiopic, bundled for offline use (SIL OFL) */
+@font-face{font-family:UiEthiopic;src:url('fonts/noto-sans-ethiopic.ttf') format('truetype');font-weight:100 900;font-style:normal;font-display:swap}
+html[lang=am]{--ui-font:UiEthiopic,system-ui,AppArabic}

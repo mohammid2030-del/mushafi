@@ -33,7 +33,7 @@ tasks.register("verifyUiLocales") {
         def parser = new groovy.json.JsonSlurper()
         def source = parser.parse(file("assets/locales/ar.json"), "UTF-8")
         def errors = []
-        ["en", "ur", "bn", "tr"].each { language ->
+        ["en", "ur", "bn", "tr", "fr", "am"].each { language ->
             def path = file("assets/locales/${language}.json")
             if (!path.exists()) { errors.add("${language}: missing catalog") }
             else {

@@ -13,7 +13,7 @@ const BOOKS_CATS = [86219, 132381, 192525, 199946, 276187, 794, 5301, 764, 27619
 let booksState = null, booksOrigin = 'home', booksCurrent = null;
 const booksDetails = new Map(), booksPending = new Map();
 
-function booksLang() { const l = typeof uiLocale === 'function' ? uiLocale() : 'ar'; return ['ar', 'en', 'ur', 'bn', 'tr', 'fr'].includes(l) ? l : 'en' }
+function booksLang() { const l = typeof uiLocale === 'function' ? uiLocale() : 'ar'; return ['ar', 'en', 'ur', 'bn', 'tr', 'fr', 'am'].includes(l) ? l : 'en' }
 function booksT(t) { return typeof uiTranslate === 'function' ? uiTranslate(t) : t }
 function booksNum(n) { return typeof ar === 'function' ? ar(n) : String(n) }
 function booksNative(name, ...args) { try { const f = window.AndroidReader?.[name]; return typeof f === 'function' ? f.apply(window.AndroidReader, args) : undefined } catch (e) { return undefined } }
