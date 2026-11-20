@@ -193,7 +193,7 @@ function ppShift(n) {
 }
 function ppSetCal(c) { ppCal = c; try { localStorage.ppCalendar = c } catch (e) {} const anchor = ppSelected || new Date(); if (c === 'h') ppHStart = ppHijriMonthStart(anchor); else ppMonth = { y: anchor.getFullYear(), m: anchor.getMonth() }; renderPrayerPage() }
 function ppSetView(v) { ppView = v; renderPrayerPage() }
-function ppAdjust(n) { const v = Math.max(-2, Math.min(2, ppHijriOffset() + n)); try { localStorage.hijriOffset = String(v) } catch (e) {} if (ppCal === 'h') ppHStart = ppHijriMonthStart(ppSelected || new Date()); const sy = scrollY; renderPrayerPage(); window.scrollTo(0, sy) }
+function ppAdjust(n) { const v = Math.max(-2, Math.min(2, ppHijriOffset() + n)); try { localStorage.hijriOffset = String(v) } catch (e) {} try { window.AndroidReader?.setHijriOffset?.(v) } catch (e) {} if (ppCal === 'h') ppHStart = ppHijriMonthStart(ppSelected || new Date()); const sy = scrollY; renderPrayerPage(); window.scrollTo(0, sy) }
 
 const ppPrevRender = renderPrayerPage;
 renderPrayerPage = function (force = false) {

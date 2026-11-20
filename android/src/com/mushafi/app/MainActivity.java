@@ -154,6 +154,7 @@ public class MainActivity extends Activity implements Runnable, SurahPlaybackSer
  @JavascriptInterface public String saveKhatmaPlan(String text){try{return KhatmaScheduler.save(this,text).toString();}catch(Exception e){return "{\"ok\":false}";}}
  @JavascriptInterface public String khatmaStatus(){try{return KhatmaScheduler.status(this).toString();}catch(Exception e){return "{}";}}
  @JavascriptInterface public boolean setDailyReminderConsent(boolean enabled){return DailyReminderScheduler.setConsent(this,enabled);}
+ @JavascriptInterface public void setHijriOffset(int offset){DailyReminderScheduler.setHijriOffset(this,offset);}
  @JavascriptInterface public String dailyReminderKinds(){return DailyReminderScheduler.kinds(this);}
  @JavascriptInterface public boolean setDailyReminderKind(String kind,boolean enabled){return DailyReminderScheduler.setKind(this,kind,enabled);}
  @JavascriptInterface public boolean initializeDailyReminderConsent(){return DailyReminderScheduler.initializeConsent(this);}

@@ -17,7 +17,7 @@ final class NativeBridge: NSObject, WKScriptMessageHandler {
             "prayerSnapshot", "savePrayerSettings", "syncDeviceState",
             "consumePrayerOpen", "consumeWidgetDaily", "consumeSurahOpen",
             "surahSnapshot", "surahDownloadedList",
-            "initializeDailyReminderConsent", "setDailyReminderConsent", "dailyReminderKinds", "setDailyReminderKind", "consumeFridayReminder", "consumeDailyReminderOpen",
+            "initializeDailyReminderConsent", "setDailyReminderConsent", "dailyReminderKinds", "setDailyReminderKind", "setHijriOffset", "consumeFridayReminder", "consumeDailyReminderOpen",
             "saveKhatmaPlan", "khatmaStatus", "consumeKhatmaOpen",
             "automaticLocationSnapshot", "booksSaved", "fajrSave", "fajrStatus", "fajrConsumeLaunch", "setPrayerMute", "wakeStatus", "wakeConsumeLink", "hajjStepStatus",
         ]
@@ -113,6 +113,7 @@ final class NativeBridge: NSObject, WKScriptMessageHandler {
         case "initializeDailyReminderConsent": value = ReminderService.shared.initializeConsent()
         case "setDailyReminderConsent": value = ReminderService.shared.setConsent(a.bool(0))
         case "dailyReminderKinds": value = ReminderService.shared.kinds()
+        case "setHijriOffset": value = ReminderService.shared.setHijriOffset(a.int(0))
         case "setDailyReminderKind": value = ReminderService.shared.setKind(a.string(0), a.bool(1))
         case "consumeFridayReminder": value = ReminderService.shared.consumeFriday()
         case "consumeDailyReminderOpen": value = ReminderService.shared.consumeDailyOpen()

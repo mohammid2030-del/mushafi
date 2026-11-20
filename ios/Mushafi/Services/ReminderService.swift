@@ -31,12 +31,19 @@ final class ReminderService {
     private var consent: Bool { defaults.bool(forKey: "reminders.consent") }
 
     /// Morning, evening, bedtime and the daily dua are independent opt-in reminders; Friday ones follow consent.
-    static let optionalKinds = ["morning", "evening", "night", "dua"]
+    static let optionalKinds = ["morning", "evening", "night", "dua", "white"]
     private func kindEnabled(_ kind: String) -> Bool {
         guard Self.optionalKinds.contains(kind) else { return consent }
+        if kind == "white" { return defaults.bool(forKey: "reminders.on.white") }
         return (defaults.object(forKey: "reminders.on." + kind) as? Bool) ?? consent
     }
     private var anyDaily: Bool { consent || Self.optionalKinds.contains { kindEnabled($0) } }
+
+    func setHijriOffset(_ value: Int?) -> Bool {
+        defaults.set(max(-2, min(2, value ?? 0)), forKey: "reminders.hijriOffset")
+        schedule()
+        return true
+    }
 
     func kinds() -> String {
         var out: [String: Bool] = [:]
@@ -125,6 +132,21 @@ final class ReminderService {
             list.append(Event(kind: "night", at: at(day, 22, 30)))
             if calendar.component(.weekday, from: day) == 6 { list.append(Event(kind: "salawat", at: at(day, 9, 0))) }
         }
+        // White days: the evening (6 PM) before the 13th of each Hijri month, except Ramadan and Dhu al-Hijjah.
+        if kindEnabled("white") {
+            var hijri = Calendar(identifier: .islamicUmmAlQura)
+            hijri.timeZone = TimeZone(identifier: "UTC")!
+            let offset = defaults.integer(forKey: "reminders.hijriOffset")
+            for offset0 in 0...6 {
+                guard let day = calendar.date(byAdding: .day, value: offset0, to: today),
+                      let next = calendar.date(byAdding: .day, value: 1 + offset, to: day) else { continue }
+                let parts = calendar.dateComponents([.year, .month, .day], from: next)
+                var utc = Calendar(identifier: .gregorian); utc.timeZone = TimeZone(identifier: "UTC")!
+                guard let noon = utc.date(from: DateComponents(year: parts.year, month: parts.month, day: parts.day, hour: 12)) else { continue }
+                let h = hijri.dateComponents([.day, .month], from: noon)
+                if h.day == 13, h.month != 9, h.month != 12 { list.append(Event(kind: "white", at: at(day, 18, 0))) }
+            }
+        }
         // Friday dua 15 minutes before Maghrib, from the user's prayer settings.
         let settings = PrayerSettings.load()
         if (settings.json["confirmed"] as? Bool) == true {
@@ -198,6 +220,8 @@ final class ReminderService {
             return (t("أذكار الصباح"), t("ابدأ صباحك بذكر الله، وخصّص وقتًا لأذكار الصباح."), "")
         case "evening":
             return (t("أذكار المساء"), t("اختم نهارك بذكر الله، وخذ وقتًا لأذكار المساء."), "")
+        case "white":
+            return (t("غدًا تبدأ الأيام البيض"), t("صوم ثلاثة أيام من كل شهر صوم الدهر كله. (صحيح البخاري ١٩٧٩)") + "\n" + t("الأيام البيض: الثالث عشر والرابع عشر والخامس عشر من الشهر الهجري."), "")
         default:
             return (t("ذكرك وقراءتك قبل النوم"), t("تذكير بأذكار يومك وقراءة سورة الملك. اختم يومك بالذكر والقرآن."), "")
         }

@@ -2,7 +2,7 @@ package com.mushafi.app;
 import java.util.*;
 /** Device civil-time reminders. No reading/audio state and no network. */
 public final class DailyReminderPlan {
- public static final String[] KINDS={"dua","morning","evening","night","salawat","fridayDua"};
+ public static final String[] KINDS={"dua","morning","evening","night","salawat","fridayDua","white"};
  public static final class Event{public final String kind,id;public final long at;public Event(String k,long t){kind=k;at=t;id=k+"|"+t;}}
  private static long floorDiv(long x,long y){long q=x/y;return x<0&&x%y!=0?q-1:q;}
  private static long floorMod(long x,long y){long r=x%y;return r<0?r+y:r;}
