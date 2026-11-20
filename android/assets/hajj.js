@@ -16,10 +16,10 @@ Object.assign(iconPaths, {
 const HAJJ_KEY = 'mushafi.hajj.v1';
 /* القسم عربي المحتوى حاليًا، فتُعرض الأرقام والتواريخ بالعربية دائمًا */
 const hjAr = n => (typeof uiLocale === 'function' && uiLocale() !== 'ar') ? String(n) : String(n).replace(/\d/g, x => '٠١٢٣٤٥٦٧٨٩'[x]);
-const HJ_LOCALES = { ar: 'ar-SA-u-ca-gregory-nu-arab', en: 'en-GB', ur: 'ur-PK-u-nu-latn', bn: 'bn-BD-u-nu-latn', tr: 'tr-TR', fr: 'fr-FR', am: 'am-ET' };
+const HJ_LOCALES = { ar: 'ar-SA-u-ca-gregory-nu-arab', en: 'en-GB', ur: 'ur-PK-u-nu-latn', bn: 'bn-BD-u-nu-latn', tr: 'tr-TR', fr: 'fr-FR', am: 'am-ET', ru: 'ru-RU' };
 const hjLoc = () => HJ_LOCALES[typeof uiLocale === 'function' ? uiLocale() : 'ar'] || 'ar-SA-u-ca-gregory-nu-arab';
 /* كلمات يختلف معناها هنا عن معناها العام في قاموس التطبيق (مثل «الحج» اسم السورة) */
-const HJ_OVR = {"الحج": {"en": "Hajj", "fr": "Hajj", "tr": "Hac", "ur": "حج", "bn": "হজ", "am": "ሐጅ"}, "إنهاء": {"en": "End", "fr": "Terminer", "tr": "Bitir", "ur": "ختم کریں", "bn": "শেষ করুন", "am": "ጨርስ"}};
+const HJ_OVR = {"الحج": {"en": "Hajj", "fr": "Hajj", "tr": "Hac", "ur": "حج", "bn": "হজ", "am": "ሐጅ", "ru": "Хадж"}, "إنهاء": {"en": "End", "fr": "Terminer", "tr": "Bitir", "ur": "ختم کریں", "bn": "শেষ করুন", "am": "ጨርስ", "ru": "Завершить"}};
 const hjLang = () => typeof uiLocale === 'function' ? uiLocale() : 'ar';
 const hjT = s => (HJ_OVR[s] && HJ_OVR[s][hjLang()]) || (typeof uiTranslate === 'function' ? uiTranslate(s) : s);
 function hjOverride(root) { if (hjLang() === 'ar') return; const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT); let n; while ((n = w.nextNode())) { const t = n.nodeValue.trim(), o = HJ_OVR[t]; if (o && o[hjLang()]) n.nodeValue = n.nodeValue.replace(t, o[hjLang()]) } }

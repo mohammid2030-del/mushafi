@@ -5,7 +5,7 @@ import java.io.*;
 import org.json.JSONObject;
 /** Device-local UI language. Never translates Quran or user data. */
 public final class UiLocale {
- private static final Set<String> SUPPORTED=new HashSet<>(Arrays.asList("ar","en","ur","bn","tr","fr","am"));
+ private static final Set<String> SUPPORTED=new HashSet<>(Arrays.asList("ar","en","ur","bn","tr","fr","am","ru"));
  private static final Map<String,JSONObject> CACHE=new HashMap<>();
  static String normalize(String code){String value=(code==null?"":code).toLowerCase(Locale.ROOT).split("[-_]",2)[0];return SUPPORTED.contains(value)?value:"en";}
  public static String device(Context c){Locale locale=android.os.Build.VERSION.SDK_INT>=24?c.getResources().getConfiguration().getLocales().get(0):c.getResources().getConfiguration().locale;return normalize(locale.getLanguage());}

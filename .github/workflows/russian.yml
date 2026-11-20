@@ -1,5 +1,5 @@
 name: Russian (meanings)
-# Downloads the Amharic translation of the meanings (am.sadiq) and Noto Sans Ethiopic once,
+# Downloads the Russian translation of the meanings (ru.kuliev) once,
 # and commits them into the app so Russian works offline like the other languages.
 on:
   workflow_dispatch:

@@ -54,7 +54,7 @@ function hlSkyMarkup(data) {
   if (data.error || !today || !phase) return `<section class="hl-sky day"><div class="hl-sky-body"><span class="hl-sky-kicker">مواقيت الصلاة</span><h2>تعذر حساب المواقيت</h2><p>${esc(data.error || 'راجع الموقع والمنطقة الزمنية')}</p><button class="hl-pill" onclick="prayerHome()">${uiIcon('settings')}<span>مراجعة الإعدادات</span></button></div></section>`;
   const events = hlEvents(data), current = events.filter(e => e.time <= now).at(-1);
   const pill = phase.kind === 'iqama'
-    ? `<span>إقامة ${prayerNames[phase.key]}</span> <span>${hlLeft(phase.target - now, true)}</span>`
+    ? `<span><span>إقامة</span> <span>${prayerNames[phase.key]}</span></span> <span>${hlLeft(phase.target - now, true)}</span>`
     : `<span>${prayerNames[phase.key]}</span> <span>${hlLeft(phase.target - now, true)}</span>`;
   const weather = hlWeatherChip(), sky = hlSky(today, now), wx = hlWeatherKind(), dark = /night|dawn|dusk/.test(sky);
   const night = hlNightVerse(data, today, now), dua = hlDua(today, now);
@@ -307,7 +307,7 @@ function hlTimesMarkup(data) {
   return `<section class="hl-times">
     <div class="hl-times-head"><div><strong>${esc(greg)}</strong><small>${esc(hijri)}${s.city ? ' · ' + esc(hlCityName(s)) : ''}</small></div><button class="hl-link" onclick="prayerHome()"><span>كل المواقيت</span>${uiIcon('arrow')}</button></div>
     <div class="hl-rows">${rows}</div>
-    ${!nextKey && phase ? `<div class="hl-tomorrow"><span><span>${phase.kind === 'iqama' ? 'إقامة ' + prayerNames[phase.key] : prayerNames[phase.key]}</span> <span>غدًا</span></span><span class="hl-time">${prayerClock(phase.target, zone)}</span><small>${hlRemain(phase.target - now)}</small></div>` : ''}
+    ${!nextKey && phase ? `<div class="hl-tomorrow"><span><span>${phase.kind === 'iqama' ? '<span>إقامة</span> <span>' + prayerNames[phase.key] + '</span>' : prayerNames[phase.key]}</span> <span>غدًا</span></span><span class="hl-time">${prayerClock(phase.target, zone)}</span><small>${hlRemain(phase.target - now)}</small></div>` : ''}
   </section>`
 }
 
