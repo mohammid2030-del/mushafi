@@ -6,10 +6,9 @@ jobs:
     steps:
       - run: |
           for u in https://stream.radiojar.com/0tpy1h0kxtzuv https://stream.radiojar.com/8s5u5tpdtwzuv; do
-            echo "=== $u"; curl -sS -o /dev/null -D - -A "Mushafi/Android" "$u" --max-time 5 | head -20 || true
-            loc=$(curl -sS -o /dev/null -w '%{redirect_url}' -A "Mushafi/Android" "$u" --max-time 5)
-            echo "LOC=$loc"; sleep 8
-            echo "--- retry location after 8s"; curl -sS -o /dev/null -D - -A x "$loc" --max-time 4 | head -8 || true
-            echo "--- range request"; curl -sS -o /dev/null -D - -H "Range: bytes=50000-" -A x "$loc" --max-time 4 | head -8 || true
-            echo "--- full follow 15s"; curl -sS -L -o /tmp/s.mp3 -A x "$u" --max-time 15 -w 'bytes=%{size_download} code=%{http_code}\n' || true
+            loc=$(curl -sS -o /dev/null -w '%{redirect_url}' "$u" --max-time 5); h=${loc/http:/https:}
+            echo "=== $h"; curl -sS -o /dev/null -D - "$h" --max-time 6 -w 'bytes=%{size_download}\n' 2>&1 | head -12 || true
+            echo "--- https host only"; curl -sS -o /dev/null -D - "https://${loc#http://}" --max-time 3 2>&1 | grep -i "HTTP/\|location\|curl" || true
+            echo "--- 60s stability (cleartext follow)"; curl -sS -L -o /dev/null "$u" --max-time 60 -w 'bytes=%{size_download}\n' 2>&1 | tail -2 || true
           done
+          echo "--- other https sources"; for s in https://Qurango.net/radio/tarateel https://backup.qurango.net/radio/tarateel; do curl -sS -o /dev/null -D - "$s" --max-time 4 2>&1 | grep -i "HTTP/\|location\|content-type\|curl" ; done; true
