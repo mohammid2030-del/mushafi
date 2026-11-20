@@ -162,6 +162,8 @@ const HL_DUAS = {
     { text: 'رَبِّ أَعُوذُ بِكَ مِنْ هَمَزَاتِ الشَّيَاطِينِ وَأَعُوذُ بِكَ رَبِّ أَنْ يَحْضُرُونِ', source: 'المؤمنون · ٩٧–٩٨' },
   ],
 };
+function hlNormDua(t) { return String(t || '').replace(/[\u064B-\u0652\u0670\u06D6-\u06ED]/g, '').replace(/[أإآٱ]/g, 'ا').replace(/ى/g, 'ي').replace(/ة/g, 'ه').replace(/[^\u0621-\u064A]/g, '') }
+function hlSameDua(a, b) { a = hlNormDua(a); b = hlNormDua(b); if (!a || !b) return false; const k = Math.min(14, a.length, b.length); return a.includes(b.slice(0, k)) || b.includes(a.slice(0, k)) }
 function hlDayNumber(now) { const d = new Date(now); return Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 86400000) }
 function hlDua(today, now) {
   if (!today) return null;
@@ -170,7 +172,11 @@ function hlDua(today, now) {
   // Before Fajr the night's Isha dua belongs to the previous evening.
   let day = hlDayNumber(now);
   if (key === 'isha' && Number.isFinite(today.fajr) && now < today.fajr - 30 * 60000) day -= 1;
-  const pool = HL_DUAS[key], index = ((day % pool.length) + pool.length) % pool.length;
+  const pool = HL_DUAS[key];
+  let index = ((day % pool.length) + pool.length) % pool.length;
+  // Never show the same dua as the daily «دعاء من القرآن» card below.
+  let below = null; try { if (typeof dailyPoolItem === 'function' && dailyReminderContent) below = dailyPoolItem(new Date(now)) } catch (e) {}
+  for (let i = 0; below && i < pool.length && hlSameDua(pool[index].text, below.text); i++) index = (index + 1) % pool.length;
   return { key: key + '-' + index, ...pool[index] }
 }
 // From 10 pm until the Fajr adhan the head of the sky shows ﴿وقرآن الفجر…﴾.
