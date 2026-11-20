@@ -23,6 +23,43 @@ function scWrap(g, text, max) {
   return out;
 }
 
+// Verses flow as one paragraph, like a mushaf line: the basmala stands on its own line, every verse-end marker stays
+// with the word before it, and full lines are justified edge to edge (the last line is centred).
+function scParagraphs(text) {
+  const rows = String(text).split(/\n+/).map(r => r.trim()).filter(Boolean);
+  const out = [];
+  if (rows.length > 1 && /^بِسْمِ/.test(rows[0]) && rows[0].split(/\s+/).length <= 5) out.push(rows.shift());
+  if (rows.length) out.push(rows.join(' '));
+  return out.map(p => {
+    const tokens = [];
+    for (const w of p.split(/\s+/).filter(Boolean)) { if (tokens.length && /^[﴿(]?[\d٠-٩۰-۹]+[﴾)]?$|^[ۖۗۚۛۜ۩ۘ]$/.test(w)) tokens[tokens.length - 1] += ' ' + w; else tokens.push(w) }
+    return tokens;
+  });
+}
+function scLines(g, text, max) {
+  const space = g.measureText(' ').width, lines = [];
+  for (const tokens of scParagraphs(text)) {
+    let cur = [], width = 0;
+    for (const t of tokens) {
+      const w = g.measureText(t).width;
+      if (cur.length && width + space + w > max) { lines.push({ words: cur, width, last: false }); cur = []; width = 0 }
+      width += (cur.length ? space : 0) + w; cur.push({ t, w });
+    }
+    if (cur.length) lines.push({ words: cur, width, last: true });
+  }
+  return lines;
+}
+function scDrawLine(g, line, cx, y, max) {
+  const n = line.words.length, natural = line.words.reduce((a, w) => a + w.w, 0), space = g.measureText(' ').width;
+  // justify full lines; keep the last line of a paragraph (and very short lines) centred at natural spacing
+  const stretch = n > 1 ? (max - natural) / (n - 1) : space, justify = !line.last && n > 1 && stretch <= space * 2.6, gapW = justify ? stretch : space;
+  const total = natural + gapW * (n - 1);
+  let x = cx + total / 2;
+  g.textAlign = 'right';
+  for (const w of line.words) { g.fillText(w.t, x, y); x -= w.w + gapW }
+  g.textAlign = 'center';
+}
+
 /** Draw a share card. content: { text, reference, kicker } */
 async function scRender(content, format = 'story') {
   const f = SC_FORMATS[format] || SC_FORMATS.story;
@@ -48,7 +85,7 @@ async function scRender(content, format = 'story') {
     L.rLH = (L.rSize || 0) * 1.5;
     L.kBlock = L.kSize ? L.kSize * 1.4 + L.gap * 0.7 : 0;
     L.rBlock = L.rLines.length ? L.gap * 1.3 + L.rLines.length * L.rLH : 0;
-    g.font = `${size}px Quran, serif`; L.lines = scWrap(g, content.text, inner);
+    g.font = `${size}px Quran, serif`; L.lines = scLines(g, content.text, inner); L.measure = inner;
     L.total = L.kBlock + L.lines.length * L.lh + L.rBlock;
     return L;
   };
@@ -56,19 +93,30 @@ async function scRender(content, format = 'story') {
   for (let size = f.max; size >= f.min; size -= 1) { L = lay(size); if (L.total <= room) break }
   if (L.total > room) {   // very long passage: keep what fits and mark the cut
     const keep = Math.max(1, Math.floor((room - L.kBlock - L.rBlock) / L.lh));
-    if (L.lines.length > keep) { L.lines = L.lines.slice(0, keep); L.lines[keep - 1] += ' …' }
+    if (L.lines.length > keep) { L.lines = L.lines.slice(0, keep); const t = L.lines[keep - 1]; t.words.push({ t: '…', w: g.measureText('…').width }); t.last = true; L.cut = true }
     L.total = L.kBlock + L.lines.length * L.lh + L.rBlock;
-  } else if (L.lines.length > 1) {
-    // even lines: the narrowest measure that keeps the same number of lines, so the last line is not a lone word
-    g.font = `${L.size}px Quran, serif`; let lo = inner * 0.55, hi = inner;
-    for (let k = 0; k < 14; k++) { const mid = (lo + hi) / 2; if (scWrap(g, content.text, mid).length <= L.lines.length) hi = mid; else lo = mid }
-    L.lines = scWrap(g, content.text, hi);
+  }
+  // pick the measure (up to the card width) that fills every full line most evenly, so justified lines need no wide gaps
+  if (!L.cut && L.lines.length > 1) {
+    // also try a slightly smaller size: a few points less often lets every full line fill evenly
+    let best = null;
+    for (let sz = L.size; sz >= Math.max(f.min, Math.round(L.size * 0.86)); sz -= 2) {
+      const T = sz === L.size ? L : lay(sz); if (T.total > room) continue;
+      g.font = `${sz}px Quran, serif`; const sp = g.measureText(' ').width;
+      for (let m = inner; m >= inner * 0.7; m -= inner * 0.01) {
+        const ls = scLines(g, content.text, m); if (ls.length > T.lines.length) break;
+        const full = ls.filter(l => !l.last), lastShort = ls.filter(l => l.last && ls.length > 1 && (l.words.length === 1 || l.width < m * 0.3)).length;
+        const cost = full.reduce((a, l) => { const n = l.words.length, st = n > 1 ? (m - l.width) / (n - 1) + sp : 9 * sp; return a + ((m - l.width) / m) ** 2 + (st > sp * 2.6 ? 1 : 0) }, 0) + lastShort * 3 + (L.size - sz) * 0.012;
+        if (!best || cost < best.cost - 1e-6) best = { cost, m, ls, T };
+      }
+    }
+    if (best) { L = best.T; L.lines = best.ls; L.measure = best.m; L.total = L.kBlock + L.lines.length * L.lh + L.rBlock }
   }
   const { size, lh, kSize, rSize, rLines, rLH, gap, lines } = L;
   let y = top + Math.max(0, (room - L.total) / 2);
   if (kSize) { g.font = `600 ${kSize}px AppArabic, sans-serif`; g.fillStyle = GOLD; g.fillText(content.kicker, CX, y + kSize * 0.7); y += L.kBlock }
   g.font = `${size}px Quran, serif`; g.fillStyle = INK; g.shadowColor = 'rgba(0,0,0,.35)'; g.shadowBlur = 8;
-  lines.forEach((line, i) => g.fillText(line, CX, y + lh * (i + 0.5)));
+  lines.forEach((line, i) => scDrawLine(g, line, CX, y + lh * (i + 0.5), L.measure));
   g.shadowBlur = 0; y += lines.length * lh;
   if (rLines.length) {
     y += gap * 0.65;
@@ -77,7 +125,7 @@ async function scRender(content, format = 'story') {
     g.font = `500 ${rSize}px AppArabic, sans-serif`; g.fillStyle = GOLD;
     rLines.forEach((line, i) => g.fillText(line, CX, y + rLH * (i + 0.5)));
   }
-  content._fit = { size, rSize, kSize, cut: lines.some(l => l.endsWith(' …')) };
+  content._fit = { size, rSize, kSize, cut: !!L.cut };
   scBrand(g, f.W / 2, f.brandY, format === 'story' ? 40 : 34);
   return c;
 }
