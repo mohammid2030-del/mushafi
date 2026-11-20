@@ -90,3 +90,9 @@ body.dark .rh-tools .ui-icon{color:var(--gold)}
 body.dark .rh-mini-play{background:var(--gold);color:#1b1a14}
 body.dark .rh-recent button>.ui-icon{color:var(--gold)}
 body.dark .rh-live{background:var(--paper)}
+
+.rh-live-art.photo{background-size:cover;background-position:center;color:transparent}
+.rh-live-art.photo::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(21,63,50,.10),rgba(21,63,50,.28));pointer-events:none}
+.rh-live-art.photo.makkah{background-image:url(images/live-makkah.jpg)}
+.rh-live-art.photo.madinah{background-image:url(images/live-madinah.jpg)}
+.rh-live-art.photo .rh-live-tag{z-index:1}

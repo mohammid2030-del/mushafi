@@ -64,7 +64,7 @@ iconPaths.radio = '<rect x="3" y="8" width="18" height="12" rx="3"/><path d="m7 
 iconPaths.chevron = '<path d="m15 6-6 6 6 6"/>';
 function rhLiveCard(key) {
   const c = liveBroadcastChannels[key];
-  return `<button class="rh-live" onclick="openLiveBroadcast('${key}')" aria-label="${c.title}"><span class="rh-live-art ${key}">${key === 'makkah' ? kaabaIcon() : madinahIcon()}<b class="rh-live-tag"><i class="rh-dot"></i>مباشر</b></span><span class="rh-live-text"><strong>${c.place}</strong><small>${c.channel}</small></span></button>`;
+  return `<button class="rh-live" onclick="openLiveBroadcast('${key}')" aria-label="${c.title}"><span class="rh-live-art photo ${key}"><b class="rh-live-tag"><i class="rh-dot"></i>مباشر</b></span><span class="rh-live-text"><strong>${c.place}</strong><small>${c.channel}</small></span></button>`;
 }
 function recitationHub() {
   enterSection('recitation', 'n-home');
