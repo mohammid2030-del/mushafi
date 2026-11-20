@@ -7,43 +7,88 @@ iconPaths.skipPrev = '<path d="M18 5L8 12l10 7z"/><path d="M6 5v14"/>';
 function rhLast() { try { const v = JSON.parse(localStorage.rhLastListen || 'null'); return v && surahCatalog[v.reader] && chapters[v.chapter - 1] ? v : null } catch (e) { return null } }
 const rhPrevStart = startFullSurah;
 startFullSurah = function (reader, chapter, ...rest) { try { localStorage.rhLastListen = JSON.stringify({ reader, chapter }) } catch (e) {} return rhPrevStart.call(this, reader, chapter, ...rest) };
+/* سجل «شغلتها مؤخرًا» */
+function rhRecent() { try { return (JSON.parse(localStorage.rhRecent || '[]') || []).filter(v => surahCatalog[v.reader] && chapters[v.chapter - 1]).slice(0, 6) } catch (e) { return [] } }
+function rhRemember(reader, chapter) { try { const list = rhRecent().filter(v => !(v.reader === reader && v.chapter === chapter)); list.unshift({ reader, chapter }); localStorage.rhRecent = JSON.stringify(list.slice(0, 6)) } catch (e) {} }
+const rhPrevStart2 = startFullSurah;
+startFullSurah = function (reader, chapter, ...rest) { rhRadioStop(); rhRemember(+reader, +chapter); return rhPrevStart2.call(this, reader, chapter, ...rest) };
+function rhPortrait(id, cls = '') { const img = surahReaderPortraits[id]; return `<span class="rh-face ${cls}">${img ? `<img src="images/${img}.png" alt="" decoding="async" loading="lazy">` : uiIcon('mic')}</span>` }
+/* بطاقة متابعة الاستماع المختصرة */
 function rhFollowMarkup() {
   const live = typeof fullSurahActive === 'function' && fullSurahActive(), last = live ? { reader: surahState.reader, chapter: surahState.chapter } : rhLast();
-  if (!last) return `<button class="mh-follow rh-follow rh-empty" onclick="openHomeRecitation('readers')"><div class="mh-follow-head"><h2>متابعة الاستماع</h2><span class="mh-chip">${uiIcon('headphones')}</span></div><div class="mh-follow-row"><strong>لم تبدأ الاستماع بعد</strong></div><p>اختر قارئك والسورة التي تحب سماعها</p></button>`;
+  if (!last) return '';
   const pct = live && surahState.duration ? Math.min(100, surahState.position / surahState.duration * 100) : 0, playing = live && ['playing', 'loading'].includes(surahState.status);
-  return `<section class="mh-follow rh-follow"><div class="mh-follow-head"><h2>متابعة الاستماع</h2><span class="mh-chip">${live ? (playing ? 'يُتلى الآن' : 'متوقف مؤقتًا') : 'آخر استماع'}</span></div>
-    <button class="rh-now" onclick="${live ? 'fullSurahPlayerHome()' : `startFullSurah(${last.reader},${last.chapter},'listen')`}"><strong>سورة ${chapters[last.chapter - 1].name_arabic}</strong><small>${esc(fullReaderName(last.reader))}</small></button>
-    <div class="app-progress mh-bar rh-bar"><span style="width:${pct}%"></span></div>
-    <div class="rh-controls">
-      <button aria-label="الاستماع مع المصحف" onclick="${live ? 'openFullSurahMushaf()' : `startFullSurah(${last.reader},${last.chapter},'mushaf')`}">${uiIcon('book')}</button>
-      <button aria-label="السورة التالية" ${last.chapter >= 114 ? 'disabled' : ''} onclick="startFullSurah(${last.reader},${Math.min(114, last.chapter + 1)},'listen');setTimeout(rhRefresh,300)">${uiIcon('skipNext')}</button>
-      <button class="rh-play" aria-label="${playing ? 'إيقاف مؤقت' : 'تشغيل'}" onclick="rhToggle()">${uiIcon(playing ? 'pause' : 'play')}</button>
-      <button aria-label="السورة السابقة" ${last.chapter <= 1 ? 'disabled' : ''} onclick="startFullSurah(${last.reader},${Math.max(1, last.chapter - 1)},'listen');setTimeout(rhRefresh,300)">${uiIcon('skipPrev')}</button>
-      <button aria-label="قائمة السور" onclick="openHomeRecitation('chapters')">${uiIcon('playlist')}</button>
-    </div></section>`;
+  const sub = live && surahState.position ? mhT('سورة {0} · الدقيقة {1}', chapters[last.chapter - 1].name_arabic, mediaTime(surahState.position)) : mhT('سورة {0}', chapters[last.chapter - 1].name_arabic);
+  return `<section class="rh-mini${playing ? ' on' : ''}" aria-label="متابعة الاستماع">
+    <button class="rh-mini-main" onclick="${live ? 'fullSurahPlayerHome()' : `startFullSurah(${last.reader},${last.chapter},'listen')`}">${rhPortrait(last.reader, 'round')}<span class="rh-mini-text"><small>${live ? (playing ? 'يُتلى الآن' : 'متوقف مؤقتًا') : 'متابعة الاستماع'}</small><strong>${esc(fullReaderName(last.reader))}</strong><em translate="no" data-rh-sub>${sub}</em><span class="rh-mini-bar"><i style="width:${pct}%"></i></span></span></button>
+    <button class="rh-mini-play" aria-label="${playing ? 'إيقاف مؤقت' : 'تشغيل'}" onclick="rhToggle()">${uiIcon(playing ? 'pause' : 'play')}</button></section>`;
 }
 function rhToggle() {
   const live = fullSurahActive();
   if (live && ['playing', 'loading'].includes(surahState.status)) pauseFullSurah();
-  else if (live && surahState.status === 'paused') resumeFullSurah();
+  else if (live && surahState.status === 'paused') { rhRadioStop(); resumeFullSurah() }
   else { const l = rhLast(); if (l) startFullSurah(l.reader, l.chapter, 'listen') }
   setTimeout(rhRefresh, 250);
 }
+function rhOpenReader(id) { surahReader = id; try { localStorage.surahReader = id } catch (e) {} openHomeRecitation('chapters') }
+function rhSection(title, more, body, cls = '') { return `<section class="rh-sec ${cls}"><div class="rh-sec-head"><h2>${title}</h2>${more || ''}</div>${body}</section>` }
+/* الإذاعات: بث صوتي مباشر */
+const rhRadios = [
+  { id: 'sa', title: 'إذاعة القرآن الكريم', place: 'من المملكة العربية السعودية', url: 'https://stream.radiojar.com/0tpy1h0kxtzuv' },
+  { id: 'eg', title: 'إذاعة القرآن الكريم', place: 'من القاهرة', url: 'https://stream.radiojar.com/8s5u5tpdtwzuv' }
+];
+let rhRadio = { id: '', audio: null, status: 'stopped' };
+function rhRadioStop() { if (rhRadio.audio) { try { rhRadio.audio.pause(); rhRadio.audio.removeAttribute('src'); rhRadio.audio.load() } catch (e) {} } rhRadio = { id: '', audio: null, status: 'stopped' }; rhPaintRadios() }
+function rhRadioToggle(id) {
+  if (rhRadio.id === id) { rhRadioStop(); return }
+  rhRadioStop();
+  const st = rhRadios.find(r => r.id === id); if (!st) return;
+  if (typeof fullSurahActive === 'function' && fullSurahActive() && ['playing', 'loading'].includes(surahState.status)) pauseFullSurah();
+  try { if (['playing', 'loading'].includes(inlineVerse.status)) pauseInlineVerse() } catch (e) {}
+  const audio = new Audio(); audio.preload = 'none'; audio.src = st.url;
+  rhRadio = { id, audio, status: 'loading' };
+  audio.addEventListener('playing', () => { if (rhRadio.audio === audio) { rhRadio.status = 'playing'; rhPaintRadios() } });
+  audio.addEventListener('waiting', () => { if (rhRadio.audio === audio) { rhRadio.status = 'loading'; rhPaintRadios() } });
+  audio.addEventListener('pause', () => { if (rhRadio.audio === audio) rhRadioStop() });
+  audio.addEventListener('error', () => { if (rhRadio.audio === audio) { rhRadioStop(); showSmallNotice('تعذر تشغيل الإذاعة، تحقق من الاتصال بالإنترنت') } });
+  try { if ('mediaSession' in navigator) navigator.mediaSession.metadata = new MediaMetadata({ title: st.title, artist: st.place, album: 'مصحفي' }) } catch (e) {}
+  audio.play().catch(() => { if (rhRadio.audio === audio) { rhRadioStop(); showSmallNotice('تعذر تشغيل الإذاعة، تحقق من الاتصال بالإنترنت') } });
+  rhPaintRadios(); setTimeout(rhRefresh, 200);
+}
+function rhRadioCard(r) {
+  const on = rhRadio.id === r.id, label = on ? (rhRadio.status === 'playing' ? 'إيقاف الاستماع' : 'جارٍ الاتصال…') : 'استماع مباشر';
+  return `<article class="rh-radio${on ? ' on' : ''}" data-radio="${r.id}"><span class="rh-radio-art" aria-hidden="true">${uiIcon('radio')}</span><strong>${r.title}</strong><small>${r.place}</small><button onclick="rhRadioToggle('${r.id}')"><i class="rh-dot"></i>${uiIcon(on && rhRadio.status === 'playing' ? 'pause' : 'radio')}<span>${label}</span></button></article>`;
+}
+function rhPaintRadios() { const box = document.getElementById('rh-radios'); if (box) { box.innerHTML = rhRadios.map(rhRadioCard).join(''); try { uiLocalize(box) } catch (e) {} } }
+iconPaths.radio = '<rect x="3" y="8" width="18" height="12" rx="3"/><path d="m7 8 9-5"/><circle cx="15.5" cy="14" r="2.5"/><path d="M6.5 12h4M6.5 16h4"/>';
+iconPaths.chevron = '<path d="m15 6-6 6 6 6"/>';
+function rhLiveCard(key) {
+  const c = liveBroadcastChannels[key];
+  return `<button class="rh-live" onclick="openLiveBroadcast('${key}')" aria-label="${c.title}"><span class="rh-live-art ${key}">${key === 'makkah' ? kaabaIcon() : madinahIcon()}<b class="rh-live-tag"><i class="rh-dot"></i>مباشر</b></span><span class="rh-live-text"><strong>${c.place}</strong><small>${c.channel}</small></span></button>`;
+}
 function recitationHub() {
   enterSection('recitation', 'n-home');
-  app.innerHTML = sectionHeading('التلاوة الصوتية', 'استمع إلى القرآن الكريم بصوت قارئك المفضل', 'home()') + `<div class="mushaf-hub rh-hub">
-    <div class="mh-grid">
-      <button class="mh-card" onclick="openHomeRecitation('readers')"><span class="mh-icon">${uiIcon('mic')}</span><b>القراء</b><small>اختر قارئك المفضل</small></button>
-      <button class="mh-card" onclick="openHomeRecitation('chapters')"><span class="mh-icon">${uiIcon('playlist')}</span><b>السور</b><small translate="no">${mhT('{0} سورة للاستماع', uiLocale()==='ar'?ar(114):'114')}</small></button>
-      <button class="mh-card" onclick="rhDownloads()"><span class="mh-icon">${uiIcon('download')}</span><b>تنزيلاتي</b><small>استمع دون إنترنت</small></button>
-      <button class="mh-card" onclick="rhMemorize()"><span class="mh-icon">${uiIcon('repeat')}</span><b>الحفظ والتكرار</b><small>كرر الآيات للحفظ</small></button>
-    </div><div id="rh-follow">${rhFollowMarkup()}</div></div>`;
+  const readers = audioReaderOrder.filter(id => surahCatalog[id]);
+  const recent = rhRecent();
+  app.innerHTML = sectionHeading('التلاوة الصوتية', 'استمع إلى القرآن الكريم بصوت قارئك المفضل', 'home()') + `<div class="rh-hub">
+    <div id="rh-follow">${rhFollowMarkup()}</div>
+    ${rhSection('القراء', `<button class="rh-more" onclick="openHomeRecitation('readers')">عرض الكل${uiIcon('chevron')}</button>`, `<div class="rh-rail">${readers.map(id => `<button class="rh-reader" onclick="rhOpenReader(${id})">${rhPortrait(id)}<strong>${esc(surahCatalog[id].name)}</strong></button>`).join('')}</div>`)}
+    ${rhSection('بث مباشر', '', `<div class="rh-rail rh-rail-wide">${rhLiveCard('makkah')}${rhLiveCard('madinah')}</div>`)}
+    ${rhSection('إذاعات صوتية', '', `<div class="rh-rail rh-rail-wide" id="rh-radios">${rhRadios.map(rhRadioCard).join('')}</div>`)}
+    <div class="rh-tools">
+      <button onclick="openHomeRecitation('chapters')">${uiIcon('playlist')}<span>السور</span></button>
+      <button onclick="rhDownloads()">${uiIcon('download')}<span>تنزيلاتي</span></button>
+      <button onclick="rhMemorize()">${uiIcon('repeat')}<span>الحفظ والتكرار</span></button>
+    </div>
+    ${recent.length ? rhSection('شغلتها مؤخرًا', '', `<div class="rh-recent">${recent.map(v => `<button onclick="startFullSurah(${v.reader},${v.chapter},'listen')">${rhPortrait(v.reader, 'round sm')}<span><strong>سورة ${chapters[v.chapter - 1].name_arabic}</strong><small>${esc(fullReaderName(v.reader))}</small></span>${uiIcon('play')}</button>`).join('')}</div>`) : ''}
+  </div>`;
   try { uiLocalize(app) } catch (e) {}
   revealSection();
+  if (!readers.length && typeof surahReady !== 'undefined') surahReady.then(() => { if (view === 'recitation' && Object.keys(surahCatalog).length) recitationHub() }).catch(() => {});
 }
 function rhRefresh() { const box = document.getElementById('rh-follow'); if (view === 'recitation' && box) { box.innerHTML = rhFollowMarkup(); try { uiLocalize(box) } catch (e) {} } }
 const rhPrevUpdate = updateFullSurahUI;
-updateFullSurahUI = function (...a) { const r = rhPrevUpdate.apply(this, a); if (view === 'recitation') { const bar = document.querySelector('#rh-follow .rh-bar>span'); if (bar && surahState.duration) bar.style.width = Math.min(100, surahState.position / surahState.duration * 100) + '%'; if (!rhUpdating) { rhUpdating = true; setTimeout(() => { rhUpdating = false; const st = document.querySelector('#rh-follow .mh-chip'); const want = fullSurahActive() ? (['playing', 'loading'].includes(surahState.status) ? 'يُتلى الآن' : 'متوقف مؤقتًا') : 'آخر استماع'; if (st && st.dataset.s !== want) { st.dataset.s = want; rhRefresh() } }, 400) } } return r };
+updateFullSurahUI = function (...a) { const r = rhPrevUpdate.apply(this, a); if (view === 'recitation') { const bar = document.querySelector('#rh-follow .rh-mini-bar>i'); if (bar && surahState.duration) bar.style.width = Math.min(100, surahState.position / surahState.duration * 100) + '%'; const sub = document.querySelector('#rh-follow [data-rh-sub]'); if (sub && fullSurahActive() && surahState.position) sub.textContent = mhT('سورة {0} · الدقيقة {1}', chapters[surahState.chapter - 1].name_arabic, mediaTime(surahState.position)); if (!rhUpdating) { rhUpdating = true; setTimeout(() => { rhUpdating = false; const box = document.querySelector('#rh-follow .rh-mini'); const want = fullSurahActive() && ['playing', 'loading'].includes(surahState.status); if (box && box.classList.contains('on') !== want) rhRefresh(); else if (!box && fullSurahActive()) rhRefresh() }, 400) } } return r };
 let rhUpdating = false;
 /* الحفظ والتكرار: مشغل الآيات مع خيار تكرار الآية، من آخر موضع قراءة */
 function rhMemorize() { let key = '1:1'; try { const last = JSON.parse(localStorage.last || 'null'); if (last && chapters[last.c - 1]) key = last.c + ':' + (last.v || 1) } catch (e) {} if (typeof standaloneAudioEntry === 'function') standaloneAudioEntry(key); else openAudio(key) }
@@ -105,3 +150,5 @@ const rhPrevClose = closeHomeRecitation;
 closeHomeRecitation = function (...a) { const onHub = !!app.querySelector('.rh-hub'); const r = rhPrevClose.apply(this, a); if (onHub && app.querySelector('.rh-hub')) { view = 'recitation'; try { active('n-home') } catch (e) {} rhRefresh() } return r };
 const rhPrevPlayer = fullSurahPlayerHome;
 fullSurahPlayerHome = function (...a) { const fromHub = view === 'recitation' || !!app.querySelector('.rh-hub'); const r = rhPrevPlayer.apply(this, a); if (fromHub) { const back = document.getElementById('listen-back'); if (back) back.onclick = recitationHub } return r };
+
+if (typeof openLiveBroadcast === 'function') { const rhPrevLive = openLiveBroadcast; openLiveBroadcast = function (...a) { rhRadioStop(); return rhPrevLive.apply(this, a) } }
