@@ -311,7 +311,7 @@ function homeLayout() {
     readingRow = hlNode(`<div class="hl-list">${hlRow('book', resume ? 'تابع القراءة' : 'ابدأ القراءة', esc(title + (meta ? ' · ' + meta : '')), go)}</div>`)
   }
   put('.hl-reading-slot', readingRow);
-  put('.hl-recitation-slot', recitation ? hlNode(`<div class="hl-list">${hlRow('headphones', 'التلاوة الصوتية', 'اختر قارئك، واستمع مع المصحف', 'openHomeRecitation()')}${charity ? hlRow('charity', 'باب الخير', 'أقسام إحسان ومشاريعه وأوقافه، في مكان واحد', 'charityHome()') : ''}</div>`) : null, hlHead('استماع وعطاء'));
+  put('.hl-recitation-slot', recitation ? hlNode(`<div class="hl-list">${hlRow('headphones', 'التلاوة الصوتية', 'القراء والسور والتنزيلات والحفظ', 'recitationHub()')}${charity ? hlRow('charity', 'باب الخير', 'أقسام إحسان ومشاريعه وأوقافه، في مكان واحد', 'charityHome()') : ''}</div>`) : null, hlHead('استماع وعطاء'));
   put('.hl-dua-slot', dua, hlHead('دعاء من القرآن'));
   put('.hl-charity-slot', recitation ? null : (charity ? hlNode(`<div class="hl-list">${hlRow('charity', 'باب الخير', 'أقسام إحسان ومشاريعه وأوقافه، في مكان واحد', 'charityHome()')}</div>`) : null), recitation ? '' : hlHead('باب الخير'));
   put('.hl-footer-slot', footer);
