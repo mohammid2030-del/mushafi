@@ -21,7 +21,7 @@ window.handleNativeBack=function(){
  if(view==='reader'&&!controlsVisible&&!khatmaReading&&!surahReading&&!smartReading&&systemReaderParent){systemBackNavigate(systemReaderParent);return true;}
  if(view==='reader'||view==='onboarding'||view==='khatma-setup'||view==='dua-reader'||view.startsWith('surah-')){systemBackNavigate(()=>handleBack());return true;}
  const parent=systemBackParents.get(view);if(parent){systemBackNavigate(parent);return true;}
- const back=app.querySelector('.screen-heading button[aria-label="رجوع"]');if(back){systemBackNavigate(()=>back.click());return true;}
+ const back=app.querySelector('.screen-heading button[data-back],.screen-heading button[aria-label="رجوع"],.screen-heading>button.round-action:first-child');if(back){systemBackNavigate(()=>back.click());return true;}
  systemBackNavigate(()=>handleBack());return true;
 };
 
