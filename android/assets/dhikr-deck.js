@@ -24,17 +24,12 @@ function dhikrDeck(group) {
   app.innerHTML = sectionHeading(group === 'favorites' ? 'مفضلة الأدعية' : devotionGroupName(group), ar(items.length) + ' ' + (items.length <= 10 ? 'نصوص' : 'نصًا') + ' · متاح دون إنترنت', 'duaHome()') + `
   <section class="dk" id="dk">
     <div class="dk-top">
-      <span class="dk-pos" id="dk-pos"></span>
-      <div class="dk-bar" aria-hidden="true"><i id="dk-bar"></i></div>
+      <button class="dk-tool" id="dk-prev" aria-label="الذكر السابق">${uiIcon('back')}</button>
+      <div class="dk-progress"><span class="dk-pos" id="dk-pos"></span><div class="dk-bar" aria-hidden="true"><i id="dk-bar"></i></div></div>
+      <button class="dk-tool" id="dk-next" aria-label="الذكر التالي">${uiIcon('arrow')}</button>
       <button class="dk-tool" id="dk-index" aria-label="فهرس أذكار القسم">${uiIcon('grid')}</button>
     </div>
-    <div class="dk-brand" aria-hidden="true">${mushafiBrandIcon()}</div>
     <div class="dk-stack" id="dk-stack"></div>
-    <div class="dk-nav">
-      <button class="dk-step" id="dk-prev" aria-label="الذكر السابق">${uiIcon('back')}</button>
-      <span class="dk-hint">اسحب البطاقة للتنقل</span>
-      <button class="dk-step" id="dk-next" aria-label="الذكر التالي">${uiIcon('arrow')}</button>
-    </div>
     ${group === 'prayer' ? '<button class="dk-reset" id="dk-prayer-reset">إعادة العدّ لصلاة جديدة</button>' : ''}
   </section>`;
   document.getElementById('dk-prev').onclick = () => dkGo(-1);
@@ -48,23 +43,27 @@ function dhikrDeck(group) {
 
 function dkCardMarkup(d, i, depth) {
   const n = dk.items.length, saved = duaFavorites().includes(d.id), c = dkCount(d), t = dkTarget(d), done = c >= t;
-  const ring = 2 * Math.PI * 17, frac = Math.min(1, c / t);
+  const disputed = d.routineEvidence?.disputed;
   return `<article class="dk-card${done ? ' is-done' : ''}" data-depth="${depth}" style="--depth:${depth}" ${depth ? 'aria-hidden="true"' : ''}>
-    <div class="dk-head"><span class="dk-kind">${dkKind(d)}</span><span class="dk-num">${ar(i + 1)} <i>/ ${ar(n)}</i></span></div>
-    <h2 class="dk-title">${esc(d.title)}</h2>${d.routineEvidence?.disputed ? '<span class="dk-grade">في تصحيحه خلاف · انظر المصدر</span>' : ''}
-    <div class="dk-body"><div class="devotion-text dk-text${d.kind === 'quran' ? ' dhikr-quran' : ''}${String(d.text).length <= 120 ? ' dk-short' : ''}" data-dk-text="${d.id}" lang="ar" dir="rtl" translate="no" style="font-size:${dkSize(d)}px"></div></div>
+    <div class="dk-head">
+      <span class="dk-brand-mini" aria-hidden="true">${mushafiBrandIcon()}</span>
+      <span class="dk-num">${ar(i + 1)} / ${ar(n)}</span>
+      <span class="dk-kind">${dkKind(d)}</span>
+    </div>
+    <h2 class="dk-title">${esc(d.title)}</h2>
+    <div class="dk-body"><div class="devotion-text dk-text${d.kind === 'quran' ? ' dhikr-quran' : ''}" data-dk-text="${d.id}" lang="ar" dir="rtl" translate="no" style="font-size:${dkSize(d)}px"></div></div>
+    <button class="dk-count" data-dk-count aria-label="تأكيد إتمام قراءة الذكر">
+      <span class="dk-count-text">${done ? 'تمت القراءة ✓' : t > 1 ? `<b>${ar(c)}</b> من ${dkTimes(t)}` : 'المس بعد إتمام القراءة'}</span>
+      <span class="dk-count-bar" aria-hidden="true"><i style="width:${Math.min(100, c / t * 100)}%"></i></span>
+    </button>
     <div class="dk-foot">
-      <button class="dk-ref" data-dk-source>${uiIcon('book')}<span translate="no" dir="rtl">${esc(d.reference)}</span></button>
+      <button class="dk-ref${disputed ? ' is-disputed' : ''}" data-dk-source>${uiIcon(disputed ? 'info' : 'book')}<span translate="no" dir="rtl">${esc(d.reference)}</span></button>
       <div class="dk-actions">
-        <button class="dk-icon${saved ? ' is-saved' : ''}" data-dk-fav aria-label="${saved ? 'إزالة من المفضلة' : 'حفظ في المفضلة'}">${uiIcon('heart')}</button>
         <button class="dk-icon" data-dk-share aria-label="مشاركة الذكر">${uiIcon('share')}</button>
+        <button class="dk-icon${saved ? ' is-saved' : ''}" data-dk-fav aria-label="${saved ? 'إزالة من المفضلة' : 'حفظ في المفضلة'}">${uiIcon('heart')}</button>
       </div>
     </div>
-    <button class="dk-count" data-dk-count aria-label="تأكيد إتمام قراءة الذكر">
-      <svg viewBox="0 0 40 40" aria-hidden="true"><circle class="dk-ring-bg" cx="20" cy="20" r="17"/><circle class="dk-ring" cx="20" cy="20" r="17" stroke-dasharray="${ring.toFixed(1)}" stroke-dashoffset="${(ring * (1 - frac)).toFixed(1)}"/></svg>
-      <span class="dk-count-num">${done ? '✓' : t > 1 ? ar(c) : ''}</span>
-      <span class="dk-count-label">${done ? 'تمت القراءة' : t > 1 ? 'من ' + dkTimes(t) : 'المس بعد إتمام القراءة'}</span>
-    </button>
+    ${disputed ? '<span class="dk-grade">في تصحيحه خلاف · انظر المصدر</span>' : ''}
   </article>`;
 }
 function dkEndMarkup(depth) {
@@ -97,7 +96,23 @@ function dkRender(enter = 0) {
   document.getElementById('dk-next').disabled = dk.index >= n;
   if (front) dkBind(front);
   dkLocalize(stack);
+  dkLayout();
 }
+// the deck takes exactly the room between the top bar and the navigation bar, and each text shrinks until it shows in full
+function dkLayout() {
+  const stack = document.getElementById('dk-stack'); if (!stack) return;
+  const nav = document.querySelector('body>nav') || document.querySelector('nav'), r = nav ? nav.getBoundingClientRect() : null, navTop = r && r.height > 0 && getComputedStyle(nav).display !== 'none' ? r.top : innerHeight;
+  const top = stack.getBoundingClientRect().top + scrollY - scrollY;
+  const room = Math.max(330, Math.min(navTop, innerHeight) - top - 10);
+  stack.style.height = room + 'px';
+  stack.querySelectorAll('.dk-card').forEach(card => {
+    const body = card.querySelector('.dk-body'), text = card.querySelector('.dk-text'); if (!body || !text) return;
+    let size = parseFloat(text.style.fontSize) || 24; const min = 16;
+    while (size > min && text.scrollHeight > body.clientHeight) { size -= 1; text.style.fontSize = size + 'px' }
+    body.classList.toggle('is-scroll', text.scrollHeight > body.clientHeight + 2);
+  });
+}
+addEventListener('resize', () => { if (view === 'dua-category' && document.getElementById('dk-stack')) dkLayout() });
 function dkGo(step) {
   const n = dk.items.length, next = dk.index + step;
   if (dk.busy || next < 0 || next > n) return;
@@ -111,13 +126,12 @@ function dkCountTap(card) {
   const key = devotionProgressKey(d, dk.group), all = readJSON('devotionProgress', {}), t = dkTarget(d);
   all[key] = Math.min(t, Math.max(0, +all[key] || 0) + 1); saveJSON('devotionProgress', all);
   try { tactile() } catch (e) {}
-  const c = all[key], ring = card.querySelector('.dk-ring'), len = 2 * Math.PI * 17;
-  if (ring) ring.style.strokeDashoffset = (len * (1 - c / t)).toFixed(1);
-  card.querySelector('.dk-count-num').textContent = c >= t ? '✓' : t > 1 ? ar(c) : '';
-  card.classList.remove('dk-pulse'); void card.offsetWidth; card.classList.add('dk-pulse');
+  const c = all[key];
+  card.querySelector('.dk-count-bar i').style.width = Math.min(100, c / t * 100) + '%';
+  card.querySelector('.dk-count-text').innerHTML = c >= t ? 'تمت القراءة ✓' : `<b>${ar(c)}</b> من ${dkTimes(t)}`; dkLocalize(card.querySelector('.dk-count-text'));
+  const btn = card.querySelector('.dk-count'); btn.classList.remove('dk-pulse'); void btn.offsetWidth; btn.classList.add('dk-pulse');
   if (c >= t) {
     card.classList.add('is-done');
-    card.querySelector('.dk-count-label').textContent = 'تمت القراءة'; dkLocalize(card.querySelector('.dk-count-label'));
     const n = dk.items.length, done = dk.items.filter(dkDone).length; document.getElementById('dk-bar').style.width = done / n * 100 + '%';
     setTimeout(() => { if (view === 'dua-category' && dk.items[dk.index] === d) dkGo(1) }, 650);
   }
