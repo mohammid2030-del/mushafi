@@ -27,14 +27,12 @@ function dhikrDeck(group) {
       <button class="dk-tool" id="dk-prev" aria-label="الذكر السابق">${uiIcon('back')}</button>
       <div class="dk-progress"><span class="dk-pos" id="dk-pos"></span><div class="dk-bar" aria-hidden="true"><i id="dk-bar"></i></div></div>
       <button class="dk-tool" id="dk-next" aria-label="الذكر التالي">${uiIcon('arrow')}</button>
-      <button class="dk-tool" id="dk-index" aria-label="فهرس أذكار القسم">${uiIcon('grid')}</button>
     </div>
     <div class="dk-stack" id="dk-stack"></div>
     ${group === 'prayer' ? '<button class="dk-reset" id="dk-prayer-reset">إعادة العدّ لصلاة جديدة</button>' : ''}
   </section>`;
   document.getElementById('dk-prev').onclick = () => dkGo(-1);
   document.getElementById('dk-next').onclick = () => dkGo(1);
-  document.getElementById('dk-index').onclick = dkIndexSheet;
   const reset = document.getElementById('dk-prayer-reset'); if (reset) reset.onclick = () => { resetPrayerSession(); dkMemory.prayer = 0; dkRender() };
   dkRender();
   dkLocalize(app);
@@ -175,12 +173,6 @@ function dkBind(card) {
   };
   card.addEventListener('pointerup', end); card.addEventListener('pointercancel', end);
   card.addEventListener('click', e => { if (moved) { moved = false; return } if (e.target.closest('button,a,.dhikr-ayah-marker')) return; if (!card.classList.contains('dk-end')) dkCountTap(card) });
-}
-function dkIndexSheet() {
-  const box = featureSheet('فهرس أذكار القسم', 'dk-index-sheet');
-  box.innerHTML = '<div class="dk-index-list">' + dk.items.map((d, i) => `<button data-i="${i}" class="${i === dk.index ? 'is-current' : ''}${dkDone(d) ? ' is-done' : ''}"><span class="dk-index-n">${dkDone(d) ? uiIcon('check') : ar(i + 1)}</span><span><strong translate="no" dir="rtl">${esc(d.title)}</strong><small>${dkKind(d)}${d.count ? ' — ' + dkTimes(d.count) : ''}</small></span></button>`).join('') + '</div>';
-  box.querySelectorAll('[data-i]').forEach(b => b.onclick = () => { const i = +b.dataset.i; closeFeatureSheet(); dk.index = i; dkRender(i >= dk.index ? 1 : -1) });
-  dkLocalize(box);
 }
 const dkPrevDuaHome = duaHome;
 duaHome = function (group) { return dkEligible(group) ? dhikrDeck(group) : dkPrevDuaHome.apply(this, arguments) };

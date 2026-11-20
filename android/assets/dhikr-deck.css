@@ -72,13 +72,4 @@ body.dark .dk{--dk-card:linear-gradient(170deg,#24232a,#1a1a1f);--dk-back:#1c1b2
 .dk-end-actions .primary{background:linear-gradient(180deg,#f0d9a2,#c9a24a);color:#2a1f08;border:0;box-shadow:0 8px 22px rgba(201,162,74,.3)}
 .dk-reset{align-self:center;padding:8px 16px;border-radius:99px;border:1px solid var(--dk-edge);background:transparent;color:var(--dk-gold);font:600 13px var(--ui-font,AppArabic),Tahoma,sans-serif}
 
-.dk-index-list{display:flex;flex-direction:column;gap:6px;padding-bottom:10px}
-.dk-index-list button{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:16px;border:1px solid var(--line);background:transparent;color:var(--ink);text-align:start}
-.dk-index-list button.is-current{border-color:rgba(201,162,74,.55);background:rgba(201,162,74,.08)}
-.dk-index-n{width:34px;height:34px;flex:0 0 auto;display:grid;place-items:center;border-radius:11px;background:rgba(201,162,74,.12);color:#a8843f;font:700 13px var(--ui-font,AppArabic),Tahoma,sans-serif}
-body.dark .dk-index-n{color:#e8cf96}
-.dk-index-list .is-done .dk-index-n{background:linear-gradient(180deg,#f0d9a2,#c9a24a);color:#2a1f08}
-.dk-index-n .ui-icon{width:17px;height:17px}
-.dk-index-list strong{display:block;font:600 14px/1.5 var(--ui-font,AppArabic),Tahoma,sans-serif}
-.dk-index-list small{display:block;color:var(--muted);font-size:12px}
 @media (prefers-reduced-motion:reduce){.dk-card,.dk-bar i,.dk-count-bar i{transition:none}.dk-card.dk-enter-next,.dk-card.dk-enter-prev,.dk-card.dk-enter-prev-ltr{animation:none}.dk-count.dk-pulse{animation:none}}
