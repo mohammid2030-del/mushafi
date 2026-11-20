@@ -37,17 +37,21 @@ if mode == 'metadata'
   puts 'DONE'; exit
 end
 DIMS = {[1320,2868]=>'iPhone-6.9',[2064,2752]=>'iPad-13',[1398,2034]=>'iPhone-Duo-outer',[2007,2853]=>'iPhone-Duo-inner'}
-TYPES = {'APP_IPHONE_67'=>'iPhone-6.9','APP_IPAD_PRO_3GEN_129'=>'iPad-13'}
-root = ENV['SHOTS'] || 'shots/screenshots'
+TYPES = {'APP_IPHONE_67'=>'iPhone-6.9','APP_IPAD_PRO_3GEN_129'=>'iPad-13','APP_IPHONE_DUO'=>'iPhone-Duo-inner'}
+LANG_OF = ->(loc) { {'ar-SA'=>'ar','fr-FR'=>'fr','fr-CA'=>'fr','ur-PK'=>'ur','bn-BD'=>'bn','tr'=>'tr','ru'=>'ru'}[loc] || 'en' }
 v.get_app_store_version_localizations.each do |loc|
   sets = loc.get_app_screenshot_sets
-  puts "== #{loc.locale}"
+  lg = LANG_OF.(loc.locale); root = lg == 'ar' ? 'shots/screenshots' : "shots/screenshots_#{lg}"
+  puts "== #{loc.locale} (#{lg})"
   done = []
   sets.each do |set|
     shots = set.app_screenshots || []
     dims = shots.map { |s| a = s.image_asset || {}; [a['width'], a['height']] }.uniq
     folder = TYPES[set.screenshot_display_type] || dims.map { |d| DIMS[d] }.compact.first
     puts "  #{set.screenshot_display_type}: #{shots.size} shots #{dims.inspect} -> #{folder.inspect}"
+    if mode == 'upload' && folder.nil?
+      shots.each(&:delete!); puts "    cleared old #{set.screenshot_display_type}"; next
+    end
     next unless mode == 'upload' && folder
     shots.each(&:delete!)
     Dir[File.join(root, folder, '*.png')].sort_by { |f| File.basename(f).to_i }.each do |f|
