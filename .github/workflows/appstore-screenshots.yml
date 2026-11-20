@@ -1,0 +1,27 @@
+# Replace the App Store screenshots with the set on the store-assets branch.
+name: App Store screenshots
+on:
+  workflow_dispatch:
+    inputs:
+      mode: {description: "inspect or upload", type: choice, options: [inspect, upload], default: inspect}
+      new_version: {description: "Create this version if none is editable (e.g. 3.1.60)", required: false, default: ""}
+jobs:
+  shots:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with: {ref: store-assets, path: shots}
+      - uses: ruby/setup-ruby@v1
+        with: {ruby-version: '3.3'}
+      - run: gem install fastlane --no-document >/dev/null
+      - env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          ASC_KEY_P8_BASE64: ${{ secrets.ASC_KEY_P8_BASE64 }}
+          MODE: ${{ inputs.mode }}
+          NEW_VERSION: ${{ inputs.new_version }}
+        run: |
+          export ASC_KEY_PATH="$RUNNER_TEMP/key.p8"; echo "$ASC_KEY_P8_BASE64" | base64 -d > "$ASC_KEY_PATH"
+          ruby tools/asc-screenshots.rb
