@@ -33,6 +33,11 @@ public class MainActivity extends Activity implements Runnable, SurahPlaybackSer
  @JavascriptInterface public void surahPlay(int reader,int chapter,int verse){surahCommand(SurahPlaybackService.PLAY,reader,chapter,verse);}
  @JavascriptInterface public void surahPlaySession(int reader,int chapter,int verse,String viewMode,String mode){runOnUiThread(()->{if(!foreground)return;try{if(audio!=null)audio.stop();stopPrayerPreview();Intent i=new Intent(this,SurahPlaybackService.class).setAction(SurahPlaybackService.PLAY).putExtra("reader",reader).putExtra("chapter",chapter).putExtra("verse",verse).putExtra("mode",SurahPlaybackMode.normalize(mode));if(android.os.Build.VERSION.SDK_INT>=26)startForegroundService(i);else startService(i);}catch(Exception e){fileMessage(false,"تعذر بدء التلاوة الآن؛ أعد المحاولة والتطبيق مفتوح");}});}
  @JavascriptInterface public void surahSetMode(String mode){if(!java.util.Arrays.asList("continuous","random","single").contains(mode))return;runOnUiThread(()->{if(!foreground)return;try{startService(new Intent(this,SurahPlaybackService.class).setAction(SurahPlaybackService.MODE).putExtra("mode",mode));}catch(Exception ignored){}});}
+ @JavascriptInterface public String surahDownloadedList(){return SurahDownloads.list(this);}
+ @JavascriptInterface public void surahDownload(int reader,int chapter){if(chapter<1||chapter>114)return;SurahDownloads.start(this,reader,chapter,this::surahDownloadEvent);}
+ @JavascriptInterface public void surahDownloadCancel(){SurahDownloads.cancel();}
+ @JavascriptInterface public void surahDownloadDelete(int reader,int chapter){if(chapter<1||chapter>114)return;SurahDownloads.delete(this,reader,chapter,this::surahDownloadEvent);}
+ private void surahDownloadEvent(String json){runOnUiThread(()->{if(web!=null)web.evaluateJavascript("window.onSurahDownload&&window.onSurahDownload("+json+")",null);});}
  @JavascriptInterface public void surahPause(){surahCommand(SurahPlaybackService.PAUSE,0,0,0);}
  @JavascriptInterface public void surahResume(){surahCommand(SurahPlaybackService.RESUME,0,0,0);}
  @JavascriptInterface public void surahStop(){surahCommand(SurahPlaybackService.STOP,0,0,0);}

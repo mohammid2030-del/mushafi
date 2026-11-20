@@ -16,3 +16,18 @@
 .rh-downloads>button{display:flex;align-items:center;gap:13px;width:100%;font:inherit;color:var(--ink);text-align:start}
 .rh-downloads strong{display:block;font-size:16px;font-weight:600}.rh-downloads small{display:block;margin-top:4px;font-size:12.5px;color:var(--muted)}
 .rh-downloads>button>span:nth-child(2){flex:1}
+.rh-dl-card{display:flex;align-items:center;gap:13px;width:100%;margin-top:12px;padding:16px 18px;border-radius:20px;border:1px solid color-mix(in srgb,var(--gold) 30%,transparent);background:color-mix(in srgb,var(--gold) 7%,var(--paper));color:var(--ink);font:inherit;text-align:start;cursor:pointer}
+.rh-dl-card>.ui-icon:first-child{width:26px;height:26px;color:var(--gold);flex:none}
+.rh-dl-card>span{flex:1;min-width:0}.rh-dl-card strong{display:block;font-size:15px;font-weight:600}.rh-dl-card strong b{color:var(--gold);font-weight:600}
+.rh-dl-card small{display:block;margin-top:3px;font-size:12px;color:var(--muted)}
+.rh-dl-card>.ui-icon:last-child{width:16px;height:16px;color:var(--muted)}
+.rh-dl-bar{display:block;height:5px;margin-top:8px;border-radius:5px;background:var(--line);overflow:hidden}.rh-dl-bar>i{display:block;height:100%;background:var(--gold);border-radius:5px;transition:width .3s}
+.rh-dl-del{flex:none;padding:8px 14px;border-radius:12px;border:1px solid var(--line);background:none;color:var(--ink);font:inherit;font-size:13px;cursor:pointer}
+.rh-dl-card.done{cursor:default}
+.rh-dl-row{display:flex;align-items:center;border-bottom:1px solid var(--line)}.rh-dl-row:last-child{border-bottom:0}
+.rh-dl-play{flex:1;display:flex;align-items:center;gap:13px;padding:16px 18px;border:0;background:none;color:var(--ink);font:inherit;text-align:start;cursor:pointer}
+.rh-dl-play strong{display:block;font-size:16px;font-weight:600}.rh-dl-play small{display:block;margin-top:4px;font-size:12.5px;color:var(--muted)}
+.rh-dl-x{display:grid;place-items:center;width:52px;height:52px;margin-inline-end:8px;border:0;background:none;color:var(--muted);cursor:pointer}.rh-dl-x .ui-icon{width:20px;height:20px}
+.rh-dl-add{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:52px;margin-top:14px}
+.rh-saved{color:var(--gold)}
+.rh-dl-mb{text-align:start;unicode-bidi:isolate}html[dir=rtl] .rh-dl-mb{text-align:right}

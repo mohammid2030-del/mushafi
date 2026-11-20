@@ -251,7 +251,8 @@ final class SurahPlayer: NSObject {
             return
         }
         activateSession()
-        let item = AVPlayerItem(url: url)
+        let source = track().flatMap { SurahDownloads.localFile(reader: reader, chapter: chapter, track: $0) } ?? url
+        let item = AVPlayerItem(url: source)
         let player = AVPlayer(playerItem: item)
         player.automaticallyWaitsToMinimizeStalling = true
         self.item = item
