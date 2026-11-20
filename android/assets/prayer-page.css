@@ -94,7 +94,8 @@ body.dark .pp-cell.sel{background:var(--gold);color:#1b1a14}body.dark .pp-cell.s
 .pp-occasions button>i{width:10px;height:10px;flex:none;border-radius:50%;background:var(--occ,var(--gold))}
 .pp-occasions strong{display:block;font-size:15px}.pp-occasions small{display:block;margin-top:2px;font-size:12.5px;color:var(--muted)}
 .pp-note{margin:0 4px;font-size:12.5px;line-height:1.9;color:var(--muted);text-align:center}
-.pp .pp-hero .pp-hero-time,.pp .pp-hero .pp-hero-left b{color:var(--green)!important}
+.pp{--pp-accent:#1d7a4a}
+.pp .pp-hero .pp-hero-time,.pp .pp-hero .pp-hero-left b,.pp .pp-row.is-current time,.pp .pp-list .hi time{color:var(--pp-accent)!important}
 body.dark .pp .pp-hero .pp-hero-time,body.dark .pp .pp-hero .pp-hero-left b{color:var(--gold)!important}
 .pp .pp-hero{background:radial-gradient(120% 120% at 100% 0%,color-mix(in srgb,var(--gold) 12%,transparent),transparent 55%),color-mix(in srgb,var(--green) 8%,var(--paper))!important}
 .pp .pp-hero.is-iqama{background:radial-gradient(120% 120% at 100% 0%,color-mix(in srgb,var(--gold) 20%,transparent),transparent 60%),color-mix(in srgb,var(--gold) 7%,var(--paper))!important}
