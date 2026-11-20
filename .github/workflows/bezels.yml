@@ -1,0 +1,18 @@
+# Fetch Apple's official product bezels (Design Resources) for App Store artwork.
+name: Bezels
+on: workflow_dispatch
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          sudo apt-get install -y p7zip-full >/dev/null
+          mkdir -p dl out
+          base=https://devimages-cdn.apple.com/design/resources/download
+          for n in Bezel-iPhone-Duo Bezel-iPhone-18-Pro-Max Bezel-iPhone-18-Pro Bezel-iPhone-17-Pro-Max Bezel-iPhone-17-Pro Bezel-iPhone-18 "Bezel-iPad-Pro-(M5)" "Bezel-iPad-Pro-M5" Bezel-iPad-Pro-13; do
+            if curl -fsSL "$base/$n.dmg" -o "dl/$n.dmg"; then echo "OK $n"; mkdir -p "x/$n"; 7z x -y "dl/$n.dmg" -o"x/$n" >/dev/null || true; else echo "MISS $n"; fi
+          done
+          find x -name '*.png' | sed 's/^/PNG /' | head -300
+          find x -name '*.png' -exec sh -c 'f="$1"; d=$(echo "$f" | cut -d/ -f2); mkdir -p "out/$d"; cp "$f" "out/$d/"' _ {} \;
+      - uses: actions/upload-artifact@v4
+        with: {name: bezels, path: out}
