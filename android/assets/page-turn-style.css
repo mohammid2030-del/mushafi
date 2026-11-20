@@ -1,0 +1,12 @@
+.pt-slide-layer{position:fixed;z-index:30;overflow:hidden;pointer-events:none;contain:strict}
+.pt-slide-layer>.mushaf-reader{position:absolute;inset:0;margin:0;will-change:transform}
+body.reading .mushaf-reader{will-change:auto}
+.pt-choice{display:flex;flex-direction:column;gap:12px;padding:18px 0;border-bottom:1px solid var(--line)}
+.pt-choice-head{display:flex;flex-direction:column;gap:3px}.pt-choice-head small{color:var(--muted);font-size:12.5px}
+.pt-options{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.pt-options button{display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 6px;border-radius:16px;border:1px solid var(--line);background:color-mix(in srgb,var(--paper) 80%,transparent);color:var(--ink);font:500 13px var(--ui-font,AppArabic),sans-serif;transition:background .2s,border-color .2s}
+.pt-options button .ui-icon{width:24px;height:24px;color:var(--muted)}
+.pt-options button.on{border-color:color-mix(in srgb,var(--gold) 60%,transparent);background:color-mix(in srgb,var(--gold) 12%,var(--paper));color:var(--ink)}
+.pt-options button.on .ui-icon{color:var(--gold)}
+.pt-options button:disabled{opacity:.45}
+.pt-slide-layer>.mushaf-reader{box-shadow:0 0 28px rgba(40,30,10,.18)}
