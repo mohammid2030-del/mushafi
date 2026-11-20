@@ -145,7 +145,7 @@ body.fajr-running .glass-nav,body.fajr-running nav{display:none!important}
 .fajr-orb{position:relative;display:grid;place-items:center;width:178px;height:178px;margin:30px 0 16px}
 .fajr-orb-ring{position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle,color-mix(in srgb,var(--gold) 24%,transparent),transparent 68%);border:1.5px solid rgba(181,141,69,.35)}
 .fajr-orb.dialing .fajr-orb-ring{animation:fajrPulse 1.6s ease-out infinite}
-.fajr-orb-face{position:relative;display:grid;place-items:center;width:118px;height:118px;border-radius:50%;background:linear-gradient(150deg,#1d4a3a,#0e2620);color:#efd9a6;font-size:36px;font-weight:600;box-shadow:0 16px 36px rgba(16,40,32,.32)}
+.fajr-orb-face{position:relative;display:grid;place-items:center;width:118px;height:118px;border-radius:50%;background:linear-gradient(150deg,#9a7638,#5c4420);color:#efd9a6;font-size:36px;font-weight:600;box-shadow:0 16px 36px rgba(16,40,32,.32)}
 @keyframes fajrPulse{0%{transform:scale(.82);opacity:1}100%{transform:scale(1.18);opacity:0}}
 @media (prefers-reduced-motion:reduce){.fajr-orb.dialing .fajr-orb-ring{animation:none}}
 .fajr-run-who strong{display:block;font-size:24px;font-weight:600}
@@ -177,7 +177,7 @@ body.fajr-running .glass-nav,body.fajr-running nav{display:none!important}
 
 /* done + totals + history */
 .fajr-done{padding-top:40px}
-.fajr-done-mark{display:grid;place-items:center;width:88px;height:88px;border-radius:50%;background:linear-gradient(150deg,#1d4a3a,#0e2620);color:#efd9a6;margin-bottom:12px}
+.fajr-done-mark{display:grid;place-items:center;width:88px;height:88px;border-radius:50%;background:linear-gradient(150deg,#9a7638,#5c4420);color:#efd9a6;margin-bottom:12px}
 .fajr-done-mark .ui-icon{width:40px;height:40px}
 .fajr-done h1{margin:4px 0;font-size:26px}
 .fajr-done p{margin:0 0 18px;color:var(--muted);font-size:14.5px;line-height:1.8}
