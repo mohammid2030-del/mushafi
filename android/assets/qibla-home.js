@@ -43,7 +43,7 @@ function hqStop() {
 function hqTick() {
   hq.raf = 0;
   const btn = document.getElementById('hl-qibla'), needle = document.getElementById('hq-needle');
-  if (!btn || !needle || view !== 'home') { if (view !== 'qibla') hqStop(); else { hq.running = false; hq.heading = null } return }
+  if (!btn || !needle || view !== 'home' || !btn.offsetParent) { if (view !== 'qibla') hqStop(); else { hq.running = false; hq.heading = null } return }
   const live = typeof hq.heading === 'number' && hq.bearing !== null;
   const target = live ? hq.bearing - hq.heading : 0;
   if (hq.angle === null) hq.angle = target; else hq.angle += (((target - hq.angle) % 360 + 540) % 360 - 180) * .14;
