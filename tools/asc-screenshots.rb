@@ -25,6 +25,17 @@ if mode == 'dump'
   out = v.get_app_store_version_localizations.map { |l| {locale: l.locale, description: l.description, keywords: l.keywords, promotional_text: l.promotional_text, whats_new: l.whats_new, marketing_url: l.marketing_url, support_url: l.support_url} }
   puts 'JSON-BEGIN'; puts JSON.generate(out); puts 'JSON-END'; exit
 end
+if mode == 'metadata'
+  require 'json'
+  meta = JSON.parse(File.read(File.join(File.dirname(root), 'metadata.json')))
+  v.get_app_store_version_localizations.each do |l|
+    m = meta[l.locale] or (puts "skip #{l.locale} (no text)"; next)
+    attrs = {description: m['description'], keywords: m['keywords'], promotionalText: m['promotional_text'], marketingUrl: m['marketing_url'], supportUrl: m['support_url']}
+    attrs[:whatsNew] = m['whats_new']
+    l.update(attributes: attrs); puts "metadata #{l.locale} ok"
+  end
+  puts 'DONE'; exit
+end
 DIMS = {[1320,2868]=>'iPhone-6.9',[2064,2752]=>'iPad-13',[1398,2034]=>'iPhone-Duo-outer',[2007,2853]=>'iPhone-Duo-inner'}
 TYPES = {'APP_IPHONE_67'=>'iPhone-6.9','APP_IPAD_PRO_3GEN_129'=>'iPad-13'}
 root = ENV['SHOTS'] || 'shots/screenshots'
