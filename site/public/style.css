@@ -1,5 +1,6 @@
 /* مصحفي — website styles. Mobile first; all type in rem so it follows the reader's font-size setting. */
 @font-face{font-family:UI;src:url(/fonts/ui.woff) format("woff");font-weight:100 900;font-display:swap}
+@font-face{font-family:Ethiopic;src:url(/fonts/ethiopic.ttf) format("truetype");font-display:swap}
 @font-face{font-family:Quran;src:url(/fonts/quran.ttf) format("truetype");font-display:swap}
 :root{
   --night:#0b0e1a;--night2:#0f1427;--nightBg:radial-gradient(56rem 30rem at 50% 50%,rgba(46,58,108,.26),transparent 70%),linear-gradient(180deg,#0b0e1a,#0e1222);--ink:#163b2e;--cream:#f7f1e4;--paper:#fffdf8;
@@ -328,9 +329,10 @@ a.store:hover{transform:translateY(-2px)}
 }
 
 /* ── languages ── */
-html[lang=en] body,html[lang=tr] body,html[lang=fr] body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,"Noto Sans",Inter,UI,sans-serif;letter-spacing:-.003em}
+html[lang=en] body,html[lang=tr] body,html[lang=fr] body,html[lang=ru] body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,"Noto Sans",Inter,UI,sans-serif;letter-spacing:-.003em}
+html[lang=am] body{font-family:Ethiopic,"Noto Sans Ethiopic","Kefa",-apple-system,"Segoe UI",Roboto,UI,sans-serif}
 html[lang=bn] body{font-family:"Noto Sans Bengali","Hind Siliguri","Kohinoor Bangla","Bangla Sangam MN",-apple-system,"Segoe UI",Roboto,UI,sans-serif}
-html[lang=en] .hero h1,html[lang=tr] .hero h1,html[lang=fr] .hero h1,html[lang=bn] .hero h1{letter-spacing:-.025em;line-height:1.1;padding-bottom:.08em}
+html[lang=en] .hero h1,html[lang=tr] .hero h1,html[lang=fr] .hero h1,html[lang=ru] .hero h1,html[lang=bn] .hero h1{letter-spacing:-.025em;line-height:1.1;padding-bottom:.08em}
 html[lang=en] .sec-head h2,html[lang=tr] .sec-head h2,html[lang=fr] .sec-head h2{letter-spacing:-.015em}
 [lang=bn] .lt-sample,[lang=bn]{line-height:1.8}
 .nav-end{display:flex;align-items:center;gap:.5rem}
@@ -402,7 +404,8 @@ html[lang=en] .sec-head h2,html[lang=tr] .sec-head h2,html[lang=fr] .sec-head h2
 .dv-flag:hover{background:rgba(255,255,255,.12)}
 .dv-flag.on{border-color:var(--gold2);background:rgba(232,207,150,.14)}
 .dv-flag .fl{font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif;font-size:1.1em;line-height:1}
-.dv-flag [lang=en],.dv-flag [lang=tr],.dv-flag [lang=fr]{font-family:-apple-system,"Segoe UI",Roboto,sans-serif;font-weight:600}
+.dv-flag [lang=en],.dv-flag [lang=tr],.dv-flag [lang=fr],.dv-flag [lang=ru]{font-family:-apple-system,"Segoe UI",Roboto,sans-serif;font-weight:600}
+.dv-flag [lang=am],.lang-menu li[lang=am]{font-family:Ethiopic,"Noto Sans Ethiopic",sans-serif}
 .dv-flag [lang=bn]{font-family:"Noto Sans Bengali",-apple-system,sans-serif}
 @media (prefers-reduced-motion:reduce){.dv{transition:none}}
 .dv-stage.live .dv{transition:transform .6s var(--ease),opacity .9s;transition-delay:0s}
