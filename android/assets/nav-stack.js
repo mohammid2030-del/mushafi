@@ -18,15 +18,22 @@ for (const name of navPageFunctions) {
   if (typeof original !== 'function' || original.navWrapped) continue;
   const wrapped = function (...args) {
     const outer = navDepth === 0, startView = view, startParent = outer && !systemBackRestoring ? systemBackRoute() : null;
+    const startUp = outer && !systemBackRestoring ? systemBackParents.get(startView) : null, snapshot = startUp ? new Map(systemBackParents) : null;
     navDepth++;
     let result;
     const before = navEnterCount;
     try { result = original.apply(this, args) } finally { navDepth-- }
     // A page that opens another page straight away (khatma → its setup) is not a stop on the way back:
     // the page finally shown returns to where the user actually was.
-    if (outer && !systemBackRestoring && view !== startView && navEnterCount !== before) { if (startParent) systemBackParents.set(view, startParent); else systemBackParents.delete(view) }
+    // Going up to the page this one was opened from (an in-page back or close button) is a step back, not a new visit:
+    // the page keeps its own way back instead of pointing back down to where the user just was.
+    if (startUp && startUp.navView === view && view !== startView && navEnterCount !== before) { const p = snapshot.get(view); if (p) systemBackParents.set(view, p); else systemBackParents.delete(view) }
+    // Leaving the full-screen player through its own buttons (close, surah list) is not a stop on the way back:
+    // the page it leads to returns to where the player was opened from (the Player tab), never into the player again.
+    else if (startUp && startView === 'surah-listen' && view !== startView && navEnterCount !== before) systemBackParents.set(view, startUp)
+    else if (outer && !systemBackRestoring && view !== startView && navEnterCount !== before) { if (startParent) systemBackParents.set(view, startParent); else systemBackParents.delete(view) }
     // Only remember calls that actually opened a page (not sheets, native screens or calls that bailed out).
-    if (navEnterCount !== before && typeof view === 'string' && view && view !== 'reader' && view !== 'onboarding') navEntries[view] = () => window[name](...args);
+    if (navEnterCount !== before && typeof view === 'string' && view && view !== 'reader' && view !== 'onboarding') { const v = view, entry = () => window[name](...args); entry.navView = v; navEntries[v] = entry }
     return result;
   };
   wrapped.navWrapped = true;
