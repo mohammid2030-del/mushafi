@@ -19,20 +19,25 @@ body.dark .tafsir-card .sheet-title h2 small{color:#e8cf96;background:rgba(232,2
 .tafsir-card .tafsir-scroll{padding:4px 18px 16px}
 .tafsir-card .tafsir-scroll>*{animation:tc-in .28s ease-out both}
 .tafsir-card .tafsir-scroll>*:nth-child(2){animation-delay:.04s}.tafsir-card .tafsir-scroll>*:nth-child(3){animation-delay:.08s}.tafsir-card .tafsir-scroll>*:nth-child(4){animation-delay:.12s}
-.tafsir-verse{position:relative;text-align:center;padding:16px 16px 12px;border-radius:20px;background:linear-gradient(180deg,rgba(201,162,74,.10),rgba(201,162,74,.04));border:1px solid rgba(201,162,74,.22)}
+.tafsir-verse{position:relative;text-align:center;padding:12px 16px 14px;border-radius:20px;background:linear-gradient(180deg,rgba(201,162,74,.10),rgba(201,162,74,.04));border:1px solid rgba(201,162,74,.22)}
 body.dark .tafsir-verse{background:linear-gradient(180deg,rgba(232,207,150,.08),rgba(232,207,150,.02));border-color:rgba(232,207,150,.16)}
-.tafsir-verse-text{font:calc(var(--tafsir-font) + 7px)/2.05 Quran,serif;color:var(--ink);margin:0;max-height:38vh;overflow:auto}
-.tafsir-verse-ref{display:inline-block;margin-top:4px;font-size:12px;color:#a8843f}
-body.dark .tafsir-verse-ref{color:#e8cf96}
+.tafsir-verse-text{font:calc(var(--tafsir-font) + var(--tv-add,4px))/2 Quran,serif;color:var(--ink);margin:0;text-align:justify;text-align-last:center;word-spacing:.04em;overflow:hidden}
+.tafsir-verse[data-len=short] .tafsir-verse-text{text-align:center}
+.tafsir-verse.is-collapsed .tafsir-verse-text{max-height:calc((var(--tafsir-font) + var(--tv-add,0px)) * 2 * 3 + 6px);-webkit-mask-image:linear-gradient(180deg,#000 70%,transparent);mask-image:linear-gradient(180deg,#000 70%,transparent)}
+.tafsir-verse.is-collapsed{padding-bottom:10px}.tafsir-verse.is-collapsed .tafsir-verse-more{position:absolute;left:50%;bottom:8px;transform:translateX(-50%);margin:0;background:var(--surface,#16181f);box-shadow:0 4px 14px rgba(0,0,0,.18)}body:not(.dark) .tafsir-verse.is-collapsed .tafsir-verse-more{background:#fbf8f1}
+.tafsir-verse-more{display:block;margin:8px auto 0;padding:5px 14px;border-radius:999px;border:1px solid rgba(201,162,74,.3);background:transparent;color:#a8843f;font:600 12px var(--ui-font,AppArabic),Tahoma,sans-serif}
+body.dark .tafsir-verse-more{color:#e8cf96;border-color:rgba(232,207,150,.25)}
+.tafsir-verse-ref{display:inline-block;padding:3px 12px;border-radius:999px;background:rgba(201,162,74,.12);font:600 12px var(--ui-font,AppArabic),Tahoma,sans-serif;color:#a8843f}
+body.dark .tafsir-verse-ref{color:#e8cf96;background:rgba(232,207,150,.10)}
 .tafsir-card .tafsir-source{padding:14px 2px 2px;font-size:13px;font-weight:700;color:#a8843f;border:0}
 body.dark .tafsir-card .tafsir-source{color:#e8cf96}
 .tafsir-card .source-offline{font-size:11px;font-weight:600;padding:3px 10px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
-.tafsir-card .tafsir-text{font:var(--tafsir-font)/2.05 var(--ui-font,AppArabic),Tahoma,sans-serif;padding:8px 2px 6px;color:var(--ink)}
+.tafsir-card .tafsir-text{font:var(--tafsir-font)/1.95 var(--ui-font,AppArabic),Tahoma,sans-serif;padding:8px 2px 6px;color:var(--ink)}
 .tafsir-card .tafsir-note{font-size:11px;color:var(--muted);opacity:.8;margin:6px 2px 0}
 
 .tafsir-card .tafsir-footer{display:flex;flex-wrap:wrap;align-items:center;gap:8px;background:transparent!important;border-top:1px solid var(--line);box-shadow:none;padding:10px 14px 12px;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
 .tafsir-card .tafsir-navigation{flex:1 1 100%;gap:8px}
-.tafsir-card .tafsir-navigation button{min-height:44px;border-radius:14px;font:600 14px var(--ui-font,AppArabic),Tahoma,sans-serif}
+.tafsir-card .tafsir-navigation button{min-height:42px;border-radius:14px;font:600 14px var(--ui-font,AppArabic),Tahoma,sans-serif}
 .tafsir-card .tafsir-navigation button:nth-child(2){background:linear-gradient(180deg,#f0d9a2,#c9a24a)!important;color:#2a1f08!important;border:0!important;box-shadow:0 6px 18px rgba(201,162,74,.3)}
 .tafsir-card .tafsir-quick-actions{flex:1 1 auto;padding:0;gap:6px}
 .tafsir-card .tafsir-quick-actions button{min-height:36px;border-radius:12px;font:12px var(--ui-font,AppArabic),Tahoma,sans-serif}
