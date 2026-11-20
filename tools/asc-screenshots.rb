@@ -11,6 +11,12 @@ if v.nil? && mode == 'upload' && ENV['NEW_VERSION'].to_s != ''
   v = app.get_edit_app_store_version(platform: ios)
 end
 live = app.get_live_app_store_version(platform: ios) rescue nil
+info = (app.fetch_edit_app_info || app.fetch_live_app_info) rescue nil
+puts "store name/subtitle languages: #{info ? info.get_app_info_localizations.map { |l| "#{l.locale}(#{l.name})" }.join(', ') : '?'}"
+puts "live version languages: #{live ? live.get_app_store_version_localizations.map(&:locale).join(', ') : '?'}"
+if live && mode == 'inspect'
+  live.get_app_store_version_localizations.each { |l| (l.get_app_screenshot_sets rescue []).each { |st| puts "  live #{l.locale} #{st.screenshot_display_type}: #{(st.app_screenshots||[]).size}" } }
+end
 puts "live: #{live&.version_string} #{live&.app_store_state}"
 abort('no editable version (create one in App Store Connect or pass NEW_VERSION)') unless v
 puts "editable: #{v.version_string} #{v.app_store_state}"
