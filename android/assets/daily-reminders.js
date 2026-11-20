@@ -43,3 +43,16 @@ document.addEventListener('visibilitychange',async()=>{if(document.hidden){daily
 setInterval(()=>{if(document.hidden)return;refreshDailyDua();checkDailyFridayExpiry();maybeFridayGuide()},30000);
 function commitDailyReminderConsent(enabled){if(window.AndroidReader?.setDailyReminderConsent&&AndroidReader.setDailyReminderConsent(enabled)===false)throw Error('reminder consent');localStorage.dailyReminderConsent=enabled?'1':'0';localStorage.removeItem('dailyReminderSettings')}
 if(localStorage.mushafiWelcomeCompleted==='1')window.AndroidReader?.initializeDailyReminderConsent?.();
+/* تذكيرات مستقلة اختيارية: أذكار الصباح، أذكار المساء، قبل النوم، والدعاء (مرة يوميًا ٨:٠٠ مساءً) */
+const DAILY_KINDS=[
+ ['morning','أذكار الصباح','٥:٠٠ صباحًا'],
+ ['evening','أذكار المساء','٥:٠٠ مساءً'],
+ ['night','ذكرك وقراءتك قبل النوم','١٠:٣٠ مساءً'],
+ ['dua','دعاء يطمئن به قلبك','مرة يوميًا ٨:٠٠ مساءً']
+];
+function dailyKinds(){try{if(window.AndroidReader?.dailyReminderKinds)return JSON.parse(AndroidReader.dailyReminderKinds()||'{}')}catch(e){}const saved=readJSON('dailyReminderKinds',null);if(saved)return saved;const on=localStorage.dailyReminderConsent==='1';return Object.fromEntries(DAILY_KINDS.map(([k])=>[k,on]))}
+function setDailyKind(kind,on){if(!DAILY_KINDS.some(([k])=>k===kind))return false;if(window.AndroidReader?.setDailyReminderKind){if(AndroidReader.setDailyReminderKind(kind,!!on)===false)return false}const all=dailyKinds();all[kind]=!!on;saveJSON('dailyReminderKinds',all);return true}
+function dailyKindsSwitches(prefix,values){return DAILY_KINDS.map(([k,label,hint])=>prayerSwitch(label,prefix+k,!!values[k],hint)).join('')}
+function dailyNeedPermission(){const st=readPrayerData(true).status||{};if(!st.notifications&&window.AndroidReader?.requestPrayerNotifications)AndroidReader.requestPrayerNotifications()}
+function dailyInjectSettings(){const first=app.querySelector('.prayer-settings-card');if(!first||app.querySelector('.daily-kinds'))return;const values=dailyKinds();first.insertAdjacentHTML('afterend',`<div class="prayer-section-head"><h2>تذكيرات الأذكار والدعاء</h2></div><div class="prayer-settings-card daily-kinds">${dailyKindsSwitches('daily-kind-',values)}<p class="small-note">اختيارية ومستقلة عن تنبيهات الصلاة؛ فعّل ما يناسبك منها.</p></div>`);for(const [k] of DAILY_KINDS){const input=document.getElementById('daily-kind-'+k);if(!input)continue;input.onchange=e=>{if(!setDailyKind(k,e.target.checked)){e.target.checked=!e.target.checked;showSmallNotice('تعذر حفظ التذكير');return}if(e.target.checked)dailyNeedPermission()}}try{uiLocalize(app.querySelector('.daily-kinds'));uiLocalize(app.querySelector('.daily-kinds').previousElementSibling)}catch(e){}}
+if(typeof renderPrayerSettings==='function'){const dailyPrevSettings=renderPrayerSettings;renderPrayerSettings=function(tab='alerts',...a){const r=dailyPrevSettings.call(this,tab,...a);if(tab==='alerts')dailyInjectSettings();return r}}

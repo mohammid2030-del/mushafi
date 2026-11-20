@@ -14,6 +14,7 @@ public final class UiLocale {
  public static void save(Context c,String code){if(!"system".equals(code)&&!SUPPORTED.contains(code))return;c.getSharedPreferences("ui-language",0).edit().putString("language",code).commit();MushafiWidget.refresh(c);}
  public static String text(Context c,String source,Object... args){return textIn(c,language(c),source,args);}
  public static String textIn(Context c,String lang,String source,Object... args){String result=source;if(!lang.equals("ar")){try{JSONObject dictionary;synchronized(CACHE){dictionary=CACHE.get(lang);if(dictionary==null){try(InputStream in=c.getAssets().open("locales/"+lang+".json");ByteArrayOutputStream bytes=new ByteArrayOutputStream()){byte[] b=new byte[8192];int n;while((n=in.read(b))!=-1)bytes.write(b,0,n);dictionary=new JSONObject(bytes.toString("UTF-8"));CACHE.put(lang,dictionary);}}}result=dictionary.optString(source,source);}catch(Exception ignored){}}for(int i=0;i<args.length;i++)result=result.replace("{"+i+"}",String.valueOf(args[i]));return result;}
+ public static String minutes(Context c,int n){if(language(c).equals("ar")){if(n==1)return "دقيقة واحدة";if(n==2)return "دقيقتان";return number(c,n)+(n>=3&&n<=10?" دقائق":" دقيقة");}return text(c,"{0} دقيقة",number(c,n));}
  public static String number(Context c,int n){return java.text.NumberFormat.getIntegerInstance(Locale.forLanguageTag(language(c))).format(n);}
  private UiLocale(){}
 }

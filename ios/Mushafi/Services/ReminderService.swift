@@ -30,6 +30,36 @@ final class ReminderService {
 
     private var consent: Bool { defaults.bool(forKey: "reminders.consent") }
 
+    /// Morning, evening, bedtime and the daily dua are independent opt-in reminders; Friday ones follow consent.
+    static let optionalKinds = ["morning", "evening", "night", "dua"]
+    private func kindEnabled(_ kind: String) -> Bool {
+        guard Self.optionalKinds.contains(kind) else { return consent }
+        return (defaults.object(forKey: "reminders.on." + kind) as? Bool) ?? consent
+    }
+    private var anyDaily: Bool { consent || Self.optionalKinds.contains { kindEnabled($0) } }
+
+    func kinds() -> String {
+        var out: [String: Bool] = [:]
+        for k in Self.optionalKinds { out[k] = kindEnabled(k) }
+        guard let data = try? JSONSerialization.data(withJSONObject: out), let text = String(data: data, encoding: .utf8) else { return "{}" }
+        return text
+    }
+
+    func setKind(_ kind: String?, _ enabled: Bool) -> Bool {
+        guard let kind, Self.optionalKinds.contains(kind) else { return false }
+        defaults.set(enabled, forKey: "reminders.on." + kind)
+        if enabled {
+            center.getNotificationSettings { settings in
+                if settings.authorizationStatus == .notDetermined {
+                    self.center.requestAuthorization(options: [.alert, .sound, .badge]) { _, _ in
+                        PrayerService.shared.refreshAuthorization { self.schedule() }
+                    }
+                } else { self.schedule() }
+            }
+        } else { schedule() }
+        return true
+    }
+
     func initializeConsent() -> Bool {
         if defaults.object(forKey: "reminders.consent") == nil {
             defaults.set(PrayerService.shared.notificationsAuthorized, forKey: "reminders.consent")
@@ -65,7 +95,7 @@ final class ReminderService {
                 let old = pending.map(\.identifier).filter { $0.hasPrefix(Self.dailyPrefix) || $0.hasPrefix(Self.khatmaPrefix) }
                 self.center.removePendingNotificationRequests(withIdentifiers: old)
                 guard allowed else { return }
-                if self.consent { self.scheduleDaily() }
+                if self.anyDaily { self.scheduleDaily() }
                 self.scheduleKhatma()
             }
         }
@@ -90,7 +120,6 @@ final class ReminderService {
         for offset in 0...5 {
             guard let day = calendar.date(byAdding: .day, value: offset, to: today) else { continue }
             list.append(Event(kind: "morning", at: at(day, 5, 0)))
-            list.append(Event(kind: "dua", at: at(day, 8, 0)))
             list.append(Event(kind: "evening", at: at(day, 17, 0)))
             list.append(Event(kind: "dua", at: at(day, 20, 0)))
             list.append(Event(kind: "night", at: at(day, 22, 30)))
@@ -109,7 +138,7 @@ final class ReminderService {
                 if zoned.component(.weekday, from: when) == 6 { list.append(Event(kind: "fridayDua", at: when)) }
             }
         }
-        return list.filter { $0.at > now.addingTimeInterval(5) }.sorted { $0.at < $1.at }
+        return list.filter { $0.at > now.addingTimeInterval(5) && kindEnabled($0.kind) }.sorted { $0.at < $1.at }
     }
 
     private func scheduleDaily() {
@@ -144,11 +173,8 @@ final class ReminderService {
     }
 
     private static func duaIndex(_ date: Date, _ size: Int) -> Int {
-        var local = Calendar(identifier: .gregorian)
-        local.timeZone = .current
-        let hour = local.component(.hour, from: date)
-        let slot = civilDay(date) * 2 + (hour < 8 ? -1 : hour < 20 ? 0 : 1)
-        return floorMod(slot, size)
+        guard size > 0 else { return 0 }
+        return floorMod(civilDay(date), size)
     }
 
     private static func fridayIndex(_ date: Date, _ size: Int) -> Int {

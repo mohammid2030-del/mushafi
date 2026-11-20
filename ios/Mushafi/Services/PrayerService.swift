@@ -244,7 +244,12 @@ final class PrayerService: NSObject {
         let content = UNMutableNotificationContent()
         let index = PrayerSettings.keys.firstIndex(of: e.key) ?? 0
         let name = UiLanguage.text(PrayerSettings.names[index])
-        func minutes(_ n: Int) -> String { UiLanguage.text("{0} دقيقة", UiLanguage.number(n)) }
+        func minutes(_ n: Int) -> String {
+            guard UiLanguage.current == "ar" else { return UiLanguage.text("{0} دقيقة", UiLanguage.number(n)) }
+            if n == 1 { return "دقيقة واحدة" }
+            if n == 2 { return "دقيقتان" }
+            return UiLanguage.number(n) + ((3...10).contains(n) ? " دقائق" : " دقيقة")
+        }
         switch e.kind {
         case "adhan":
             let iqama = (s.row(e.key)["iqama"] as? Int) ?? 0

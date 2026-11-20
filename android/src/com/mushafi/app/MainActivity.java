@@ -154,6 +154,8 @@ public class MainActivity extends Activity implements Runnable, SurahPlaybackSer
  @JavascriptInterface public String saveKhatmaPlan(String text){try{return KhatmaScheduler.save(this,text).toString();}catch(Exception e){return "{\"ok\":false}";}}
  @JavascriptInterface public String khatmaStatus(){try{return KhatmaScheduler.status(this).toString();}catch(Exception e){return "{}";}}
  @JavascriptInterface public boolean setDailyReminderConsent(boolean enabled){return DailyReminderScheduler.setConsent(this,enabled);}
+ @JavascriptInterface public String dailyReminderKinds(){return DailyReminderScheduler.kinds(this);}
+ @JavascriptInterface public boolean setDailyReminderKind(String kind,boolean enabled){return DailyReminderScheduler.setKind(this,kind,enabled);}
  @JavascriptInterface public boolean initializeDailyReminderConsent(){return DailyReminderScheduler.initializeConsent(this);}
  @JavascriptInterface public boolean consumeFridayReminder(){return DailyReminderScheduler.consumeFriday(this);}
  @JavascriptInterface public String consumeDailyReminderOpen(){String kind=getIntent().getStringExtra("dailyReminderKind");if(kind==null||!Arrays.asList(DailyReminderPlan.KINDS).contains(kind))return "{}";try{JSONObject j=new JSONObject().put("kind",kind).put("id",getIntent().getStringExtra("dailyReminderItem"));getIntent().removeExtra("dailyReminderKind");getIntent().removeExtra("dailyReminderItem");return j.toString();}catch(Exception e){return "{}";}}
