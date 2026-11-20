@@ -1,32 +1,42 @@
 {
   "notesAr": [
-    "قسم جديد: الحج والعمرة — دليل المناسك مع الطواف والسعي ثلاثي الأبعاد",
-    "عدّ الأشواط والوقت والخطوات، وملخص الرحلة كصورة أو PDF",
-    "تحسينات عامة"
+    "لغتان جديدتان: الروسية والأمهرية مع ترجمة معاني القرآن",
+    "الإذاعات الصوتية تعمل باستمرار، ومتابعة الاستماع تكمل من حيث توقفت",
+    "إصلاح الرجوع في الأذكار والمشغل، وتحسين أول تشغيل للتطبيق"
   ],
   "notesEn": [
-    "New: Hajj & Umrah — rites guide with 3D tawaf and sa'i",
-    "Round counter, time and steps, plus a trip summary as image or PDF",
-    "General improvements"
+    "Two new languages: Russian and Amharic, with translated Quran meanings",
+    "Quran radio plays continuously, and Continue listening resumes where you stopped",
+    "Back navigation fixed in adhkar and the player, and a smoother first launch"
   ],
   "notesUr": [
-    "نیا حصہ: حج و عمرہ — مناسک کی رہنمائی اور سہ جہتی طواف و سعی",
-    "چکر، وقت اور قدموں کا شمار، اور سفر کا خلاصہ تصویر یا PDF میں",
-    "عمومی بہتری"
+    "دو نئی زبانیں: روسی اور امہاری، قرآن کے معانی کے ترجمے کے ساتھ",
+    "قرآن ریڈیو مسلسل چلتا ہے، اور سننا وہیں سے جاری ہوتا ہے جہاں رکا تھا",
+    "اذکار اور پلیئر میں واپسی درست، اور پہلی بار کھولنا بہتر"
   ],
   "notesBn": [
-    "নতুন: হজ ও উমরাহ — ত্রিমাত্রিক তাওয়াফ ও সাঈসহ নির্দেশিকা",
-    "চক্কর, সময় ও পদক্ষেপ গণনা, ছবি বা PDF হিসেবে সারাংশ",
-    "সাধারণ উন্নতি"
+    "দুটি নতুন ভাষা: রুশ ও আমহারিক, কুরআনের অর্থের অনুবাদসহ",
+    "কুরআন রেডিও একটানা চলে, আর শোনা যেখানে থেমেছিল সেখান থেকে চলে",
+    "আজকার ও প্লেয়ারে ফিরে যাওয়া ঠিক করা হয়েছে, প্রথম চালু আরও মসৃণ"
   ],
   "notesTr": [
-    "Yeni: Hac ve Umre — 3B tavaf ve sa'y ile menasik rehberi",
-    "Şavt, süre ve adım sayacı; resim veya PDF olarak yolculuk özeti",
-    "Genel iyileştirmeler"
+    "İki yeni dil: Rusça ve Amharca, Kur'an meali ile",
+    "Kur'an radyosu kesintisiz çalar, dinlemeye devam kaldığınız yerden sürer",
+    "Zikirler ve oynatıcıda geri gezinme düzeltildi, ilk açılış iyileştirildi"
   ],
   "notesFr": [
-    "Nouveau : Hajj et Omra — guide des rites avec tawaf et sa'y en 3D",
-    "Compteur de tours, durée et pas, et résumé du voyage en image ou PDF",
-    "Améliorations générales"
+    "Deux nouvelles langues : le russe et l'amharique, avec la traduction du sens du Coran",
+    "La radio du Coran joue sans interruption, et l'écoute reprend là où vous l'avez arrêtée",
+    "Retour corrigé dans les invocations et le lecteur, et premier lancement plus fluide"
+  ],
+  "notesAm": [
+    "ሁለት አዲስ ቋንቋዎች፦ ሩሲያኛ እና አማርኛ፣ ከቁርኣን ትርጉም ጋር",
+    "የቁርኣን ሬዲዮ ያለማቋረጥ ይጫወታል፤ ማዳመጥ ካቆሙበት ይቀጥላል",
+    "በዚክሮች እና በማጫወቻው ውስጥ ወደኋላ መመለስ ተስተካክሏል፤ የመጀመሪያው መክፈቻ ተሻሽሏል"
+  ],
+  "notesRu": [
+    "Два новых языка: русский и амхарский, с переводом смыслов Корана",
+    "Радио Корана играет без перерывов, а прослушивание продолжается с места остановки",
+    "Исправлен возврат назад в азкарах и плеере, первый запуск стал плавнее"
   ]
 }
