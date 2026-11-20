@@ -665,44 +665,51 @@ function hajjReport(id) {
 /* بطاقة الملخص للمشاركة — بهوية مصحفي */
 function hajjLoadImg(src) { return new Promise(res => { const im = new Image(); im.onload = () => res(im); im.onerror = () => res(null); im.src = src }) }
 async function hajjReportCanvas(trip) {
+  // Same card as verse/dua sharing: Mushafi's glass panel on the dark story background, "مصحفي | Mushafi" beneath.
   const lang = typeof uiLocale === 'function' ? uiLocale() : 'ar', rtl = lang === 'ar' || lang === 'ur', fam = lang === 'bn' ? 'UiBengali, system-ui' : rtl ? 'AppArabic' : 'system-ui, AppArabic';
   try { await Promise.all([document.fonts?.load('700 40px AppArabic'), document.fonts?.load('40px Quran'), lang === 'bn' ? document.fonts?.load('700 40px UiBengali') : null]) } catch (e) {}
-  const icon = await hajjLoadImg('images/mushafi-official-icon.png');
-  const W = 1080, H = 1350, c = document.createElement('canvas'); c.width = W; c.height = H;
+  const f = SC_FORMATS.story, bgImg = await scImage(f.src);
+  const W = f.W, H = f.H, c = document.createElement('canvas'); c.width = W; c.height = H;
   const g = c.getContext('2d'), x = hajjTripTotals(trip), stages = trip.kind === 'visit' ? [] : hajjStagesFor(trip.kind, trip.type);
-  const GOLD = '#d9b874', INK = '#f7f0df', SOFT = 'rgba(247,240,223,.62)';
-  const bg = g.createLinearGradient(0, 0, 0, H); bg.addColorStop(0, '#16231e'); bg.addColorStop(1, '#0c1411'); g.fillStyle = bg; g.fillRect(0, 0, W, H);
-  const glow = g.createRadialGradient(W * 0.85, 0, 10, W * 0.85, 0, 700); glow.addColorStop(0, 'rgba(217,184,116,.22)'); glow.addColorStop(1, 'rgba(217,184,116,0)'); g.fillStyle = glow; g.fillRect(0, 0, W, H);
-  // نقش هندسي خفيف (نجمة ثمانية)
-  g.save(); g.strokeStyle = 'rgba(217,184,116,.07)'; g.lineWidth = 1.5;
-  for (let y = -60; y < H + 120; y += 120) for (let xx = -60; xx < W + 120; xx += 120) { g.beginPath(); for (let k = 0; k < 2; k++) { g.save(); g.translate(xx, y); g.rotate(k * Math.PI / 4); g.strokeRect(-34, -34, 68, 68); g.restore() } g.stroke() }
-  g.restore();
+  const GOLD = '#dcbf86', INK = '#f6efe0', SOFT = 'rgba(246,239,224,.62)', [X0, Y0, X1, Y1] = f.box, CW = X1 - X0, CX = (X0 + X1) / 2;
+  if (bgImg) g.drawImage(bgImg, 0, 0, W, H); else { g.fillStyle = '#121212'; g.fillRect(0, 0, W, H) }
   const rr = (x0, y0, w, h, r) => { g.beginPath(); g.moveTo(x0 + r, y0); g.arcTo(x0 + w, y0, x0 + w, y0 + h, r); g.arcTo(x0 + w, y0 + h, x0, y0 + h, r); g.arcTo(x0, y0 + h, x0, y0, r); g.arcTo(x0, y0, x0 + w, y0, r); g.closePath() };
   g.direction = rtl ? 'rtl' : 'ltr'; g.textAlign = 'center'; g.textBaseline = 'alphabetic';
-  const F = (w, s, f = fam) => `${w} ${s}px ${f}, sans-serif`;
-  const fit = (t, max, size, w = 400, f = fam) => { let z = size; g.font = F(w, z, f); while (z > 14 && g.measureText(t).width > max) { z -= 2; g.font = F(w, z, f) } return z };
-  // الشعار
-  if (icon) { g.save(); rr(W / 2 - 66, 84, 132, 132, 32); g.clip(); g.drawImage(icon, W / 2 - 66, 84, 132, 132); g.restore(); g.strokeStyle = 'rgba(217,184,116,.45)'; g.lineWidth = 2; rr(W / 2 - 66, 84, 132, 132, 32); g.stroke() }
-  g.fillStyle = GOLD; g.font = F(600, 30); g.fillText(hjT('مصحفي'), W / 2, 262);
-  g.fillStyle = INK; fit(hjT('ملخص رحلتي الإيمانية'), W - 160, 70, 700); g.fillText(hjT('ملخص رحلتي الإيمانية'), W / 2, 358);
-  g.fillStyle = GOLD; g.font = F(500, 40); g.fillText(hjT(hajjKindTitle(trip)), W / 2, 420);
-  g.fillStyle = SOFT; g.font = F(400, 30); g.fillText(hajjDate(trip.startedAt), W / 2, 470); g.font = F(400, 26); g.fillText((rtl ? '\u200f' : '') + hajjTime(trip.startedAt) + ' — ' + (trip.endedAt ? hajjTime(trip.endedAt) : hjT('جارية')), W / 2, 510);
-  // البطاقة الرئيسية
-  g.fillStyle = 'rgba(255,255,255,.045)'; rr(80, 548, W - 160, 240, 40); g.fill(); g.strokeStyle = 'rgba(217,184,116,.22)'; g.lineWidth = 2; g.stroke();
-  g.fillStyle = SOFT; g.font = F(400, 28); g.fillText(hjT('إجمالي المسافة'), W / 2, 610);
-  g.fillStyle = INK; g.font = F(700, 96); g.fillText(hajjKm(x.dist), W / 2, 706);
-  g.fillStyle = 'rgba(247,240,223,.45)'; g.font = F(400, 22); g.fillText(hjT(hajjSrcLabel[x.src]), W / 2, 762);
+  const F = (w, s, fm = fam) => `${w} ${s}px ${fm}, sans-serif`;
+  const fit = (t, max, size, w = 400, fm = fam) => { let z = size; g.font = F(w, z, fm); while (z > 14 && g.measureText(t).width > max) { z -= 2; g.font = F(w, z, fm) } return z };
+  const pad = 70, inner = CW - pad * 2;
+  // heading
+  g.fillStyle = INK; fit(hjT('ملخص رحلتي الإيمانية'), inner, 54, 700); g.fillText(hjT('ملخص رحلتي الإيمانية'), CX, Y0 + 100);
+  g.fillStyle = GOLD; fit(hjT(hajjKindTitle(trip)), inner, 36, 600); g.fillText(hjT(hajjKindTitle(trip)), CX, Y0 + 154);
+  g.fillStyle = SOFT; g.font = F(400, 26); g.fillText(hajjDate(trip.startedAt) + '  ·  ' + (rtl ? '‏' : '') + hajjTime(trip.startedAt) + ' — ' + (trip.endedAt ? hajjTime(trip.endedAt) : hjT('جارية')), CX, Y0 + 200);
+  // distance
+  g.fillStyle = 'rgba(255,255,255,.05)'; rr(X0 + pad, Y0 + 236, inner, 200, 34); g.fill(); g.strokeStyle = 'rgba(220,191,134,.25)'; g.lineWidth = 2; g.stroke();
+  g.fillStyle = SOFT; g.font = F(400, 26); g.fillText(hjT('إجمالي المسافة'), CX, Y0 + 286);
+  g.fillStyle = INK; g.font = F(700, 84); g.fillText(hajjKm(x.dist), CX, Y0 + 372);
+  g.fillStyle = 'rgba(246,239,224,.45)'; g.font = F(400, 20); g.fillText(hjT(hajjSrcLabel[x.src]), CX, Y0 + 414);
+  // four figures, 2 × 2
   const cells = [[hjT('الخطوات'), x.steps == null ? '—' : hajjNum(x.steps)], [hjT('المدة'), hjT(hajjDuration(x.span))], [hjT('أشواط الطواف'), hjAr(x.tawaf)], [hjT('أشواط السعي'), hjAr(x.sai)]];
-  const cw = (W - 160 - 3 * 20) / 4;
-  cells.forEach(([k, v], i) => { const x0 = rtl ? W - 80 - (i + 1) * cw - i * 20 : 80 + i * (cw + 20); g.fillStyle = 'rgba(255,255,255,.04)'; rr(x0, 814, cw, 144, 28); g.fill(); g.fillStyle = INK; fit(v, cw - 24, 44, 700); g.fillText(v, x0 + cw / 2, 884); g.fillStyle = SOFT; fit(k, cw - 20, 22); g.fillText(k, x0 + cw / 2, 930) });
+  const gap = 18, cw = (inner - gap) / 2, ch = 112;
+  cells.forEach(([k, v], i) => {
+    const col = i % 2, row = Math.floor(i / 2), xx = rtl ? X1 - pad - (col + 1) * cw - col * gap : X0 + pad + col * (cw + gap), yy = Y0 + 452 + row * (ch + gap);
+    g.fillStyle = 'rgba(255,255,255,.045)'; rr(xx, yy, cw, ch, 26); g.fill();
+    g.fillStyle = INK; fit(v, cw - 30, 44, 700); g.fillText(v, xx + cw / 2, yy + 58); g.fillStyle = SOFT; fit(k, cw - 24, 22); g.fillText(k, xx + cw / 2, yy + 92);
+  });
+  // stages
+  let y = Y0 + 452 + 2 * ch + gap + 46;
   if (stages.length) {
     const done = stages.filter(s => trip.stages[s.id]);
-    g.fillStyle = GOLD; g.font = F(600, 28); g.fillText(hjF('المراحل المنجزة: {0} من {1}', hjAr(done.length), hjAr(stages.length)), W / 2, 1008);
-    g.font = F(500, 24); let y = 1034, line = [], widthOf = arr => arr.reduce((s, t) => s + g.measureText(t).width + 56, -16);
-    const rows = []; for (const s of stages) { const nl = [...line, hjT(s.title)]; if (widthOf(nl) > W - 160 && line.length) { rows.push(line); line = [hjT(s.title)] } else line = nl } if (line.length) rows.push(line);
-    for (const row of rows.slice(0, 2)) { let xr = W / 2 + widthOf(row) / 2; for (const t of (rtl ? row : [...row].reverse())) { const on = trip.stages[stages.find(s => hjT(s.title) === t).id], tw = g.measureText(t).width + 40; g.fillStyle = on ? 'rgba(63,154,112,.22)' : 'rgba(255,255,255,.05)'; rr(xr - tw, y, tw, 46, 23); g.fill(); g.fillStyle = on ? '#8fd6b0' : SOFT; g.fillText(t, xr - tw / 2, y + 32); xr -= tw + 16 } y += 60 }
+    g.fillStyle = GOLD; g.font = F(600, 26); g.fillText(hjF('المراحل المنجزة: {0} من {1}', hjAr(done.length), hjAr(stages.length)), CX, y);
+    g.font = F(500, 21); y += 22;
+    const widthOf = arr => arr.reduce((sum, t) => sum + g.measureText(t).width + 46, -12), rows = []; let line = [];
+    for (const st of stages) { const nl = [...line, hjT(st.title)]; if (widthOf(nl) > inner && line.length) { rows.push(line); line = [hjT(st.title)] } else line = nl } if (line.length) rows.push(line);
+    for (const row of rows.slice(0, 2)) {
+      let xr = CX + widthOf(row) / 2;
+      for (const t of (rtl ? row : [...row].reverse())) { const on = trip.stages[stages.find(st => hjT(st.title) === t).id], tw = g.measureText(t).width + 34; g.fillStyle = on ? 'rgba(220,191,134,.2)' : 'rgba(255,255,255,.05)'; rr(xr - tw, y, tw, 42, 21); g.fill(); g.fillStyle = on ? GOLD : SOFT; g.fillText(t, xr - tw / 2, y + 29); xr -= tw + 12 }
+      y += 54;
+    }
   }
-  g.fillStyle = GOLD; g.font = F(400, 44, 'Quran'); g.fillText('﴿وَأَتِمُّوا الْحَجَّ وَالْعُمْرَةَ لِلَّهِ﴾', W / 2, H - 118);
-  g.fillStyle = 'rgba(247,240,223,.42)'; g.font = F(400, 22); g.fillText('mushafiapp.com  ·  App Store', W / 2, H - 64);
+  g.fillStyle = GOLD; g.font = F(400, 38, 'Quran'); g.fillText('﴿وَأَتِمُّوا الْحَجَّ وَالْعُمْرَةَ لِلَّهِ﴾', CX, Y1 - 40);
+  scBrand(g, W / 2, f.brandY, 40);
   return c;
 }
