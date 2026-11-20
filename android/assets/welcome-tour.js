@@ -4,8 +4,7 @@ window.onQiblaLocation=function(result){if(view!=='qibla'||!qiblaState)return;qi
 const welcomeAccountHome=accountHome;accountHome=function(){if(view==='onboarding'&&onboardingState){renderWelcome();return}welcomeAccountHome()};
 const welcomeCloudEvent=window.onNativeCloud;window.onNativeCloud=function(state){welcomeCloudEvent(state);if(view==='onboarding'&&[5,6].includes(onboardingState?.step))renderWelcome()};
 const tourSteps=[
- ['.qibla-header-button','اتجاه القبلة','هنا قبلتك. تستخدم موقع الجهاز الموحّد للصلاة والطقس، ويتجدّد تلقائيًا أثناء الاستخدام، والبوصلة تحتاج مستشعرًا مدعومًا في هاتفك.'],
- ['.live-header-button','الحرمين، بالقرب منك','بث مكة المكرمة والمدينة المنورة من القنوات الرسمية. المشاهدة تحتاج الإنترنت.'],
+ ['#hl-qibla-slot','اتجاه القبلة','سهم القبلة يتحرك مع هاتفك ويضيء حين تتجه إليها؛ اضغطه لفتح البوصلة الكاملة. تستخدم موقع الجهاز الموحّد للصلاة والطقس، ويتجدّد تلقائيًا أثناء الاستخدام، والبوصلة تحتاج مستشعرًا مدعومًا في هاتفك.'],
  ['#home-weather','الطقس وتاريخ يومك','التاريخ الهجري والميلادي وطقس موقعك الموحّد. يُحدّث الطقس كل ساعة أثناء الاستخدام، ويظهر وقت آخر تحديث.'],
  ['#.hl-times','صلاتك في وقتها','الصلاة القادمة والوقت المتبقي. افتح «كل المواقيت» لجدول الصلاة، واضبط التنبيهات والموقع من المزيد.'],
  ['.hero-continue','من حيث وصلت','تابع موضع قراءتك العامة هنا. الضغط المطوّل على آية داخل المصحف يفتح التفسير والاستماع والعلامات والملاحظات.'],

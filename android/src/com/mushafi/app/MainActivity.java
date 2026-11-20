@@ -68,6 +68,7 @@ public class MainActivity extends Activity implements Runnable, SurahPlaybackSer
 
  private QiblaController qibla;private AutomaticLocation automaticLocation;
  @JavascriptInterface public void startQibla(double latitude,double longitude){runOnUiThread(()->{if(foreground&&qibla!=null){if(automaticLocation!=null)automaticLocation.setPrecise(true);qibla.start(latitude,longitude);}});}
+ @JavascriptInterface public void startQiblaHeading(double latitude,double longitude){runOnUiThread(()->{if(foreground&&qibla!=null)qibla.start(latitude,longitude);});}
  @JavascriptInterface public void stopQibla(){runOnUiThread(()->{if(qibla!=null)qibla.stop();if(automaticLocation!=null)automaticLocation.setPrecise(false);});}
  private ChallengeClient challenge;private CloudSyncController cloud;private String pendingBackupExport;private boolean darkTheme=false;private android.widget.FrameLayout contentRoot;private WebView web;private volatile boolean reading;private boolean readerImeVisible;private volatile boolean readerSearchOpen;private AudioEngine audio;private boolean foreground=false;
  private android.location.LocationListener prayerLocationListener;private android.location.Location prayerBestLocation;private boolean prayerLocationPending;private boolean qiblaLocationRequest;private final android.os.Handler prayerHandler=new android.os.Handler(android.os.Looper.getMainLooper());private android.media.MediaPlayer prayerPreview;

@@ -71,7 +71,7 @@ function hlSkyMarkup(data) {
       <button class="hl-pill" onclick="prayerHome()">${uiIcon('clock')}${pill}</button>
       ${dua ? `<p class="hl-dua hl-words" data-hl-slot="dua" data-hl-key="dua-${dua.key}" lang="ar" dir="rtl" translate="no">${hlWords(dua.text)}<small>${dua.source}</small></p>` : ''}
     </div>
-    ${hlArc(today, now)}
+    <div class="hl-arc-wrap">${hlArc(today, now)}<span class="hl-qibla-slot" id="hl-qibla-slot"></span></div>
     <div class="hl-sky-times">${hlTimesMarkup(data)}</div>
   </section>`
 }

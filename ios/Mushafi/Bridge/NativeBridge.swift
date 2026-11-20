@@ -33,7 +33,7 @@ final class NativeBridge: NSObject, WKScriptMessageHandler {
             "openSourceUrl", "openWeatherReference", "openRecitationReference", "openSupportPage", "contactDeveloper", "openCharityPlatform",
             "exportAppBackup", "importAppBackup",
             "requestPrayerLocation", "requestQiblaLocation", "cancelPrayerLocation", "openLocationSettings",
-            "startQibla", "stopQibla", "requestHomeWeather",
+            "startQibla", "startQiblaHeading", "stopQibla", "requestHomeWeather",
             "requestPrayerNotifications", "openPrayerSystemSettings", "previewPrayerVoice", "stopPrayerVoice",
             "testPrayerNotification", "openWidgets", "openLiveBroadcast",
             "openBook", "deleteBook", "reverseGeocode", "wakeRegister", "wakeCreateInvite", "wakeAcceptInvite", "wakePeers", "wakeRemovePeer", "wakeRing", "wakeCancel", "fajrKeepAwake", "fajrStopAlarm", "fajrRequestPermissions",
@@ -196,7 +196,7 @@ final class NativeBridge: NSObject, WKScriptMessageHandler {
         case "openLocationSettings": ExternalLinks.openAppSettings()
         case "openBook": openBook(a.string(0))
         case "deleteBook": BookStore.delete(a.string(0)); shell?.callback("onBooksChanged")
-        case "startQibla": compass.start(orientation: shell?.currentOrientation ?? .portrait)
+        case "startQibla", "startQiblaHeading": compass.start(orientation: shell?.currentOrientation ?? .portrait)
         case "stopQibla": compass.stop()
         case "requestHomeWeather":
             guard let lat = a.double(0), let lon = a.double(1), let key = a.string(2),
