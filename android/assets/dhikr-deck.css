@@ -27,11 +27,11 @@ body.dark .dk{--dk-card:linear-gradient(170deg,#24232a,#1a1a1f);--dk-back:#1c1b2
 @keyframes dk-in-prev{from{transform:translateX(-60%) rotate(-6deg);opacity:0}to{transform:none;opacity:1}}
 @keyframes dk-in-prev-ltr{from{transform:translateX(60%) rotate(6deg);opacity:0}to{transform:none;opacity:1}}
 
-.dk-head{display:flex;align-items:center;justify-content:space-between;gap:8px;position:relative;direction:rtl;min-height:32px}
+.dk-head{display:flex;align-items:center;justify-content:flex-start;gap:8px;position:relative;min-height:32px}
 .dk-brand-mini{display:block;width:30px;height:30px;flex:0 0 auto}
 .dk-brand-mini .mushafi-brand-icon{display:block;width:30px!important;height:30px!important;border-radius:9px;filter:drop-shadow(0 4px 10px rgba(201,162,74,.25))}
 .dk-num{position:absolute;left:50%;transform:translateX(-50%);padding:5px 16px;border-radius:99px;background:linear-gradient(180deg,#f0d9a2,#c9a24a);color:#2a1f08;font:700 14px var(--ui-font,AppArabic),Tahoma,sans-serif;white-space:nowrap;box-shadow:0 6px 16px rgba(201,162,74,.28)}
-.dk-kind{color:var(--dk-gold);font:600 12px var(--ui-font,AppArabic),Tahoma,sans-serif;white-space:nowrap}
+.dk-kind{color:var(--dk-gold);font:600 12px var(--ui-font,AppArabic),Tahoma,sans-serif;max-width:calc(50% - 50px);line-height:1.25;overflow-wrap:anywhere}
 .dk-title{margin:12px 4px 2px;font:700 15px/1.5 var(--ui-font,AppArabic),Tahoma,sans-serif;color:var(--dk-gold);text-align:center;position:relative}
 .dk-body{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;overflow:hidden;margin:4px -4px;padding:0 4px;position:relative}
 .dk-body.is-scroll{align-items:flex-start;overflow-y:auto;overscroll-behavior:contain}

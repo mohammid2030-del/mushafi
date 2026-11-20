@@ -46,7 +46,6 @@ function dkCardMarkup(d, i, depth) {
   const disputed = d.routineEvidence?.disputed;
   return `<article class="dk-card${done ? ' is-done' : ''}" data-depth="${depth}" style="--depth:${depth}" ${depth ? 'aria-hidden="true"' : ''}>
     <div class="dk-head">
-      <span class="dk-brand-mini" aria-hidden="true">${mushafiBrandIcon()}</span>
       <span class="dk-num">${ar(i + 1)} / ${ar(n)}</span>
       <span class="dk-kind">${dkKind(d)}</span>
     </div>
