@@ -31,3 +31,4 @@
 .rh-dl-add{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:52px;margin-top:14px}
 .rh-saved{color:var(--gold)}
 .rh-dl-mb{text-align:start;unicode-bidi:isolate}html[dir=rtl] .rh-dl-mb{text-align:right}
+.reader-top .audio-open{display:none!important}
