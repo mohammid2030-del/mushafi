@@ -67,10 +67,10 @@ function rhLiveCard(key) {
   return `<button class="rh-live" onclick="openLiveBroadcast('${key}')" aria-label="${c.title}"><span class="rh-live-art photo ${key}"><b class="rh-live-tag"><i class="rh-dot"></i>مباشر</b></span><span class="rh-live-text"><strong>${c.place}</strong><small>${c.channel}</small></span></button>`;
 }
 function recitationHub() {
-  enterSection('recitation', 'n-home');
+  enterSection('recitation', 'n-player');
   const readers = audioReaderOrder.filter(id => surahCatalog[id]);
   const recent = rhRecent();
-  app.innerHTML = sectionHeading('التلاوة الصوتية', 'استمع إلى القرآن الكريم بصوت قارئك المفضل', 'home()') + `<div class="rh-hub">
+  app.innerHTML = sectionHeading('المشغل', 'القراء والسور، البث المباشر والإذاعات', '') + `<div class="rh-hub">
     <div id="rh-follow">${rhFollowMarkup()}</div>
     ${rhSection('القراء', `<button class="rh-more" onclick="openHomeRecitation('readers')">عرض الكل${uiIcon('chevron')}</button>`, `<div class="rh-rail">${readers.map(id => `<button class="rh-reader" onclick="rhOpenReader(${id})">${rhPortrait(id)}<strong>${esc(surahCatalog[id].name)}</strong></button>`).join('')}</div>`)}
     ${rhSection('بث مباشر', '', `<div class="rh-rail rh-rail-wide">${rhLiveCard('makkah')}${rhLiveCard('madinah')}</div>`)}
@@ -135,7 +135,7 @@ renderHomeRecitation = function (stage = 'readers', ...rest) {
   return r;
 };
 function rhDownloads(keepScroll) {
-  const y = scrollY; enterSection('recitation-downloads', 'n-home');
+  const y = scrollY; enterSection('recitation-downloads', 'n-player');
   const set = rhDownloadedSet(), rows = [...set].map(k => k.split(':').map(Number)).filter(([r, c]) => surahCatalog[r] && chapters[c - 1]).sort((a, b) => a[1] - b[1] || a[0] - b[0])
     .map(([r, c]) => `<div class="rh-dl-row"><button class="rh-dl-play" onclick="startFullSurah(${r},${c},'listen')"><span class="azkar-category-icon">${uiIcon('play')}</span><span><strong>سورة ${chapters[c - 1].name_arabic}</strong><small>${esc(fullReaderName(r))}</small></span></button><button class="rh-dl-x" aria-label="حذف" onclick="rhDeleteSurah(${r},${c})">${uiIcon('trash')}</button></div>`).join('');
   const busy = rhDl.reader ? `<div data-rh-r="${rhDl.reader}" data-rh-c="${rhDl.chapter}"><p class="az-note">سورة ${chapters[rhDl.chapter - 1].name_arabic} · ${esc(fullReaderName(rhDl.reader))}</p>${rhDownloadCard(rhDl.reader, rhDl.chapter)}</div>` : '';

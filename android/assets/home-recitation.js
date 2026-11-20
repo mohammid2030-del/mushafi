@@ -4,7 +4,7 @@ let homeRecitationSession=null,homeRecitationReturn=false;
 function openHomeRecitation(stage='readers'){
  if(homeRecitationSession){renderHomeRecitation(stage);return}
  const trigger=document.querySelector('.home-recitation-card'),root=document.createElement('div');root.className='home-recitation-overlay';
- root.innerHTML='<section class="home-recitation-dialog" role="dialog" aria-modal="true" aria-labelledby="home-recitation-title"><div class="home-recitation-heading"><button class="icon" data-home-audio-back aria-label="رجوع">'+uiIcon('arrow')+'</button><div><span class="overline">التلاوة الصوتية</span><h2 id="home-recitation-title">اختر القارئ</h2></div><button class="icon" data-home-audio-close aria-label="إغلاق">'+uiIcon('close')+'</button></div><div class="home-recitation-body"></div></section>';
+ root.innerHTML='<section class="home-recitation-dialog" role="dialog" aria-modal="true" aria-labelledby="home-recitation-title"><div class="home-recitation-heading"><button class="icon" data-home-audio-back aria-label="رجوع">'+uiIcon('arrow')+'</button><div><span class="overline">المشغل</span><h2 id="home-recitation-title">اختر القارئ</h2></div><button class="icon" data-home-audio-close aria-label="إغلاق">'+uiIcon('close')+'</button></div><div class="home-recitation-body"></div></section>';
  homeRecitationSession={root,trigger,scroll:scrollY,overflow:document.body.style.overflow,reader:surahCatalog[surahReader]?surahReader:7,chapter:1,stage};homeRecitationReturn=true;document.body.classList.add('home-recitation-open');document.body.style.overflow='hidden';document.body.append(root);
  root.querySelector('[data-home-audio-close]').onclick=()=>closeHomeRecitation();root.querySelector('[data-home-audio-back]').onclick=homeRecitationBack;root.onclick=e=>{if(e.target===root)closeHomeRecitation()};root.onkeydown=e=>{if(e.key==='Escape'){e.preventDefault();homeRecitationBack()}if(e.key==='Tab'){const items=[...root.querySelectorAll('button,input')].filter(el=>el.getClientRects().length&&!el.disabled),first=items[0],last=items.at(-1);if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus()}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus()}}};
  renderHomeRecitation(stage);root.querySelector('[data-home-audio-close]').focus({preventScroll:true});
@@ -36,7 +36,7 @@ function returnHomeRecitation(){const origin=homeRecitationFullscreen;if(!origin
 const homeAudioPlayerPrevious=fullSurahPlayerHome;fullSurahPlayerHome=function(){
  if(homeRecitationSession){homeRecitationFullscreen={scroll:homeRecitationSession.scroll};closeHomeRecitation(false);homeRecitationReturn=false}
  homeAudioPlayerPrevious();
- if(homeRecitationFullscreen){active('n-home');document.getElementById('listen-back').onclick=returnHomeRecitation;document.getElementById('full-player-stop').onclick=()=>{stopFullSurah();returnHomeRecitation()}}
+ if(homeRecitationFullscreen){active('n-player');document.getElementById('listen-back').onclick=returnHomeRecitation;document.getElementById('full-player-stop').onclick=()=>{stopFullSurah();returnHomeRecitation()}}
 };
 const homeAudioIndexPrevious=surahIndex;surahIndex=function(...args){if(homeRecitationFullscreen){returnHomeRecitation();return}homeAudioIndexPrevious(...args)};
 const homeAudioBackPrevious=handleBack;handleBack=function(){if(homeRecitationSession&&!activeSheet&&!reciterPicker){homeRecitationBack();return}if(homeRecitationFullscreen&&view==='surah-listen'&&!activeSheet&&!reciterPicker){returnHomeRecitation();return}homeAudioBackPrevious()};

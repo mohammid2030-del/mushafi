@@ -17,7 +17,7 @@ window.handleNativeBack=function(){
  if(view==='onboarding'&&onboardingState?.step===0)return false;
  if(activeSheet||selectedVerseKey||document.querySelector('.verse-sheet,.verse-toolbar,.feature-sheet')){systemBackNavigate(()=>handleBack());return true;}
  if(view==='home')return false;
- if(['more','duas','quran','library'].includes(view)){home();return true;}
+ if(['more','duas','quran','library','recitation'].includes(view)){home();return true;}
  if(view==='reader'&&!controlsVisible&&!khatmaReading&&!surahReading&&!smartReading&&systemReaderParent){systemBackNavigate(systemReaderParent);return true;}
  if(view==='reader'||view==='onboarding'||view==='khatma-setup'||view==='dua-reader'||view.startsWith('surah-')){systemBackNavigate(()=>handleBack());return true;}
  const parent=systemBackParents.get(view);if(parent){systemBackNavigate(parent);return true;}
