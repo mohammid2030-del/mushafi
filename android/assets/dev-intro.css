@@ -1,0 +1,47 @@
+.dev-intro{position:fixed;inset:0;z-index:2147483000;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:calc(var(--app-safe-top,0px) + 56px) 28px calc(var(--app-safe-bottom,0px) + 112px);background:var(--bg);color:var(--ink);font-family:var(--ui-font,AppArabic),sans-serif;overflow:hidden;cursor:default;-webkit-tap-highlight-color:transparent}
+.di-glow{position:absolute;inset:-20% -30% auto;height:75%;background:radial-gradient(ellipse at 50% 38%,color-mix(in srgb,var(--gold) 26%,transparent),transparent 62%);opacity:0;animation:di-glow 2.4s .2s ease-out forwards;pointer-events:none}
+.di-pattern{position:absolute;inset:0;opacity:0;background-image:radial-gradient(color-mix(in srgb,var(--gold) 22%,transparent) 1px,transparent 1.4px);background-size:22px 22px;-webkit-mask-image:radial-gradient(ellipse at 50% 30%,#000 0,transparent 70%);mask-image:radial-gradient(ellipse at 50% 30%,#000 0,transparent 70%);animation:di-fade 2s .6s ease forwards;pointer-events:none}
+.di-skip{position:absolute;top:calc(var(--app-safe-top,0px) + 14px);inset-inline-end:18px;z-index:2;padding:8px 14px;border:0;border-radius:999px;background:color-mix(in srgb,var(--paper) 70%,transparent);color:var(--muted);font:500 13px var(--ui-font,AppArabic),sans-serif;opacity:0;animation:di-fade .6s 1s ease forwards}
+.di-stage{position:relative;z-index:1;width:min(100%,420px);display:flex;flex-direction:column;align-items:center;text-align:center}
+.di-emblem{position:relative;width:96px;height:96px;display:grid;place-items:center;margin-bottom:22px;animation:di-emblem 1.5s cubic-bezier(.2,.8,.2,1) both}
+.di-emblem .mushafi-brand-icon{width:76px;height:76px;border-radius:22px;overflow:hidden;filter:drop-shadow(0 12px 22px color-mix(in srgb,var(--gold) 32%,transparent))!important}
+.di-emblem .di-ring{position:absolute;inset:-6px;width:calc(100% + 12px);height:calc(100% + 12px);transform:rotate(-90deg)}
+.di-emblem circle{fill:none;stroke:var(--gold);stroke-width:1.4;stroke-linecap:round;stroke-dasharray:352;stroke-dashoffset:352;opacity:.75;animation:di-ring 1.6s .35s cubic-bezier(.6,0,.2,1) forwards}
+.di-kicker{display:inline-block;margin-bottom:14px;padding:5px 14px;border-radius:999px;border:1px solid color-mix(in srgb,var(--gold) 34%,transparent);background:color-mix(in srgb,var(--gold) 8%,transparent);color:var(--gold);font-size:12.5px;font-weight:600;opacity:0;animation:di-rise .8s 1.15s cubic-bezier(.2,.8,.2,1) forwards}
+.di-letter{display:flex;flex-direction:column;gap:10px}
+.di-line{margin:0;font-size:16px;line-height:2;color:color-mix(in srgb,var(--ink) 86%,transparent)}
+.di-hello{margin-bottom:4px;font-size:27px;font-weight:600;line-height:1.6;color:var(--ink)}
+.di-w{display:inline-block;opacity:0;filter:blur(7px);transform:translateY(7px);animation:di-word .75s var(--d) cubic-bezier(.2,.8,.2,1) forwards}
+.di-sig{display:flex;align-items:center;gap:12px;width:100%;margin-top:22px;padding-top:16px;border-top:1px solid color-mix(in srgb,var(--gold) 20%,transparent);text-align:start;opacity:0;animation:di-rise .9s var(--sig) cubic-bezier(.2,.8,.2,1) forwards}
+.di-av{display:grid;place-items:center;width:46px;height:46px;flex:none;border-radius:50%;background:linear-gradient(140deg,#e6cf9a,#c9a35a);color:#211b10;font:700 19px AppArabic,sans-serif}
+.di-sig-txt{flex:1;display:flex;flex-direction:column;gap:2px}.di-sig-txt b{font-size:15.5px;font-weight:600}.di-sig-txt small{font-size:12px;color:var(--muted)}
+.di-hand{font:400 36px/1.3 HLQuran,Quran,serif;color:var(--gold);transform:rotate(-6deg);clip-path:inset(0 0 0 100%);animation:di-write 1.3s calc(var(--sig) + .35s) cubic-bezier(.5,0,.2,1) forwards}
+.di-cta{position:absolute;z-index:2;bottom:calc(var(--app-safe-bottom,0px) + 34px);inset-inline:28px;max-width:420px;margin:auto;display:flex;align-items:center;justify-content:center;gap:10px;min-height:54px;border:0;border-radius:18px;background:linear-gradient(135deg,#b8955a,#8f6d33);color:#fff;font:600 16px var(--ui-font,AppArabic),sans-serif;box-shadow:0 14px 34px color-mix(in srgb,var(--gold) 34%,transparent);opacity:0;transform:translateY(16px);animation:di-cta .8s var(--cta) cubic-bezier(.2,.8,.2,1) forwards;overflow:hidden}
+.di-cta::after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent 30%,rgba(255,255,255,.28) 50%,transparent 70%);transform:translateX(-120%);animation:di-shine 1.4s calc(var(--cta) + .6s) ease forwards}
+.di-cta .ui-icon{width:18px;height:18px}
+body.dark .di-cta{background:linear-gradient(135deg,#d2b67d,#a8864a);color:#1b1408}
+body.dark .di-glow{background:radial-gradient(ellipse at 50% 38%,color-mix(in srgb,var(--gold) 15%,transparent),transparent 62%)}
+/* tapped: finish the letter at once */
+.dev-intro.di-done *{animation-delay:0s!important;animation-duration:.35s!important}
+.dev-intro.di-done .di-hand{animation-duration:.6s!important}
+/* leaving: the letter lifts away, the welcome rises in beneath */
+.dev-intro.leaving{pointer-events:none;animation:di-out 1.1s .25s ease forwards}
+.dev-intro.leaving .di-stage{animation:di-lift .7s cubic-bezier(.5,0,.6,1) forwards}
+.dev-intro.leaving .di-cta,.dev-intro.leaving .di-skip{animation:di-hide .35s ease forwards}
+.welcome-shell.welcome-enter .welcome-top,.welcome-shell.welcome-enter .welcome-step-context,.welcome-shell.welcome-enter .welcome-progress,.welcome-shell.welcome-enter .welcome-content>*>*,.welcome-shell.welcome-enter .welcome-actions{animation:di-enter .9s cubic-bezier(.2,.8,.2,1) both}
+.welcome-shell.welcome-enter .welcome-top{animation-delay:.45s}.welcome-shell.welcome-enter .welcome-step-context,.welcome-shell.welcome-enter .welcome-progress{animation-delay:.55s}
+.welcome-shell.welcome-enter .welcome-content>*>:nth-child(1){animation-delay:.6s}.welcome-shell.welcome-enter .welcome-content>*>:nth-child(2){animation-delay:.72s}.welcome-shell.welcome-enter .welcome-content>*>:nth-child(3){animation-delay:.84s}.welcome-shell.welcome-enter .welcome-content>*>:nth-child(n+4){animation-delay:.96s}.welcome-shell.welcome-enter .welcome-actions{animation-delay:1.05s}
+@keyframes di-glow{to{opacity:1}}@keyframes di-fade{to{opacity:1}}@keyframes di-hide{to{opacity:0}}
+@keyframes di-emblem{from{opacity:0;transform:scale(.82);filter:blur(10px)}to{opacity:1;transform:none;filter:none}}
+@keyframes di-ring{to{stroke-dashoffset:0}}
+@keyframes di-rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@keyframes di-word{to{opacity:1;filter:none;transform:none}}
+@keyframes di-write{to{clip-path:inset(0 0 0 0)}}
+@keyframes di-cta{to{opacity:1;transform:none}}
+@keyframes di-shine{to{transform:translateX(120%)}}
+@keyframes di-lift{to{opacity:0;transform:translateY(-34px) scale(.97);filter:blur(6px)}}
+@keyframes di-out{to{opacity:0}}
+@keyframes di-enter{from{opacity:0;transform:translateY(22px);filter:blur(4px)}to{opacity:1;transform:none;filter:none}}
+@media (prefers-reduced-motion:reduce){.dev-intro *,.dev-intro,.welcome-shell.welcome-enter *{animation-duration:.01s!important;animation-delay:0s!important}}
+.dev-intro:not(.di-done) .di-cta{pointer-events:none}
+.di-cta:focus{outline:none}.di-cta:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
