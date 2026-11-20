@@ -167,7 +167,7 @@ function rhDownloads(keepScroll) {
 }
 /* الرجوع إلى صفحة التلاوة بعد اختيار القارئ أو السورة أو من المشغل */
 const rhPrevClose = closeHomeRecitation;
-closeHomeRecitation = function (...a) { const onHub = !!app.querySelector('.rh-hub'); const r = rhPrevClose.apply(this, a); if (onHub && app.querySelector('.rh-hub')) { view = 'recitation'; try { active('n-home') } catch (e) {} rhRefresh() } return r };
+closeHomeRecitation = function (...a) { const onHub = !!app.querySelector('.rh-hub'); const r = rhPrevClose.apply(this, a); if (onHub && app.querySelector('.rh-hub')) { view = 'recitation'; try { active('n-player') } catch (e) {} rhRefresh() } return r };
 const rhPrevPlayer = fullSurahPlayerHome;
 fullSurahPlayerHome = function (...a) { const fromHub = view === 'recitation' || !!app.querySelector('.rh-hub'); const r = rhPrevPlayer.apply(this, a); if (fromHub) { const back = document.getElementById('listen-back'); if (back) back.onclick = recitationHub } return r };
 
