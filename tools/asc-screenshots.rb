@@ -20,6 +20,11 @@ end
 puts "live: #{live&.version_string} #{live&.app_store_state}"
 abort('no editable version (create one in App Store Connect or pass NEW_VERSION)') unless v
 puts "editable: #{v.version_string} #{v.app_store_state}"
+if mode == 'dump'
+  require 'json'
+  out = v.get_app_store_version_localizations.map { |l| {locale: l.locale, description: l.description, keywords: l.keywords, promotional_text: l.promotional_text, whats_new: l.whats_new, marketing_url: l.marketing_url, support_url: l.support_url} }
+  puts 'JSON-BEGIN'; puts JSON.generate(out); puts 'JSON-END'; exit
+end
 DIMS = {[1320,2868]=>'iPhone-6.9',[2064,2752]=>'iPad-13',[1398,2034]=>'iPhone-Duo-outer',[2007,2853]=>'iPhone-Duo-inner'}
 TYPES = {'APP_IPHONE_67'=>'iPhone-6.9','APP_IPAD_PRO_3GEN_129'=>'iPad-13'}
 root = ENV['SHOTS'] || 'shots/screenshots'
