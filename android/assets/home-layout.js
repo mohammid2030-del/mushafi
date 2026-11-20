@@ -162,7 +162,7 @@ const HL_DUAS = {
     { text: 'رَبِّ أَعُوذُ بِكَ مِنْ هَمَزَاتِ الشَّيَاطِينِ وَأَعُوذُ بِكَ رَبِّ أَنْ يَحْضُرُونِ', source: 'المؤمنون · ٩٧–٩٨' },
   ],
 };
-function hlNormDua(t) { return String(t || '').replace(/[\u064B-\u0652\u0670\u06D6-\u06ED]/g, '').replace(/[أإآٱ]/g, 'ا').replace(/ى/g, 'ي').replace(/ة/g, 'ه').replace(/[^\u0621-\u064A]/g, '') }
+function hlNormDua(t) { return String(t || '').replace(/[\u0610-\u061A\u064B-\u065F\u0670\u06D6-\u06ED\u0640]/g, '').replace(/[أإآٱ]/g, 'ا').replace(/ؤ/g, 'و').replace(/ئ/g, 'ي').replace(/ى/g, 'ي').replace(/ة/g, 'ه').replace(/ء/g, '').replace(/[^\u0621-\u064A]/g, '') }
 function hlSameDua(a, b) { a = hlNormDua(a); b = hlNormDua(b); if (!a || !b) return false; const k = Math.min(14, a.length, b.length); return a.includes(b.slice(0, k)) || b.includes(a.slice(0, k)) }
 function hlDayNumber(now) { const d = new Date(now); return Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 86400000) }
 function hlDua(today, now) {
