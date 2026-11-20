@@ -32,6 +32,22 @@ for (const name of navPageFunctions) {
   wrapped.navWrapped = true;
   window[name] = wrapped;
 }
+// Pages with tabs step back through their first tab before leaving (prayer times: month or night → today → home).
+function navTabBack() {
+  if (view === 'prayer' && typeof prayerTab !== 'undefined' && prayerTab !== 'today' && typeof ppTab === 'function') { ppTab('today'); return true }
+  if (view === 'quran' && typeof quranTab !== 'undefined' && quranTab !== 'surahs') { openQuran('surahs'); return true }
+  return false;
+}
+const navNativeBack = window.handleNativeBack;
+window.handleNativeBack = function (...args) {
+  if (!activeSheet && !document.querySelector('.feature-sheet,.first-tour,.home-recitation-overlay') && navTabBack()) return true;
+  return navNativeBack.apply(this, args);
+};
+document.addEventListener('click', e => {
+  if (!e.target.closest?.('#app .screen-heading button[data-back], #app .screen-heading > button.round-action:first-child')) return;
+  if (navTabBack()) { e.preventDefault(); e.stopImmediatePropagation() }
+}, true);
+
 // The back arrow in a page heading follows the same record as the system back, so the two never disagree.
 document.addEventListener('click', e => {
   const button = e.target.closest?.('#app .screen-heading button[data-back], #app .screen-heading > button.round-action:first-child');
