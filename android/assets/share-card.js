@@ -207,5 +207,5 @@ shareDevotion = function (id) {
   if (!d) return scDuaText(id);
   const clean = r => String(r || '').replace(/(\d|[٠-٩])[a-z]\b/gi, '$1'); // sub-numbers such as 2730a read as 2730
   const ref = [...new Set([d.reference, d.hadithRef?.reference].filter(Boolean).map(clean))].join(' · ');
-  openShareCard({ text: d.text, reference: ref, kicker: d.title && d.title.length < 40 ? d.title : '' }, () => scDuaText(id), `Mushafi-dua`);
+  openShareCard({ text: d.text, reference: ref, kicker: '' }, () => scDuaText(id), `Mushafi-dua`);
 };
