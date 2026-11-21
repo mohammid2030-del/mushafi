@@ -40,6 +40,7 @@ DIMS = {[1320,2868]=>'iPhone-6.9',[2064,2752]=>'iPad-13',[1398,2034]=>'iPhone-Du
 TYPES = {'APP_IPHONE_67'=>'iPhone-6.9','APP_IPAD_PRO_3GEN_129'=>'iPad-13','APP_IPHONE_DUO'=>'iPhone-Duo-inner'}
 LANG_OF = ->(loc) { {'ar-SA'=>'ar','fr-FR'=>'fr','fr-CA'=>'fr','ur-PK'=>'ur','bn-BD'=>'bn','tr'=>'tr','ru'=>'ru'}[loc] || 'en' }
 v.get_app_store_version_localizations.each do |loc|
+  next if ENV['ONLY'].to_s != '' && ENV['ONLY'] != loc.locale
   sets = loc.get_app_screenshot_sets
   lg = LANG_OF.(loc.locale); root = lg == 'ar' ? 'shots/screenshots' : "shots/screenshots_#{lg}"
   puts "== #{loc.locale} (#{lg})"

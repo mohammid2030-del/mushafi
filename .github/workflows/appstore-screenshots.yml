@@ -4,6 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       mode: {description: "inspect or upload", type: choice, options: [inspect, upload, dump, metadata], default: inspect}
+      only: {description: "Only this locale (optional)", required: false, default: ""}
       new_version: {description: "Create this version if none is editable (e.g. 3.1.60)", required: false, default: ""}
 jobs:
   shots:
@@ -27,4 +28,5 @@ jobs:
           ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
           MODE: ${{ inputs.mode }}
           NEW_VERSION: ${{ inputs.new_version }}
+          ONLY: ${{ inputs.only }}
         run: ruby tools/asc-screenshots.rb
