@@ -1318,7 +1318,7 @@
     document.dispatchEvent(new CustomEvent('mushafi:lang', { detail: lang }));
   }
   // App screenshots follow the chosen language with a soft cross-fade.
-  function shotSrc(name, lang) { return (lang === 'ar' ? '/img/' + name + '.webp' : '/img/' + lang + '/' + name + '.webp') + '?v=1121d'; }
+  function shotSrc(name, lang) { return (lang === 'ar' ? '/img/' + name + '.webp' : '/img/' + lang + '/' + name + '.webp') + '?v=1121e'; }
   function setShot(img, lang, instant) {
     var want = shotSrc(img.getAttribute('data-shot'), lang || current);
     if (img.getAttribute('src') === want) return;
