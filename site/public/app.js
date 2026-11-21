@@ -21,10 +21,10 @@
     var p = phaseFor(new Date());
     if (hero.dataset.phase === p) return;
     hero.dataset.phase = p;
-    if (shot) { shot.setAttribute('data-shot', SHOT[p]); if (window.mushafiI18n) window.mushafiI18n.setShot(shot, true); else shot.src = '/img/' + SHOT[p] + '.webp'; }
+    if (shot) { shot.setAttribute('data-shot', SHOT[p]); if (window.mushafiI18n) window.mushafiI18n.setShot(shot, true); else shot.src = '/img/' + SHOT[p] + '.webp?v=1121d'; }
     label.textContent = tr(TEXT[p]);
     var light = p === 'night' || p === 'dusk';
-    document.documentElement.style.setProperty('--navInk', light ? '#f4ecda' : '#163b2e');
+    document.documentElement.style.setProperty('--navInk', light ? '#f4ecda' : '#231a0b');
   }
   applyPhase();
   setInterval(applyPhase, 60000);
