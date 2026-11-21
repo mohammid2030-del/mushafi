@@ -74,7 +74,7 @@ const rhRadios = [
   { id: 'eg', title: 'إذاعة القرآن الكريم', place: 'من القاهرة', url: 'https://stream.radiojar.com/8s5u5tpdtwzuv' }
 ];
 let rhRadio = { id: '', audio: null, status: 'stopped' };
-// Android streams the radio natively (the page cannot reach the web there, and it keeps playing with the screen off).
+// Android and iOS stream the radio natively (the page cannot follow the stream's http redirect, and it keeps playing with the screen off).
 const rhRadioNative = () => typeof window.AndroidReader?.radioPlay === 'function';
 function rhRadioStop() {
   if (rhRadio.audio) { try { rhRadio.audio.pause(); rhRadio.audio.removeAttribute('src'); rhRadio.audio.load() } catch (e) {} }

@@ -19,7 +19,7 @@ final class NativeBridge: NSObject, WKScriptMessageHandler {
             "surahSnapshot", "surahDownloadedList",
             "initializeDailyReminderConsent", "setDailyReminderConsent", "dailyReminderKinds", "setDailyReminderKind", "setHijriOffset", "consumeFridayReminder", "consumeDailyReminderOpen",
             "saveKhatmaPlan", "khatmaStatus", "consumeKhatmaOpen",
-            "automaticLocationSnapshot", "booksSaved", "fajrSave", "fajrStatus", "fajrConsumeLaunch", "setPrayerMute", "wakeStatus", "wakeConsumeLink", "hajjStepStatus",
+            "automaticLocationSnapshot", "booksSaved", "fajrSave", "fajrStatus", "fajrConsumeLaunch", "setPrayerMute", "wakeStatus", "wakeConsumeLink", "hajjStepStatus", "radioSnapshot",
         ]
         if CloudSync.isAvailable { list += ["cloudSnapshot", "cloudMatchesAck"] }
         return list
@@ -40,6 +40,7 @@ final class NativeBridge: NSObject, WKScriptMessageHandler {
             "requestAppReview", "openAppReview", "surahDownload", "surahDownloadCancel", "surahDownloadDelete",
             "hajjStepPermission", "hajjStepsBegin", "hajjStepsEnd", "hajjStepsQuery", "hajjShareFile", "hajjSaveFile",
             "surahPlay", "surahPlaySession", "surahSetMode", "surahPause", "surahResume", "surahStop", "surahSkip", "surahSeek",
+            "radioPlay", "radioStop",
         ]
         if CloudSync.isAvailable {
             list += ["cloudSignIn", "cloudSignInApple", "cloudSignOut", "cloudPush", "cloudRetry", "cloudResolve",
@@ -72,6 +73,7 @@ final class NativeBridge: NSObject, WKScriptMessageHandler {
         prayer.onChange = { [weak self] in self?.shell?.callback("onPrayerNativeChanged") }
         prayer.onPreview = { [weak self] playing in self?.shell?.callback("onPrayerPreview", playing) }
         surah.onState = { [weak self] json in self?.shell?.callbackRaw("onNativeSurah", json) }
+        RadioPlayer.shared.onState = { [weak self] json in self?.shell?.callbackRaw("onNativeRadio", json) }
         SurahDownloads.shared.emit = { [weak self] json in self?.shell?.callbackRaw("onSurahDownload", json) }
         CloudSync.shared.onState = { [weak self] json in self?.shell?.callbackRaw("onNativeCloud", json) }
         WakeClient.shared.onEvent = { [weak self] name, json in self?.shell?.callbackRaw(name, json) }
@@ -129,6 +131,7 @@ final class NativeBridge: NSObject, WKScriptMessageHandler {
         case "wakeStatus": value = WakeClient.shared.status()
         case "wakeConsumeLink": value = WakeClient.shared.consumeLink()
         case "hajjStepStatus": value = HajjNative.shared.status()
+        case "radioSnapshot": value = RadioPlayer.shared.snapshot
         case "cloudSnapshot": value = CloudSync.shared.snapshotJSON()
         case "cloudMatchesAck": value = CloudSync.shared.matchesAck(a.string(0))
         default: return nil
@@ -246,6 +249,11 @@ final class NativeBridge: NSObject, WKScriptMessageHandler {
             prayer.stopPreview()
             surah.play(reader: a.int(0) ?? 7, chapter: a.int(1) ?? 1, verse: a.int(2) ?? 0, mode: a.string(4))
         case "surahSetMode": if let mode = a.string(0), ["continuous", "random", "single"].contains(mode) { surah.setMode(mode) }
+        case "radioPlay":
+            if let id = a.string(0), let url = a.string(1) {
+                RadioPlayer.shared.play(id: id, url: url, title: a.string(2) ?? "", place: a.string(3) ?? "")
+            }
+        case "radioStop": RadioPlayer.shared.stop()
         case "surahPause": surah.pause()
         case "surahResume": surah.resume()
         case "surahStop": surah.stop()

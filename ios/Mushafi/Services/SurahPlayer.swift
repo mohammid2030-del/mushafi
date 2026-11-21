@@ -135,6 +135,7 @@ final class SurahPlayer: NSObject {
     // MARK: - Commands (bridge)
 
     func play(reader r: Int, chapter c: Int, verse: Int, mode: String? = nil) {
+        RadioPlayer.shared.stop()
         if let mode { playbackMode = Self.normalize(mode) }
         guard valid(r, c) else {
             message = "التلاوة غير متاحة"
@@ -478,15 +479,19 @@ final class SurahPlayer: NSObject {
             self.resume()
             return .success
         }
-        commands.pauseCommand.addTarget { [weak self] _ in self?.pause(); return .success }
+        commands.pauseCommand.addTarget { [weak self] _ in
+            if RadioPlayer.shared.active { RadioPlayer.shared.stop(); return .success }
+            self?.pause(); return .success
+        }
         commands.togglePlayPauseCommand.addTarget { [weak self] _ in
             guard let self else { return .commandFailed }
+            if RadioPlayer.shared.active { RadioPlayer.shared.stop(); return .success }
             if self.status == "playing" || self.status == "loading" { self.pause() }
             else if self.accessoryJustConnected { return .commandFailed }
             else { self.resume() }
             return .success
         }
-        commands.stopCommand.addTarget { [weak self] _ in self?.stop(); return .success }
+        commands.stopCommand.addTarget { [weak self] _ in RadioPlayer.shared.stop(); self?.stop(); return .success }
         commands.skipForwardCommand.preferredIntervals = [15]
         commands.skipBackwardCommand.preferredIntervals = [15]
         commands.skipForwardCommand.addTarget { [weak self] _ in self?.skip(15_000); return .success }
