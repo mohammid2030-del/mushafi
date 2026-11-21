@@ -16,11 +16,9 @@ duaHome = function (group) {
   const g = id => devotionGroups.find(x => x.id === id), n = id => groupProgress(id).total, has = id => !!g(id) && n(id) > 0;
   const today = id => { const p = groupProgress(id); return `<em class="az-count">${ar(p.done)} / ${ar(p.total)}</em>` };
   const row = (icon, title, sub, action, count) => `<button onclick="${action}"><span class="azkar-category-icon">${uiIcon(icon)}</span><span><strong>${title}</strong><small>${sub}</small></span>${count != null ? `<em>${ar(count)}</em>` : ''}${uiIcon('arrow')}</button>`;
-  const azkar = [
-    row('sunrise', 'أذكار الصباح والمساء', 'كل وقت له أذكاره مع عدّاد الإنجاز', "duaHome('me')", n('morning') + n('evening')),
-    ...['prayer', 'sleep', 'daily', 'tasbih'].filter(has).map(id => row(g(id).icon, g(id).title, g(id).subtitle, `duaHome('${id}')`, n(id)))
-  ].join('');
-  const topics = ['quran', 'sunnah', 'prophets', 'tawba', 'hamm', 'rizq', 'family', 'shifa', 'witr', 'hajj', 'travel'].filter(has)
+  const azkar = ['prayer', 'sleep', 'home', 'purity', 'food', 'clothes', 'adhan', 'weather', 'travel', 'manners', 'tasbih'].filter(has)
+    .map(id => row(g(id).icon, g(id).title, g(id).subtitle, `duaHome('${id}')`, n(id))).join('');
+  const topics = ['quran', 'sunnah', 'prophets', 'tawba', 'hamm', 'rizq', 'family', 'shifa', 'witr', 'hajj'].filter(has)
     .map(id => `<button onclick="duaHome('${id}')">${uiIcon(g(id).icon)}<span>${g(id).title}</span></button>`).join('')
     + `<button onclick="duaHome('favorites')">${uiIcon('bookmark')}<span>الأدعية المفضلة</span></button>`;
   app.innerHTML = `<div class="azkar-title az-hub-title"><div><span>وَاذْكُر رَّبَّكَ كَثِيرًا</span><h1>الأذكار والأدعية</h1><p>طمأنينة لقلبك في كل وقت</p></div><button class="round-action" onclick="duaHome('favorites')" aria-label="مفضلة الأذكار">${uiIcon('heart')}</button></div>

@@ -22,6 +22,33 @@
   order.sunnah = sunnahOrder.filter(id => devotionById[id] && devotionById[id].kind !== 'quran');
   order.hajj = ['muslim-1184a', ...HAJJ.map(h => 'hajj-' + h[0]).filter(id => devotionById[id])]; tag('muslim-1184a', 'hajj');
   tag('quran-23-29', 'travel');
+  /* الأذكار اليومية مفصولة: كل مناسبة في قسم مستقل */
+  const DAILY = {
+    home: ['leave-home', 'audit-leave-home-safety', 'mosque-enter', 'mosque-leave', 'muslim-1434a'],
+    purity: ['bathroom-enter', 'bathroom-leave', 'audit-after-wudu'],
+    food: ['audit-food-name', 'food-forgot', 'audit-food-blessing', 'audit-milk', 'food-end', 'audit-meal-praise', 'audit-host', 'muslim-2055a'],
+    clothes: ['audit-new-garment', 'audit-garment-praise'],
+    adhan: ['audit-shahada-adhan', 'audit-hayala', 'audit-after-adhan', 'muslim-406a'],
+    weather: ['audit-rain', 'muslim-897a', 'muslim-897a-excess-rain', 'audit-after-rain', 'muslim-899b'],
+    manners: ['audit-sneeze', 'audit-sneeze-response', 'audit-sneeze-reply', 'audit-anger', 'audit-meeting']
+  };
+  Object.entries(DAILY).forEach(([g, list]) => { list.forEach(id => tag(id, g)); order[g] = list.filter(id => devotionById[id]) });
+  order.travel = ids('travel');
+  /* لا يتكرر النص نفسه داخل القسم الواحد (مصدران للدعاء نفسه)؛ أقسام الأوقات تبقى كما هي لأن العدد يختلف بين الأوقات */
+  const norm = t => String(t || '').replace(/[\u064B-\u065F\u0670\u06D6-\u06ED\u0640]/g, '').replace(/[^\u0621-\u064A]/g, '').replace(/[أإآٱ]/g, 'ا').replace(/ى/g, 'ي').replace(/ة/g, 'ه');
+  const keepAll = ['morning', 'evening', 'prayer', 'sleep', 'hajj'];
+  const allGroups = new Set(devotions.flatMap(d => d.groups));
+  allGroups.forEach(g => {
+    if (keepAll.includes(g)) return;
+    const seq = order[g] ? [...order[g], ...ids(g).filter(id => !order[g].includes(id))] : ids(g);
+    const seen = new Set();
+    seq.forEach(id => {
+      const d = devotionById[id], k = d && norm(d.text);
+      if (!k) return;
+      if (seen.has(k)) { d.groups = d.groups.filter(x => x !== g); if (order[g]) order[g] = order[g].filter(x => x !== id) }
+      else seen.add(k);
+    });
+  });
   window.devotionCategoryOrder = Object.assign(window.devotionCategoryOrder || {}, order);
   const G = [
     { id: 'morning', title: 'أذكار الصباح', subtitle: 'ابدأ يومك بذكر الله', icon: 'sun' },
@@ -29,6 +56,13 @@
     { id: 'prayer', title: 'أذكار بعد الصلاة', subtitle: 'الأذكار الثابتة عقب الصلوات المفروضة', icon: 'mosque' },
     { id: 'sleep', title: 'أذكار النوم والاستيقاظ', subtitle: 'أذكار ما قبل النوم وبعد الاستيقاظ', icon: 'bed' },
     { id: 'daily', title: 'الأذكار اليومية', subtitle: 'المنزل، الطعام، اللباس، السفر وغيرها', icon: 'home' },
+    { id: 'home', title: 'المنزل والمسجد', subtitle: 'عند الخروج من المنزل ودخول المسجد والخروج منه', icon: 'home' },
+    { id: 'purity', title: 'الخلاء والوضوء', subtitle: 'عند دخول الخلاء والخروج منه وبعد الوضوء', icon: 'drop' },
+    { id: 'food', title: 'الطعام والشراب', subtitle: 'التسمية والحمد والدعاء لأهل الطعام', icon: 'cup' },
+    { id: 'clothes', title: 'اللباس', subtitle: 'عند لبس الثوب والثوب الجديد', icon: 'shirt' },
+    { id: 'adhan', title: 'الأذان', subtitle: 'عند سماع الأذان وبعده', icon: 'speaker' },
+    { id: 'weather', title: 'المطر والريح', subtitle: 'عند المطر والريح وطلب الغيث', icon: 'rain' },
+    { id: 'manners', title: 'العطاس والغضب والمجلس', subtitle: 'أذكار مواقف اليوم', icon: 'chat' },
     { id: 'tasbih', title: 'التسبيح والاستغفار', subtitle: 'أذكار وأوراد ثابتة مع مسبحة إلكترونية', icon: 'beads' },
     { id: 'quran', title: 'أدعية من القرآن', subtitle: 'الآيات كاملة بمراجعها', icon: 'book' },
     { id: 'sunnah', title: 'أدعية من السنة', subtitle: 'مختارات صحيحة من السنة النبوية', icon: 'scroll' },
@@ -53,3 +87,9 @@ iconPaths.people = '<circle cx="9" cy="8" r="3.2"/><path d="M3 20a6 6 0 0 1 12 0
 iconPaths.pulse = '<path d="M20.8 8.6A5 5 0 0 0 12 5.4a5 5 0 0 0-8.8 3.2c0 5.4 8.8 10.9 8.8 10.9s8.8-5.5 8.8-10.9z"/><path d="M5 12h3l1.5-2.5 2 5 1.5-2.5h6"/>';
 iconPaths.pillars = '<path d="M3 9.5 12 4l9 5.5M4 20h16M5.5 9.5v8M9.8 9.5v8M14.2 9.5v8M18.5 9.5v8M4.5 17.5h15"/>';
 iconPaths.plane = '<path d="M10.5 13.5 4 11l1.5-1.5 7 1 4-4a2 2 0 0 1 3 3l-4 4 1 7L15 22l-2.5-6.5-3 3V21l-1.5 1-1-3-3-1L5 16.5h2.5z"/>';
+iconPaths.drop = iconPaths.drop || '<path d="M12 3s6 6.4 6 11a6 6 0 0 1-12 0c0-4.6 6-11 6-11z"/>';
+iconPaths.cup = iconPaths.cup || '<path d="M5 8h11v6a5 5 0 0 1-5 5h-1a5 5 0 0 1-5-5zM16 10h1.5a2.5 2.5 0 0 1 0 5H16M8 3v2M11 3v2M14 3v2"/>';
+iconPaths.shirt = iconPaths.shirt || '<path d="M8 3 4 5.5 2.5 10l3 1.5V21h13v-9.5l3-1.5L20 5.5 16 3a4 4 0 0 1-8 0z"/>';
+iconPaths.speaker = iconPaths.speaker || '<path d="M4 9v6h4l5 4V5L8 9zM16 9a4 4 0 0 1 0 6M18.5 6.5a7.5 7.5 0 0 1 0 11"/>';
+iconPaths.rain = iconPaths.rain || '<path d="M7 15a4 4 0 0 1-.4-8A6 6 0 0 1 18 8.5a3.5 3.5 0 0 1-.5 6.5zM8 18l-1 2M12 18l-1 2M16 18l-1 2"/>';
+iconPaths.chat = iconPaths.chat || '<path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/>';
