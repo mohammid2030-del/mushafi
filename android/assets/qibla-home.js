@@ -84,3 +84,5 @@ qiblaRenderState = function (...a) {
   } else hqAlignedOnPage = false;
   return r;
 };
+/* The app can draw Home before this file loads (startup race), so the wrapper above misses the first Home: start the arrow now if Home is already on screen. */
+if (typeof view !== 'undefined' && view === 'home') setTimeout(() => { if (view === 'home') hqStart() }, 60);
