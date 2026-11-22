@@ -71,7 +71,16 @@ function rhSection(title, more, body, cls = '') { return `<section class="rh-sec
 /* الإذاعات: بث صوتي مباشر */
 const rhRadios = [
   { id: 'sa', title: 'إذاعة القرآن الكريم', place: 'من المملكة العربية السعودية', url: 'https://stream.radiojar.com/0tpy1h0kxtzuv' },
-  { id: 'eg', title: 'إذاعة القرآن الكريم', place: 'من القاهرة', url: 'https://stream.radiojar.com/8s5u5tpdtwzuv' }
+  { id: 'eg', title: 'إذاعة القرآن الكريم', place: 'من القاهرة', url: 'https://stream.radiojar.com/8s5u5tpdtwzuv' },
+  // mp3quran (المكتبة الصوتية للقرآن الكريم): each station also plays from backup.qurango.net when the main server drops.
+  { id: 'tarateel', title: 'تراتيل قصيرة متميزة', place: 'تلاوات متنوعة على مدار الساعة', url: 'https://qurango.net/radio/tarateel' },
+  { id: 'afasy', title: 'مشاري العفاسي', place: 'تلاوات متواصلة', url: 'https://qurango.net/radio/mishary_alafasi' },
+  { id: 'basit', title: 'عبد الباسط عبد الصمد', place: 'تلاوة مرتلة', url: 'https://qurango.net/radio/abdulbasit_abdulsamad' },
+  { id: 'basitm', title: 'عبد الباسط عبد الصمد', place: 'تلاوة مجودة', url: 'https://qurango.net/radio/abdulbasit_abdulsamad_mojawwad' },
+  { id: 'minshawi', title: 'محمد صديق المنشاوي', place: 'تلاوة مجودة', url: 'https://qurango.net/radio/mohammed_siddiq_alminshawi_mojawwad' },
+  { id: 'banna', title: 'محمود علي البنا', place: 'تلاوات متواصلة', url: 'https://qurango.net/radio/mahmoud_ali__albanna' },
+  { id: 'basfer', title: 'عبد الله بصفر', place: 'تلاوات متواصلة', url: 'https://qurango.net/radio/abdullah_basfer' },
+  { id: 'thubaity', title: 'عبد الباري الثبيتي', place: 'تلاوات متواصلة', url: 'https://qurango.net/radio/abdelbari_altoubayti' }
 ];
 let rhRadio = { id: '', audio: null, status: 'stopped' };
 // Android and iOS stream the radio natively (the page cannot follow the stream's http redirect, and it keeps playing with the screen off).

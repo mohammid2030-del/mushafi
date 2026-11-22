@@ -56,6 +56,7 @@
         android:allowBackup="false"
         android:fullBackupContent="false"
         android:usesCleartextTraffic="false"
+        android:networkSecurityConfig="@xml/network_security_config"
         android:enableOnBackInvokedCallback="true">
 
         <!-- Main WebView shell. Handles config changes itself so the WebView is never recreated. -->

@@ -3,34 +3,61 @@ import MediaPlayer
 
 /// الإذاعات: live Quran radio streamed natively.
 ///
-/// The page runs on a custom scheme, so an <audio> element cannot follow the stream's
-/// redirect to a plain-http server (mixed content). Here the redirect is resolved first,
-/// radiojar hosts are moved to https, and AVPlayer plays the stream with retries; it keeps
-/// playing in the background and shows on the lock screen. State goes to `window.onNativeRadio`.
+/// AVPlayer plays the station's own address and follows its redirects (Radiojar moves to a plain-http
+/// node, allowed for radiojar.com only in Info.plist). A drop, stall or error reconnects on its own,
+/// alternating with the station's backup server when it has one (mp3quran: qurango.net and
+/// backup.qurango.net). It keeps playing in the background, resumes after a call, and shows on the
+/// lock screen. State goes to `window.onNativeRadio`.
 final class RadioPlayer: NSObject {
     static let shared = RadioPlayer()
 
     var onState: ((String) -> Void)?
     private(set) var id = ""
     private(set) var status = "stopped"
-    private var title = "", place = "", source = ""
+    private var title = "", place = ""
+    private var sources: [URL] = []
+    private var sourceIndex = 0
     private var player: AVPlayer?
     private var statusObserver: NSKeyValueObservation?
     private var timeObserver: NSKeyValueObservation?
+    private var itemObservers: [NSObjectProtocol] = []
     private var generation = 0
     private var attempts = 0
     private var stallTimer: Timer?
+    private var steadyTimer: Timer?
+    private static let maxAttempts = 8
 
     var active: Bool { status != "stopped" }
 
     var snapshot: String { Self.json(["id": id, "status": status]) }
 
+    override init() {
+        super.init()
+        NotificationCenter.default.addObserver(self, selector: #selector(interrupted(_:)), name: AVAudioSession.interruptionNotification, object: nil)
+    }
+
+    /// Only the known radio networks may be played: Radiojar and mp3quran.
+    static func allowed(_ url: URL) -> Bool {
+        guard url.scheme == "https", let host = url.host?.lowercased() else { return false }
+        return ["radiojar.com", "qurango.net", "mp3quran.net"].contains { host == $0 || host.hasSuffix("." + $0) }
+    }
+
+    /// The station's address, then its backup server.
+    static func candidates(_ url: URL) -> [URL] {
+        var list = [url]
+        guard var parts = URLComponents(url: url, resolvingAgainstBaseURL: false), let host = parts.host?.lowercased() else { return list }
+        if host == "qurango.net" { parts.host = "backup.qurango.net" } else if host == "backup.qurango.net" { parts.host = "qurango.net" } else { return list }
+        if let backup = parts.url { list.append(backup) }
+        return list
+    }
+
     func play(id: String, url: String, title: String, place: String) {
         stop(silent: true)
-        guard let link = URL(string: url), link.scheme == "https" else { fail(); return }
+        guard let link = URL(string: url), Self.allowed(link) else { fail(); return }
         SurahPlayer.shared.stop()
         PrayerService.shared.stopPreview()
-        self.id = String(id.prefix(20)); self.title = title; self.place = place; source = url
+        self.id = String(id.prefix(20)); self.title = title; self.place = place
+        sources = Self.candidates(link); sourceIndex = 0
         attempts = 0
         status = "loading"
         publish()
@@ -42,8 +69,8 @@ final class RadioPlayer: NSObject {
     private func stop(silent: Bool) {
         generation += 1
         stallTimer?.invalidate(); stallTimer = nil
-        statusObserver = nil; timeObserver = nil
-        player?.pause(); player = nil
+        steadyTimer?.invalidate(); steadyTimer = nil
+        teardownPlayer()
         let was = active
         id = ""; status = "stopped"
         if was {
@@ -54,23 +81,25 @@ final class RadioPlayer: NSObject {
 
     // MARK: - Connection
 
-    private func connect() {
-        generation += 1
-        let gen = generation
-        guard let link = URL(string: source) else { fail(); return }
-        Self.resolve(link) { [weak self] resolved in
-            DispatchQueue.main.async {
-                guard let self, gen == self.generation else { return }
-                self.start(resolved ?? link, gen: gen)
-            }
-        }
+    private func teardownPlayer() {
+        statusObserver = nil; timeObserver = nil
+        itemObservers.forEach { NotificationCenter.default.removeObserver($0) }
+        itemObservers = []
+        player?.pause()
+        player?.replaceCurrentItem(with: nil)
+        player = nil
     }
 
-    private func start(_ url: URL, gen: Int) {
+    private func connect() {
+        teardownPlayer()
+        generation += 1
+        let gen = generation
+        guard !sources.isEmpty else { fail(); return }
+        let url = sources[sourceIndex % sources.count]
         try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .default, options: [])
         try? AVAudioSession.sharedInstance().setActive(true)
         let item = AVPlayerItem(url: url)
-        item.preferredForwardBufferDuration = 4
+        item.preferredForwardBufferDuration = 6
         let player = AVPlayer(playerItem: item)
         player.automaticallyWaitsToMinimizeStalling = true
         self.player = player
@@ -83,27 +112,52 @@ final class RadioPlayer: NSObject {
         timeObserver = player.observe(\.timeControlStatus) { [weak self] p, _ in
             DispatchQueue.main.async {
                 guard let self, gen == self.generation else { return }
-                let next = p.timeControlStatus == .playing ? "playing" : "loading"
-                if next == "playing" { self.attempts = 0 }
-                if next != self.status { self.status = next; self.publish(); self.updateNowPlaying() }
+                if p.timeControlStatus == .playing {
+                    self.stallTimer?.invalidate(); self.stallTimer = nil
+                    if self.status != "playing" { self.status = "playing"; self.publish(); self.updateNowPlaying() }
+                    self.steadyTimer?.invalidate()
+                    self.steadyTimer = Timer.scheduledTimer(withTimeInterval: 30, repeats: false) { [weak self] _ in self?.attempts = 0 }
+                } else if p.timeControlStatus == .waitingToPlayAtSpecifiedRate {
+                    if self.status != "loading" { self.status = "loading"; self.publish(); self.updateNowPlaying() }
+                    self.armStall(gen: gen, seconds: 15)
+                }
             }
         }
+        let center = NotificationCenter.default
+        let again: (Notification) -> Void = { [weak self] _ in
+            DispatchQueue.main.async { guard let self, gen == self.generation else { return }; self.retry() }
+        }
+        itemObservers.append(center.addObserver(forName: .AVPlayerItemFailedToPlayToEndTime, object: item, queue: nil, using: again))
+        itemObservers.append(center.addObserver(forName: .AVPlayerItemDidPlayToEndTime, object: item, queue: nil, using: again))
+        itemObservers.append(center.addObserver(forName: .AVPlayerItemPlaybackStalled, object: item, queue: nil) { [weak self] _ in
+            DispatchQueue.main.async { guard let self, gen == self.generation else { return }; self.armStall(gen: gen, seconds: 10) }
+        })
         player.play()
         updateNowPlaying()
-        stallTimer?.invalidate()
-        stallTimer = Timer.scheduledTimer(withTimeInterval: 12, repeats: false) { [weak self] _ in
-            guard let self, gen == self.generation, self.status != "playing" else { return }
-            self.retry()
+        armStall(gen: gen, seconds: 20)
+    }
+
+    private func armStall(gen: Int, seconds: TimeInterval) {
+        guard stallTimer == nil else { return }
+        stallTimer = Timer.scheduledTimer(withTimeInterval: seconds, repeats: false) { [weak self] _ in
+            guard let self, gen == self.generation else { return }
+            self.stallTimer = nil
+            if self.status != "playing" || self.player?.timeControlStatus != .playing { self.retry() }
         }
     }
 
     private func retry() {
+        guard active else { return }
+        stallTimer?.invalidate(); stallTimer = nil
+        steadyTimer?.invalidate(); steadyTimer = nil
         attempts += 1
-        guard attempts <= 5, active else { fail(); return }
-        player?.pause(); player = nil
-        status = "loading"; publish()
+        guard attempts <= Self.maxAttempts else { fail(); return }
+        teardownPlayer()
+        sourceIndex += 1
+        status = "loading"; publish(); updateNowPlaying()
+        generation += 1
         let gen = generation
-        DispatchQueue.main.asyncAfter(deadline: .now() + Double(min(attempts, 3))) { [weak self] in
+        DispatchQueue.main.asyncAfter(deadline: .now() + Double(min(attempts, 5))) { [weak self] in
             guard let self, gen == self.generation, self.active else { return }
             self.connect()
         }
@@ -114,37 +168,19 @@ final class RadioPlayer: NSObject {
         onState?(Self.json(["id": "", "status": "error"]))
     }
 
-    /// Follows the stream's redirects by hand (up to 4 hops) and keeps radiojar on https.
-    private static func resolve(_ url: URL, hops: Int = 0, done: @escaping (URL?) -> Void) {
-        guard hops < 4 else { done(url); return }
-        var request = URLRequest(url: url, timeoutInterval: 8)
-        request.httpMethod = "GET"
-        request.setValue("bytes=0-0", forHTTPHeaderField: "Range")
-        let session = URLSession(configuration: .ephemeral, delegate: NoRedirect.shared, delegateQueue: nil)
-        session.dataTask(with: request) { _, response, _ in
-            session.finishTasksAndInvalidate()
-            guard let http = response as? HTTPURLResponse else { done(secure(url)); return }
-            if (300..<400).contains(http.statusCode), let location = http.value(forHTTPHeaderField: "Location"),
-               let next = URL(string: location, relativeTo: url)?.absoluteURL {
-                resolve(secure(next), hops: hops + 1, done: done)
+    /// A phone call or another app's audio pauses the radio; when it ends the live stream starts again.
+    @objc private func interrupted(_ note: Notification) {
+        guard active, let raw = note.userInfo?[AVAudioSessionInterruptionTypeKey] as? UInt,
+              let type = AVAudioSession.InterruptionType(rawValue: raw) else { return }
+        DispatchQueue.main.async {
+            guard self.active else { return }
+            if type == .began {
+                self.stallTimer?.invalidate(); self.stallTimer = nil
+                self.status = "loading"; self.publish(); self.updateNowPlaying()
             } else {
-                done(secure(url))
+                self.attempts = 0
+                self.connect()
             }
-        }.resume()
-    }
-
-    private static func secure(_ url: URL) -> URL {
-        guard url.scheme == "http", let host = url.host?.lowercased(), host == "radiojar.com" || host.hasSuffix(".radiojar.com"),
-              var parts = URLComponents(url: url, resolvingAgainstBaseURL: false) else { return url }
-        parts.scheme = "https"
-        return parts.url ?? url
-    }
-
-    private final class NoRedirect: NSObject, URLSessionTaskDelegate {
-        static let shared = NoRedirect()
-        func urlSession(_ session: URLSession, task: URLSessionTask, willPerformHTTPRedirection response: HTTPURLResponse,
-                        newRequest request: URLRequest, completionHandler: @escaping (URLRequest?) -> Void) {
-            completionHandler(nil)
         }
     }
 

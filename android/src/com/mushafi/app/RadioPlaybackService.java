@@ -8,7 +8,10 @@ import android.net.Uri;
 import android.os.*;
 import java.util.*;
 
-/** Live Quran radio, played natively so it keeps going with the screen off (the page's web view cannot reach the web). */
+/** Live Quran radio, played natively with Media3 ExoPlayer so it keeps going with the screen off and survives drops:
+ *  it follows the stations' redirects (Radiojar moves to a plain-http node, allowed for radiojar.com only by the network
+ *  security config), reconnects on errors and stalls, and switches to the station's backup server when there is one. */
+@androidx.annotation.OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)
 public class RadioPlaybackService extends Service implements AudioManager.OnAudioFocusChangeListener {
  public static final String PLAY = "radio.PLAY", STOP = "radio.STOP";
  public interface Listener { void onRadio(String json); }
@@ -16,19 +19,35 @@ public class RadioPlaybackService extends Service implements AudioManager.OnAudi
  static volatile String snapshot = "{\"id\":\"\",\"status\":\"stopped\"}";
  private static final String CHANNEL = "radio_playback_v1";
  private static final int NOTIFICATION = 7810;
- private MediaPlayer player;
+ private static final int MAX_ATTEMPTS = 8;
+ private androidx.media3.exoplayer.ExoPlayer player;
  private MediaSession session;
  private AudioManager focus;
  private String id = "", title = "", place = "", status = "stopped";
  private boolean foreground, pausedByFocus;
 
- /** Only the known radio streams (Radiojar) may be played. */
+ /** Only the known radio networks may be played: Radiojar and mp3quran (qurango.net). */
  static boolean allowed(String url) {
   try {
    Uri u = Uri.parse(url);
    String h = u.getHost();
-   return "https".equals(u.getScheme()) && h != null && (h.equals("radiojar.com") || h.endsWith(".radiojar.com"));
+   if (!"https".equals(u.getScheme()) || h == null) return false;
+   h = h.toLowerCase(java.util.Locale.ROOT);
+   return h.equals("radiojar.com") || h.endsWith(".radiojar.com") || h.equals("qurango.net") || h.endsWith(".qurango.net") || h.equals("mp3quran.net") || h.endsWith(".mp3quran.net");
   } catch (Exception e) { return false; }
+ }
+
+ /** The station's address, then its backup server (mp3quran serves every station from qurango.net and backup.qurango.net). */
+ static List<String> candidates(String url) {
+  List<String> list = new ArrayList<>();
+  list.add(url);
+  try {
+   Uri u = Uri.parse(url);
+   String h = u.getHost() == null ? "" : u.getHost().toLowerCase(java.util.Locale.ROOT);
+   if (h.equals("qurango.net")) list.add(u.buildUpon().authority("backup.qurango.net").build().toString());
+   else if (h.equals("backup.qurango.net")) list.add(u.buildUpon().authority("qurango.net").build().toString());
+  } catch (Exception ignored) {}
+  return list;
  }
 
  @Override public IBinder onBind(Intent intent) { return null; }
@@ -52,9 +71,9 @@ public class RadioPlaybackService extends Service implements AudioManager.OnAudi
  }
 
  private final Handler main = new Handler(Looper.getMainLooper());
- private String url = "";
- private int generation, attempts;
- private final Runnable stallCheck = () -> { if (player != null && "loading".equals(status)) retry(); };
+ private List<String> sources = new ArrayList<>();
+ private int generation, attempts, sourceIndex;
+ private final Runnable stallCheck = () -> { if (player != null && !"playing".equals(status)) retry(); };
  private final Runnable steady = () -> attempts = 0;
 
  private void start(String newId, String newUrl, String newTitle, String newPlace) {
@@ -62,84 +81,59 @@ public class RadioPlaybackService extends Service implements AudioManager.OnAudi
   id = newId == null ? "" : newId;
   title = newTitle == null ? "" : newTitle;
   place = newPlace == null ? "" : newPlace;
-  url = newUrl == null ? "" : newUrl;
-  attempts = 0;
+  String url = newUrl == null ? "" : newUrl;
+  attempts = 0; sourceIndex = 0;
   status = "loading";
   goForeground();
   if (!allowed(url)) { fail(); return; }
+  sources = candidates(url);
   if (focus.requestAudioFocus(this, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN) != AudioManager.AUDIOFOCUS_REQUEST_GRANTED) { fail(); return; }
   connect();
- }
-
- /** Radiojar answers with a short-lived redirect to an http:// node; the same node serves https, so the redirect is resolved here and kept on https (cleartext stays off). */
- static String resolve(String source) {
-  String current = source;
-  for (int hop = 0; hop < 4; hop++) {
-   java.net.HttpURLConnection c = null;
-   try {
-    c = (java.net.HttpURLConnection) new java.net.URL(current).openConnection();
-    c.setInstanceFollowRedirects(false);
-    c.setConnectTimeout(8000); c.setReadTimeout(8000);
-    c.setRequestProperty("User-Agent", "Mushafi/Android");
-    c.setRequestProperty("Icy-MetaData", "0");
-    int code = c.getResponseCode();
-    if (code < 300 || code >= 400) return code < 300 ? current : null;
-    String next = c.getHeaderField("Location");
-    if (next == null) return null;
-    next = new java.net.URL(new java.net.URL(current), next).toString();
-    if (next.startsWith("http://")) next = "https://" + next.substring(7);
-    if (!allowed(next)) return null;
-    current = next;
-   } catch (Exception e) { return null; }
-   finally { if (c != null) c.disconnect(); }
-  }
-  return null;
  }
 
  private void connect() {
   releasePlayer();
   final int gen = ++generation;
   status = "loading"; publish();
-  final String source = url;
-  new Thread(() -> {
-   final String stream = resolve(source);
-   main.post(() -> { if (gen == generation && !id.isEmpty()) play(gen, stream); });
-  }, "radio-resolve").start();
- }
-
- private void play(int gen, String stream) {
-  if (stream == null) { retry(); return; }
+  final String stream = sources.get(sourceIndex % sources.size());
   try {
-   final MediaPlayer next = new MediaPlayer();
+   androidx.media3.datasource.DefaultHttpDataSource.Factory http = new androidx.media3.datasource.DefaultHttpDataSource.Factory()
+    .setUserAgent("Mushafi/Android").setAllowCrossProtocolRedirects(true).setConnectTimeoutMs(10000).setReadTimeoutMs(20000);
+   final androidx.media3.exoplayer.ExoPlayer next = new androidx.media3.exoplayer.ExoPlayer.Builder(this)
+    .setMediaSourceFactory(new androidx.media3.exoplayer.source.DefaultMediaSourceFactory(http)).build();
    player = next;
-   next.setAudioAttributes(new AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_MEDIA).setContentType(AudioAttributes.CONTENT_TYPE_SPEECH).build());
-   next.setWakeMode(this, PowerManager.PARTIAL_WAKE_LOCK);
-   Map<String, String> headers = new HashMap<>();
-   headers.put("User-Agent", "Mushafi/Android");
-   next.setDataSource(this, Uri.parse(stream), headers);
-   next.setOnPreparedListener(mp -> { if (player != mp) return; mp.start(); status = "playing"; publish(); main.removeCallbacks(steady); main.postDelayed(steady, 30000); });
-   next.setOnInfoListener((mp, what, extra) -> {
-    if (player != mp) return false;
-    if (what == MediaPlayer.MEDIA_INFO_BUFFERING_START) { status = "loading"; publish(); main.removeCallbacks(stallCheck); main.postDelayed(stallCheck, 12000); }
-    else if (what == MediaPlayer.MEDIA_INFO_BUFFERING_END) { main.removeCallbacks(stallCheck); status = "playing"; publish(); }
-    return false;
+   next.setAudioAttributes(new androidx.media3.common.AudioAttributes.Builder().setUsage(androidx.media3.common.C.USAGE_MEDIA).setContentType(androidx.media3.common.C.AUDIO_CONTENT_TYPE_SPEECH).build(), false);
+   next.setWakeMode(androidx.media3.common.C.WAKE_MODE_NETWORK);
+   next.addListener(new androidx.media3.common.Player.Listener() {
+    @Override public void onPlaybackStateChanged(int state) {
+     if (player != next || gen != generation) return;
+     if (state == androidx.media3.common.Player.STATE_BUFFERING) {
+      if (!"loading".equals(status)) { status = "loading"; publish(); }
+      main.removeCallbacks(stallCheck); main.postDelayed(stallCheck, 15000);
+     } else if (state == androidx.media3.common.Player.STATE_READY) {
+      main.removeCallbacks(stallCheck);
+      if (next.getPlayWhenReady() && !"playing".equals(status)) { status = "playing"; publish(); main.removeCallbacks(steady); main.postDelayed(steady, 30000); }
+     } else if (state == androidx.media3.common.Player.STATE_ENDED) retry();
+    }
+    @Override public void onPlayerError(androidx.media3.common.PlaybackException error) { if (player == next && gen == generation) retry(); }
    });
-   next.setOnErrorListener((mp, what, extra) -> { if (player == mp) retry(); return true; });
-   next.setOnCompletionListener(mp -> { if (player == mp) retry(); });
-   next.prepareAsync();
+   next.setMediaItem(androidx.media3.common.MediaItem.fromUri(stream));
+   next.setPlayWhenReady(true);
+   next.prepare();
    main.removeCallbacks(stallCheck); main.postDelayed(stallCheck, 20000);
   } catch (Exception e) { retry(); }
  }
 
- /** A live stream that drops or stalls reconnects on its own (fresh redirect each time) before giving up. */
+ /** A live stream that drops or stalls reconnects on its own, alternating with the backup server, before giving up. */
  private void retry() {
   if (id.isEmpty()) return;
   releasePlayer();
   main.removeCallbacks(steady);
-  if (++attempts > 5) { fail(); return; }
+  if (++attempts > MAX_ATTEMPTS) { fail(); return; }
+  sourceIndex++;
   status = "loading"; publish();
   final int gen = ++generation;
-  main.postDelayed(() -> { if (gen == generation && !id.isEmpty()) connect(); }, Math.min(1000L * attempts, 4000L));
+  main.postDelayed(() -> { if (gen == generation && !id.isEmpty()) connect(); }, Math.min(1000L * attempts, 5000L));
  }
 
  private void fail() { status = "error"; publish(); stopRadio(false); }
@@ -159,7 +153,7 @@ public class RadioPlaybackService extends Service implements AudioManager.OnAudi
 
  private void releasePlayer() {
   main.removeCallbacks(stallCheck);
-  if (player != null) { try { player.reset(); player.release(); } catch (Exception ignored) {} player = null; }
+  if (player != null) { try { player.release(); } catch (Exception ignored) {} player = null; }
  }
 
  private void release() {
@@ -174,10 +168,10 @@ public class RadioPlaybackService extends Service implements AudioManager.OnAudi
   if (player == null) return;
   if (change == AudioManager.AUDIOFOCUS_LOSS) stopRadio();
   else if (change == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT || change == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK) {
-   try { if (player.isPlaying()) { player.pause(); pausedByFocus = true; } } catch (Exception ignored) {}
+   try { if (player.getPlayWhenReady()) { player.setPlayWhenReady(false); pausedByFocus = true; } } catch (Exception ignored) {}
   } else if (change == AudioManager.AUDIOFOCUS_GAIN && pausedByFocus) {
    pausedByFocus = false;
-   try { player.start(); } catch (Exception ignored) {}
+   try { player.setPlayWhenReady(true); } catch (Exception ignored) {}
   }
  }
 
