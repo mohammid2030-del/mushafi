@@ -27,7 +27,6 @@ public class BookReaderActivity extends Activity {
  private int ink, muted, bg, surface, gold;
  private FrameLayout body;
  private TextView pageLabel;
- private ListView pages;
  private PdfRenderer renderer;
  private ParcelFileDescriptor descriptor;
  private float aspect = 1.414f;
@@ -122,57 +121,127 @@ public class BookReaderActivity extends Activity {
   if (total > 0) { progress.setIndeterminate(false); progress.setProgress((int) (done * 1000 / total)); status.setText(t("جارٍ تنزيل الكتاب…") + "  " + UiLocale.number(this, (int) (done * 100 / total)) + "٪"); }
  }
 
- /* ---------- reading ---------- */
+ /* ---------- reading: page by page like the Mushaf; two pages side by side on a wide screen ---------- */
+ private FrameLayout stage;
+ private LinearLayout spreadRow;
+ private int start;              // first page shown
+ private boolean twoUp, rtlBook, turning;
+ private GestureDetector gestures;
+
  private void open(File f) {
   try {
    descriptor = ParcelFileDescriptor.open(f, ParcelFileDescriptor.MODE_READ_ONLY);
    renderer = new PdfRenderer(descriptor); pageCount = renderer.getPageCount();
    if (pageCount > 0) { PdfRenderer.Page p = renderer.openPage(0); aspect = p.getHeight() / (float) Math.max(1, p.getWidth()); p.close(); }
   } catch (Exception e) { BookStore.delete(this, id); notifyPage(); showMessage(t("تعذر فتح الكتاب"), false, t("إعادة المحاولة"), v -> download()); return; }
+  String name = book.optString("title");
+  rtlBook = name.matches("(?s).*[\\u0600-\\u06FF].*") || UiLocale.rtl(this);
   body.removeAllViews();
-  pages = new ListView(this); pages.setDivider(new android.graphics.drawable.ColorDrawable(bg)); pages.setDividerHeight(dp(10)); pages.setBackgroundColor(bg);
-  pages.setPadding(dp(8), dp(10), dp(8), dp(24)); pages.setClipToPadding(false); pages.setSelector(new android.graphics.drawable.ColorDrawable(Color.TRANSPARENT));
-  pages.setAdapter(new BaseAdapter() {
-   public int getCount() { return pageCount; }
-   public Object getItem(int i) { return i; }
-   public long getItemId(int i) { return i; }
-   public View getView(int i, View convert, ViewGroup parent) {
-    ImageView v = convert instanceof ImageView ? (ImageView) convert : new ImageView(BookReaderActivity.this);
-    int w = parent.getWidth() - parent.getPaddingLeft() - parent.getPaddingRight(); if (w <= 0) w = getResources().getDisplayMetrics().widthPixels - dp(16);
-    pageWidth = w;
-    v.setLayoutParams(new AbsListView.LayoutParams(-1, (int) (w * aspect)));
-    v.setScaleType(ImageView.ScaleType.FIT_CENTER); v.setBackgroundColor(Color.WHITE); v.setTag(i);
-    v.setContentDescription(UiLocale.text(BookReaderActivity.this, "صفحة {0}", UiLocale.number(BookReaderActivity.this, i + 1)));
-    Bitmap b = cache.get(i); v.setImageBitmap(b);
-    if (b == null) render(i, v);
-    return v;
+  stage = new FrameLayout(this); stage.setBackgroundColor(bg); stage.setClipChildren(false);
+  spreadRow = new LinearLayout(this); spreadRow.setGravity(Gravity.CENTER); spreadRow.setClipChildren(false);
+  spreadRow.setLayoutDirection(rtlBook ? View.LAYOUT_DIRECTION_RTL : View.LAYOUT_DIRECTION_LTR);
+  stage.addView(spreadRow, new FrameLayout.LayoutParams(-1, -1));
+  body.addView(stage, new FrameLayout.LayoutParams(-1, -1));
+  gestures = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
+   @Override public boolean onDown(MotionEvent e) { return true; }
+   @Override public boolean onFling(MotionEvent a, MotionEvent b, float vx, float vy) {
+    if (a == null || Math.abs(vx) < Math.abs(vy) || Math.abs(b.getX() - a.getX()) < dp(40)) return false;
+    boolean towardRight = vx > 0;
+    turn(towardRight == rtlBook ? 1 : -1); return true;
+   }
+   @Override public boolean onSingleTapUp(MotionEvent e) {
+    float w = stage.getWidth(); if (w <= 0) return false;
+    if (e.getX() < w / 4f) { turn(rtlBook ? 1 : -1); return true; }
+    if (e.getX() > w * 3 / 4f) { turn(rtlBook ? -1 : 1); return true; }
+    return false;
    }
   });
-  pages.setOnScrollListener(new AbsListView.OnScrollListener() {
-   public void onScrollStateChanged(AbsListView v, int s) {}
-   public void onScroll(AbsListView v, int first, int visible, int total) { updateLabel(); }
-  });
-  body.addView(pages, new FrameLayout.LayoutParams(-1, -1));
+  stage.setOnTouchListener((v, e) -> gestures.onTouchEvent(e));
   JSONObject saved = BookStore.find(this, id); int page = saved == null ? 0 : saved.optInt("page", 0);
-  if (page > 0 && page < pageCount) pages.setSelection(page);
+  start = page > 0 && page < pageCount ? page : 0;
+  stage.post(this::layoutSpread);
+ }
+
+ @Override public void onConfigurationChanged(android.content.res.Configuration c) {
+  super.onConfigurationChanged(c);
+  if (stage != null) stage.post(this::layoutSpread);
+ }
+
+ private int step() { return twoUp ? 2 : 1; }
+
+ /** Builds the current spread: one page fitted to the screen, or two pages side by side when the screen is wide. */
+ private void layoutSpread() {
+  if (stage == null || pageCount == 0 || destroyed) return;
+  int pad = dp(12), gap = dp(6);
+  int w = stage.getWidth() - pad * 2, h = stage.getHeight() - pad * 2;
+  if (w <= 0 || h <= 0) { stage.post(this::layoutSpread); return; }
+  twoUp = pageCount > 1 && w > h * 1.1f;
+  if (twoUp) start -= start % 2;
+  start = Math.max(0, Math.min(start, pageCount - 1));
+  int boxW = twoUp ? (w - gap) / 2 : w;
+  int pw = (int) Math.min(boxW, h / aspect), ph = (int) (pw * aspect);
+  pageWidth = pw;
+  spreadRow.removeAllViews();
+  for (int k = 0; k < step(); k++) {
+   int index = start + k;
+   ImageView v = new ImageView(this);
+   v.setScaleType(ImageView.ScaleType.FIT_CENTER); v.setBackgroundColor(Color.WHITE); v.setTag(index);
+   if (Build.VERSION.SDK_INT >= 21) {
+    v.setElevation(dp(dark ? 0 : 3));
+    v.setOutlineProvider(new ViewOutlineProvider() { @Override public void getOutline(View view, Outline o) { o.setRoundRect(0, 0, view.getWidth(), view.getHeight(), dp(4)); } });
+    v.setClipToOutline(true);
+   }
+   LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(pw, ph);
+   if (twoUp) lp.setMarginStart(k == 0 ? 0 : gap);
+   if (index >= pageCount) { v.setVisibility(View.INVISIBLE); spreadRow.addView(v, lp); continue; }
+   v.setContentDescription(UiLocale.text(this, "صفحة {0}", UiLocale.number(this, index + 1)));
+   Bitmap b = cache.get(index);
+   if (b != null && b.getWidth() >= Math.min(pw, 1600) * 0.9f) v.setImageBitmap(b); else { if (b != null) v.setImageBitmap(b); render(index, v); }
+   spreadRow.addView(v, lp);
+  }
   updateLabel();
+  for (int k = 1; k <= step(); k++) { prefetch(start + step() - 1 + k); prefetch(start - k); }
  }
+
+ private void turn(int direction) {
+  if (turning || stage == null) return;
+  int next = start + direction * step();
+  if (next < 0 || next >= pageCount) return;
+  turning = true;
+  float out = (direction > 0) == rtlBook ? stage.getWidth() : -stage.getWidth();
+  spreadRow.animate().translationX(out * 0.35f).alpha(0f).setDuration(140).withEndAction(() -> {
+   start = next; layoutSpread();
+   spreadRow.setTranslationX(-out * 0.35f);
+   spreadRow.animate().translationX(0).alpha(1f).setDuration(180).withEndAction(() -> turning = false).start();
+  }).start();
+ }
+
  private void updateLabel() {
-  if (pages == null || pageCount == 0) return;
-  int first = pages.getFirstVisiblePosition(); View top = pages.getChildAt(0);
-  if (top != null && top.getBottom() < pages.getHeight() / 3 && first + 1 < pageCount) first++;
-  pageLabel.setText(UiLocale.number(this, first + 1) + " / " + UiLocale.number(this, pageCount));
+  if (pageCount == 0) return;
+  String first = UiLocale.number(this, start + 1);
+  String text = twoUp && start + 1 < pageCount ? first + "–" + UiLocale.number(this, start + 2) : first;
+  pageLabel.setText(text + " / " + UiLocale.number(this, pageCount));
  }
+
+ private void prefetch(int index) {
+  if (index < 0 || index >= pageCount || cache.get(index) != null) return;
+  render(index, null);
+ }
+
  private void render(final int index, final ImageView target) {
-  final int width = Math.min(Math.max(pageWidth, dp(200)), 1400);
+  final int width = Math.min(Math.max(pageWidth, dp(200)), 1600);
   worker.execute(() -> {
-   if (destroyed || renderer == null || cache.get(index) != null) { ui.post(() -> { if (index == (Integer) target.getTag()) target.setImageBitmap(cache.get(index)); }); return; }
+   Bitmap have = cache.get(index);
+   if (destroyed || renderer == null || (have != null && have.getWidth() >= width * 0.9f)) {
+    if (target != null) ui.post(() -> { if (target.getTag() instanceof Integer && (Integer) target.getTag() == index) target.setImageBitmap(cache.get(index)); });
+    return;
+   }
    Bitmap bmp = null;
    try { synchronized (this) { PdfRenderer.Page p = renderer.openPage(index); int h = Math.max(1, Math.round(width * p.getHeight() / (float) Math.max(1, p.getWidth())));
      bmp = Bitmap.createBitmap(width, h, Bitmap.Config.ARGB_8888); bmp.eraseColor(Color.WHITE); p.render(bmp, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY); p.close(); } } catch (Throwable e) { bmp = null; }
    final Bitmap result = bmp;
    if (result != null) cache.put(index, result);
-   ui.post(() -> { if (!destroyed && target.getTag() instanceof Integer && (Integer) target.getTag() == index) target.setImageBitmap(result); });
+   if (target != null) ui.post(() -> { if (!destroyed && result != null && target.getTag() instanceof Integer && (Integer) target.getTag() == index) target.setImageBitmap(result); });
   });
  }
 
@@ -181,7 +250,7 @@ public class BookReaderActivity extends Activity {
 
  @Override protected void onPause() {
   super.onPause();
-  if (pages != null && pageCount > 0) BookStore.setPage(this, id, pages.getFirstVisiblePosition(), pageCount);
+  if (stage != null && pageCount > 0) BookStore.setPage(this, id, start, pageCount);
  }
  @Override protected void onDestroy() {
   destroyed = true; cancelled = true; worker.shutdownNow();

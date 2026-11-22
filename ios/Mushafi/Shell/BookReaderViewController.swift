@@ -64,9 +64,15 @@ final class BookReaderViewController: UIViewController, URLSessionDownloadDelega
         let body = UIView(); body.backgroundColor = bg
         pdfView.backgroundColor = bg
         pdfView.autoScales = true
-        pdfView.displayMode = .singlePageContinuous
-        pdfView.displayDirection = .vertical
+        pdfView.displayMode = .singlePage
+        pdfView.displayDirection = .horizontal
         pdfView.pageShadowsEnabled = true
+        pdfView.pageBreakMargins = UIEdgeInsets(top: 12, left: 6, bottom: 12, right: 6)
+        for direction in [UISwipeGestureRecognizer.Direction.left, .right] {
+            let swipe = UISwipeGestureRecognizer(target: self, action: #selector(swiped(_:)))
+            swipe.direction = direction
+            pdfView.addGestureRecognizer(swipe)
+        }
         pdfView.isHidden = true
 
         message.textColor = ink; message.font = .systemFont(ofSize: 15); message.numberOfLines = 0; message.textAlignment = .center
@@ -161,6 +167,9 @@ final class BookReaderViewController: UIViewController, URLSessionDownloadDelega
         }
         message.text = nil; progress.isHidden = true; action.isHidden = true
         pdfView.document = document
+        rtlBook = ((book["title"] as? String) ?? "").range(of: "\\p{Arabic}", options: .regularExpression) != nil || UiLanguage.isRTL
+        pdfView.displaysRTL = rtlBook
+        applyLayout(force: true)
         pdfView.isHidden = false
         if let page = BookStore.find(id)?["page"] as? Int, page > 0, page < document.pageCount, let p = document.page(at: page) { pdfView.go(to: p) }
         pageObserver = NotificationCenter.default.addObserver(forName: .PDFViewPageChanged, object: pdfView, queue: .main) { [weak self] _ in self?.updateLabel() }
@@ -169,7 +178,43 @@ final class BookReaderViewController: UIViewController, URLSessionDownloadDelega
 
     private func updateLabel() {
         guard let doc = pdfView.document, let page = pdfView.currentPage else { return }
-        pageLabel.text = UiLanguage.number(doc.index(for: page) + 1) + " / " + UiLanguage.number(doc.pageCount)
+        let index = doc.index(for: page)
+        let first = pdfView.displayMode == .twoUp ? index - index % 2 : index
+        let shown = pdfView.displayMode == .twoUp && first + 1 < doc.pageCount
+            ? UiLanguage.number(first + 1) + "–" + UiLanguage.number(first + 2) : UiLanguage.number(first + 1)
+        pageLabel.text = shown + " / " + UiLanguage.number(doc.pageCount)
+    }
+
+    // MARK: - Mushaf-style pages: one page fitted to the screen, two side by side when the screen is wide.
+
+    private var rtlBook = true
+    private var laidOutSize: CGSize = .zero
+
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        applyLayout(force: false)
+    }
+
+    private func applyLayout(force: Bool) {
+        guard let doc = pdfView.document else { return }
+        let size = pdfView.bounds.size
+        guard size.width > 0, size.height > 0, force || size != laidOutSize else { return }
+        laidOutSize = size
+        let current = pdfView.currentPage
+        let wide = doc.pageCount > 1 && size.width > size.height * 1.1
+        pdfView.displayMode = wide ? .twoUp : .singlePage
+        pdfView.displaysAsBook = false
+        pdfView.autoScales = true
+        pdfView.layoutDocumentView()
+        pdfView.scaleFactor = pdfView.scaleFactorForSizeToFit
+        if let current { pdfView.go(to: current) }
+        updateLabel()
+    }
+
+    @objc private func swiped(_ gesture: UISwipeGestureRecognizer) {
+        let forward = (gesture.direction == .right) == rtlBook
+        if forward { if pdfView.canGoToNextPage { pdfView.goToNextPage(nil) } }
+        else if pdfView.canGoToPreviousPage { pdfView.goToPreviousPage(nil) }
     }
 
     private func close() {
