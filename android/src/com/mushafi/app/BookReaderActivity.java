@@ -312,10 +312,13 @@ public class BookReaderActivity extends Activity {
   });
  }
 
- /** The whole page on screen, as large as it fits: full width, unless that would make it taller than the screen. */
+ /** The whole page fills the screen: it is fitted, then stretched up to a quarter more in the other direction
+  *  so a tablet spread fills the screen edge to edge (text a little wider), without ever distorting further. */
  private int[] fit(float pageAspect) {
   int w = boxWidth, h = Math.round(w * pageAspect);
   if (h > boxHeight) { h = boxHeight; w = Math.round(h / pageAspect); }
+  w = Math.min(boxWidth, Math.round(w * 1.25f));
+  h = Math.min(boxHeight, Math.round(h * 1.25f));
   return new int[] { w, h };
  }
 
