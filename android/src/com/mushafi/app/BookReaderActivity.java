@@ -70,7 +70,7 @@ public class BookReaderActivity extends Activity {
    int top = insets.getSystemWindowInsetTop(), left = insets.getSystemWindowInsetLeft(), right = insets.getSystemWindowInsetRight(), bottom = insets.getSystemWindowInsetBottom();
    if (Build.VERSION.SDK_INT >= 28 && insets.getDisplayCutout() != null) { android.view.DisplayCutout c = insets.getDisplayCutout(); top = Math.max(top, c.getSafeInsetTop()); left = Math.max(left, c.getSafeInsetLeft()); right = Math.max(right, c.getSafeInsetRight()); }
    bar.setPadding(dp(8) + left, dp(6) + top, dp(14) + right, dp(6));
-   body.setPadding(left, reading ? 0 : bar.getHeight(), right, bottom);
+   body.setPadding(reading ? 0 : left, reading ? 0 : bar.getHeight(), reading ? 0 : right, reading ? 0 : bottom);
    return insets.consumeSystemWindowInsets();
   });
 
@@ -152,7 +152,7 @@ public class BookReaderActivity extends Activity {
   String name = book.optString("title");
   rtlBook = name.matches("(?s).*[\\u0600-\\u06FF].*") || UiLocale.rtl(this);
   body.removeAllViews();
-  reading = true; body.setPadding(body.getPaddingLeft(), 0, body.getPaddingRight(), body.getPaddingBottom());
+  reading = true; body.setPadding(0, 0, 0, 0);
   immersive(true);
   ui.postDelayed(() -> { if (reading && barShown) showBar(false); }, 1800);
   gestures = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
