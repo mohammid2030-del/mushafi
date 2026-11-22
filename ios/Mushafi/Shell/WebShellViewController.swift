@@ -60,6 +60,8 @@ final class WebShellViewController: UIViewController, WKNavigationDelegate, WKUI
         webView.scrollView.backgroundColor = .clear
         webView.scrollView.contentInsetAdjustmentBehavior = .never
         webView.scrollView.bounces = false
+        webView.scrollView.showsVerticalScrollIndicator = false
+        webView.scrollView.showsHorizontalScrollIndicator = false
         // The app has its own text-size controls; pinch or double-tap zoom only
         // leaves the page stuck half-zoomed.
         webView.scrollView.minimumZoomScale = 1

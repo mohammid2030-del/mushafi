@@ -37,3 +37,6 @@ html.glass-theme body .mushafi-brand-icon{background:transparent!important;borde
 html{-webkit-tap-highlight-color:transparent}
 body{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 :is(input,textarea,[contenteditable]:not([contenteditable=false]),.tafsir-text,.tafsir-verse-text,.muslim-full-text,.learn-body,.challenge-code,.library-audit-context),:is([contenteditable]:not([contenteditable=false]),.tafsir-text,.tafsir-verse-text,.muslim-full-text,.learn-body,.library-audit-context) *{-webkit-user-select:text;user-select:text;-webkit-touch-callout:default}
+/* No scrollbars anywhere: touch scrolling only */
+html,body,*{scrollbar-width:none}
+*::-webkit-scrollbar{display:none;width:0;height:0}
