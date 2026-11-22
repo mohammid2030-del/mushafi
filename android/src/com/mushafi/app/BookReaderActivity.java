@@ -308,11 +308,10 @@ public class BookReaderActivity extends Activity {
    b.getPixels(row, 0, w, 0, y, w, 1);
    for (int x = 0; x < w; x++) {
     int c = row[x], r = (c >> 16) & 255, g = (c >> 8) & 255, bl = c & 255;
-    int max = Math.max(r, Math.max(g, bl)), min = Math.min(r, Math.min(g, bl));
+    int chroma = Math.max(r, Math.max(g, bl)) - Math.min(r, Math.min(g, bl));
     float ink = 1f - (0.299f * r + 0.587f * g + 0.114f * bl) / 255f;
-    float sat = max == 0 ? 0 : (max - min) / (float) max;
-    if (sat > 0.28f && ink > 0.12f) {
-     float k = Math.min(1f, ink * 1.7f);
+    if (chroma > 48 && ink > 0.1f) {
+     float k = Math.min(1f, Math.max(ink, chroma / 255f) * 2.2f);
      row[x] = 0xff000000 | ((int) (pr + (gr - pr) * k) << 16) | ((int) (pg + (gg - pg) * k) << 8) | (int) (pb + (gb - pb) * k);
     } else {
      row[x] = 0xff000000 | ((int) (pr + (tr - pr) * ink) << 16) | ((int) (pg + (tg - pg) * ink) << 8) | (int) (pb + (tb - pb) * ink);
