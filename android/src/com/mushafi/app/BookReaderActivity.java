@@ -137,7 +137,7 @@ public class BookReaderActivity extends Activity {
  private ScrollView scroller;
  private LinearLayout spreadRow;
  private int start;              // first page shown
- private int boxWidth;           // width of one page on screen
+ private int boxWidth, boxHeight; // room for one page on screen
  private boolean twoUp, rtlBook, turning;
  private GestureDetector gestures;
  private float[][] crops;        // trimmed area of each page, as fractions {left, top, right, bottom}
@@ -221,7 +221,7 @@ public class BookReaderActivity extends Activity {
   twoUp = pageCount > 1 && w > h * 1.1f;
   if (twoUp) start -= start % 2;
   start = Math.max(0, Math.min(start, pageCount - 1));
-  boxWidth = twoUp ? (w - gap) / 2 : w;
+  boxWidth = twoUp ? (w - gap) / 2 : w; boxHeight = h;
   pageWidth = boxWidth;
   spreadRow.removeAllViews();
   spreadRow.setMinimumHeight(h);
@@ -229,7 +229,8 @@ public class BookReaderActivity extends Activity {
    int index = start + k;
    ImageView v = new ImageView(this);
    v.setScaleType(ImageView.ScaleType.FIT_XY); v.setBackgroundColor(dark ? NIGHT_PAGE : Color.WHITE); v.setTag(index);
-   LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(boxWidth, Math.round(boxWidth * shownAspect(index)));
+   int[] size = fit(shownAspect(index));
+   LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(size[0], size[1]);
    if (twoUp && k == 1) lp.setMarginStart(gap);
    if (index >= pageCount) { v.setVisibility(View.INVISIBLE); spreadRow.addView(v, lp); continue; }
    v.setContentDescription(UiLocale.text(this, "صفحة {0}", UiLocale.number(this, index + 1)));
@@ -311,13 +312,20 @@ public class BookReaderActivity extends Activity {
   });
  }
 
+ /** The whole page on screen, as large as it fits: full width, unless that would make it taller than the screen. */
+ private int[] fit(float pageAspect) {
+  int w = boxWidth, h = Math.round(w * pageAspect);
+  if (h > boxHeight) { h = boxHeight; w = Math.round(h / pageAspect); }
+  return new int[] { w, h };
+ }
+
  /** Shows a rendered page and sizes it to its trimmed shape. */
  private void showPage(int index, ImageView target, Bitmap b) {
   if (destroyed || b == null || !(target.getTag() instanceof Integer) || (Integer) target.getTag() != index) return;
   target.setImageBitmap(b);
   ViewGroup.LayoutParams lp = target.getLayoutParams();
-  int height = Math.round(boxWidth * b.getHeight() / (float) b.getWidth());
-  if (lp != null && lp.height != height) { lp.height = height; target.setLayoutParams(lp); }
+  int[] size = fit(b.getHeight() / (float) b.getWidth());
+  if (lp != null && (lp.width != size[0] || lp.height != size[1])) { lp.width = size[0]; lp.height = size[1]; target.setLayoutParams(lp); }
  }
 
  /* ---------- night pages: dark paper, white text, gold for coloured text (Quran verses, headings) ---------- */
