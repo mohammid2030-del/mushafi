@@ -26,6 +26,8 @@ public class BookReaderActivity extends Activity {
  private volatile boolean cancelled;
  private int ink, muted, bg, surface, gold;
  private FrameLayout body;
+ private LinearLayout bar;
+ private boolean reading, barShown = true;
  private TextView pageLabel;
  private PdfRenderer renderer;
  private ParcelFileDescriptor descriptor;
@@ -49,9 +51,10 @@ public class BookReaderActivity extends Activity {
   int max = (int) (Runtime.getRuntime().maxMemory() / 4);
   cache = new LruCache<Integer, Bitmap>(max) { @Override protected int sizeOf(Integer k, Bitmap b) { return b.getByteCount(); } };
 
-  LinearLayout root = new LinearLayout(this); root.setOrientation(LinearLayout.VERTICAL); root.setBackgroundColor(bg);
+  FrameLayout root = new FrameLayout(this); root.setBackgroundColor(bg);
   root.setLayoutDirection(UiLocale.rtl(this) ? View.LAYOUT_DIRECTION_RTL : View.LAYOUT_DIRECTION_LTR);
-  LinearLayout bar = new LinearLayout(this); bar.setGravity(Gravity.CENTER_VERTICAL); bar.setBackgroundColor(surface); bar.setPadding(dp(8), dp(6), dp(14), dp(6));
+  bar = new LinearLayout(this); bar.setGravity(Gravity.CENTER_VERTICAL); bar.setBackgroundColor(surface); bar.setPadding(dp(8), dp(6), dp(14), dp(6));
+  if (Build.VERSION.SDK_INT >= 21) bar.setElevation(dp(4));
   TextView close = new TextView(this); close.setText("✕"); close.setTextSize(20); close.setTextColor(ink); close.setGravity(Gravity.CENTER);
   close.setContentDescription(t("إغلاق")); close.setOnClickListener(v -> finish());
   bar.addView(close, new LinearLayout.LayoutParams(dp(48), dp(48)));
@@ -60,10 +63,16 @@ public class BookReaderActivity extends Activity {
   bar.addView(title, new LinearLayout.LayoutParams(0, -2, 1f));
   pageLabel = new TextView(this); pageLabel.setTextColor(gold); pageLabel.setTextSize(13); pageLabel.setTypeface(Typeface.DEFAULT_BOLD); pageLabel.setPadding(dp(10), 0, 0, 0);
   bar.addView(pageLabel);
-  root.addView(bar, new LinearLayout.LayoutParams(-1, -2));
-  body = new FrameLayout(this); root.addView(body, new LinearLayout.LayoutParams(-1, 0, 1f));
+  body = new FrameLayout(this); root.addView(body, new FrameLayout.LayoutParams(-1, -1));
+  root.addView(bar, new FrameLayout.LayoutParams(-1, -2, Gravity.TOP));
   setContentView(root);
-  root.setOnApplyWindowInsetsListener((v, insets) -> { v.setPadding(insets.getSystemWindowInsetLeft(), insets.getSystemWindowInsetTop(), insets.getSystemWindowInsetRight(), insets.getSystemWindowInsetBottom()); return insets.consumeSystemWindowInsets(); });
+  root.setOnApplyWindowInsetsListener((v, insets) -> {
+   int top = insets.getSystemWindowInsetTop(), left = insets.getSystemWindowInsetLeft(), right = insets.getSystemWindowInsetRight(), bottom = insets.getSystemWindowInsetBottom();
+   if (Build.VERSION.SDK_INT >= 28 && insets.getDisplayCutout() != null) { android.view.DisplayCutout c = insets.getDisplayCutout(); top = Math.max(top, c.getSafeInsetTop()); left = Math.max(left, c.getSafeInsetLeft()); right = Math.max(right, c.getSafeInsetRight()); }
+   bar.setPadding(dp(8) + left, dp(6) + top, dp(14) + right, dp(6));
+   body.setPadding(left, reading ? 0 : bar.getHeight(), right, bottom);
+   return insets.consumeSystemWindowInsets();
+  });
 
   File f = BookStore.file(this, id);
   if (f.exists() && f.length() > 0 && BookStore.find(this, id) != null) open(f); else download();
@@ -137,11 +146,15 @@ public class BookReaderActivity extends Activity {
   String name = book.optString("title");
   rtlBook = name.matches("(?s).*[\\u0600-\\u06FF].*") || UiLocale.rtl(this);
   body.removeAllViews();
+  reading = true; body.setPadding(body.getPaddingLeft(), 0, body.getPaddingRight(), body.getPaddingBottom());
+  immersive(true);
+  ui.postDelayed(() -> { if (reading && barShown) showBar(false); }, 1800);
   stage = new FrameLayout(this); stage.setBackgroundColor(bg); stage.setClipChildren(false);
   spreadRow = new LinearLayout(this); spreadRow.setGravity(Gravity.CENTER); spreadRow.setClipChildren(false);
   spreadRow.setLayoutDirection(rtlBook ? View.LAYOUT_DIRECTION_RTL : View.LAYOUT_DIRECTION_LTR);
   stage.addView(spreadRow, new FrameLayout.LayoutParams(-1, -1));
   body.addView(stage, new FrameLayout.LayoutParams(-1, -1));
+  stage.addOnLayoutChangeListener((v, l, t, r, b, ol, ot, or, ob) -> { if (r - l != or - ol || b - t != ob - ot) stage.post(this::layoutSpread); });
   gestures = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
    @Override public boolean onDown(MotionEvent e) { return true; }
    @Override public boolean onDoubleTap(MotionEvent e) { zoom(!zoomed, e.getX(), e.getY()); return true; }
@@ -162,7 +175,7 @@ public class BookReaderActivity extends Activity {
     float w = stage.getWidth(); if (w <= 0 || zoomed) return false;
     if (e.getX() < w / 4f) { turn(rtlBook ? 1 : -1); return true; }
     if (e.getX() > w * 3 / 4f) { turn(rtlBook ? -1 : 1); return true; }
-    return false;
+    showBar(!barShown); return true;
    }
   });
   stage.setOnTouchListener((v, e) -> gestures.onTouchEvent(e));
@@ -178,6 +191,23 @@ public class BookReaderActivity extends Activity {
 
  private int step() { return twoUp ? 2 : 1; }
 
+ /** The pages fill the screen; a tap in the middle shows or hides the title bar (and the phone's bars with it). */
+ private void showBar(boolean show) {
+  barShown = show;
+  bar.animate().cancel();
+  if (show) { bar.setVisibility(View.VISIBLE); bar.setTranslationY(-bar.getHeight()); bar.animate().translationY(0).alpha(1f).setDuration(180).start(); }
+  else bar.animate().translationY(-bar.getHeight()).alpha(0f).setDuration(180).withEndAction(() -> { if (!barShown) bar.setVisibility(View.GONE); }).start();
+  immersive(!show);
+ }
+
+ @SuppressWarnings("deprecation")
+ private void immersive(boolean on) {
+  View d = getWindow().getDecorView();
+  int light = (Build.VERSION.SDK_INT >= 23 && !dark) ? View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR : 0;
+  int keep = View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION;
+  d.setSystemUiVisibility(on ? keep | View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY : keep | light);
+ }
+
  /** Double tap: twice as large around the tapped spot, drag to move around; double tap again to fit the page. */
  private void zoom(boolean in, float x, float y) {
   zoomed = in;
@@ -189,7 +219,7 @@ public class BookReaderActivity extends Activity {
  private void layoutSpread() {
   if (stage == null || pageCount == 0 || destroyed) return;
   zoomed = false; spreadRow.setScaleX(1f); spreadRow.setScaleY(1f); spreadRow.setTranslationX(0); spreadRow.setTranslationY(0);
-  int pad = dp(12), gap = dp(6);
+  int pad = dp(6), gap = dp(6);
   int w = stage.getWidth() - pad * 2, h = stage.getHeight() - pad * 2;
   if (w <= 0 || h <= 0) { stage.post(this::layoutSpread); return; }
   twoUp = pageCount > 1 && w > h * 1.1f;
@@ -202,7 +232,7 @@ public class BookReaderActivity extends Activity {
   for (int k = 0; k < step(); k++) {
    int index = start + k;
    ImageView v = new ImageView(this);
-   v.setScaleType(ImageView.ScaleType.FIT_CENTER); v.setBackgroundColor(Color.WHITE); v.setTag(index);
+   v.setScaleType(ImageView.ScaleType.FIT_CENTER); v.setBackgroundColor(dark ? NIGHT_PAGE : Color.WHITE); v.setTag(index);
    v.setLayerType(View.LAYER_TYPE_HARDWARE, null);
    if (Build.VERSION.SDK_INT >= 21) {
     v.setElevation(dp(dark ? 0 : 3));
@@ -259,11 +289,37 @@ public class BookReaderActivity extends Activity {
    try { synchronized (this) { PdfRenderer.Page p = renderer.openPage(index); int h = Math.max(1, Math.round(width * p.getHeight() / (float) Math.max(1, p.getWidth())));
      bmp = Bitmap.createBitmap(width, h, Bitmap.Config.ARGB_8888); bmp.eraseColor(Color.WHITE);
      Matrix m = new Matrix(); m.setScale(width / (float) p.getWidth(), h / (float) p.getHeight());
-     p.render(bmp, null, m, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY); p.close(); } } catch (Throwable e) { bmp = null; }
+     p.render(bmp, null, m, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY); p.close(); }
+    if (dark) nightPage(bmp); } catch (Throwable e) { bmp = null; }
    final Bitmap result = bmp;
    if (result != null) cache.put(index, result);
    if (target != null) ui.post(() -> { if (!destroyed && result != null && target.getTag() instanceof Integer && (Integer) target.getTag() == index) target.setImageBitmap(result); });
   });
+ }
+
+ /* ---------- night pages: dark paper, white text, gold for coloured text (Quran verses, headings) ---------- */
+ private static final int NIGHT_PAGE = 0xff17171b;
+ private static void nightPage(Bitmap b) {
+  int w = b.getWidth(), h = b.getHeight(); int[] row = new int[w];
+  final int pr = 0x17, pg = 0x17, pb = 0x1b;          // page
+  final int tr = 0xf2, tg = 0xec, tb = 0xe0;          // text
+  final int gr = 0xe6, gg = 0xc4, gb = 0x78;          // gold
+  for (int y = 0; y < h; y++) {
+   b.getPixels(row, 0, w, 0, y, w, 1);
+   for (int x = 0; x < w; x++) {
+    int c = row[x], r = (c >> 16) & 255, g = (c >> 8) & 255, bl = c & 255;
+    int max = Math.max(r, Math.max(g, bl)), min = Math.min(r, Math.min(g, bl));
+    float ink = 1f - (0.299f * r + 0.587f * g + 0.114f * bl) / 255f;
+    float sat = max == 0 ? 0 : (max - min) / (float) max;
+    if (sat > 0.28f && ink > 0.12f) {
+     float k = Math.min(1f, ink * 1.7f);
+     row[x] = 0xff000000 | ((int) (pr + (gr - pr) * k) << 16) | ((int) (pg + (gg - pg) * k) << 8) | (int) (pb + (gb - pb) * k);
+    } else {
+     row[x] = 0xff000000 | ((int) (pr + (tr - pr) * ink) << 16) | ((int) (pg + (tg - pg) * ink) << 8) | (int) (pb + (tb - pb) * ink);
+    }
+   }
+   b.setPixels(row, 0, w, 0, y, w, 1);
+  }
  }
 
  /** The shell refreshes الكتب when it comes back (MainActivity.onResume). */
