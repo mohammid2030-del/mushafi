@@ -27,6 +27,9 @@ if mode == 'dump'
 end
 if mode == 'metadata'
   require 'json'
+  if ENV['NEW_VERSION'].to_s != '' && v.version_string != ENV['NEW_VERSION']
+    v.update(attributes: {versionString: ENV['NEW_VERSION']}); puts "version #{v.version_string} -> #{ENV['NEW_VERSION']}"
+  end
   meta = JSON.parse(File.read('shots/metadata.json'))
   v.get_app_store_version_localizations.each do |l|
     m = meta[l.locale] or (puts "skip #{l.locale} (no text)"; next)
