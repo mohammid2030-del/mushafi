@@ -35,8 +35,12 @@ enum ExternalLinks {
     }
 
     static func openSupportPage(_ page: String?) {
-        guard let page, ["privacy", "support", "delete-account"].contains(page) else { return }
-        open(supportBase + (page == "privacy" ? "privacy" : ""))
+        guard let page, ["privacy", "support", "delete-account", "tiktok", "x"].contains(page) else { return }
+        switch page {
+        case "tiktok": open("https://www.tiktok.com/@mushafi.app.sa")
+        case "x": open("https://x.com/mushafiapp_sa")
+        default: open(supportBase + (page == "privacy" ? "privacy" : ""))
+        }
     }
 
     /// Opens the user's mail app with a message to the developer already addressed and filled in.
