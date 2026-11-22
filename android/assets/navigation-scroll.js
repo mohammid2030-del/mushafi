@@ -13,10 +13,23 @@ function restoreSectionScroll(name){stopSectionScroll();if(['reader','dua-reader
  for(const record of saved.nested){const element=sectionFind(record.path);if(element)element.scrollTop=record.top}const anchor=sectionFind(saved.anchor),target=anchor&&anchor.getClientRects().length?anchor.getBoundingClientRect().top+scrollY-saved.offset:saved.y;sectionInstantScroll(target);if(sectionScrollPending&&Math.abs(scrollY-Math.max(0,target))<3)sectionScrollPending.applied=true};
  sectionScrollFrame=requestAnimationFrame(()=>{attempt();if(run!==sectionScrollRun)return;sectionScrollObserver=new ResizeObserver(()=>{cancelAnimationFrame(sectionScrollFrame);sectionScrollFrame=requestAnimationFrame(attempt)});sectionScrollObserver.observe(app);document.fonts?.ready.then(()=>{if(run===sectionScrollRun)attempt()})});sectionScrollTimer=setTimeout(()=>{if(run===sectionScrollRun){attempt();stopSectionScroll()}},1100)}
 function scrollActiveSectionToTop(){stopSectionScroll();if(!sectionRootViews.has(view))return;window.scrollTo({top:0,behavior:allowsMotion()?'smooth':'auto'});const key=sectionScrollKey(),saved=sectionScrollMemory.get(key);if(saved)sectionScrollMemory.set(key,{...saved,y:0,anchor:null,offset:0,nested:[]})}
-function navigateMainTab(id){const routes={'n-home':()=>home(),'n-quran':()=>(typeof mushafHub==='function'?mushafHub():openQuran(quranTab)),'n-dua':()=>duaHome(),'n-player':()=>recitationHub(),'n-more':()=>moreHome()};routes[id]?.()}
-/* Every screen opens at its top, whether entered from a tab, a row or Back (no remembered position). */
-const scrollMemoryEnter=enterSection;enterSection=function(...args){stopSectionScroll();const result=scrollMemoryEnter(...args);sectionInstantScroll(0);requestAnimationFrame(()=>{if(view===args[0])sectionInstantScroll(0)});return result};
-const scrollMemoryShowPage=showPage;showPage=function(...args){if(view!=='reader')captureSectionScroll();stopSectionScroll();return scrollMemoryShowPage.apply(this,args)};
+function navigateMainTab(id){scrollTabSwitch=true;scrollReturn.length=0;try{navigateMainTabRoute(id)}finally{scrollTabSwitch=false}}
+function navigateMainTabRoute(id){const routes={'n-home':()=>home(),'n-quran':()=>(typeof mushafHub==='function'?mushafHub():openQuran(quranTab)),'n-dua':()=>duaHome(),'n-player':()=>recitationHub(),'n-more':()=>moreHome()};routes[id]?.()}
+/* Scroll rule:
+   - Opening a page (a row, a card, a link) shows it from its top.
+   - Going back to the page you came from (back arrow or system back) returns to where you were on it.
+   - Switching tabs (Home, Mushaf, Adhkar, Player, More) shows the tab from its top.
+   - Redrawing the page you are on (theme, sync, refresh) keeps your place. */
+let scrollTabSwitch=false;const scrollReturn=[];
+function scrollSettle(y,name){const run=sectionScrollRun,go=()=>{if(view===name&&run===sectionScrollRun)sectionInstantScroll(y)};go();requestAnimationFrame(go);setTimeout(go,120);setTimeout(go,350)}
+const scrollMemoryEnter=enterSection;enterSection=function(...args){stopSectionScroll();const name=args[0],fromView=view,fromY=scrollY;const result=scrollMemoryEnter(...args);
+ if(scrollTabSwitch){scrollReturn.length=0;scrollSettle(0,name);return result}
+ if(fromView===name){scrollSettle(fromY,name);return result}
+ const at=scrollReturn.map(e=>e.view).lastIndexOf(name);
+ if(at>=0){const y=scrollReturn[at].y;scrollReturn.length=at;scrollSettle(y,name)}
+ else{if(fromView&&fromView!=='reader'&&fromView!=='onboarding'){scrollReturn.push({view:fromView,y:fromY});if(scrollReturn.length>40)scrollReturn.shift()}scrollSettle(0,name)}
+ return result};
+const scrollMemoryShowPage=showPage;showPage=function(...args){if(view!=='reader'&&view){const last=scrollReturn[scrollReturn.length-1];if(!last||last.view!==view)scrollReturn.push({view,y:scrollY})}stopSectionScroll();return scrollMemoryShowPage.apply(this,args)};
 const scrollMemoryLibrary=libraryHome;libraryHome=function(tab=sectionLibraryTab){const result=scrollMemoryLibrary(tab);sectionLibraryTab=tab;return result};
 const scrollMemoryQuran=openQuran;openQuran=function(tab=quranTab){return scrollMemoryQuran(tab)};
 function sectionUserScrollIntent(event){const nav=event.target instanceof Element&&event.target.closest('body>nav');if(nav&&(event.type==='pointerdown'||event.type==='touchstart'||event.type==='keydown'&&['ArrowLeft','ArrowRight','Home','End','Enter',' '].includes(event.key)))return;stopSectionScroll()}
