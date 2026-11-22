@@ -38,19 +38,3 @@ function socialOpen(kind) {
   if (typeof window.AndroidReader?.openSupportPage === 'function') window.AndroidReader.openSupportPage(kind);
   else window.open(item.url, '_blank', 'noopener');
 }
-const socialMoreHome = moreHome;
-moreHome = function (...args) {
-  const r = socialMoreHome.apply(this, args);
-  const about = [...document.querySelectorAll('.section-label h2')].find(h => h.textContent.trim() === uiTranslate('عن التطبيق') || h.textContent.trim() === 'عن التطبيق');
-  const menu = about?.parentElement.nextElementSibling;
-  if (menu?.classList.contains('menu-list') && !menu.querySelector('.social-row')) {
-    const row = (icon, title, sub, action) => listAction(icon, title, sub, action).replace('class="menu-row"', 'class="menu-row social-row"');
-    const html = row('share', 'شارك مصحفي', 'أرسل التطبيق لمن تحب مع روابط التحميل', 'socialShareApp()')
-      + row('tiktok', 'مصحفي على تيك توك', `<bdi dir="ltr">${SOCIAL.tiktok.handle}</bdi>`, "socialOpen('tiktok')")
-      + row('xlogo', 'مصحفي على X', `<bdi dir="ltr">${SOCIAL.x.handle}</bdi>`, "socialOpen('x')");
-    const first = menu.querySelector('.menu-row');
-    if (first) first.insertAdjacentHTML('afterend', html); else menu.insertAdjacentHTML('afterbegin', html);
-    try { uiLocalize(menu) } catch (e) {}
-  }
-  return r;
-};
