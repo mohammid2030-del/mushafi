@@ -46,7 +46,7 @@ public class BookReaderActivity extends Activity {
   ink = dark ? NightPalette.INK : 0xff213c31; muted = dark ? NightPalette.MUTED : 0xff7e897e; gold = dark ? NightPalette.GOLD : 0xff8a6a2c;
   getWindow().setStatusBarColor(surface); getWindow().setNavigationBarColor(bg);
   if (Build.VERSION.SDK_INT >= 23 && !dark) getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
-  int max = (int) (Runtime.getRuntime().maxMemory() / 6);
+  int max = (int) (Runtime.getRuntime().maxMemory() / 4);
   cache = new LruCache<Integer, Bitmap>(max) { @Override protected int sizeOf(Integer k, Bitmap b) { return b.getByteCount(); } };
 
   LinearLayout root = new LinearLayout(this); root.setOrientation(LinearLayout.VERTICAL); root.setBackgroundColor(bg);
@@ -125,7 +125,7 @@ public class BookReaderActivity extends Activity {
  private FrameLayout stage;
  private LinearLayout spreadRow;
  private int start;              // first page shown
- private boolean twoUp, rtlBook, turning;
+ private boolean twoUp, rtlBook, turning, zoomed;
  private GestureDetector gestures;
 
  private void open(File f) {
@@ -144,13 +144,22 @@ public class BookReaderActivity extends Activity {
   body.addView(stage, new FrameLayout.LayoutParams(-1, -1));
   gestures = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
    @Override public boolean onDown(MotionEvent e) { return true; }
+   @Override public boolean onDoubleTap(MotionEvent e) { zoom(!zoomed, e.getX(), e.getY()); return true; }
+   @Override public boolean onScroll(MotionEvent a, MotionEvent b, float dx, float dy) {
+    if (!zoomed) return false;
+    float maxX = spreadRow.getWidth() / 2f, maxY = spreadRow.getHeight() / 2f;
+    spreadRow.setTranslationX(Math.max(-maxX, Math.min(maxX, spreadRow.getTranslationX() - dx)));
+    spreadRow.setTranslationY(Math.max(-maxY, Math.min(maxY, spreadRow.getTranslationY() - dy)));
+    return true;
+   }
    @Override public boolean onFling(MotionEvent a, MotionEvent b, float vx, float vy) {
+    if (zoomed) return false;
     if (a == null || Math.abs(vx) < Math.abs(vy) || Math.abs(b.getX() - a.getX()) < dp(40)) return false;
     boolean towardRight = vx > 0;
     turn(towardRight == rtlBook ? 1 : -1); return true;
    }
-   @Override public boolean onSingleTapUp(MotionEvent e) {
-    float w = stage.getWidth(); if (w <= 0) return false;
+   @Override public boolean onSingleTapConfirmed(MotionEvent e) {
+    float w = stage.getWidth(); if (w <= 0 || zoomed) return false;
     if (e.getX() < w / 4f) { turn(rtlBook ? 1 : -1); return true; }
     if (e.getX() > w * 3 / 4f) { turn(rtlBook ? -1 : 1); return true; }
     return false;
@@ -169,9 +178,17 @@ public class BookReaderActivity extends Activity {
 
  private int step() { return twoUp ? 2 : 1; }
 
+ /** Double tap: twice as large around the tapped spot, drag to move around; double tap again to fit the page. */
+ private void zoom(boolean in, float x, float y) {
+  zoomed = in;
+  if (in) { spreadRow.setPivotX(x); spreadRow.setPivotY(y); spreadRow.animate().scaleX(2f).scaleY(2f).setDuration(180).start(); }
+  else spreadRow.animate().scaleX(1f).scaleY(1f).translationX(0).translationY(0).setDuration(180).start();
+ }
+
  /** Builds the current spread: one page fitted to the screen, or two pages side by side when the screen is wide. */
  private void layoutSpread() {
   if (stage == null || pageCount == 0 || destroyed) return;
+  zoomed = false; spreadRow.setScaleX(1f); spreadRow.setScaleY(1f); spreadRow.setTranslationX(0); spreadRow.setTranslationY(0);
   int pad = dp(12), gap = dp(6);
   int w = stage.getWidth() - pad * 2, h = stage.getHeight() - pad * 2;
   if (w <= 0 || h <= 0) { stage.post(this::layoutSpread); return; }
@@ -186,6 +203,7 @@ public class BookReaderActivity extends Activity {
    int index = start + k;
    ImageView v = new ImageView(this);
    v.setScaleType(ImageView.ScaleType.FIT_CENTER); v.setBackgroundColor(Color.WHITE); v.setTag(index);
+   v.setLayerType(View.LAYER_TYPE_HARDWARE, null);
    if (Build.VERSION.SDK_INT >= 21) {
     v.setElevation(dp(dark ? 0 : 3));
     v.setOutlineProvider(new ViewOutlineProvider() { @Override public void getOutline(View view, Outline o) { o.setRoundRect(0, 0, view.getWidth(), view.getHeight(), dp(4)); } });
@@ -196,7 +214,7 @@ public class BookReaderActivity extends Activity {
    if (index >= pageCount) { v.setVisibility(View.INVISIBLE); spreadRow.addView(v, lp); continue; }
    v.setContentDescription(UiLocale.text(this, "صفحة {0}", UiLocale.number(this, index + 1)));
    Bitmap b = cache.get(index);
-   if (b != null && b.getWidth() >= Math.min(pw, 1600) * 0.9f) v.setImageBitmap(b); else { if (b != null) v.setImageBitmap(b); render(index, v); }
+   if (b != null && b.getWidth() >= Math.min(pw * 2, 2000) * 0.9f) v.setImageBitmap(b); else { if (b != null) v.setImageBitmap(b); render(index, v); }
    spreadRow.addView(v, lp);
   }
   updateLabel();
@@ -229,7 +247,8 @@ public class BookReaderActivity extends Activity {
  }
 
  private void render(final int index, final ImageView target) {
-  final int width = Math.min(Math.max(pageWidth, dp(200)), 1600);
+  // Rendered at twice the size it is shown and scaled down, so small Arabic text stays sharp.
+  final int width = Math.min(Math.max(pageWidth * 2, dp(400)), 2000);
   worker.execute(() -> {
    Bitmap have = cache.get(index);
    if (destroyed || renderer == null || (have != null && have.getWidth() >= width * 0.9f)) {
@@ -238,7 +257,9 @@ public class BookReaderActivity extends Activity {
    }
    Bitmap bmp = null;
    try { synchronized (this) { PdfRenderer.Page p = renderer.openPage(index); int h = Math.max(1, Math.round(width * p.getHeight() / (float) Math.max(1, p.getWidth())));
-     bmp = Bitmap.createBitmap(width, h, Bitmap.Config.ARGB_8888); bmp.eraseColor(Color.WHITE); p.render(bmp, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY); p.close(); } } catch (Throwable e) { bmp = null; }
+     bmp = Bitmap.createBitmap(width, h, Bitmap.Config.ARGB_8888); bmp.eraseColor(Color.WHITE);
+     Matrix m = new Matrix(); m.setScale(width / (float) p.getWidth(), h / (float) p.getHeight());
+     p.render(bmp, null, m, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY); p.close(); } } catch (Throwable e) { bmp = null; }
    final Bitmap result = bmp;
    if (result != null) cache.put(index, result);
    if (target != null) ui.post(() -> { if (!destroyed && result != null && target.getTag() instanceof Integer && (Integer) target.getTag() == index) target.setImageBitmap(result); });
