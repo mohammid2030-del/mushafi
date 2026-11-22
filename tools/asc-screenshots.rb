@@ -6,7 +6,7 @@ Spaceship::ConnectAPI.token = Spaceship::ConnectAPI::Token.create(key_id: ENV['A
 app = Spaceship::ConnectAPI::App.find('com.mohammedasif.mushafi') or abort('app not found')
 ios = Spaceship::ConnectAPI::Platform::IOS
 v = app.get_edit_app_store_version(platform: ios)
-if v.nil? && mode == 'upload' && ENV['NEW_VERSION'].to_s != ''
+if v.nil? && %w[upload metadata].include?(mode) && ENV['NEW_VERSION'].to_s != ''
   app.ensure_version!(ENV['NEW_VERSION'], platform: ios)
   v = app.get_edit_app_store_version(platform: ios)
 end
