@@ -14,9 +14,24 @@ function dkSize(d) { const n = String(d.text || '').length, q = d.kind === 'qura
 function dkLtr() { return document.documentElement.dir === 'ltr' }
 function dkLocalize(root) { try { uiLocalize(root) } catch (e) {} }
 
+/* التهليل: one card where the reader chooses ten times (morning and evening, Ahmad) or a hundred (in the day, al-Bukhari and Muslim). */
+const DK_TAHLIL = ['routine-tahlil10', 'routine-tahlil100'];
+function dkTahlilChoice() { try { return localStorage.tahlilCount === '100' ? 1 : 0 } catch (e) { return 0 } }
+function dkTahlil(index) { return devotions.find(d => d.id === DK_TAHLIL[index]) }
+function dkItems(group) {
+  const items = devotionItemsForGroup(group), out = [];
+  let placed = false;
+  for (const d of items) {
+    if (!DK_TAHLIL.includes(d.id)) { out.push(d); continue }
+    if (placed) continue;
+    placed = true;
+    out.push(dkTahlil(dkTahlilChoice()) || d);
+  }
+  return out;
+}
 function dhikrDeck(group) {
   enterSection('dua-category', 'n-dua');
-  const items = devotionItemsForGroup(group);
+  const items = dkItems(group);
   let index = dk.group === group && dkMemory[group] != null ? dkMemory[group] : -1;
   dk = { group, items, index: 0, busy: false };
   if (index < 0 || index > items.length) { index = items.findIndex(d => !dkDone(d)); if (index < 0) index = 0 }
@@ -47,7 +62,8 @@ function dkCardMarkup(d, i, depth) {
       <span class="dk-num">${ar(i + 1)} / ${ar(n)}</span>
       <span class="dk-kind">${dkKind(d)}</span>
     </div>
-    <h2 class="dk-title">${esc(d.title)}</h2>
+    <h2 class="dk-title">${DK_TAHLIL.includes(d.id) ? 'التهليل' : esc(d.title)}</h2>
+    ${DK_TAHLIL.includes(d.id) ? `<div class="dk-choice" role="group" aria-label="عدد مرات التهليل">${[[0, 'عشر مرات'], [1, 'مائة مرة']].map(([k, t]) => `<button type="button" data-dk-choice="${k}" class="${DK_TAHLIL[k] === d.id ? 'on' : ''}" aria-pressed="${DK_TAHLIL[k] === d.id}">${t}</button>`).join('')}</div>` : ''}
     <div class="dk-body"><div class="devotion-text dk-text${d.kind === 'quran' ? ' dhikr-quran' : ''}" data-dk-text="${d.id}" lang="ar" dir="rtl" translate="no" style="font-size:${dkSize(d)}px"></div></div>
     <button class="dk-count" data-dk-count aria-label="تأكيد إتمام قراءة الذكر">
       <span class="dk-count-text">${done ? 'تمت القراءة ✓' : t > 1 ? `<b>${ar(c)}</b> من ${dkTimes(t)}` : 'المس بعد إتمام القراءة'}</span>
@@ -137,10 +153,22 @@ function dkCountTap(card) {
 }
 function dkBind(card) {
   if (card.classList.contains('dk-end')) {
-    card.querySelector('[data-dk-restart]').onclick = () => { dk.index = 0; dkRender(-1) };
+    card.querySelector('[data-dk-restart]').onclick = () => {
+      // start over for real: today's counts for every dhikr of this section go back to zero
+      const all = readJSON('devotionProgress', {});
+      for (const d of [...dk.items, ...DK_TAHLIL.map(dkTahlil).filter(Boolean)]) delete all[devotionProgressKey(d, dk.group)];
+      saveJSON('devotionProgress', all);
+      dk.index = 0; dkMemory[dk.group] = 0; dkRender(-1);
+    };
     card.querySelector('[data-dk-back]').onclick = () => duaHome();
   } else {
     const d = dk.items[dk.index];
+    card.querySelectorAll('[data-dk-choice]').forEach(b => b.onclick = e => {
+      e.stopPropagation();
+      const k = +b.dataset.dkChoice, next = dkTahlil(k); if (!next || next.id === d.id) return;
+      try { localStorage.tahlilCount = k ? '100' : '10' } catch (err) {}
+      dk.items[dk.index] = next; dkRender(0);
+    });
     card.querySelector('[data-dk-source]').onclick = e => { e.stopPropagation(); showDevotionSource(d.id) };
     card.querySelector('[data-dk-share]').onclick = e => { e.stopPropagation(); shareDevotion(d.id) };
     card.querySelector('[data-dk-fav]').onclick = e => {
@@ -178,3 +206,5 @@ function dkBind(card) {
 }
 const dkPrevDuaHome = duaHome;
 duaHome = function (group) { return dkEligible(group) ? dhikrDeck(group) : dkPrevDuaHome.apply(this, arguments) };
+// section progress counts the tahlil card once, at the count the reader chose
+groupProgress = function (group) { const items = dkItems(group); return { total: items.length, done: items.filter(d => devotionCount(d, group) >= (d.count || 1)).length } };

@@ -73,3 +73,7 @@ body.dark .dk{--dk-card:linear-gradient(170deg,#24232a,#1a1a1f);--dk-back:#1c1b2
 .dk-reset{align-self:center;padding:8px 16px;border-radius:99px;border:1px solid var(--dk-edge);background:transparent;color:var(--dk-gold);font:600 13px var(--ui-font,AppArabic),Tahoma,sans-serif}
 
 @media (prefers-reduced-motion:reduce){.dk-card,.dk-bar i,.dk-count-bar i{transition:none}.dk-card.dk-enter-next,.dk-card.dk-enter-prev,.dk-card.dk-enter-prev-ltr{animation:none}.dk-count.dk-pulse{animation:none}}
+/* التهليل: choose ten or a hundred */
+.dk-choice{display:flex;justify-content:center;gap:4px;margin:8px auto 0;padding:3px;width:max-content;border-radius:12px;background:color-mix(in srgb,var(--dk-gold,#b08b3e) 12%,transparent);position:relative;z-index:2}
+.dk-choice button{border:0;background:none;font:700 13px/1 var(--ui-font,AppArabic),Tahoma,sans-serif;color:var(--muted,#7c7466);padding:8px 14px;border-radius:9px;cursor:pointer}
+.dk-choice button.on{background:linear-gradient(180deg,#f2dca2,#c79c47);color:#2a1f08;box-shadow:0 2px 6px rgba(150,110,40,.25)}
