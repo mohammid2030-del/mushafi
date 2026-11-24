@@ -44,7 +44,7 @@ export class WorldStats extends DurableObject {
 }
 
 // Cloudflare "Top countries", last 14 days up to 24 Nov 2026 — the starting point; live counts add on top.
-const WORLD_SINCE = '2026-11-10';
+const WORLD_SINCE = '2026-11-13';
 const WORLD_BASE = { US: 6800, SA: 4330, NL: 1800, SG: 1140, GB: 845, DE: 667, BE: 652, AU: 628, HK: 518, CA: 455, FR: 449, QA: 328,
   CH: 321, PS: 320, JP: 295, PL: 291, YE: 285, TH: 251, EG: 232, BR: 213, IQ: 187, TR: 165, BD: 151, DZ: 151, MA: 150, SE: 149,
   CN: 98, KR: 98, FI: 97, IE: 89, SD: 63, ID: 60, IN: 49, LY: 37, AF: 36, TW: 30, SY: 27, RU: 27, OM: 23, UA: 18, RO: 14, LT: 13,
