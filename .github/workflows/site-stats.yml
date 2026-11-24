@@ -1,0 +1,23 @@
+name: Website stats
+# Visits to mushafiapp.com from Cloudflare's analytics (last 30 days, per day). Read-only.
+on: workflow_dispatch
+jobs:
+  stats:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Query Cloudflare analytics
+        env:
+          CF: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          ZONE=$(curl -fsS -H "Authorization: Bearer $CF" "https://api.cloudflare.com/client/v4/zones?name=mushafiapp.com" | jq -r '.result[0].id')
+          echo "zone: ${ZONE:0:6}…"
+          SINCE=$(date -u -d '29 days ago' +%F); UNTIL=$(date -u +%F)
+          Q=$(jq -n --arg z "$ZONE" --arg s "$SINCE" --arg u "$UNTIL" '{query:"query($z:String!,$s:Date!,$u:Date!){viewer{zones(filter:{zoneTag:$z}){httpRequests1dGroups(limit:31,filter:{date_geq:$s,date_leq:$u},orderBy:[date_ASC]){dimensions{date} sum{requests pageViews countryMap{clientCountryName requests}} uniq{uniques}}}}}",variables:{z:$z,s:$s,u:$u}}')
+          curl -fsS -H "Authorization: Bearer $CF" -H "Content-Type: application/json" -d "$Q" https://api.cloudflare.com/client/v4/graphql > r.json
+          jq -c '.errors' r.json
+          echo "date | unique visitors | page views | requests"
+          jq -r '.data.viewer.zones[0].httpRequests1dGroups[] | "\(.dimensions.date) | \(.uniq.uniques) | \(.sum.pageViews) | \(.sum.requests)"' r.json
+          echo "TOTAL uniques(sum of days) / pageViews:"
+          jq -r '[.data.viewer.zones[0].httpRequests1dGroups[]] | "\(map(.uniq.uniques)|add) / \(map(.sum.pageViews)|add)"' r.json
+          echo "Top countries (requests):"
+          jq -r '[.data.viewer.zones[0].httpRequests1dGroups[].sum.countryMap[]] | group_by(.clientCountryName) | map({c:.[0].clientCountryName,r:(map(.requests)|add)}) | sort_by(-.r) | .[:10][] | "\(.c) \(.r)"' r.json
