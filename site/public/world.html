@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>مصحفي حول العالم</title>
+<meta name="description" content="من أين يزورنا الناس، ومن أين يحمّلون مصحفي">
+<meta name="theme-color" content="#0c0a07">
+<meta property="og:title" content="مصحفي حول العالم"><meta property="og:image" content="/img/og.jpg">
+<link rel="icon" href="/favicon.png"><link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preload" href="/fonts/ui.woff" as="font" type="font/woff" crossorigin>
+<link rel="stylesheet" href="/style.css?v=1124w"><link rel="stylesheet" href="/world.css?v=1124w">
+</head>
+<body>
+<header class="nav solid" id="nav"><div class="wrap nav-in"><a class="brand" href="/"><img src="/img/icon.webp" alt="" width="40" height="40"><span><b>مصحفي</b><small>قرآن، ذكر، طمأنينة</small></span></a><div class="nav-end"><div class="lang" id="lang"><button class="lang-btn" id="langBtn" type="button" aria-haspopup="listbox" aria-expanded="false" aria-label="اللغة"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3Z"/></svg><span id="langCur">العربية</span><svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><path d="m7 10 5 5 5-5"/></svg></button><ul class="lang-menu" id="langMenu" role="listbox" aria-label="اللغة" hidden><li role="option" data-lang="ar" lang="ar" dir="rtl"><b>العربية</b><small>Arabic</small></li><li role="option" data-lang="en" lang="en" dir="ltr"><b>English</b><small>English</small></li><li role="option" data-lang="ur" lang="ur" dir="rtl"><b>اردو</b><small>Urdu</small></li><li role="option" data-lang="bn" lang="bn" dir="ltr"><b>বাংলা</b><small>Bengali</small></li><li role="option" data-lang="tr" lang="tr" dir="ltr"><b>Türkçe</b><small>Turkish</small></li><li role="option" data-lang="fr" lang="fr" dir="ltr"><b>Français</b><small>French</small></li><li role="option" data-lang="ru" lang="ru" dir="ltr"><b>Русский</b><small>Russian</small></li><li role="option" data-lang="am" lang="am" dir="ltr"><b>አማርኛ</b><small>Amharic</small></li></ul></div><a class="btn btn-gold nav-cta" href="/#download">حمّل التطبيق</a></div></div></header>
+<main class="wd" id="wd">
+  <div class="wrap">
+    <header class="wd-head">
+      <span class="wd-live"><i></i>مباشر</span>
+      <h1>مصحفي حول العالم</h1>
+      <p>من أين يزورنا الناس، ومن أين يحمّلون مصحفي</p>
+    </header>
+    <div class="wd-stats">
+      <div class="wd-stat"><div class="wd-ic"><svg viewBox="0 0 24 24"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></div><b id="tV" data-noi18n>—</b><span>زيارة</span></div>
+      <div class="wd-stat"><div class="wd-ic"><svg viewBox="0 0 24 24"><path d="M12 3v12m0 0-5-5m5 5 5-5M4 19h16"/></svg></div><b id="tD" data-noi18n>—</b><span>تحميل جديد</span></div>
+      <div class="wd-stat"><div class="wd-ic"><svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.3-5.6M20 4v5h-5"/></svg></div><b id="tU" data-noi18n>—</b><span>تحديث للتطبيق</span></div>
+      <div class="wd-stat"><div class="wd-ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z"/></svg></div><b id="tC" data-noi18n>—</b><span>دولة</span></div>
+    </div>
+    <div class="wd-grid">
+      <section class="wd-card">
+        <div class="wd-bar">
+          <div class="wd-seg" id="wdMetric"><button type="button" data-m="v" class="on">الزيارات</button><button type="button" data-m="d">التحميلات</button><button type="button" data-m="u">التحديثات</button></div>
+          <div class="wd-seg" id="wdMode"><button type="button" data-p="globe" class="on">كرة</button><button type="button" data-p="flat">خريطة</button></div>
+        </div>
+        <div class="wd-stage" id="wdStage"><svg id="wdMap" role="img" aria-label="خريطة الدول"></svg></div>
+        <div class="wd-pop" id="wdPop" hidden data-noi18n><div class="wd-flag" id="pF"></div><div class="who"><div class="nm" id="pN"></div><div class="rk" id="pR"></div></div>
+          <div class="wd-nums"><div><b id="pV"></b><span id="lV"></span></div><div><b id="pD"></b><span id="lD"></span></div><div><b id="pU"></b><span id="lU"></span></div></div></div>
+        <div class="wd-legend">أقل<i></i>أكثر</div>
+      </section>
+      <section class="wd-card">
+        <div class="wd-lh" data-noi18n><span id="wdLT"></span><small id="wdSince"></small></div>
+        <div id="wdList" data-noi18n></div>
+        <button type="button" class="wd-more" id="wdMore" data-noi18n></button>
+      </section>
+    </div>
+    <p class="wd-note"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z"/></svg><span>لا نحفظ أي معلومة عن الزائر، فقط رقم لكل دولة. العدّ مستمر ويتحدّث تلقائيًا.</span></p>
+  </div>
+</main>
+<footer class="foot"><div class="wrap foot-in"><a class="brand" href="/"><img src="/img/icon.webp" alt="" width="34" height="34"><span><b>مصحفي</b><small>قرآنك، وطمأنينة يومك.</small></span></a><nav><a href="/">الرئيسية</a><a href="/privacy">سياسة الخصوصية</a><a href="mailto:support@mushafiapp.com">تواصل معنا</a></nav><p>© ٢٠٢٦ مصحفي</p></div></footer>
+<script src="/i18n.js?v=1124w"></script>
+<script src="/vendor/d3.min.js"></script>
+<script src="/world.js?v=1124w"></script>
+</body></html>
