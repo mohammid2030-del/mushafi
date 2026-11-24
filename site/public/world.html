@@ -8,7 +8,7 @@
 <meta property="og:title" content="مصحفي حول العالم"><meta property="og:image" content="/img/og.jpg">
 <link rel="icon" href="/favicon.png"><link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="preload" href="/fonts/ui.woff" as="font" type="font/woff" crossorigin>
-<link rel="stylesheet" href="/style.css?v=1124w"><link rel="stylesheet" href="/world.css?v=1124w">
+<link rel="stylesheet" href="/style.css?v=1124x"><link rel="stylesheet" href="/world.css?v=1124x">
 </head>
 <body>
 <header class="nav solid" id="nav"><div class="wrap nav-in"><a class="brand" href="/"><img src="/img/icon.webp" alt="" width="40" height="40"><span><b>مصحفي</b><small>قرآن، ذكر، طمأنينة</small></span></a><div class="nav-end"><div class="lang" id="lang"><button class="lang-btn" id="langBtn" type="button" aria-haspopup="listbox" aria-expanded="false" aria-label="اللغة"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3Z"/></svg><span id="langCur">العربية</span><svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><path d="m7 10 5 5 5-5"/></svg></button><ul class="lang-menu" id="langMenu" role="listbox" aria-label="اللغة" hidden><li role="option" data-lang="ar" lang="ar" dir="rtl"><b>العربية</b><small>Arabic</small></li><li role="option" data-lang="en" lang="en" dir="ltr"><b>English</b><small>English</small></li><li role="option" data-lang="ur" lang="ur" dir="rtl"><b>اردو</b><small>Urdu</small></li><li role="option" data-lang="bn" lang="bn" dir="ltr"><b>বাংলা</b><small>Bengali</small></li><li role="option" data-lang="tr" lang="tr" dir="ltr"><b>Türkçe</b><small>Turkish</small></li><li role="option" data-lang="fr" lang="fr" dir="ltr"><b>Français</b><small>French</small></li><li role="option" data-lang="ru" lang="ru" dir="ltr"><b>Русский</b><small>Russian</small></li><li role="option" data-lang="am" lang="am" dir="ltr"><b>አማርኛ</b><small>Amharic</small></li></ul></div><a class="btn btn-gold nav-cta" href="/#download">حمّل التطبيق</a></div></div></header>
@@ -18,6 +18,7 @@
       <span class="wd-live"><i></i>مباشر</span>
       <h1>مصحفي حول العالم</h1>
       <p>من أين يزورنا الناس، ومن أين يحمّلون مصحفي</p>
+      <button type="button" class="wd-share" id="wdShare"><svg viewBox="0 0 24 24"><path d="M12 15V3m0 0L7.5 7.5M12 3l4.5 4.5M5 12v6.5A2.5 2.5 0 0 0 7.5 21h9a2.5 2.5 0 0 0 2.5-2.5V12"/></svg>شارك الخريطة</button>
     </header>
     <div class="wd-stats">
       <div class="wd-stat"><div class="wd-ic"><svg viewBox="0 0 24 24"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></div><b id="tV" data-noi18n>—</b><span>زيارة</span></div>
@@ -45,8 +46,18 @@
     <p class="wd-note"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z"/></svg><span>لا نحفظ أي معلومة عن الزائر، فقط رقم لكل دولة. العدّ مستمر ويتحدّث تلقائيًا.</span></p>
   </div>
 </main>
+<div class="wd-modal" id="wdModal" hidden>
+  <div class="wd-sheet">
+    <button type="button" class="wd-x" id="wdClose" aria-label="إغلاق"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+    <div class="wd-prev" id="wdPrev"><span class="wd-wait">تجهيز الصورة…</span></div>
+    <div class="wd-acts">
+      <button type="button" class="wd-btn gold" id="wdDoShare"><svg viewBox="0 0 24 24"><path d="M12 15V3m0 0L7.5 7.5M12 3l4.5 4.5M5 12v6.5A2.5 2.5 0 0 0 7.5 21h9a2.5 2.5 0 0 0 2.5-2.5V12"/></svg>مشاركة</button>
+      <button type="button" class="wd-btn" id="wdSave"><svg viewBox="0 0 24 24"><path d="M12 3v12m0 0-5-5m5 5 5-5M4 19h16"/></svg>حفظ الصورة</button>
+    </div>
+  </div>
+</div>
 <footer class="foot"><div class="wrap foot-in"><a class="brand" href="/"><img src="/img/icon.webp" alt="" width="34" height="34"><span><b>مصحفي</b><small>قرآنك، وطمأنينة يومك.</small></span></a><nav><a href="/">الرئيسية</a><a href="/privacy">سياسة الخصوصية</a><a href="mailto:support@mushafiapp.com">تواصل معنا</a></nav><p>© ٢٠٢٦ مصحفي</p></div></footer>
-<script src="/i18n.js?v=1124w"></script>
+<script src="/i18n.js?v=1124x"></script>
 <script src="/vendor/d3.min.js"></script>
-<script src="/world.js?v=1124w"></script>
+<script src="/world.js?v=1124x"></script>
 </body></html>

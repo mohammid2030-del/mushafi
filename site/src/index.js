@@ -50,6 +50,8 @@ const WORLD_BASE = { US: 6800, SA: 4330, NL: 1800, SG: 1140, GB: 845, DE: 667, B
   CN: 98, KR: 98, FI: 97, IE: 89, SD: 63, ID: 60, IN: 49, LY: 37, AF: 36, TW: 30, SY: 27, RU: 27, OM: 23, UA: 18, RO: 14, LT: 13,
   NG: 12, AR: 8, SI: 7, MX: 7, ES: 6, MY: 6, CO: 5, IS: 4, AE: 3, PT: 3, VE: 3, BF: 3, BG: 2, ZA: 2, VN: 2, PK: 1, CL: 1, HU: 1,
   BY: 1, CR: 1, IT: 1, HR: 1 };
+// Android downloads per country (Cloudflare, /download paths, same 14 days).
+const WORLD_BASE_D = { SA: 130, YE: 100, US: 30, GB: 20, BR: 10, CH: 10, QA: 10, SD: 10, SE: 10, IQ: 10 };
 
 function worldCountry(request) {
   let c = String((request.cf && request.cf.country) || '').toUpperCase();
@@ -74,7 +76,7 @@ async function worldData(env, ctx) {
   const cache = caches.default, key = new Request('https://mushafiapp.com/api/world?c=1');
   const hit = await cache.match(key);
   if (hit) return hit;
-  const out = { since: WORLD_SINCE, v: { ...WORLD_BASE }, d: {}, u: {} };
+  const out = { since: WORLD_SINCE, v: { ...WORLD_BASE }, d: { ...WORLD_BASE_D }, u: {} };
   try {
     for (const { k, n } of await env.WORLD.get(env.WORLD.idFromName('world')).all()) {
       const [t, c] = k.split(':');

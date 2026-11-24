@@ -151,4 +151,96 @@
     col = colorer(); makeDots(); setup(); render();
     setInterval(function () { if (!document.hidden) load().then(render); }, 60000);
   });
+
+  // ---- Share: a 1080×1920 story image (Snapchat / Instagram / WhatsApp status) ----
+  var storyBlob = null;
+  function fmtDate(d, opt) { try { return new Intl.DateTimeFormat(lang() === 'ar' ? 'ar-SA-u-ca-gregory-nu-arab' : lang(), opt).format(d); } catch (e) { return d.toDateString(); } }
+  function rrect(x, X, Y, w, h, r) { x.beginPath(); x.moveTo(X + r, Y); x.arcTo(X + w, Y, X + w, Y + h, r); x.arcTo(X + w, Y + h, X, Y + h, r); x.arcTo(X, Y + h, X, Y, r); x.arcTo(X, Y, X + w, Y, r); x.closePath(); }
+  function fit(x, text, max, size, weight) { var s = size; do { x.font = weight + ' ' + s + 'px UI'; s -= 1; } while (x.measureText(text).width > max && s > 14); return text; }
+  function loadImg(src) { return new Promise(function (ok) { var i = new Image(); i.onload = function () { ok(i); }; i.onerror = function () { ok(null); }; i.src = src; }); }
+  function drawStory() {
+    var S = 1080, H = 1920, cv = document.createElement('canvas'); cv.width = S; cv.height = H;
+    var x = cv.getContext('2d'), rtl = document.documentElement.dir === 'rtl', cx = S / 2;
+    return Promise.all([loadImg('/img/icon.webp'), document.fonts ? document.fonts.load('800 60px UI') : null]).then(function (r) {
+      var icon = r[0];
+      x.direction = rtl ? 'rtl' : 'ltr'; x.textAlign = 'center'; x.textBaseline = 'middle';
+      var g = x.createLinearGradient(0, 0, 0, H); g.addColorStop(0, '#1a140b'); g.addColorStop(.5, '#0c0a07'); g.addColorStop(1, '#070604');
+      x.fillStyle = g; x.fillRect(0, 0, S, H);
+      var gl = x.createRadialGradient(cx, 0, 10, cx, 0, 900); gl.addColorStop(0, 'rgba(230,198,126,.26)'); gl.addColorStop(1, 'rgba(230,198,126,0)'); x.fillStyle = gl; x.fillRect(0, 0, S, H);
+      // brand
+      if (icon) { x.save(); rrect(x, cx - 70, 170, 140, 140, 34); x.clip(); x.drawImage(icon, cx - 70, 170, 140, 140); x.restore(); }
+      x.fillStyle = '#e6c67e'; x.font = '800 78px UI'; fit(x, T('مصحفي حول العالم'), 980, 78, 800); x.fillText(T('مصحفي حول العالم'), cx, 395);
+      // date range pill
+      var a = SINCE ? new Date(SINCE + 'T12:00:00Z') : new Date(), b = new Date();
+      var range = T('من {a} إلى {b}').replace('{a}', fmtDate(a, { day: 'numeric', month: 'long' })).replace('{b}', fmtDate(b, { day: 'numeric', month: 'long', year: 'numeric' }));
+      x.font = '700 34px UI'; var pw = Math.min(980, x.measureText(range).width + 70);
+      rrect(x, cx - pw / 2, 468, pw, 70, 35); x.fillStyle = 'rgba(230,198,126,.13)'; x.fill(); x.strokeStyle = 'rgba(230,198,126,.45)'; x.lineWidth = 2; x.stroke();
+      x.fillStyle = '#f0d38e'; fit(x, range, pw - 50, 34, 700); x.fillText(range, cx, 504);
+      // globe, turned to the busiest country
+      var top = ranked(), focus = [42, 24], R2 = 335, gy = 935;
+      var pj = d3.geoOrthographic().scale(R2).translate([cx, gy]).clipAngle(90).rotate([-focus[0] + 10, -Math.max(-40, Math.min(40, focus[1])) + 4, 0]), gp = d3.geoPath(pj, x);
+      var halo = x.createRadialGradient(cx, gy, R2 * .86, cx, gy, R2 + 70); halo.addColorStop(0, 'rgba(230,198,126,.30)'); halo.addColorStop(1, 'rgba(230,198,126,0)');
+      x.fillStyle = halo; x.beginPath(); x.arc(cx, gy, R2 + 70, 0, 7); x.fill();
+      var oc = x.createRadialGradient(cx - 110, gy - 120, 20, cx, gy, R2); oc.addColorStop(0, '#241c10'); oc.addColorStop(1, '#090704');
+      x.fillStyle = oc; x.beginPath(); gp({ type: 'Sphere' }); x.fill();
+      x.strokeStyle = 'rgba(240,214,150,.07)'; x.lineWidth = 1; x.beginPath(); gp(d3.geoGraticule10()); x.stroke();
+      var max = d3.max(countries(), function (c) { return val(c); }) || 1, sc = d3.scaleSqrt().domain([0, max]).range(['#5a4422', '#ffe3a0']);
+      WORLD.features.forEach(function (f) {
+        var v = f.id ? val(f.id) : 0; x.beginPath(); gp(f);
+        x.fillStyle = v ? sc(v) : 'rgba(240,214,150,.10)'; x.fill(); x.strokeStyle = 'rgba(240,214,150,.24)'; x.lineWidth = 1; x.stroke();
+      });
+      var shine = x.createRadialGradient(cx - 120, gy - 140, 10, cx - 60, gy - 80, R2); shine.addColorStop(0, 'rgba(255,255,255,.12)'); shine.addColorStop(1, 'rgba(255,255,255,0)');
+      x.fillStyle = shine; x.beginPath(); x.arc(cx, gy, R2, 0, 7); x.fill();
+      x.strokeStyle = 'rgba(230,198,126,.7)'; x.lineWidth = 2.5; x.beginPath(); x.arc(cx, gy, R2, 0, 7); x.stroke();
+      var center = [-pj.rotate()[0], -pj.rotate()[1]];
+      top.slice(0, 12).forEach(function (c) {
+        var p = where(c); if (!p || d3.geoDistance(p, center) > 1.45) return; var q = pj(p);
+        var dg = x.createRadialGradient(q[0], q[1], 0, q[0], q[1], 22); dg.addColorStop(0, 'rgba(255,231,168,.9)'); dg.addColorStop(1, 'rgba(255,231,168,0)');
+        x.fillStyle = dg; x.beginPath(); x.arc(q[0], q[1], 22, 0, 7); x.fill(); x.fillStyle = '#fff3cf'; x.beginPath(); x.arc(q[0], q[1], 6, 0, 7); x.fill();
+      });
+      // two numbers
+      var cards = [[total('v'), T('زيارة للموقع')], [total('d') + total('u'), T('تحميل للأندرويد')]], cw = 470, ch = 210, cy = 1330;
+      cards.forEach(function (k, i) {
+        var X = rtl ? (i === 0 ? cx + 15 : cx - 15 - cw) : (i === 0 ? cx - 15 - cw : cx + 15);
+        rrect(x, X, cy, cw, ch, 40); x.fillStyle = 'rgba(255,248,232,.06)'; x.fill(); x.strokeStyle = 'rgba(240,214,150,.22)'; x.lineWidth = 2; x.stroke();
+        var ng = x.createLinearGradient(0, cy + 40, 0, cy + 140); ng.addColorStop(0, '#fff2d2'); ng.addColorStop(1, '#d9b462');
+        x.fillStyle = ng; x.font = '800 96px UI'; x.fillText(nf(k[0]), X + cw / 2, cy + 92);
+        x.fillStyle = '#bba985'; fit(x, k[1], cw - 40, 34, 700); x.fillText(k[1], X + cw / 2, cy + 165);
+      });
+      // top countries
+      x.fillStyle = '#f7eedb'; x.font = '800 36px UI';
+      x.fillText(T({ v: 'أكثر الدول زيارة', d: 'أكثر الدول تحميلًا', u: 'أكثر الدول تحديثًا' }[metric]), cx, 1608);
+      var five = top.slice(0, 5), colW = 196, start = cx - colW * five.length / 2;
+      five.forEach(function (c, i) {
+        var X = rtl ? start + colW * (five.length - 1 - i) + colW / 2 : start + colW * i + colW / 2;
+        x.font = '64px UI'; x.fillStyle = '#fff'; x.fillText(flag(c), X, 1690);
+        x.fillStyle = '#f0d38e'; x.font = '800 32px UI'; x.fillText(nf(val(c)), X, 1752);
+        x.fillStyle = '#bba985'; fit(x, cname(c), colW - 16, 24, 600); x.fillText(cname(c), X, 1792);
+      });
+      // footer
+      x.fillStyle = 'rgba(240,214,150,.55)'; x.font = '700 30px UI'; x.fillText(T('حمّل مصحفي مجانًا') + '  ·  mushafiapp.com', cx, 1862);
+      return new Promise(function (ok) { cv.toBlob(ok, 'image/png'); });
+    });
+  }
+  function openShare() {
+    var m = $('wdModal'), pv = $('wdPrev');
+    m.hidden = false; storyBlob = null; pv.innerHTML = '<span class="wd-wait">' + T('تجهيز الصورة…') + '</span>';
+    drawStory().then(function (b) {
+      storyBlob = b; var im = new Image(); im.alt = T('مصحفي حول العالم'); im.src = URL.createObjectURL(b); pv.innerHTML = ''; pv.appendChild(im);
+    });
+  }
+  function saveStory() {
+    if (!storyBlob) return; var a = document.createElement('a'); a.href = URL.createObjectURL(storyBlob); a.download = 'mushafi-world.png'; document.body.appendChild(a); a.click(); a.remove();
+  }
+  $('wdShare').onclick = function () { if (WORLD) openShare(); };
+  $('wdClose').onclick = function () { $('wdModal').hidden = true; };
+  $('wdModal').onclick = function (e) { if (e.target === this) this.hidden = true; };
+  $('wdSave').onclick = saveStory;
+  $('wdDoShare').onclick = function () {
+    if (!storyBlob) return;
+    var file = new File([storyBlob], 'mushafi-world.png', { type: 'image/png' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) navigator.share({ files: [file], title: T('مصحفي حول العالم'), text: T('مصحفي حول العالم') + ' — https://mushafiapp.com/world' }).catch(function () {});
+    else saveStory();
+  };
+  window.mushafiStory = drawStory;
 })();
