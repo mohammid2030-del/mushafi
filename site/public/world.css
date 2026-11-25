@@ -44,7 +44,7 @@ body.wd-dark{background:#0c0a07}
 .wd-pop .who{flex:1;min-width:0}
 .wd-pop .nm{font-weight:800;font-size:.95rem;line-height:1.4}
 .wd-pop .rk{font-size:.72rem;color:var(--wmuted);font-weight:600}
-.wd-nums{display:grid;grid-template-columns:repeat(3,1fr);text-align:center;flex:1 1 100%;border-top:1px solid var(--wline);padding-top:.6rem}
+.wd-nums{display:grid;grid-template-columns:repeat(4,1fr);text-align:center;flex:1 1 100%;border-top:1px solid var(--wline);padding-top:.6rem}
 .wd-nums>div+div{border-inline-start:1px solid var(--wline)}
 .wd-nums b{display:block;font-size:1.2rem;font-weight:800;color:var(--wgold);line-height:1.4}
 .wd-nums span{font-size:.7rem;color:var(--wmuted);font-weight:600}
@@ -83,3 +83,13 @@ body.wd-dark{background:#0c0a07}
 .wd-btn{display:inline-flex;align-items:center;gap:.45rem;border:1px solid rgba(240,214,150,.3);background:rgba(255,248,232,.08);color:#f7eedb;font:inherit;font-weight:800;font-size:.9rem;padding:.65rem 1.2rem;border-radius:99px;cursor:pointer}
 .wd-btn.gold{border:0;color:#231a0b;background:linear-gradient(180deg,#f1d898,#c9a24a)}
 .wd-x{position:absolute;top:-.4rem;inset-inline-end:-.4rem;z-index:2;width:2.3rem;height:2.3rem;border-radius:50%;border:1px solid rgba(240,214,150,.3);background:#1a150d;color:#f7eedb;display:grid;place-items:center;cursor:pointer}
+.wd-ic svg path.fill{fill:currentColor;stroke:none}
+.wd-since{display:block;font-style:normal;font-size:.68rem;color:var(--wgold);font-weight:700;margin-top:.15rem}
+.wd-stat{position:relative}
+.wd-lh .meta{font-size:.74rem;color:var(--wmuted);font-weight:600}
+.wd-more[hidden]{display:none}
+.wd-stat.wide{grid-column:1/-1;display:flex;align-items:center;gap:.7rem;padding:.8rem .9rem}
+.wd-stat.wide .wd-ic{margin:0}
+.wd-stat.wide b{font-size:1.45rem}
+.wd-stat.wide span{font-size:.85rem}
+@media(min-width:760px){.wd-stats{grid-template-columns:repeat(5,1fr)}.wd-stat.wide{grid-column:auto;display:block;padding:.95rem .9rem}.wd-stat.wide .wd-ic{margin-bottom:.6rem}.wd-stat.wide b{font-size:1.6rem}.wd-stat.wide span{font-size:.78rem}}

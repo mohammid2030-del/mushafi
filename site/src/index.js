@@ -28,7 +28,8 @@ async function serveApk(request) {
 
 // «مصحفي حول العالم» (/world): anonymous counts per country — nothing about the visitor is kept,
 // only one number per country for visits, new downloads and in-app updates.
-// v = requests to the site (same unit as Cloudflare's "Top countries"), d = new APK downloads, u = in-app updates.
+// v = requests to the site (same unit as Cloudflare's "Top countries"), d = new APK downloads, u = in-app updates,
+// a = taps on the site's App Store button (counted from APPLE_SINCE).
 export class WorldStats extends DurableObject {
   constructor(ctx, env) {
     super(ctx, env);
@@ -37,7 +38,7 @@ export class WorldStats extends DurableObject {
   }
   add(inc) {
     for (const [k, n] of Object.entries(inc || {})) {
-      if (/^[vdu]:[A-Z]{2}$/.test(k) && n > 0 && n < 1e5) this.sql.exec('INSERT INTO c (k, n) VALUES (?, ?) ON CONFLICT(k) DO UPDATE SET n = n + excluded.n', k, Math.floor(n));
+      if (/^[vdua]:[A-Z]{2}$/.test(k) && n > 0 && n < 1e5) this.sql.exec('INSERT INTO c (k, n) VALUES (?, ?) ON CONFLICT(k) DO UPDATE SET n = n + excluded.n', k, Math.floor(n));
     }
   }
   all() { return this.sql.exec('SELECT k, n FROM c').toArray(); }
@@ -45,6 +46,8 @@ export class WorldStats extends DurableObject {
 
 // Cloudflare "Top countries", last 14 days up to 24 Nov 2026 — the starting point; live counts add on top.
 const WORLD_SINCE = '2026-11-13';
+const APPLE_SINCE = '2026-11-25';
+const APP_STORE = 'https://apps.apple.com/app/id6832528924';
 const WORLD_BASE = { US: 6800, SA: 4330, NL: 1800, SG: 1140, GB: 845, DE: 667, BE: 652, AU: 628, HK: 518, CA: 455, FR: 449, QA: 328,
   CH: 321, PS: 320, JP: 295, PL: 291, YE: 285, TH: 251, EG: 232, BR: 213, IQ: 187, TR: 165, BD: 151, DZ: 151, MA: 150, SE: 149,
   CN: 98, KR: 98, FI: 97, IE: 89, SD: 63, ID: 60, IN: 49, LY: 37, AF: 36, TW: 30, SY: 27, RU: 27, OM: 23, UA: 18, RO: 14, LT: 13,
@@ -76,7 +79,7 @@ async function worldData(env, ctx) {
   const cache = caches.default, key = new Request('https://mushafiapp.com/api/world?c=1');
   const hit = await cache.match(key);
   if (hit) return hit;
-  const out = { since: WORLD_SINCE, v: { ...WORLD_BASE }, d: { ...WORLD_BASE_D }, u: {} };
+  const out = { since: WORLD_SINCE, asince: APPLE_SINCE, v: { ...WORLD_BASE }, d: { ...WORLD_BASE_D }, u: {}, a: {} };
   try {
     for (const { k, n } of await env.WORLD.get(env.WORLD.idFromName('world')).all()) {
       const [t, c] = k.split(':');
@@ -91,8 +94,13 @@ async function worldData(env, ctx) {
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
-    if (url.hostname === 'mushafiapp.com' && url.pathname !== '/api/world') worldCount(env, ctx, 'v', request);
+    if (url.hostname === 'mushafiapp.com' && url.pathname !== '/api/world' && url.pathname !== '/go/appstore') worldCount(env, ctx, 'v', request);
     if (url.pathname === '/api/world') return worldData(env, ctx);
+    // The site's App Store button passes through here once, so each tap is counted for its country.
+    if (url.pathname === '/go/appstore') {
+      if (request.method === 'GET') worldCount(env, ctx, 'a', request);
+      return new Response(null, { status: 302, headers: { location: APP_STORE, 'cache-control': 'no-store' } });
+    }
     // One public address: the old workers.dev link and www both move to mushafiapp.com.
     if (url.hostname !== 'mushafiapp.com' && url.hostname !== 'localhost') {
       return Response.redirect('https://mushafiapp.com' + url.pathname + url.search, 301);

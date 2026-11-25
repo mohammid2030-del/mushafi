@@ -7,9 +7,9 @@
   var PALESTINE = { ar: 'فلسطين', en: 'Palestine', ur: 'فلسطین', bn: 'ফিলিস্তিন', tr: 'Filistin', fr: 'Palestine', ru: 'Палестина', am: 'ፍልስጤም' };
   // Small countries that have no shape at this map scale still get a dot.
   var POINTS = { SG: [103.82, 1.35], HK: [114.17, 22.32], BH: [50.56, 26.07], MT: [14.4, 35.9], MV: [73.5, 4.2], MU: [57.55, -20.2], LU: [6.13, 49.6], MO: [113.55, 22.17], AD: [1.52, 42.5], MC: [7.42, 43.74], SM: [12.45, 43.94], LI: [9.55, 47.15] };
-  var KEY = { v: 'v', d: 'd', u: 'u' };
+  var KEY = { v: 'v', d: 'd', u: 'u', a: 'a' };
 
-  var DATA = { v: {}, d: {}, u: {} }, SINCE = null, WORLD = null, byId = {};
+  var DATA = { v: {}, d: {}, u: {}, a: {} }, SINCE = null, ASINCE = null, WORLD = null, byId = {};
   var metric = 'v', mode = 'globe', sel = null, spinning = true, showAll = false, rot = [-35, -18, 0];
   var W = 600, H = 600, R = 262, proj, path, col;
 
@@ -33,7 +33,7 @@
   function val(c, m) { return (DATA[m || metric][c]) || 0; }
   function countries() {
     var all = {};
-    ['v', 'd', 'u'].forEach(function (m) { Object.keys(DATA[m]).forEach(function (c) { if (DATA[m][c] > 0) all[c] = 1; }); });
+    ['v', 'd', 'u', 'a'].forEach(function (m) { Object.keys(DATA[m]).forEach(function (c) { if (DATA[m][c] > 0) all[c] = 1; }); });
     return Object.keys(all);
   }
   function ranked() { return countries().filter(function (c) { return val(c) > 0; }).sort(function (a, b) { return val(b) - val(a); }); }
@@ -92,9 +92,9 @@
     if (!sel) { pop.hidden = true; return; }
     var rk = ranked().indexOf(sel) + 1;
     $('pF').textContent = flag(sel); $('pN').textContent = cname(sel);
-    $('pR').textContent = rk ? T('المرتبة {n} عالميًا').replace('{n}', nf(rk)) : T('لا توجد زيارات بعد');
-    $('pV').textContent = nf(val(sel, 'v')); $('pD').textContent = nf(val(sel, 'd')); $('pU').textContent = nf(val(sel, 'u'));
-    $('lV').textContent = T('الزيارات'); $('lD').textContent = T('التحميلات'); $('lU').textContent = T('التحديثات');
+    $('pR').textContent = rk ? T('المرتبة {n} عالميًا').replace('{n}', nf(rk)) : (countries().indexOf(sel) < 0 ? T('لا توجد زيارات بعد') : '');
+    $('pV').textContent = nf(val(sel, 'v')); $('pD').textContent = nf(val(sel, 'd')); $('pU').textContent = nf(val(sel, 'u')); $('pA').textContent = nf(val(sel, 'a'));
+    $('lV').textContent = T('الزيارات'); $('lD').textContent = T('التحميلات'); $('lU').textContent = T('التحديثات'); $('lA').textContent = 'App Store';
     pop.hidden = false;
   }
   function select(c, fly) {
@@ -104,8 +104,8 @@
   }
   function list() {
     var rows = ranked(), max = rows.length ? val(rows[0]) : 1;
-    $('wdLT').textContent = T({ v: 'أكثر الدول زيارة', d: 'أكثر الدول تحميلًا', u: 'أكثر الدول تحديثًا' }[metric]);
-    try { $('wdSince').textContent = SINCE ? T('منذ {d}').replace('{d}', new Intl.DateTimeFormat(lang() === 'ar' ? 'ar-SA-u-ca-gregory-nu-arab' : lang(), { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(SINCE + 'T12:00:00Z'))) : ''; } catch (e) {}
+    $('wdLT').textContent = T({ v: 'أكثر الدول زيارة', d: 'أكثر الدول تحميلًا', u: 'أكثر الدول تحديثًا', a: 'أكثر الدول فتحًا لـ App Store' }[metric]);
+    try { var sd = metric === 'a' ? ASINCE : SINCE; $('wdSince').textContent = sd ? T('منذ {d}').replace('{d}', fmtDate(new Date(sd + 'T12:00:00Z'), { day: 'numeric', month: 'long', year: 'numeric' })) : ''; } catch (e) {}
     var box = $('wdList');
     if (!rows.length) { box.innerHTML = '<div class="wd-empty">' + T('العدّ بدأ للتو، ترقّب أول الأرقام') + '</div>'; $('wdMore').hidden = true; return; }
     box.innerHTML = rows.slice(0, showAll ? rows.length : 8).map(function (c, i) {
@@ -117,7 +117,8 @@
   }
   function totals() {
     $('tV').textContent = nf(total('v')); $('tD').textContent = nf(total('d')); $('tU').textContent = nf(total('u'));
-    $('tC').textContent = nf(countries().length);
+    $('tA').textContent = nf(total('a')); $('tC').textContent = nf(countries().length);
+    $('tAs').textContent = ASINCE ? T('منذ {d}').replace('{d}', fmtDate(new Date(ASINCE + 'T12:00:00Z'), { day: 'numeric', month: 'long' })) : '';
   }
   function render() { col = colorer(); makeDots(); totals(); list(); popup(); draw(); }
 
@@ -140,7 +141,7 @@
 
   function load() {
     return fetch('/api/world', { cache: 'no-store' }).then(function (r) { return r.json(); }).then(function (j) {
-      DATA = { v: j.v || {}, d: j.d || {}, u: j.u || {} }; SINCE = j.since || null;
+      DATA = { v: j.v || {}, d: j.d || {}, u: j.u || {}, a: j.a || {} }; SINCE = j.since || null; ASINCE = j.asince || null;
     }).catch(function () {});
   }
   Promise.all([fetch('/world/countries.json').then(function (r) { return r.json(); }), load()]).then(function (res) {
@@ -199,17 +200,19 @@
         x.fillStyle = dg; x.beginPath(); x.arc(q[0], q[1], 22, 0, 7); x.fill(); x.fillStyle = '#fff3cf'; x.beginPath(); x.arc(q[0], q[1], 6, 0, 7); x.fill();
       });
       // two numbers
-      var cards = [[total('v'), T('زيارة للموقع')], [total('d') + total('u'), T('تحميل للأندرويد')]], cw = 470, ch = 210, cy = 1330;
+      var aS = ASINCE ? T('منذ {d}').replace('{d}', fmtDate(new Date(ASINCE + 'T12:00:00Z'), { day: 'numeric', month: 'long' })) : '';
+      var cards = [[total('v'), T('زيارة للموقع')], [total('d') + total('u'), T('تحميل للأندرويد')], [total('a'), T('فتح App Store'), aS]], cw = 318, ch = 230, cy = 1320, gap = 18, x0 = cx - (cw * 3 + gap * 2) / 2;
       cards.forEach(function (k, i) {
-        var X = rtl ? (i === 0 ? cx + 15 : cx - 15 - cw) : (i === 0 ? cx - 15 - cw : cx + 15);
+        var X = rtl ? x0 + (2 - i) * (cw + gap) : x0 + i * (cw + gap);
         rrect(x, X, cy, cw, ch, 40); x.fillStyle = 'rgba(255,248,232,.06)'; x.fill(); x.strokeStyle = 'rgba(240,214,150,.22)'; x.lineWidth = 2; x.stroke();
         var ng = x.createLinearGradient(0, cy + 40, 0, cy + 140); ng.addColorStop(0, '#fff2d2'); ng.addColorStop(1, '#d9b462');
-        x.fillStyle = ng; x.font = '800 96px UI'; x.fillText(nf(k[0]), X + cw / 2, cy + 92);
-        x.fillStyle = '#bba985'; fit(x, k[1], cw - 40, 34, 700); x.fillText(k[1], X + cw / 2, cy + 165);
+        x.fillStyle = ng; fit(x, nf(k[0]), cw - 40, 84, 800); x.fillText(nf(k[0]), X + cw / 2, cy + (k[2] ? 82 : 95));
+        x.fillStyle = '#bba985'; fit(x, k[1], cw - 36, 31, 700); x.fillText(k[1], X + cw / 2, cy + (k[2] ? 152 : 168));
+        if (k[2]) { x.fillStyle = '#e6c67e'; fit(x, k[2], cw - 36, 24, 700); x.fillText(k[2], X + cw / 2, cy + 194); }
       });
       // top countries
       x.fillStyle = '#f7eedb'; x.font = '800 36px UI';
-      x.fillText(T({ v: 'أكثر الدول زيارة', d: 'أكثر الدول تحميلًا', u: 'أكثر الدول تحديثًا' }[metric]), cx, 1608);
+      x.fillText(T({ v: 'أكثر الدول زيارة', d: 'أكثر الدول تحميلًا', u: 'أكثر الدول تحديثًا', a: 'أكثر الدول فتحًا لـ App Store' }[metric]), cx, 1608);
       var five = top.slice(0, 5), colW = 196, start = cx - colW * five.length / 2;
       five.forEach(function (c, i) {
         var X = rtl ? start + colW * (five.length - 1 - i) + colW / 2 : start + colW * i + colW / 2;
