@@ -29,7 +29,7 @@ moreHome = function () {
   app.innerHTML = sectionHeading('المزيد', 'أدواتك وإعداداتك، في مكان واحد') + `<div class="mp">
     <button class="mp-profile cloud-account-entry" type="button" onclick="accountHome()"><span class="mp-logo">${typeof mushafiBrandIcon === 'function' ? mushafiBrandIcon() : ''}</span><span class="mp-who"><strong>${signed ? 'حسابي والمزامنة' : 'حسابك، على أجهزتك'}</strong><small data-cloud-status>${status}</small></span><span class="mp-chev">${I('chevron')}</span></button>
     ${H('grid', 'أدواتك')}
-    <div class="mp-tools">${tool('book', 'ختمتي', 'khatmaHome()')}${tool('chart', 'وردي اليومي', 'wardHome()')}${tool('beads', 'المسبحة', 'sebhaHome()')}${challenge ? tool('trophy', 'تحدّي مصحفي', 'challengeHome()') : ''}${fajr ? tool('sunrise', 'صحبة الفجر', "fajrHome('more')") : ''}${charity ? tool('charity', 'باب الخير', 'charityHome()') : ''}</div>
+    <div class="mp-tools">${tool('book', 'ختمتي', 'khatmaHome()')}${tool('chart', 'وردي اليومي', 'wardHome()')}${tool('beads', 'المسبحة', 'sebhaHome()')}${challenge ? tool('trophy', 'تحدّي مصحفي', 'challengeHome()') : ''}${fajr ? tool('sunrise', 'صحبة الفجر', "fajrHome('more')") : ''}</div>
     ${H('settings', 'الإعدادات')}
     <div class="mp-group">
       ${row('mosque', 'الصلاة والأذان', 'openPrayerSettings()', city ? `<span class="mp-val">${mpEsc(city)}</span>` : '')}

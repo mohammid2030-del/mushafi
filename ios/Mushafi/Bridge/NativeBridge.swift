@@ -30,7 +30,7 @@ final class NativeBridge: NSObject, WKScriptMessageHandler {
         var list = [
             "startupReady", "setLaunchWelcomed", "setAppTheme", "setUiLanguage", "setReading", "setStoryReading",
             "haptic", "copyText", "shareText",
-            "openSourceUrl", "openWeatherReference", "openRecitationReference", "openSupportPage", "contactDeveloper", "openCharityPlatform",
+            "openSourceUrl", "openWeatherReference", "openRecitationReference", "openSupportPage", "contactDeveloper", "openCharityPlatform", "ehsanDonate",
             "exportAppBackup", "importAppBackup",
             "requestPrayerLocation", "requestQiblaLocation", "cancelPrayerLocation", "openLocationSettings",
             "startQibla", "startQiblaHeading", "stopQibla", "requestHomeWeather",
@@ -189,6 +189,8 @@ final class NativeBridge: NSObject, WKScriptMessageHandler {
                 SurahPlayer.shared.pause()
                 shell?.present(LiveBroadcastViewController(city: city, dark: a.bool(1)), animated: true)
             }
+        case "ehsanDonate":
+            if let shell { EhsanDonation.donate(amount: a.int(0) ?? 0, field: a.string(1) ?? "", way: a.int(2) ?? 1, from: shell) }
         case "openCharityPlatform":
             if !ExternalLinks.openCharity(a.string(0)) { fileMessage(false, "تعذر فتح صفحة الجهة") }
 

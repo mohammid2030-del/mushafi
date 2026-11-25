@@ -358,10 +358,12 @@ function homeLayout() {
     const go = reading.querySelector('.hero-continue')?.getAttribute('onclick') || 'hlOpenMushaf()';
     readingRow = hlNode(`<div class="hl-list" id="hl-reading">${hlRow('book', resume ? 'تابع القراءة' : 'ابدأ القراءة', esc(title + (meta ? ' · ' + meta : '')), go)}</div>`)
   }
-  put('.hl-reading-slot', readingRow);
-  put('.hl-recitation-slot', recitation ? hlNode(`<div class="hl-list">${hlRow('headphones', 'المشغل', 'القراء والسور والتنزيلات والحفظ', 'recitationHub()')}${charity ? hlRow('charity', 'باب الخير', 'أقسام إحسان ومشاريعه وأوقافه، في مكان واحد', 'charityHome()') : ''}</div>`) : null, hlHead('استماع وعطاء'));
+  const ehsan = typeof ehsanBanner === 'function' ? ehsanBanner() : null;
+  put('.hl-reading-slot', readingRow || ehsan);
+  if (readingRow && ehsan) readingRow.after(ehsan);
+  put('.hl-recitation-slot', recitation ? hlNode(`<div class="hl-list">${hlRow('headphones', 'المشغل', 'القراء والسور والتنزيلات والحفظ', 'recitationHub()')}</div>`) : null, hlHead('استماع وعطاء'));
   put('.hl-dua-slot', dua, hlHead('دعاء من القرآن'));
-  put('.hl-charity-slot', recitation ? null : (charity ? hlNode(`<div class="hl-list">${hlRow('charity', 'باب الخير', 'أقسام إحسان ومشاريعه وأوقافه، في مكان واحد', 'charityHome()')}</div>`) : null), recitation ? '' : hlHead('باب الخير'));
+  put('.hl-charity-slot', null);
   put('.hl-footer-slot', footer);
   fajr?.remove(); challenge?.remove(); reading?.remove();
   // the recitation card stays (hidden) so its player can still open from it
