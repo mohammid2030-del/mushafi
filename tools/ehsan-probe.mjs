@@ -23,12 +23,13 @@ await pg.fill('#qd_amount', '25');
 await pg.screenshot({ path: 'out/1-filled.png' });
 await pg.evaluate(() => { const b = [...document.querySelectorAll('#qd-formPage button, #qd-formPage [type=submit]')].find(e => /تبرع الآن/.test(e.textContent)); b.click(); });
 await pg.waitForTimeout(4000);
-await pg.screenshot({ path: 'out/1b-after-click.png' });
-log('AFTERCLICK', (await pg.evaluate(() => [...document.querySelectorAll('.modal.show, [role=dialog]')].map(m => m.innerText.replace(/\s+/g,' ').slice(0,400)))));
-if (PAY) { await pg.goto(PAY, { waitUntil: 'networkidle', timeout: 45000 }).catch(e => log('PAYGOTO', String(e).slice(0,200))); }
-await pg.waitForTimeout(5000);
+const safe = async (n, f) => { try { return await f(); } catch (e) { log('FAIL', n, String(e).slice(0, 200)); } };
+log('AFTERCLICK', await safe('modal', () => pg.evaluate(() => [...document.querySelectorAll('.modal.show, [role=dialog]:not([aria-hidden=true])')].map(m => m.innerText.replace(/\s+/g, ' ').slice(0, 500)))));
+if (PAY) await safe('goto', () => pg.goto(PAY, { waitUntil: 'domcontentloaded', timeout: 45000 }));
+await pg.waitForTimeout(8000);
 log('URL', pg.url());
-await pg.screenshot({ path: 'out/2-payment.png', fullPage: true });
-log('PAYTEXT', (await pg.evaluate(() => document.body.innerText)).replace(/\s+/g, ' ').slice(0, 2500));
+log('PAYTEXT', await safe('text', async () => (await pg.evaluate(() => document.body.innerText)).replace(/\s+/g, ' ').slice(0, 3000)));
 log('IFRAMES', pg.frames().map(f => f.url()).slice(0, 10));
+const shot = await safe('shot', () => pg.screenshot({ type: 'jpeg', quality: 55, timeout: 15000, animations: 'disabled', caret: 'initial' }));
+if (shot) { const b64 = shot.toString('base64'); for (let k = 0; k < b64.length; k += 4000) console.log('IMG' + String(k / 4000).padStart(4, '0') + ' ' + b64.slice(k, k + 4000)); }
 await b.close();
