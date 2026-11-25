@@ -1,0 +1,17 @@
+NAV https://ehsan.sa/FastDonation/023544911AA3B6BE973774424665F484C3CFDFFF283D6D744E12A20EA020BFE8350C0E567D258DBD42EAE85D79436847
+TABS [{"t":"تبرع عام","type":"publicOpportunity","it":"12","label":"التبرع العام","active":false},{"t":"تيسرت","type":"tanfeethQuickDonation","it":"21","label":"التبرع لِتيسرت","active":false},{"t":"وقف","type":"AwkaafQuickDonation","it":"26","label":"التبرع لِوقف","active":true},{"t":"المساجد","type":"mosqueCareQuickDonation","it":"33","label":"التبرع للمساجد","active":false}]
+AMOUNT BTNS ["تبرع عام","تيسرت","وقف","المساجد","10﷼","50﷼","100﷼","تبرع الآن"]
+ACTIVE تيسرت hidden=tanfeethQuickDonation
+REQ POST https://ehsan.sa/QuickDonate {"sec-ch-ua-platform":"\"iOS\"","referer":"https://ehsan.sa/FastDonation/023544911AA3B6BE973774424665F484C3CFDFFF283D6D744E12A20EA020BFE8350C0E567D258DBD42EAE85D79436847","user-agent":"Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1","sec-ch-ua":"\"Not-A.Brand\";v=\"99\", \"Google Chrome\";v=\"157\", \"Chromium\";v=\"157\"","content-type":"multipart/form-data; boundary=----WebKitFormBoundary98aSA0zRlwvHweIj","sec-ch-ua-mobile":"?1","accept-language":"ar-SA"} ------WebKitFormBoundary98aSA0zRlwvHweIj Content-Disposition: form-data; name="CartItems[0][Amount]"  25 ------WebKitFormBoundary98aSA0zRlwvHweIj Content-Disposition: form-data; name="CartItems[0][InitiativeType]"  tanfeethQuickDonation ------WebKitFormBoundary98aSA0zRlwvHweIj Content-Disposition: form-data; name="FastDonationSource"  be25a516-2952-5226-c999-3a252423e046 ------WebKitFormBoundary98aSA0zRlwvHweIj-- 
+RES 200 {"isSuccess":true,"redirectToUrl":"https://ehsan.sa/Payment?TransactionId=2b8aa998-10ae-e115-32a8-3a252581fec6\u0026initiativeType=0\u0026isQuickDonation=true"}
+FAIL modal Error: page.evaluate: Execution context was destroyed, most likely because of a navigation
+AFTERCLICK 
+NAV chrome-error://chromewebdata/
+FAIL goto TimeoutError: page.goto: Timeout 45000ms exceeded.
+Call log:
+  - navigating to "https://ehsan.sa/Payment?TransactionId=2b8aa998-10ae-e115-32a8-3a252581fec6&initiativeType=0&isQuickDonation=true", wait
+URL chrome-error://chromewebdata/
+FAIL text Error: page.evaluate: Execution context was destroyed, most likely because of a navigation
+PAYTEXT 
+IFRAMES ["chrome-error://chromewebdata/"]
+NAV chrome-error://chromewebdata/
