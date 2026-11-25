@@ -8,7 +8,8 @@ const ctx = await b.newContext({ viewport: { width: 400, height: 860 }, deviceSc
   userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1' });
 const pg = await ctx.newPage();
 pg.on('framenavigated', f => { if (f === pg.mainFrame()) log('NAV', f.url()); });
-pg.on('request', r => { if (['xhr', 'fetch', 'document'].includes(r.resourceType()) && r.method() !== 'GET') log('REQ', r.method(), r.url(), (r.postData() || '').slice(0, 400)); });
+pg.on('response', async r => { if (/quickdonate|cart|checkout|payment/i.test(r.url()) && r.request().method() !== 'GET') { let t=''; try { t = (await r.text()).replace(/\s+/g,' ').slice(0, 1500); } catch (e) {} log('RES', r.status(), r.url(), t); } });
+pg.on('request', r => { if (['xhr', 'fetch', 'document'].includes(r.resourceType()) && r.method() !== 'GET') log('REQ', r.method(), r.url(), (r.postData() || '').replace(/\r?\n/g,' ').slice(0, 1500)); });
 try {
   const res = await pg.goto(URL, { waitUntil: 'networkidle', timeout: 45000 });
   log('STATUS', res && res.status());
@@ -22,12 +23,17 @@ const info = await pg.evaluate(() => {
 });
 fs.writeFileSync('out/info.json', JSON.stringify(info, null, 1));
 log('INPUTS', info.inputs.length, 'BUTTONS', info.buttons.length, 'FORMS', info.forms);
+for (const i of info.inputs) log('IN', i);
+for (const i of info.buttons) log('BTN', i);
+log('FORMHTML', (await pg.evaluate(() => (document.getElementById('qd-formPage')||{}).outerHTML||'')).replace(/\s+/g,' ').slice(0, 6000));
 // Try: choose «تيسرت», type 50, press «تبرع الآن»
 async function clickText(t) {
   const loc = pg.getByText(t, { exact: true }).filter({ visible: true }).first();
   try { await loc.click({ timeout: 5000 }); log('CLICK OK', t); return true; } catch (e) { log('CLICK FAIL', t, String(e).slice(0, 150)); return false; }
 }
 await clickText('تيسرت');
+if (!(await pg.getByText('تيسرت').count())) log('no tisirt');
+log('TABS', await pg.evaluate(() => [...document.querySelectorAll('*')].filter(e => e.children.length === 0 && /تيسرت|وقف|المساجد|تبرع عام/.test(e.textContent)).map(e => e.tagName + '.' + e.className + ' ' + e.textContent.trim() + ' vis=' + !!e.offsetParent).slice(0, 12)));
 await pg.waitForTimeout(1500);
 await pg.screenshot({ path: 'out/2-tab.png', fullPage: true });
 try {

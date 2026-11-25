@@ -3,7 +3,7 @@ on:
   push:
     branches: [ehsan-probe]
 permissions:
-  contents: read
+  contents: write
 jobs:
   probe:
     runs-on: ubuntu-latest
@@ -12,7 +12,6 @@ jobs:
       - uses: actions/checkout@v4
       - run: npm i --no-save playwright-core@1.48.2 >/dev/null 2>&1
       - run: node tools/ehsan-probe.mjs || true
-      - uses: actions/upload-artifact@v4
-        with:
-          name: probe
-          path: out/
+      - run: |
+          git config user.name probe; git config user.email probe@users.noreply.github.com
+          git add -f out && git commit -qm "probe output" && git push -q origin HEAD:ehsan-probe-out --force
