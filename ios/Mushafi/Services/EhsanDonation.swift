@@ -93,13 +93,10 @@ enum EhsanDonation {
     }
 }
 
-/// Ehsan's payment page under Mushafi's own header (title, secure line, Ehsan logo, close).
+/// Ehsan's payment page inside the same centred glass card as the donation card (logo, title, close).
 final class EhsanPayViewController: UIViewController, WKNavigationDelegate, WKUIDelegate {
     private let url: URL
     private let dark: Bool
-    private let amount: Int
-    private let field: String
-    private static let fieldNames = ["publicOpportunity": "تبرع عام", "tanfeethQuickDonation": "تيسرت", "AwkaafQuickDonation": "وقف", "mosqueCareQuickDonation": "المساجد"]
     private let web: WKWebView
     private let progress = UIProgressView(progressViewStyle: .bar)
     private var observer: NSKeyValueObservation?
@@ -107,31 +104,46 @@ final class EhsanPayViewController: UIViewController, WKNavigationDelegate, WKUI
     init(url: URL, dark: Bool, amount: Int, field: String) {
         self.url = url
         self.dark = dark
-        self.amount = amount
-        self.field = field
         let config = WKWebViewConfiguration()
         config.websiteDataStore = .default()
         web = WKWebView(frame: .zero, configuration: config)
         super.init(nibName: nil, bundle: nil)
-        modalPresentationStyle = .pageSheet
+        modalPresentationStyle = .overFullScreen
+        modalTransitionStyle = .crossDissolve
         overrideUserInterfaceStyle = dark ? .dark : .light
-        if let sheet = sheetPresentationController { sheet.detents = [.large()]; sheet.prefersGrabberVisible = true; sheet.preferredCornerRadius = 26 }
     }
     required init?(coder: NSCoder) { nil }
 
     override func viewDidLoad() {
         super.viewDidLoad()
         let teal1 = UIColor(red: 0.039, green: 0.541, blue: 0.447, alpha: 1), teal3 = UIColor(red: 0.051, green: 0.227, blue: 0.388, alpha: 1)
-        view.backgroundColor = dark ? UIColor(white: 0.07, alpha: 1) : UIColor(red: 0.97, green: 0.95, blue: 0.91, alpha: 1)
+        view.backgroundColor = .clear
 
-        let header = UIView()
-        header.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(header)
+        // Dimmed, blurred backdrop like the donation card's.
+        let blur = UIVisualEffectView(effect: UIBlurEffect(style: dark ? .systemThinMaterialDark : .systemUltraThinMaterialDark))
+        blur.alpha = 0.55
+        let dim = UIView()
+        dim.backgroundColor = UIColor(red: 0.04, green: 0.03, blue: 0.02, alpha: 0.35)
+        for v in [blur, dim] { v.translatesAutoresizingMaskIntoConstraints = false; view.addSubview(v)
+            NSLayoutConstraint.activate([v.topAnchor.constraint(equalTo: view.topAnchor), v.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+                                         v.leadingAnchor.constraint(equalTo: view.leadingAnchor), v.trailingAnchor.constraint(equalTo: view.trailingAnchor)]) }
+
+        // The card.
+        let card = UIView()
+        card.translatesAutoresizingMaskIntoConstraints = false
+        card.backgroundColor = dark ? UIColor(red: 0.10, green: 0.086, blue: 0.063, alpha: 0.97) : UIColor(red: 1, green: 0.99, blue: 0.972, alpha: 0.97)
+        card.layer.cornerRadius = 30
+        card.layer.borderWidth = 1
+        card.layer.borderColor = (dark ? UIColor(red: 0.94, green: 0.84, blue: 0.59, alpha: 0.18) : UIColor.white.withAlphaComponent(0.7)).cgColor
+        card.layer.shadowColor = UIColor.black.cgColor
+        card.layer.shadowOpacity = dark ? 0.6 : 0.35
+        card.layer.shadowRadius = 35
+        card.layer.shadowOffset = CGSize(width: 0, height: 24)
+        view.addSubview(card)
 
         let logoBox = GradientView(colors: [teal1, teal3])
-        logoBox.layer.cornerRadius = 12
+        logoBox.layer.cornerRadius = 15
         logoBox.clipsToBounds = true
-        logoBox.translatesAutoresizingMaskIntoConstraints = false
         let logo = UIImageView()
         if let file = Bundle.main.url(forResource: "ehsan-logo-white", withExtension: "png", subdirectory: "assets") { logo.image = UIImage(contentsOfFile: file.path) }
         logo.contentMode = .scaleAspectFit
@@ -140,108 +152,34 @@ final class EhsanPayViewController: UIViewController, WKNavigationDelegate, WKUI
 
         let title = UILabel()
         title.text = UiLanguage.text("إتمام التبرع")
-        title.font = .systemFont(ofSize: 17, weight: .heavy)
+        title.font = .systemFont(ofSize: 18, weight: .heavy)
         title.textColor = .label
+        title.textAlignment = .center
         let lock = UIImageView(image: UIImage(systemName: "lock.fill", withConfiguration: UIImage.SymbolConfiguration(pointSize: 10, weight: .semibold)))
         lock.tintColor = .secondaryLabel
         let sub = UILabel()
         sub.text = UiLanguage.text("منصة إحسان · دفع آمن")
         sub.font = .systemFont(ofSize: 12, weight: .medium)
         sub.textColor = .secondaryLabel
-        let subRow = UIStackView(arrangedSubviews: [lock, sub])
+        let subRow = UIStackView(arrangedSubviews: UiLanguage.isRTL ? [sub, lock] : [lock, sub])
         subRow.spacing = 4
         subRow.alignment = .center
-        let texts = UIStackView(arrangedSubviews: [title, subRow])
-        texts.axis = .vertical
-        texts.alignment = UiLanguage.isRTL ? .trailing : .leading
-        texts.semanticContentAttribute = UiLanguage.isRTL ? .forceRightToLeft : .forceLeftToRight
-        subRow.semanticContentAttribute = texts.semanticContentAttribute
-        texts.spacing = 2
 
         let close = UIButton(type: .system)
         close.setImage(UIImage(systemName: "xmark", withConfiguration: UIImage.SymbolConfiguration(pointSize: 14, weight: .bold)), for: .normal)
         close.tintColor = .label
-        close.backgroundColor = UIColor.label.withAlphaComponent(0.08)
+        close.backgroundColor = UIColor.label.withAlphaComponent(0.07)
         close.layer.cornerRadius = 17
         close.addTarget(self, action: #selector(closeTapped), for: .touchUpInside)
 
-        for v in [logoBox, texts, close] as [UIView] { v.translatesAutoresizingMaskIntoConstraints = false; header.addSubview(v) }
-        let line = UIView()
-        line.backgroundColor = UIColor.label.withAlphaComponent(0.1)
-        line.translatesAutoresizingMaskIntoConstraints = false
-        header.addSubview(line)
-
-        // Donation summary card (Mushafi's design), above Ehsan's payment page.
-        let card = GradientView(colors: [teal1, UIColor(red: 0.043, green: 0.42, blue: 0.435, alpha: 1), teal3])
-        card.layer.cornerRadius = 20
-        card.clipsToBounds = true
-        card.translatesAutoresizingMaskIntoConstraints = false
-        let mark = UIImageView(image: logo.image)
-        mark.alpha = 0.12
-        mark.contentMode = .scaleAspectFit
-        let small = UILabel()
-        small.text = UiLanguage.text("تفاصيل التبرع")
-        small.font = .systemFont(ofSize: 12, weight: .semibold)
-        small.textColor = UIColor.white.withAlphaComponent(0.8)
-        let name = UILabel()
-        name.text = UiLanguage.text(Self.fieldNames[field] ?? "تبرع عام") + " - مصحفي | Mushafi"
-        name.font = .systemFont(ofSize: 17, weight: .heavy)
-        name.textColor = .white
-        name.adjustsFontSizeToFitWidth = true
-        name.minimumScaleFactor = 0.75
-        let divider = UIView()
-        divider.backgroundColor = UIColor.white.withAlphaComponent(0.22)
-        let amountTitle = UILabel()
-        amountTitle.text = UiLanguage.text("المبلغ")
-        amountTitle.font = .systemFont(ofSize: 13, weight: .medium)
-        amountTitle.textColor = UIColor.white.withAlphaComponent(0.85)
-        let amountValue = UILabel()
-        let digits = NumberFormatter()
-        digits.locale = Locale(identifier: UiLanguage.current == "ar" ? "ar-SA" : "en-US")
-        amountValue.text = (digits.string(from: NSNumber(value: amount)) ?? String(amount)) + " " + UiLanguage.text("ريال")
-        amountValue.font = .systemFont(ofSize: 20, weight: .heavy)
-        amountValue.textColor = .white
-        let rtlCard = UiLanguage.isRTL
-        for v in [mark, small, name, divider, amountTitle, amountValue] as [UIView] { v.translatesAutoresizingMaskIntoConstraints = false; card.addSubview(v) }
-        for l in [small, name] { l.textAlignment = rtlCard ? .right : .left }
-        view.addSubview(card)
-
         let frame = UIView()
-        frame.translatesAutoresizingMaskIntoConstraints = false
-        frame.layer.cornerRadius = 18
+        frame.layer.cornerRadius = 20
         frame.layer.borderWidth = 1
         frame.layer.borderColor = UIColor.label.withAlphaComponent(0.1).cgColor
         frame.clipsToBounds = true
         frame.backgroundColor = .white
-        view.addSubview(frame)
 
-        NSLayoutConstraint.activate([
-            card.topAnchor.constraint(equalTo: header.bottomAnchor, constant: 14),
-            card.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 14),
-            card.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -14),
-            mark.widthAnchor.constraint(equalToConstant: 120), mark.heightAnchor.constraint(equalToConstant: 120),
-            mark.bottomAnchor.constraint(equalTo: card.bottomAnchor, constant: 34),
-            (rtlCard ? mark.leftAnchor.constraint(equalTo: card.leftAnchor, constant: -24) : mark.rightAnchor.constraint(equalTo: card.rightAnchor, constant: 24)),
-            small.topAnchor.constraint(equalTo: card.topAnchor, constant: 14),
-            small.leftAnchor.constraint(equalTo: card.leftAnchor, constant: 16), small.rightAnchor.constraint(equalTo: card.rightAnchor, constant: -16),
-            name.topAnchor.constraint(equalTo: small.bottomAnchor, constant: 3),
-            name.leftAnchor.constraint(equalTo: card.leftAnchor, constant: 16), name.rightAnchor.constraint(equalTo: card.rightAnchor, constant: -16),
-            divider.topAnchor.constraint(equalTo: name.bottomAnchor, constant: 10), divider.heightAnchor.constraint(equalToConstant: 1),
-            divider.leftAnchor.constraint(equalTo: card.leftAnchor, constant: 16), divider.rightAnchor.constraint(equalTo: card.rightAnchor, constant: -16),
-            amountTitle.topAnchor.constraint(equalTo: divider.bottomAnchor, constant: 10),
-            amountValue.centerYAnchor.constraint(equalTo: amountTitle.centerYAnchor),
-            amountTitle.bottomAnchor.constraint(equalTo: card.bottomAnchor, constant: -15),
-            (rtlCard ? amountTitle.rightAnchor.constraint(equalTo: card.rightAnchor, constant: -16) : amountTitle.leftAnchor.constraint(equalTo: card.leftAnchor, constant: 16)),
-            (rtlCard ? amountValue.leftAnchor.constraint(equalTo: card.leftAnchor, constant: 16) : amountValue.rightAnchor.constraint(equalTo: card.rightAnchor, constant: -16)),
-            frame.topAnchor.constraint(equalTo: card.bottomAnchor, constant: 14),
-            frame.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 14),
-            frame.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -14),
-            frame.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -10),
-        ])
-
-        progress.progressTintColor = teal1
-        progress.trackTintColor = .clear
-        progress.translatesAutoresizingMaskIntoConstraints = false
+        for v in [logoBox, title, subRow, close, frame] as [UIView] { v.translatesAutoresizingMaskIntoConstraints = false; card.addSubview(v) }
         web.translatesAutoresizingMaskIntoConstraints = false
         web.navigationDelegate = self
         web.uiDelegate = self
@@ -249,44 +187,50 @@ final class EhsanPayViewController: UIViewController, WKNavigationDelegate, WKUI
         web.backgroundColor = .white
         web.customUserAgent = EhsanDonation.agent
         frame.addSubview(web)
-        view.addSubview(progress)
+        progress.progressTintColor = teal1
+        progress.trackTintColor = .clear
+        progress.translatesAutoresizingMaskIntoConstraints = false
+        frame.addSubview(progress)
 
+        let wide = card.widthAnchor.constraint(equalTo: view.widthAnchor, constant: -36); wide.priority = .defaultHigh
+        let tall = card.heightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.heightAnchor, multiplier: 0.9); tall.priority = .defaultHigh
         NSLayoutConstraint.activate([
-            header.topAnchor.constraint(equalTo: view.topAnchor, constant: 14),
-            header.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            header.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            header.heightAnchor.constraint(equalToConstant: 64),
-            logoBox.centerYAnchor.constraint(equalTo: header.centerYAnchor),
-            logoBox.widthAnchor.constraint(equalToConstant: 40), logoBox.heightAnchor.constraint(equalToConstant: 40),
+            card.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            card.centerYAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerYAnchor),
+            wide, tall,
+            card.widthAnchor.constraint(lessThanOrEqualToConstant: 420),
+            card.heightAnchor.constraint(lessThanOrEqualToConstant: 820),
+            logoBox.topAnchor.constraint(equalTo: card.topAnchor, constant: 18),
+            logoBox.centerXAnchor.constraint(equalTo: card.centerXAnchor),
+            logoBox.widthAnchor.constraint(equalToConstant: 52), logoBox.heightAnchor.constraint(equalToConstant: 52),
             logo.centerXAnchor.constraint(equalTo: logoBox.centerXAnchor), logo.centerYAnchor.constraint(equalTo: logoBox.centerYAnchor),
-            logo.widthAnchor.constraint(equalToConstant: 28), logo.heightAnchor.constraint(equalToConstant: 28),
-            texts.centerYAnchor.constraint(equalTo: header.centerYAnchor),
-            close.centerYAnchor.constraint(equalTo: header.centerYAnchor),
+            logo.widthAnchor.constraint(equalToConstant: 36), logo.heightAnchor.constraint(equalToConstant: 36),
+            title.topAnchor.constraint(equalTo: logoBox.bottomAnchor, constant: 8),
+            title.centerXAnchor.constraint(equalTo: card.centerXAnchor),
+            subRow.topAnchor.constraint(equalTo: title.bottomAnchor, constant: 2),
+            subRow.centerXAnchor.constraint(equalTo: card.centerXAnchor),
+            close.topAnchor.constraint(equalTo: card.topAnchor, constant: 14),
             close.widthAnchor.constraint(equalToConstant: 34), close.heightAnchor.constraint(equalToConstant: 34),
-            line.leadingAnchor.constraint(equalTo: header.leadingAnchor), line.trailingAnchor.constraint(equalTo: header.trailingAnchor),
-            line.bottomAnchor.constraint(equalTo: header.bottomAnchor), line.heightAnchor.constraint(equalToConstant: 1),
-            progress.topAnchor.constraint(equalTo: header.bottomAnchor),
-            progress.leadingAnchor.constraint(equalTo: view.leadingAnchor), progress.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            web.topAnchor.constraint(equalTo: frame.topAnchor),
+            (UiLanguage.isRTL ? close.leftAnchor.constraint(equalTo: card.leftAnchor, constant: 14) : close.rightAnchor.constraint(equalTo: card.rightAnchor, constant: -14)),
+            frame.topAnchor.constraint(equalTo: subRow.bottomAnchor, constant: 14),
+            frame.leadingAnchor.constraint(equalTo: card.leadingAnchor, constant: 12),
+            frame.trailingAnchor.constraint(equalTo: card.trailingAnchor, constant: -12),
+            frame.bottomAnchor.constraint(equalTo: card.bottomAnchor, constant: -12),
+            web.topAnchor.constraint(equalTo: frame.topAnchor), web.bottomAnchor.constraint(equalTo: frame.bottomAnchor),
             web.leadingAnchor.constraint(equalTo: frame.leadingAnchor), web.trailingAnchor.constraint(equalTo: frame.trailingAnchor),
-            web.bottomAnchor.constraint(equalTo: frame.bottomAnchor),
+            progress.topAnchor.constraint(equalTo: frame.topAnchor),
+            progress.leadingAnchor.constraint(equalTo: frame.leadingAnchor), progress.trailingAnchor.constraint(equalTo: frame.trailingAnchor),
         ])
-        let rtl = UiLanguage.isRTL
-        NSLayoutConstraint.activate(rtl ? [
-            logoBox.rightAnchor.constraint(equalTo: header.rightAnchor, constant: -16),
-            texts.rightAnchor.constraint(equalTo: logoBox.leftAnchor, constant: -10),
-            close.leftAnchor.constraint(equalTo: header.leftAnchor, constant: 16),
-        ] : [
-            logoBox.leftAnchor.constraint(equalTo: header.leftAnchor, constant: 16),
-            texts.leftAnchor.constraint(equalTo: logoBox.rightAnchor, constant: 10),
-            close.rightAnchor.constraint(equalTo: header.rightAnchor, constant: -16),
-        ])
-        title.textAlignment = rtl ? .right : .left
+
         observer = web.observe(\.estimatedProgress, options: [.new]) { [weak self] w, _ in
             self?.progress.setProgress(Float(w.estimatedProgress), animated: true)
             self?.progress.isHidden = w.estimatedProgress >= 1
         }
         web.load(URLRequest(url: url))
+
+        // Card pops in like the donation card.
+        card.transform = CGAffineTransform(translationX: 0, y: 14).scaledBy(x: 0.97, y: 0.97)
+        UIView.animate(withDuration: 0.32, delay: 0.05, usingSpringWithDamping: 0.85, initialSpringVelocity: 0) { card.transform = .identity }
     }
 
     @objc private func closeTapped() { dismiss(animated: true) }
@@ -299,7 +243,7 @@ final class EhsanPayViewController: UIViewController, WKNavigationDelegate, WKUI
         UIApplication.shared.open(target)
     }
 
-    // Pages that open a new window (3-D Secure, receipts) stay in the same sheet.
+    // Pages that open a new window (3-D Secure, receipts) stay in the same card.
     func webView(_ webView: WKWebView, createWebViewWith configuration: WKWebViewConfiguration, for action: WKNavigationAction, windowFeatures: WKWindowFeatures) -> WKWebView? {
         if action.targetFrame == nil { webView.load(action.request) }
         return nil
