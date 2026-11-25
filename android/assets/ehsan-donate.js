@@ -42,8 +42,7 @@ function ehsanOpen() {
     <h4>مجال التبرع</h4>
     <div class="eh-flds">${EHSAN_FIELDS.map(([k, n, d, p]) => `<button type="button" class="eh-fld" data-f="${k}" onclick="ehField('${k}')"><i><svg viewBox="0 0 24 24">${p}</svg></i><span><b>${n}</b><span>${d}</span></span></button>`).join('')}</div>
     <div class="eh-sum"><span class="eh-sum-f"></span><b class="eh-sum-a"></b></div>
-    <button type="button" class="eh-btn" onclick="ehsanGo(1)">${EH_LOCK}<span>إتمام التبرع</span></button>
-    <button type="button" class="eh-alt" onclick="ehsanGo(2)">نسخة تجربة: جرّب الطريقة الثانية</button>
+    <button type="button" class="eh-btn" onclick="ehsanGo()">${EH_LOCK}<span>إتمام التبرع</span></button>
     <div class="eh-ft">${EH_LOCK}<span>الدفع آمن عبر منصة إحسان · متاح داخل المملكة</span></div>
   </div>`;
   bg.addEventListener('click', e => { if (e.target === bg) ehsanClose() });
@@ -64,20 +63,19 @@ function ehPaint() {
   card.querySelectorAll('.eh-fld').forEach(b => b.classList.toggle('on', b.dataset.f === ehState.field));
   card.querySelector('.eh-sum-f').textContent = EHSAN_FIELDS.find(f => f[0] === ehState.field)[1];
   card.querySelector('.eh-sum-a').textContent = ok ? ehNum(amount) + ' ريال' : '—';
-  card.querySelectorAll('.eh-btn,.eh-alt').forEach(b => b.disabled = !ok);
-  card.querySelector('.eh-btn').toggleAttribute('disabled', !ok);
+    card.querySelector('.eh-btn').toggleAttribute('disabled', !ok);
 }
-function ehsanGo(mode) {
+function ehsanGo() {
   const amount = ehAmount();
   if (!(amount >= 1 && amount <= 1000000)) return;
   localStorage.ehsanLast = JSON.stringify({ field: ehState.field });
   if (window.AndroidReader?.ehsanDonate) {
-    document.querySelector('.eh-btn')?.classList.add('busy');
-    AndroidReader.ehsanDonate(amount, ehState.field, mode);
+    const btn = document.querySelector('.eh-btn'); if (btn?.classList.contains('busy')) return; btn?.classList.add('busy'); const t = btn?.querySelector('span'); if (t) t.textContent = 'جارٍ تجهيز الدفع…';
+    AndroidReader.ehsanDonate(amount, ehState.field);
   } else showSmallNotice('التبرع عبر إحسان متاح في نسخة التجربة على الآيفون');
 }
 // Native result: true = the payment page is showing; false = it could not be prepared.
 window.onEhsanDonate = ok => {
-  document.querySelector('.eh-btn')?.classList.remove('busy');
-  if (ok) ehsanClose(); else showSmallNotice('تعذّر تجهيز التبرع، فتحنا لك صفحة إحسان');
+  ehsanClose();
+  if (!ok) showSmallNotice('تعذّر تجهيز التبرع، فتحنا لك صفحة إحسان');
 };

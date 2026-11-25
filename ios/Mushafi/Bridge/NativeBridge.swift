@@ -190,7 +190,7 @@ final class NativeBridge: NSObject, WKScriptMessageHandler {
                 shell?.present(LiveBroadcastViewController(city: city, dark: a.bool(1)), animated: true)
             }
         case "ehsanDonate":
-            if let shell { EhsanDonation.donate(amount: a.int(0) ?? 0, field: a.string(1) ?? "", way: a.int(2) ?? 1, from: shell) }
+            if let shell { EhsanDonation.donate(amount: a.int(0) ?? 0, field: a.string(1) ?? "", from: shell) }
         case "openCharityPlatform":
             if !ExternalLinks.openCharity(a.string(0)) { fileMessage(false, "تعذر فتح صفحة الجهة") }
 
