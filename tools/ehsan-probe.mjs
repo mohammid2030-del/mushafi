@@ -8,43 +8,23 @@ const ctx = await b.newContext({ viewport: { width: 400, height: 860 }, deviceSc
   userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1' });
 const pg = await ctx.newPage();
 pg.on('framenavigated', f => { if (f === pg.mainFrame()) log('NAV', f.url()); });
-pg.on('response', async r => { if (/quickdonate|cart|checkout|payment/i.test(r.url()) && r.request().method() !== 'GET') { let t=''; try { t = (await r.text()).replace(/\s+/g,' ').slice(0, 1500); } catch (e) {} log('RES', r.status(), r.url(), t); } });
-pg.on('request', r => { if (['xhr', 'fetch', 'document'].includes(r.resourceType()) && r.method() !== 'GET') log('REQ', r.method(), r.url(), (r.postData() || '').replace(/\r?\n/g,' ').slice(0, 1500)); });
-try {
-  const res = await pg.goto(URL, { waitUntil: 'networkidle', timeout: 45000 });
-  log('STATUS', res && res.status());
-} catch (e) { log('GOTO ERR', String(e)); }
-await pg.waitForTimeout(3000);
-await pg.screenshot({ path: 'out/1-page.png', fullPage: true });
-fs.writeFileSync('out/page.html', await pg.content());
-const info = await pg.evaluate(() => {
-  const pick = el => ({ tag: el.tagName, id: el.id, cls: el.className && String(el.className).slice(0, 80), name: el.getAttribute('name'), type: el.getAttribute('type'), val: el.value, txt: (el.innerText || '').trim().slice(0, 40), data: Object.fromEntries([...el.attributes].filter(a => a.name.startsWith('data-') || a.name.startsWith('on') || a.name === 'href').map(a => [a.name, a.value.slice(0, 120)])) });
-  return { inputs: [...document.querySelectorAll('input,select,textarea')].map(pick), buttons: [...document.querySelectorAll('button,a.btn,[role=tab],.nav-link,label')].filter(e => e.offsetParent).map(pick).slice(0, 80), forms: [...document.forms].map(f => ({ action: f.action, method: f.method, id: f.id })) };
-});
-fs.writeFileSync('out/info.json', JSON.stringify(info, null, 1));
-log('INPUTS', info.inputs.length, 'BUTTONS', info.buttons.length, 'FORMS', info.forms);
-for (const i of info.inputs) log('IN', i);
-for (const i of info.buttons) log('BTN', i);
-log('FORMHTML', (await pg.evaluate(() => (document.getElementById('qd-formPage')||{}).outerHTML||'')).replace(/\s+/g,' ').slice(0, 6000));
-// Try: choose «تيسرت», type 50, press «تبرع الآن»
-async function clickText(t) {
-  const loc = pg.getByText(t, { exact: true }).filter({ visible: true }).first();
-  try { await loc.click({ timeout: 5000 }); log('CLICK OK', t); return true; } catch (e) { log('CLICK FAIL', t, String(e).slice(0, 150)); return false; }
-}
-await clickText('تيسرت');
-if (!(await pg.getByText('تيسرت').count())) log('no tisirt');
-log('TABS', await pg.evaluate(() => [...document.querySelectorAll('*')].filter(e => e.children.length === 0 && /تيسرت|وقف|المساجد|تبرع عام/.test(e.textContent)).map(e => e.tagName + '.' + e.className + ' ' + e.textContent.trim() + ' vis=' + !!e.offsetParent).slice(0, 12)));
-await pg.waitForTimeout(1500);
-await pg.screenshot({ path: 'out/2-tab.png', fullPage: true });
-try {
-  const amt = pg.locator('input[type=number], input[inputmode=numeric], input[placeholder*="مبلغ"]').filter({ visible: true }).first();
-  await amt.fill('50', { timeout: 5000 }); log('AMOUNT OK');
-} catch (e) { log('AMOUNT FAIL', String(e).slice(0, 150)); }
+pg.on('request', r => { if (r.method() !== 'GET') log('REQ', r.method(), r.url(), JSON.stringify(r.headers()).slice(0, 600), (r.postData() || '').replace(/\r?\n/g, ' ').slice(0, 800)); });
+pg.on('response', async r => { if (/quickdonate/i.test(r.url())) { let t = ''; try { t = (await r.text()).slice(0, 600); } catch (e) {} log('RES', r.status(), t); } });
+await pg.goto(URL, { waitUntil: 'networkidle', timeout: 45000 });
+await pg.waitForTimeout(2000);
+log('TABS', await pg.evaluate(() => [...document.querySelectorAll('.qd-btn-select')].map(e => ({ t: e.textContent.trim(), type: e.dataset.type, it: e.dataset.initiativetype, label: e.dataset.formLabel, active: e.classList.contains('active') }))));
+log('AMOUNT BTNS', await pg.evaluate(() => [...document.querySelectorAll('#qd-formPage button, #qd-formPage label')].map(e => e.textContent.trim().replace(/\s+/g, ' ')).filter(Boolean).slice(0, 20)));
+// pick «تيسرت» by JS click, type 25, submit
+await pg.evaluate(() => { [...document.querySelectorAll('.qd-btn-select')].find(e => e.textContent.trim() === 'تيسرت').click(); });
 await pg.waitForTimeout(800);
-await pg.screenshot({ path: 'out/3-amount.png', fullPage: true });
-await clickText('تبرع الآن');
-await pg.waitForTimeout(8000);
-log('URL AFTER', pg.url());
-await pg.screenshot({ path: 'out/4-after.png', fullPage: true });
-fs.writeFileSync('out/after.html', await pg.content());
+log('ACTIVE', await pg.evaluate(() => [...document.querySelectorAll('.qd-btn-select.active')].map(e => e.textContent.trim()) + ' hidden=' + document.getElementById('qd_initiativeTypePage').value));
+await pg.fill('#qd_amount', '25');
+await pg.screenshot({ path: 'out/1-filled.png' });
+await pg.evaluate(() => { const b = [...document.querySelectorAll('#qd-formPage button, #qd-formPage [type=submit]')].find(e => /تبرع الآن/.test(e.textContent)); b.click(); });
+try { await pg.waitForURL(/Payment/i, { timeout: 20000 }); } catch (e) { log('NO PAYMENT NAV'); }
+await pg.waitForTimeout(5000);
+log('URL', pg.url());
+await pg.screenshot({ path: 'out/2-payment.png', fullPage: true });
+log('PAYTEXT', (await pg.evaluate(() => document.body.innerText)).replace(/\s+/g, ' ').slice(0, 2500));
+log('IFRAMES', pg.frames().map(f => f.url()).slice(0, 10));
 await b.close();
