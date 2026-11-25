@@ -18,7 +18,7 @@ enum EhsanDonation {
         prepare(amount: amount, field: field, lang: lang) { payment in
             DispatchQueue.main.async {
                 let dark = UserDefaults.standard.bool(forKey: "mushafi.launchDark")
-                let sheet = EhsanPayViewController(url: payment ?? page, dark: dark)
+                let sheet = EhsanPayViewController(url: payment ?? page, dark: dark, amount: amount, field: field)
                 shell.topPresenter.present(sheet, animated: true)
                 shell.callback("onEhsanDonate", payment != nil)
             }
@@ -97,13 +97,18 @@ enum EhsanDonation {
 final class EhsanPayViewController: UIViewController, WKNavigationDelegate, WKUIDelegate {
     private let url: URL
     private let dark: Bool
+    private let amount: Int
+    private let field: String
+    private static let fieldNames = ["publicOpportunity": "تبرع عام", "tanfeethQuickDonation": "تيسرت", "AwkaafQuickDonation": "وقف", "mosqueCareQuickDonation": "المساجد"]
     private let web: WKWebView
     private let progress = UIProgressView(progressViewStyle: .bar)
     private var observer: NSKeyValueObservation?
 
-    init(url: URL, dark: Bool) {
+    init(url: URL, dark: Bool, amount: Int, field: String) {
         self.url = url
         self.dark = dark
+        self.amount = amount
+        self.field = field
         let config = WKWebViewConfiguration()
         config.websiteDataStore = .default()
         web = WKWebView(frame: .zero, configuration: config)
@@ -166,6 +171,74 @@ final class EhsanPayViewController: UIViewController, WKNavigationDelegate, WKUI
         line.translatesAutoresizingMaskIntoConstraints = false
         header.addSubview(line)
 
+        // Donation summary card (Mushafi's design), above Ehsan's payment page.
+        let card = GradientView(colors: [teal1, UIColor(red: 0.043, green: 0.42, blue: 0.435, alpha: 1), teal3])
+        card.layer.cornerRadius = 20
+        card.clipsToBounds = true
+        card.translatesAutoresizingMaskIntoConstraints = false
+        let mark = UIImageView(image: logo.image)
+        mark.alpha = 0.12
+        mark.contentMode = .scaleAspectFit
+        let small = UILabel()
+        small.text = UiLanguage.text("تفاصيل التبرع")
+        small.font = .systemFont(ofSize: 12, weight: .semibold)
+        small.textColor = UIColor.white.withAlphaComponent(0.8)
+        let name = UILabel()
+        name.text = UiLanguage.text(Self.fieldNames[field] ?? "تبرع عام") + " - مصحفي | Mushafi"
+        name.font = .systemFont(ofSize: 17, weight: .heavy)
+        name.textColor = .white
+        name.adjustsFontSizeToFitWidth = true
+        name.minimumScaleFactor = 0.75
+        let divider = UIView()
+        divider.backgroundColor = UIColor.white.withAlphaComponent(0.22)
+        let amountTitle = UILabel()
+        amountTitle.text = UiLanguage.text("المبلغ")
+        amountTitle.font = .systemFont(ofSize: 13, weight: .medium)
+        amountTitle.textColor = UIColor.white.withAlphaComponent(0.85)
+        let amountValue = UILabel()
+        let digits = NumberFormatter()
+        digits.locale = Locale(identifier: UiLanguage.current == "ar" ? "ar-SA" : "en-US")
+        amountValue.text = (digits.string(from: NSNumber(value: amount)) ?? String(amount)) + " " + UiLanguage.text("ريال")
+        amountValue.font = .systemFont(ofSize: 20, weight: .heavy)
+        amountValue.textColor = .white
+        let rtlCard = UiLanguage.isRTL
+        for v in [mark, small, name, divider, amountTitle, amountValue] as [UIView] { v.translatesAutoresizingMaskIntoConstraints = false; card.addSubview(v) }
+        for l in [small, name] { l.textAlignment = rtlCard ? .right : .left }
+        view.addSubview(card)
+
+        let frame = UIView()
+        frame.translatesAutoresizingMaskIntoConstraints = false
+        frame.layer.cornerRadius = 18
+        frame.layer.borderWidth = 1
+        frame.layer.borderColor = UIColor.label.withAlphaComponent(0.1).cgColor
+        frame.clipsToBounds = true
+        frame.backgroundColor = .white
+        view.addSubview(frame)
+
+        NSLayoutConstraint.activate([
+            card.topAnchor.constraint(equalTo: header.bottomAnchor, constant: 14),
+            card.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 14),
+            card.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -14),
+            mark.widthAnchor.constraint(equalToConstant: 120), mark.heightAnchor.constraint(equalToConstant: 120),
+            mark.bottomAnchor.constraint(equalTo: card.bottomAnchor, constant: 34),
+            (rtlCard ? mark.leftAnchor.constraint(equalTo: card.leftAnchor, constant: -24) : mark.rightAnchor.constraint(equalTo: card.rightAnchor, constant: 24)),
+            small.topAnchor.constraint(equalTo: card.topAnchor, constant: 14),
+            small.leftAnchor.constraint(equalTo: card.leftAnchor, constant: 16), small.rightAnchor.constraint(equalTo: card.rightAnchor, constant: -16),
+            name.topAnchor.constraint(equalTo: small.bottomAnchor, constant: 3),
+            name.leftAnchor.constraint(equalTo: card.leftAnchor, constant: 16), name.rightAnchor.constraint(equalTo: card.rightAnchor, constant: -16),
+            divider.topAnchor.constraint(equalTo: name.bottomAnchor, constant: 10), divider.heightAnchor.constraint(equalToConstant: 1),
+            divider.leftAnchor.constraint(equalTo: card.leftAnchor, constant: 16), divider.rightAnchor.constraint(equalTo: card.rightAnchor, constant: -16),
+            amountTitle.topAnchor.constraint(equalTo: divider.bottomAnchor, constant: 10),
+            amountValue.centerYAnchor.constraint(equalTo: amountTitle.centerYAnchor),
+            amountTitle.bottomAnchor.constraint(equalTo: card.bottomAnchor, constant: -15),
+            (rtlCard ? amountTitle.rightAnchor.constraint(equalTo: card.rightAnchor, constant: -16) : amountTitle.leftAnchor.constraint(equalTo: card.leftAnchor, constant: 16)),
+            (rtlCard ? amountValue.leftAnchor.constraint(equalTo: card.leftAnchor, constant: 16) : amountValue.rightAnchor.constraint(equalTo: card.rightAnchor, constant: -16)),
+            frame.topAnchor.constraint(equalTo: card.bottomAnchor, constant: 14),
+            frame.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 14),
+            frame.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -14),
+            frame.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -10),
+        ])
+
         progress.progressTintColor = teal1
         progress.trackTintColor = .clear
         progress.translatesAutoresizingMaskIntoConstraints = false
@@ -173,9 +246,9 @@ final class EhsanPayViewController: UIViewController, WKNavigationDelegate, WKUI
         web.navigationDelegate = self
         web.uiDelegate = self
         web.isOpaque = false
-        web.backgroundColor = view.backgroundColor
+        web.backgroundColor = .white
         web.customUserAgent = EhsanDonation.agent
-        view.addSubview(web)
+        frame.addSubview(web)
         view.addSubview(progress)
 
         NSLayoutConstraint.activate([
@@ -194,9 +267,9 @@ final class EhsanPayViewController: UIViewController, WKNavigationDelegate, WKUI
             line.bottomAnchor.constraint(equalTo: header.bottomAnchor), line.heightAnchor.constraint(equalToConstant: 1),
             progress.topAnchor.constraint(equalTo: header.bottomAnchor),
             progress.leadingAnchor.constraint(equalTo: view.leadingAnchor), progress.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            web.topAnchor.constraint(equalTo: header.bottomAnchor),
-            web.leadingAnchor.constraint(equalTo: view.leadingAnchor), web.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            web.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            web.topAnchor.constraint(equalTo: frame.topAnchor),
+            web.leadingAnchor.constraint(equalTo: frame.leadingAnchor), web.trailingAnchor.constraint(equalTo: frame.trailingAnchor),
+            web.bottomAnchor.constraint(equalTo: frame.bottomAnchor),
         ])
         let rtl = UiLanguage.isRTL
         NSLayoutConstraint.activate(rtl ? [
