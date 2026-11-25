@@ -9,7 +9,8 @@ const ctx = await b.newContext({ viewport: { width: 400, height: 860 }, deviceSc
 const pg = await ctx.newPage();
 pg.on('framenavigated', f => { if (f === pg.mainFrame()) log('NAV', f.url()); });
 pg.on('request', r => { if (r.method() !== 'GET') log('REQ', r.method(), r.url(), JSON.stringify(r.headers()).slice(0, 600), (r.postData() || '').replace(/\r?\n/g, ' ').slice(0, 800)); });
-pg.on('response', async r => { if (/quickdonate/i.test(r.url())) { let t = ''; try { t = (await r.text()).slice(0, 600); } catch (e) {} log('RES', r.status(), t); } });
+let PAY = null;
+pg.on('response', async r => { if (/quickdonate/i.test(r.url())) { let t = ''; try { t = await r.text(); PAY = JSON.parse(t).redirectToUrl; } catch (e) {} log('RES', r.status(), t.slice(0, 600)); } });
 await pg.goto(URL, { waitUntil: 'networkidle', timeout: 45000 });
 await pg.waitForTimeout(2000);
 log('TABS', await pg.evaluate(() => [...document.querySelectorAll('.qd-btn-select')].map(e => ({ t: e.textContent.trim(), type: e.dataset.type, it: e.dataset.initiativetype, label: e.dataset.formLabel, active: e.classList.contains('active') }))));
@@ -21,7 +22,10 @@ log('ACTIVE', await pg.evaluate(() => [...document.querySelectorAll('.qd-btn-sel
 await pg.fill('#qd_amount', '25');
 await pg.screenshot({ path: 'out/1-filled.png' });
 await pg.evaluate(() => { const b = [...document.querySelectorAll('#qd-formPage button, #qd-formPage [type=submit]')].find(e => /تبرع الآن/.test(e.textContent)); b.click(); });
-try { await pg.waitForURL(/Payment/i, { timeout: 20000 }); } catch (e) { log('NO PAYMENT NAV'); }
+await pg.waitForTimeout(4000);
+await pg.screenshot({ path: 'out/1b-after-click.png' });
+log('AFTERCLICK', (await pg.evaluate(() => [...document.querySelectorAll('.modal.show, [role=dialog]')].map(m => m.innerText.replace(/\s+/g,' ').slice(0,400)))));
+if (PAY) { await pg.goto(PAY, { waitUntil: 'networkidle', timeout: 45000 }).catch(e => log('PAYGOTO', String(e).slice(0,200))); }
 await pg.waitForTimeout(5000);
 log('URL', pg.url());
 await pg.screenshot({ path: 'out/2-payment.png', fullPage: true });
