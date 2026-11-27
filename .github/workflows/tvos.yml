@@ -1,0 +1,172 @@
+# Mushafi for Apple TV: renders the Mushaf pages (Linux), builds the tvOS app (macOS),
+# takes the App Store screenshots in the Apple TV simulator, uploads to TestFlight and App Store Connect.
+name: Apple TV
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: "check = build + screenshots · testflight = also upload build · store = also upload screenshots"
+        type: choice
+        options: [check, testflight, store]
+        default: check
+
+concurrency:
+  group: tvos-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  pages:
+    name: Render Mushaf pages
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - name: Pages cache
+        id: cache
+        uses: actions/cache@v4
+        with:
+          path: tvos/Pages
+          key: tv-pages-v1-${{ hashFiles('android/assets/pages.js', 'android/assets/reader.js', 'android/assets/*.css', 'android/assets/p*.woff2', 'tvos/scripts/render-pages.py') }}
+      - name: Render
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          pip install --quiet playwright pillow
+          python3 tvos/scripts/render-pages.py
+          ls tvos/Pages | wc -l
+          du -sh tvos/Pages
+      - uses: actions/upload-artifact@v4
+        with:
+          name: tv-pages
+          path: tvos/Pages/*.webp
+          retention-days: 3
+
+  build:
+    name: Build, screenshots${{ inputs.action != 'check' && ', upload' || '' }}
+    needs: pages
+    runs-on: macos-26
+    timeout-minutes: 90
+    permissions:
+      contents: write
+    env:
+      DEVELOPMENT_TEAM: ${{ secrets.APPLE_TEAM_ID }}
+      ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+      ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: tv-pages
+          path: tvos/Pages
+      - name: Select Xcode 26
+        run: |
+          xcode=$(ls -d /Applications/Xcode_26*.app 2>/dev/null | sort -V | tail -1)
+          if [ -n "$xcode" ]; then sudo xcode-select -s "$xcode/Contents/Developer"; fi
+          xcodebuild -version
+          ls tvos/Pages | wc -l
+          brew install xcodegen
+      - name: Generate project
+        run: |
+          python3 tvos/scripts/make-data.py
+          code="$(perl -ne 'print $1 if /versionCode\s+(\d+)/' android/build.gradle)"
+          echo "BUILD_NUMBER=${code}.${GITHUB_RUN_NUMBER}" >> "$GITHUB_ENV"
+          cd tvos && xcodegen generate
+
+      - name: Build for the Apple TV simulator
+        run: |
+          set -o pipefail
+          xcodebuild -project tvos/MushafiTV.xcodeproj -scheme MushafiTV -configuration Release \
+            -sdk appletvsimulator -destination 'generic/platform=tvOS Simulator' -derivedDataPath "$RUNNER_TEMP/dd" \
+            CODE_SIGNING_ALLOWED=NO build 2>&1 | tee "$RUNNER_TEMP/sim.log" | grep -E "error:|warning: .*Swift|BUILD (SUCCEEDED|FAILED)" || true
+          if ! grep -q "BUILD SUCCEEDED" "$RUNNER_TEMP/sim.log"; then
+            grep -n -B2 -A6 "error:" "$RUNNER_TEMP/sim.log" | head -200
+            exit 1
+          fi
+
+      - name: Screenshots in the Apple TV 4K simulator
+        run: |
+          set -x
+          app=$(find "$RUNNER_TEMP/dd/Build/Products" -name "MushafiTV.app" -maxdepth 3 | head -1)
+          runtime=$(xcrun simctl list runtimes -j | python3 -c "import json,sys; r=[x for x in json.load(sys.stdin)['runtimes'] if x['platform']=='tvOS' and x['isAvailable']]; print(r[-1]['identifier'])")
+          dtype=$(xcrun simctl list devicetypes -j | python3 -c "import json,sys; d=[x['identifier'] for x in json.load(sys.stdin)['devicetypes'] if 'Apple TV 4K' in x['name']]; print(sorted(d)[-1])")
+          echo "device type: $dtype"
+          udid=$(xcrun simctl create "TV" "$dtype" "$runtime")
+          xcrun simctl boot "$udid"
+          xcrun simctl spawn "$udid" defaults write -g AppleLanguages -array ar
+          xcrun simctl spawn "$udid" defaults write -g AppleLocale ar_SA
+          xcrun simctl shutdown "$udid"; xcrun simctl boot "$udid"; sleep 20
+          xcrun simctl status_bar "$udid" override --time "9:41" 2>/dev/null || true
+          xcrun simctl install "$udid" "$app"
+          mkdir -p tvos/shots
+          shot() { n="$1"; shift
+            xcrun simctl terminate "$udid" com.mohammedasif.mushafi 2>/dev/null || true
+            xcrun simctl launch "$udid" com.mohammedasif.mushafi "$@"
+            sleep 14
+            xcrun simctl io "$udid" screenshot "tvos/shots/$n.png"
+          }
+          shot 1-home -tvTab 0 -tvLastPage 2
+          shot 2-reader -tvReader 1 -tvPlay 7:1:2
+          shot 3-mushaf -tvTab 1
+          shot 4-reciters -tvTab 2 -tvPlay 7:1:2
+          shot 5-live -tvTab 3 -tvRadio sa
+          shot 6-settings -tvTab 4
+          ls -la tvos/shots
+          sips -g pixelWidth -g pixelHeight tvos/shots/1-home.png
+
+      - name: Publish screenshots to the tv-shots branch (for review)
+        run: |
+          git config user.name "Mushafi CI"; git config user.email "ci@mushafiapp.com"
+          git checkout --orphan tv-shots-tmp
+          git rm -rf --cached . >/dev/null
+          for f in tvos/shots/*.png; do sips -Z 1920 "$f" --out "$f.small.png" >/dev/null; done
+          git add -f tvos/shots/*.small.png
+          git commit -qm "Apple TV screenshots ${GITHUB_RUN_NUMBER}"
+          git push -qf origin HEAD:tv-shots
+          git checkout -q -f "$GITHUB_SHA"
+
+      - name: App Store Connect API key
+        if: inputs.action != 'check'
+        env:
+          ASC_KEY_P8_BASE64: ${{ secrets.ASC_KEY_P8_BASE64 }}
+        run: ios/scripts/install-asc-key.sh
+
+      - name: Add the Apple TV platform (version 1.0) if missing
+        if: inputs.action != 'check'
+        run: |
+          gem install fastlane --no-document >/dev/null
+          MODE=ensure ruby tvos/scripts/tv-asc.rb
+
+      - name: Archive (cloud-managed signing)
+        if: inputs.action != 'check'
+        run: |
+          set -o pipefail
+          xcodebuild -project tvos/MushafiTV.xcodeproj -scheme MushafiTV -configuration Release \
+            -destination 'generic/platform=tvOS' -archivePath "$RUNNER_TEMP/MushafiTV.xcarchive" \
+            -allowProvisioningUpdates -authenticationKeyPath "$ASC_KEY_PATH" \
+            -authenticationKeyID "$ASC_KEY_ID" -authenticationKeyIssuerID "$ASC_ISSUER_ID" \
+            DEVELOPMENT_TEAM="$DEVELOPMENT_TEAM" CURRENT_PROJECT_VERSION="$BUILD_NUMBER" \
+            archive 2>&1 | tee "$RUNNER_TEMP/archive.log" | grep -E "error:|ARCHIVE (SUCCEEDED|FAILED)" || true
+          if ! grep -q "ARCHIVE SUCCEEDED" "$RUNNER_TEMP/archive.log"; then
+            grep -n -A6 "error:" "$RUNNER_TEMP/archive.log" | head -150; tail -n 60 "$RUNNER_TEMP/archive.log"; exit 1
+          fi
+
+      - name: Upload to TestFlight
+        if: inputs.action != 'check'
+        run: |
+          set -o pipefail
+          cp ios/ExportOptions.plist "$RUNNER_TEMP/ExportOptions.plist"
+          /usr/libexec/PlistBuddy -c "Set :teamID $DEVELOPMENT_TEAM" "$RUNNER_TEMP/ExportOptions.plist"
+          xcodebuild -exportArchive -archivePath "$RUNNER_TEMP/MushafiTV.xcarchive" \
+            -exportOptionsPlist "$RUNNER_TEMP/ExportOptions.plist" -exportPath "$RUNNER_TEMP/export" \
+            -allowProvisioningUpdates -authenticationKeyPath "$ASC_KEY_PATH" \
+            -authenticationKeyID "$ASC_KEY_ID" -authenticationKeyIssuerID "$ASC_ISSUER_ID" 2>&1 | tee "$RUNNER_TEMP/export.log"
+          grep -q "EXPORT SUCCEEDED\|Upload succeeded\|Uploaded" "$RUNNER_TEMP/export.log"
+          echo "Uploaded Mushafi for Apple TV 1.0 (${BUILD_NUMBER})." >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload Apple TV screenshots to App Store Connect
+        if: inputs.action == 'store'
+        run: MODE=upload ruby tvos/scripts/tv-asc.rb
+
+      - name: Remove API key
+        if: always()
+        run: rm -f "${ASC_KEY_PATH:-/nonexistent}"

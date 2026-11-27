@@ -1,0 +1,59 @@
+# Mushafi for Apple TV — generated into MushafiTV.xcodeproj by XcodeGen on GitHub's Macs.
+# Same App Store record as the iPhone app (same bundle id), its own native SwiftUI interface:
+# Apple TV has no web view, so the Mushaf pages are pre-rendered from the app's own reader (tvos/Pages).
+name: MushafiTV
+options:
+  bundleIdPrefix: com.mohammedasif
+  deploymentTarget:
+    tvOS: "17.0"
+  createIntermediateGroups: true
+  developmentLanguage: ar
+
+settings:
+  base:
+    MARKETING_VERSION: "1.0"
+    CURRENT_PROJECT_VERSION: "1"
+    SWIFT_VERSION: "5.0"
+    TVOS_DEPLOYMENT_TARGET: "17.0"
+    CODE_SIGN_STYLE: Automatic
+
+targets:
+  MushafiTV:
+    type: application
+    platform: tvOS
+    sources:
+      - path: MushafiTV
+        excludes:
+          - "Info.plist"
+      - path: ../ios/Shared
+      - path: Generated
+        buildPhase: resources
+      - path: Pages
+        type: folder
+        buildPhase: resources
+      - path: ../android/assets/surah-audio.json
+        buildPhase: resources
+      - path: ../android/assets/widget-daily-verses.json
+        buildPhase: resources
+      - path: ../android/assets/adhan.min.js
+        buildPhase: resources
+      - path: ../android/assets/quran.ttf
+        buildPhase: resources
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.mohammedasif.mushafi
+        PRODUCT_NAME: MushafiTV
+        INFOPLIST_FILE: MushafiTV/Info.plist
+        TARGETED_DEVICE_FAMILY: "3"
+        ASSETCATALOG_COMPILER_APPICON_NAME: "App Icon & Top Shelf Image"
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+        LOCALIZATION_PREFERS_STRING_CATALOGS: NO
+        ENABLE_USER_SCRIPT_SANDBOXING: NO
+
+schemes:
+  MushafiTV:
+    build:
+      targets:
+        MushafiTV: all
+    archive:
+      config: Release
