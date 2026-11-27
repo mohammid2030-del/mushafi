@@ -38,6 +38,9 @@
 
     <!-- الحج والعمرة: the phone's step counter during a tawaf/sa'i session (asked only when the user starts tracking) -->
     <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />
+    <!-- Android TV: the app also runs on the big screen with a remote. -->
+    <uses-feature android:name="android.software.leanback" android:required="false" />
+    <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
     <uses-feature android:name="android.hardware.sensor.stepcounter" android:required="false" />
 
     <!-- Qibla compass sensors are optional so the app still installs on devices without them -->
@@ -51,6 +54,7 @@
         android:label="@string/widget_name"
         android:icon="@mipmap/ic_launcher"
         android:roundIcon="@mipmap/ic_launcher"
+        android:banner="@drawable/tv_banner"
         android:theme="@style/MushafiBaseTheme"
         android:supportsRtl="true"
         android:allowBackup="false"
@@ -70,6 +74,7 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
             </intent-filter>
             <!-- صحبة الفجر invite: mushafi-app://wake/<code> -->
             <intent-filter>
