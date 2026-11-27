@@ -76,7 +76,7 @@ struct HomeView: View {
                 let verse = library.verseOfTheDay()
                 tile(title: "آية اليوم", icon: "sparkles") {
                     VStack(alignment: .leading, spacing: 6) {
-                        Text("﴿\(verse.text)﴾").font(Theme.quran(31)).lineLimit(2).minimumScaleFactor(0.7)
+                        Text("﴿\(verse.text)﴾").font(Theme.quran(31)).lineLimit(3).minimumScaleFactor(0.45)
                         SubText(verse.reference)
                     }
                 } action: {}

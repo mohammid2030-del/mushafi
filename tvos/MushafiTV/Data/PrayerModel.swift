@@ -77,6 +77,6 @@ final class PrayerModel: ObservableObject {
         h.calendar = Calendar(identifier: .islamicUmmAlQura)
         h.timeZone = zone
         h.dateFormat = "d MMMM y"
-        return (g.string(from: now), h.string(from: now) + " هـ")
+        return (g.string(from: now).arDigits, h.string(from: now).arDigits + " هـ")
     }
 }

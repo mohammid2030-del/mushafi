@@ -29,10 +29,16 @@ struct NightBackground: View {
 
 /// Arabic-Indic digits for numbers shown in Arabic text.
 extension Int {
-    var ar: String {
-        let f = NumberFormatter()
-        f.locale = Locale(identifier: "ar")
-        return f.string(from: NSNumber(value: self)) ?? String(self)
+    var ar: String { String(self).arDigits }
+}
+
+extension String {
+    /// Arabic-Indic digits (٠١٢…) whatever the device's number setting.
+    var arDigits: String {
+        String(map { c in
+            guard let d = c.wholeNumberValue, c.isASCII else { return c }
+            return Character(UnicodeScalar(0x0660 + d)!)
+        })
     }
 }
 
@@ -161,7 +167,8 @@ struct Equalizer: View {
     @State private var phase = false
     private static let up: [CGFloat] = [18, 30, 12, 26, 20]
     private static let down: [CGFloat] = [28, 14, 24, 10, 30]
-    private func height(_ i: Int) -> CGFloat { playing ? (phase ? Self.up[i] : Self.down[i]) : 8 }
+    private static let rest: [CGFloat] = [12, 22, 30, 18, 10]
+    private func height(_ i: Int) -> CGFloat { playing ? (phase ? Self.up[i] : Self.down[i]) : Self.rest[i] }
     var body: some View {
         HStack(alignment: .bottom, spacing: 5) {
             ForEach(0..<5, id: \.self) { i in

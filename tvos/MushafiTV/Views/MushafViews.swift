@@ -144,7 +144,7 @@ struct ReaderView: View {
         if case .surah? = player.item {
             HStack(spacing: 26) {
                 Text((player.surah ?? 1).ar)
-                    .font(Theme.quran(30)).foregroundStyle(Theme.gold)
+                    .font(.system(size: 30, weight: .heavy)).foregroundStyle(Theme.gold)
                     .frame(width: 80, height: 80)
                     .background(RoundedRectangle(cornerRadius: 20).fill(Color.black.opacity(0.4)))
                     .overlay(RoundedRectangle(cornerRadius: 20).stroke(Theme.gold.opacity(0.35)))
