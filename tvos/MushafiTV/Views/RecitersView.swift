@@ -50,8 +50,8 @@ struct ReciterBubble: View {
 
 /// Reciter circles: the focused one grows and turns gold.
 struct BubbleButtonStyle: ButtonStyle {
-    func makeBody(configuration: Configuration) -> some View { Body(configuration: configuration) }
-    private struct Body: View {
+    func makeBody(configuration: Configuration) -> some View { Styled(configuration: configuration) }
+    private struct Styled: View {
         let configuration: ButtonStyleConfiguration
         @Environment(\.isFocused) private var focused
         var body: some View {

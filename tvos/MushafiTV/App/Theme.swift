@@ -51,9 +51,9 @@ extension Date {
 
 struct PillButtonStyle: ButtonStyle {
     var prominent = false
-    func makeBody(configuration: Configuration) -> some View { Body(configuration: configuration, prominent: prominent) }
+    func makeBody(configuration: Configuration) -> some View { Styled(configuration: configuration, prominent: prominent) }
 
-    private struct Body: View {
+    private struct Styled: View {
         let configuration: ButtonStyleConfiguration
         let prominent: Bool
         @Environment(\.isFocused) private var focused
@@ -74,9 +74,9 @@ struct PillButtonStyle: ButtonStyle {
 
 struct TileButtonStyle: ButtonStyle {
     var radius: CGFloat = 26
-    func makeBody(configuration: Configuration) -> some View { Body(configuration: configuration, radius: radius) }
+    func makeBody(configuration: Configuration) -> some View { Styled(configuration: configuration, radius: radius) }
 
-    private struct Body: View {
+    private struct Styled: View {
         let configuration: ButtonStyleConfiguration
         let radius: CGFloat
         @Environment(\.isFocused) private var focused
