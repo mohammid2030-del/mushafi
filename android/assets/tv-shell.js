@@ -168,7 +168,7 @@ function tvReciterPage(id) {
   TV.tab = 'reciter:' + id;
   const main = document.querySelector('.tv-main');
   main.innerHTML = `<section class="tv-head"><div class="tv-who"><span class="tv-av">${tvEsc(r.name[0])}</span><div><h1 class="sm">${tvEsc(r.name)}</h1><p class="tv-info">${tvEsc(r.style)}</p></div></div>
-    <button class="tvf tv-btn" data-tvid="fav" onclick="localStorage.tvReciter='${id}';this.innerHTML='${tvI('check').replace(/'/g, '&#39;')}القارئ المفضّل'">${tvI('star')}${tvFavReciter() === id ? 'القارئ المفضّل' : 'اجعله القارئ المفضّل'}</button></section>
+    <button class="tvf tv-btn" data-tvid="fav" onclick="tvSetFav('${id}',this)">${tvI(tvFavReciter() === id ? 'check' : 'star')}${tvFavReciter() === id ? 'القارئ المفضّل' : 'اجعله القارئ المفضّل'}</button></section>
     <div class="tv-grid">${chapters.map(c => `<button class="tvf tv-surah" data-tvid="p${c.id}" onclick="tvPlay('${id}',${c.id});tvGo('reciters')"><span class="n">${tvNum(c.id)}</span><span><b>${tvEsc(c.name_arabic)}</b><small>${tvNum(c.verses_count)} آية</small></span></button>`).join('')}</div>`;
   main.scrollTop = 0;
   main.querySelector('.tvf')?.focus({ preventScroll: true });
@@ -192,6 +192,7 @@ function tvSettings() {
 }
 
 // ---------- actions ----------
+function tvSetFav(id, btn) { try { localStorage.tvReciter = id } catch (e) {} if (btn) btn.innerHTML = tvI('check') + 'القارئ المفضّل' }
 function tvOpenPage(p) { document.body.classList.add('tv-reading'); showPage(p) }
 function tvLeaveReader() { document.body.classList.remove('tv-reading'); view = 'tv'; tvRender(); document.querySelector('.tv-main .tvf')?.focus({ preventScroll: true }) }
 function tvPlay(reader, chapter, verse = 0) { if (rhRadio?.id) rhRadioStop(); surahReady.then(() => startFullSurah(+reader, chapter, 'listen', verse)); setTimeout(tvRender, 400) }
