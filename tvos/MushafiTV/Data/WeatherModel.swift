@@ -110,16 +110,29 @@ final class WeatherModel: ObservableObject {
     }
 }
 
-/// Light from sunrise to maghrib, dark after, unless the viewer fixes one.
+/// Five moments of the day, as on the phone's home sky: dawn (fajr→sunrise), day (sunrise→asr),
+/// afternoon (asr→shortly before maghrib), dusk (→isha) and night.
+enum SkyPhase: String, CaseIterable {
+    case dawn, day, afternoon, dusk, night
+    /// The sun is above the horizon (for the weather wording and icons).
+    var sunUp: Bool { self == .day || self == .afternoon || self == .dusk }
+    /// Light appearance in automatic mode: the bright part of the day only.
+    var light: Bool { self == .day || self == .afternoon }
+    var title: String {
+        switch self { case .dawn: "الفجر"; case .day: "النهار"; case .afternoon: "العصر"; case .dusk: "المغرب"; case .night: "الليل" }
+    }
+}
+
+/// Light by day (sunrise to shortly before maghrib), dark at dawn, dusk and night, unless the viewer fixes one.
 @MainActor
 final class AppearanceModel: ObservableObject {
     enum Mode: String, CaseIterable { case auto, light, dark
         var title: String { switch self { case .auto: "تلقائي حسب الشمس"; case .light: "فاتح دائمًا"; case .dark: "داكن دائمًا" } }
-        var detail: String { switch self { case .auto: "فاتح من الشروق وداكن من المغرب"; case .light: "ورق كريمي وخط داكن"; case .dark: "مريح في الإضاءة الخافتة" } }
+        var detail: String { switch self { case .auto: "يتبع الفجر والنهار والعصر والمغرب والليل"; case .light: "ورق كريمي وخط داكن"; case .dark: "مريح في الإضاءة الخافتة" } }
     }
 
     @Published var mode: Mode { didSet { UserDefaults.standard.set(mode.rawValue, forKey: "tv.appearance"); update() } }
-    @Published private(set) var isDay = false
+    @Published private(set) var phase: SkyPhase = .night
     private weak var prayer: PrayerModel?
     private var timer: Timer?
 
@@ -128,7 +141,8 @@ final class AppearanceModel: ObservableObject {
         mode = Mode(rawValue: d.string(forKey: "tvAppearance") ?? d.string(forKey: "tv.appearance") ?? "") ?? .auto
     }
 
-    var light: Bool { mode == .light || (mode == .auto && isDay) }
+    var isDay: Bool { phase.sunUp }
+    var light: Bool { mode == .light || (mode == .auto && phase.light) }
     var scheme: ColorScheme { light ? .light : .dark }
 
     func attach(_ prayer: PrayerModel) {
@@ -139,9 +153,11 @@ final class AppearanceModel: ObservableObject {
     }
 
     func update() {
-        // Screenshot run: -tvDay 1/0 fixes day or night.
-        if let forced = UserDefaults.standard.string(forKey: "tvDay") { isDay = forced == "1"; return }
-        let day = prayer?.isDay() ?? false
-        if day != isDay { withAnimation(.easeInOut(duration: 2.5)) { isDay = day } }
+        // Screenshot run: -tvPhase dusk (or the older -tvDay 1/0).
+        let d = UserDefaults.standard
+        if let forced = d.string(forKey: "tvPhase").flatMap(SkyPhase.init(rawValue:)) { phase = forced; return }
+        if let day = d.string(forKey: "tvDay") { phase = day == "1" ? .day : .night; return }
+        let now = prayer?.phase() ?? .night
+        if now != phase { withAnimation(.easeInOut(duration: 2.5)) { phase = now } }
     }
 }

@@ -9,7 +9,6 @@ struct HomeView: View {
     var body: some View {
         ScrollView(.vertical) {
             VStack(alignment: .leading, spacing: 56) {
-                HStack { Spacer(); WeatherChip() }.padding(.bottom, -40)
                 hero
                 today
                 prayerStrip
@@ -93,7 +92,7 @@ struct HomeView: View {
                 }
                 tile(title: "المصحف كاملًا", icon: "books.vertical") {
                     VStack(alignment: .leading, spacing: 6) {
-                        Text("١١٤ سورة").font(.system(size: 40, weight: .heavy))
+                        Text("114 سورة").font(.system(size: 40, weight: .heavy))
                         SubText("تصفّح السور وابدأ القراءة")
                     }
                 } action: { state.tab = .mushaf }

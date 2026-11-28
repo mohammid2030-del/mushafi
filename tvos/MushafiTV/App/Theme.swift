@@ -6,7 +6,7 @@ enum Theme {
     static let gold = Color(light: (0.66, 0.48, 0.15), dark: (0.898, 0.769, 0.486))
     static let goldDeep = Color(red: 0.725, green: 0.561, blue: 0.227)
     static let ink = Color(light: (0.165, 0.129, 0.086), dark: (0.957, 0.918, 0.839))
-    static let muted = Color(light: (0.50, 0.435, 0.333), dark: (0.64, 0.59, 0.49))
+    static let muted = Color(light: (0.50, 0.435, 0.333), dark: (0.76, 0.71, 0.61))
     static let card = Color(light: (1, 1, 1, 0.62), dark: (1, 1, 1, 0.06))
     static let line = Color(light: (0.55, 0.41, 0.18, 0.16), dark: (1, 1, 1, 0.09))
     /// Fill and text of a focused pill (cream on night, dark ink on day).
@@ -43,10 +43,21 @@ extension Color {
 
 /// Arabic-Indic digits for numbers shown in Arabic text.
 extension Int {
-    var ar: String { String(self).arDigits }
+    /// Western digits (1 2 3) everywhere in the app…
+    var ar: String { String(self) }
+    /// …except inside the Mushaf reader, which keeps Arabic-Indic digits (١ ٢ ٣) like the printed page.
+    var mushaf: String { String(self).arDigits }
 }
 
 extension String {
+    /// Western digits whatever the formatter produced (Arabic locales may give ١٢٣).
+    var latinDigits: String {
+        String(map { c in
+            guard let d = c.wholeNumberValue, !c.isASCII else { return c }
+            return Character(UnicodeScalar(0x30 + d)!)
+        })
+    }
+
     /// Arabic-Indic digits (٠١٢…) whatever the device's number setting.
     var arDigits: String {
         String(map { c in

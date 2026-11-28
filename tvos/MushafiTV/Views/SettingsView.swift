@@ -46,7 +46,7 @@ struct SettingsView: View {
                     }
                 }
                 VStack(alignment: .leading, spacing: 24) {
-                    SectionTitle(title: "المظهر", detail: appearance.light ? "الآن: فاتح" : "الآن: داكن")
+                    SectionTitle(title: "المظهر", detail: "الآن: \(appearance.phase.title) · " + (appearance.light ? "فاتح" : "داكن"))
                     HStack(spacing: 26) {
                         ForEach(AppearanceModel.Mode.allCases, id: \.self) { mode in
                             Button { appearance.mode = mode } label: {

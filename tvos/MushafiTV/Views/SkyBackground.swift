@@ -7,41 +7,90 @@ struct SkyBackground: View {
     @EnvironmentObject private var appearance: AppearanceModel
 
     var body: some View {
-        let light = appearance.light, day = appearance.isDay, kind = weather.kind ?? .clear
+        let light = appearance.light, phase = appearance.phase, kind = weather.kind ?? .clear
         ZStack {
-            LinearGradient(colors: Self.base(light: light, kind: kind), startPoint: .top, endPoint: .bottom)
+            LinearGradient(colors: Self.base(light: light, phase: phase, kind: kind), startPoint: .top, endPoint: .bottom)
             TimelineView(.animation(minimumInterval: 1.0 / 30)) { context in
                 Canvas { ctx, size in
                     let t = context.date.timeIntervalSinceReferenceDate
-                    Self.draw(&ctx, size: size, t: t, light: light, day: day, kind: kind)
+                    Self.draw(&ctx, size: size, t: t, light: light, phase: phase, kind: kind)
                 }
+            }
+            // Dawn and dusk: deepen the bright horizon behind the cards so cream text stays readable.
+            if !light && (phase == .dawn || phase == .dusk) {
+                LinearGradient(stops: [.init(color: .clear, location: 0.35), .init(color: .black.opacity(0.42), location: 1)], startPoint: .top, endPoint: .bottom)
             }
         }
         .ignoresSafeArea()
         .environment(\.layoutDirection, .leftToRight)
         .animation(.easeInOut(duration: 2.5), value: light)
+        .animation(.easeInOut(duration: 2.5), value: phase)
     }
 
     private static func rgb(_ r: Double, _ g: Double, _ b: Double) -> Color { Color(red: r, green: g, blue: b) }
 
-    static func base(light: Bool, kind: WeatherModel.Kind) -> [Color] {
-        switch (light, kind) {
-        case (true, .clear): return [rgb(0.953, 0.918, 0.847), rgb(0.965, 0.937, 0.886), rgb(0.937, 0.894, 0.812)]
-        case (true, .partly): return [rgb(0.914, 0.922, 0.925), rgb(0.957, 0.933, 0.886), rgb(0.933, 0.89, 0.808)]
-        case (true, .rain), (true, .thunder): return [rgb(0.851, 0.867, 0.89), rgb(0.902, 0.902, 0.894), rgb(0.882, 0.863, 0.824)]
-        case (true, _): return [rgb(0.886, 0.89, 0.902), rgb(0.933, 0.922, 0.894), rgb(0.91, 0.882, 0.827)]
-        case (false, .clear), (false, .partly): return [rgb(0.08, 0.086, 0.15), rgb(0.06, 0.063, 0.106), rgb(0.04, 0.04, 0.063)]
-        case (false, .rain), (false, .thunder): return [rgb(0.10, 0.114, 0.149), rgb(0.075, 0.082, 0.11), rgb(0.051, 0.055, 0.07)]
-        case (false, _): return [rgb(0.133, 0.133, 0.165), rgb(0.09, 0.086, 0.114), rgb(0.059, 0.055, 0.075)]
+    private static func hex(_ v: UInt32) -> Color { rgb(Double(v >> 16 & 255) / 255, Double(v >> 8 & 255) / 255, Double(v & 255) / 255) }
+
+    /// Sky colours per moment of the day (the phone's home sky), greyer under clouds and rain.
+    static func base(light: Bool, phase: SkyPhase, kind: WeatherModel.Kind) -> [Color] {
+        let wet = kind == .rain || kind == .thunder, grey = wet || kind == .cloudy || kind == .fog || kind == .snow
+        if light && !phase.light {
+            // Light appearance fixed by the viewer outside daytime: keep the ivory screens.
+            return wet ? [rgb(0.851, 0.867, 0.89), rgb(0.902, 0.902, 0.894), rgb(0.882, 0.863, 0.824)]
+                       : [rgb(0.953, 0.918, 0.847), rgb(0.965, 0.937, 0.886), rgb(0.937, 0.894, 0.812)]
+        }
+        switch phase {
+        case .dawn:
+            return grey ? [hex(0x323a4e), hex(0x6b6b7c), hex(0xa99484)] : [hex(0x3b4a68), hex(0x8c8aa0), hex(0xe6b38e)]
+        case .day:
+            if wet { return [rgb(0.851, 0.867, 0.89), rgb(0.902, 0.902, 0.894), rgb(0.882, 0.863, 0.824)] }
+            if grey { return [rgb(0.886, 0.89, 0.902), rgb(0.933, 0.922, 0.894), rgb(0.91, 0.882, 0.827)] }
+            return kind == .partly ? [rgb(0.914, 0.922, 0.925), rgb(0.957, 0.933, 0.886), rgb(0.933, 0.89, 0.808)]
+                                   : [rgb(0.953, 0.918, 0.847), rgb(0.965, 0.937, 0.886), rgb(0.937, 0.894, 0.812)]
+        case .afternoon:
+            return grey ? [hex(0xc9cbc6), hex(0xdcd3c0), hex(0xd9b997)] : [hex(0xc4cdbf), hex(0xe5d6b4), hex(0xefbf88)]
+        case .dusk:
+            return grey ? [hex(0x34324a), hex(0x6e5560), hex(0xa77a5e)] : [hex(0x3d3a5c), hex(0x8b5f6e), hex(0xd98c5f)]
+        case .night:
+            if wet { return [rgb(0.10, 0.114, 0.149), rgb(0.075, 0.082, 0.11), rgb(0.051, 0.055, 0.07)] }
+            if grey { return [rgb(0.133, 0.133, 0.165), rgb(0.09, 0.086, 0.114), rgb(0.059, 0.055, 0.075)] }
+            return [rgb(0.08, 0.086, 0.15), rgb(0.06, 0.063, 0.106), rgb(0.04, 0.04, 0.063)]
         }
     }
 
     private static func noise(_ i: Int) -> Double { let x = sin(Double(i) * 12.9898) * 43758.5453; return x - floor(x) }
 
-    static func draw(_ ctx: inout GraphicsContext, size: CGSize, t: Double, light: Bool, day: Bool, kind: WeatherModel.Kind) {
+    static func draw(_ ctx: inout GraphicsContext, size: CGSize, t: Double, light: Bool, phase: SkyPhase, kind: WeatherModel.Kind) {
         let w = size.width, h = size.height
         let sunny = kind == .clear || kind == .partly
-        let center = CGPoint(x: w * 0.42, y: h * 0.2)
+        let day = phase == .day || phase == .afternoon
+        // The sun walks down the sky through the day.
+        let center: CGPoint = phase == .afternoon ? CGPoint(x: w * 0.32, y: h * 0.3) : CGPoint(x: w * 0.42, y: h * 0.2)
+
+        // Low warm sun on the horizon at dusk, first light at dawn.
+        if phase == .dusk || phase == .dawn {
+            let p = phase == .dusk ? CGPoint(x: w * 0.24, y: h * 0.78) : CGPoint(x: w * 0.72, y: h * 1.02)
+            let glow: Color = phase == .dusk ? Color(red: 1, green: 0.62, blue: 0.36) : Color(red: 1, green: 0.78, blue: 0.62)
+            let r = w * (phase == .dusk ? 0.42 : 0.5)
+            ctx.fill(Path(ellipseIn: CGRect(x: p.x - r, y: p.y - r, width: r * 2, height: r * 2)),
+                     with: .radialGradient(Gradient(colors: [glow.opacity(sunny ? 0.55 : 0.25), .clear]), center: p, startRadius: 0, endRadius: r))
+            if phase == .dusk && sunny {
+                let s: CGFloat = 120 + 4 * sin(t * 2 * .pi / 6)
+                ctx.fill(Path(ellipseIn: CGRect(x: p.x - s, y: p.y - s, width: s * 2, height: s * 2)),
+                         with: .radialGradient(Gradient(stops: [.init(color: Color(red: 1, green: 0.86, blue: 0.62), location: 0),
+                                                                .init(color: Color(red: 1, green: 0.6, blue: 0.35).opacity(0.6), location: 0.45),
+                                                                .init(color: .clear, location: 1)]),
+                                               center: p, startRadius: 0, endRadius: s))
+            }
+            if phase == .dawn && sunny {
+                for i in 0..<60 {
+                    let x = noise(i) * w, y = noise(i + 500) * h * 0.45
+                    let tw = 0.5 + 0.5 * sin(t * (0.6 + noise(i + 900)) + noise(i + 1300) * 6)
+                    let s = 2 + noise(i + 1700) * 2
+                    ctx.fill(Path(ellipseIn: CGRect(x: x, y: y, width: s, height: s)), with: .color(.white.opacity((0.2 + 0.5 * tw) * 0.5)))
+                }
+            }
+        }
 
         // Sun with slowly turning rays, or moon with stars.
         if day && sunny {
@@ -55,7 +104,7 @@ struct SkyBackground: View {
                 p.addLine(to: CGPoint(x: cos(a - 0.03) * w * 0.45, y: sin(a - 0.03) * w * 0.45))
                 p.addLine(to: CGPoint(x: cos(a + 0.03) * w * 0.45, y: sin(a + 0.03) * w * 0.45))
                 p.closeSubpath()
-                rays.fill(p, with: .radialGradient(Gradient(colors: [Color(red: 1, green: 0.85, blue: 0.55).opacity(light ? 0.22 : 0.14), .clear]),
+                rays.fill(p, with: .radialGradient(Gradient(colors: [Color(red: 1, green: phase == .afternoon ? 0.76 : 0.85, blue: phase == .afternoon ? 0.45 : 0.55).opacity(light ? 0.22 : 0.14), .clear]),
                                                    center: .zero, startRadius: 0, endRadius: w * 0.4))
             }
             let pulse = 1 + 0.04 * sin(t * 2 * .pi / 6)
@@ -65,7 +114,7 @@ struct SkyBackground: View {
                                                             .init(color: Color(red: 1, green: 0.78, blue: 0.43).opacity(0.5), location: 0.3),
                                                             .init(color: .clear, location: 1)]),
                                            center: center, startRadius: 0, endRadius: r))
-        } else if !day && sunny {
+        } else if phase == .night && sunny {
             for i in 0..<90 {
                 let x = noise(i) * w, y = noise(i + 500) * h * 0.6
                 let tw = 0.5 + 0.5 * sin(t * (0.6 + noise(i + 900)) + noise(i + 1300) * 6)
@@ -94,6 +143,8 @@ struct SkyBackground: View {
             layer.addFilter(.blur(radius: 18))
             let tone: Color = {
                 if kind == .rain || kind == .thunder { return light ? Color(red: 0.68, green: 0.71, blue: 0.76) : Color(red: 0.55, green: 0.58, blue: 0.65) }
+                if phase == .dusk { return Color(red: 0.96, green: 0.8, blue: 0.74) }
+                if phase == .dawn { return Color(red: 0.92, green: 0.86, blue: 0.86) }
                 return light ? .white : Color(red: 0.88, green: 0.87, blue: 0.93)
             }()
             for c in cloudy {
@@ -104,7 +155,7 @@ struct SkyBackground: View {
                 puff.addRoundedRect(in: CGRect(x: x + cw * 0.06, y: y + cw * 0.2, width: cw * 0.88, height: cw * 0.2), cornerSize: CGSize(width: cw * 0.1, height: cw * 0.1))
                 puff.addEllipse(in: CGRect(x: x + cw * 0.2, y: y + cw * 0.02, width: cw * 0.4, height: cw * 0.32))
                 puff.addEllipse(in: CGRect(x: x + cw * 0.46, y: y + cw * 0.09, width: cw * 0.32, height: cw * 0.26))
-                layer.fill(puff, with: .color(tone.opacity(light ? min(1, c.alpha * 2.6) : c.alpha)))
+                layer.fill(puff, with: .color(tone.opacity(light ? min(1, c.alpha * 2.6) : (phase == .dusk || phase == .dawn) ? min(1, c.alpha * 1.8) : c.alpha)))
             }
         }
 
@@ -141,7 +192,7 @@ struct SkyBackground: View {
     }
 }
 
-/// «٢٤° غائم جزئيًا · الرياض» shown at the top of the home screen.
+/// «24° غائم جزئيًا · الرياض» shown at the top of the home screen.
 struct WeatherChip: View {
     @EnvironmentObject private var weather: WeatherModel
     @EnvironmentObject private var appearance: AppearanceModel
@@ -150,13 +201,13 @@ struct WeatherChip: View {
     var body: some View {
         HStack(spacing: 14) {
             if weather.kind != nil {
-                Image(systemName: weather.symbol(day: appearance.isDay))
+                Image(systemName: weather.symbol(day: appearance.phase != .night))
                     .symbolRenderingMode(.multicolor)
                     .font(.system(size: 30, weight: .semibold))
                 if let temp = weather.temperature {
                     Text("\(temp.ar)°").font(.system(size: 30, weight: .heavy)).foregroundStyle(Theme.ink)
                 }
-                Text(weather.label(day: appearance.isDay)).font(.system(size: 24, weight: .semibold)).foregroundStyle(Theme.muted)
+                Text(weather.label(day: appearance.phase != .night)).font(.system(size: 24, weight: .semibold)).foregroundStyle(Theme.muted)
                 Circle().fill(Theme.gold).frame(width: 6, height: 6)
             }
             Image(systemName: "location.fill").font(.system(size: 18)).foregroundStyle(Theme.gold)
@@ -165,5 +216,52 @@ struct WeatherChip: View {
         .padding(.horizontal, 24).frame(height: 58)
         .background(Capsule().fill(Theme.card))
         .overlay(Capsule().stroke(Theme.line, lineWidth: 1))
+    }
+}
+
+/// The bar around the tabs, laid out like the Android TV app: Mushafi's mark on the right,
+/// weather, city and time on the left. Not focusable; it never takes the remote.
+struct TopBar: View {
+    @EnvironmentObject private var weather: WeatherModel
+    @EnvironmentObject private var appearance: AppearanceModel
+    @EnvironmentObject private var prayer: PrayerModel
+
+    var body: some View {
+        VStack {
+            HStack(spacing: 16) {
+                HStack(spacing: 16) {
+                    Image("Logo").resizable().scaledToFit().frame(width: 60, height: 60)
+                        .clipShape(RoundedRectangle(cornerRadius: 15, style: .continuous))
+                        .shadow(color: .black.opacity(0.35), radius: 8, y: 4)
+                    Text("مصحفي").font(.system(size: 34, weight: .heavy)).foregroundStyle(Theme.gold)
+                }
+                Spacer()
+                HStack(spacing: 14) {
+                    if weather.kind != nil {
+                        Image(systemName: weather.symbol(day: appearance.phase != .night))
+                            .symbolRenderingMode(.multicolor).font(.system(size: 30, weight: .semibold))
+                        if let temp = weather.temperature {
+                            Text("\(temp.ar)°").font(.system(size: 28, weight: .heavy)).foregroundStyle(Theme.ink)
+                        }
+                        Text(weather.label(day: appearance.phase != .night)).font(.system(size: 22, weight: .medium)).foregroundStyle(Theme.muted)
+                        Circle().fill(Theme.gold).frame(width: 5, height: 5)
+                    }
+                    Text(prayer.city).font(.system(size: 23, weight: .medium)).foregroundStyle(Theme.muted)
+                    Circle().fill(Theme.gold).frame(width: 5, height: 5)
+                    TimelineView(.periodic(from: .now, by: 20)) { context in
+                        Text(context.date.clock(prayer.zone)).font(.system(size: 28, weight: .bold)).foregroundStyle(Theme.ink)
+                            .environment(\.layoutDirection, .leftToRight)
+                    }
+                }
+                .lineLimit(1)
+            }
+            .frame(height: 60)
+            .padding(.horizontal, 90)
+            .padding(.top, 50)   // centred on the tab bar
+            Spacer()
+        }
+        .ignoresSafeArea()
+        .allowsHitTesting(false)
+        .focusable(false)
     }
 }
