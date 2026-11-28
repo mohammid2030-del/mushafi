@@ -112,6 +112,10 @@ def main():
     results = {}
     for m in models:
         asr = pipeline('automatic-speech-recognition', model=m, device='cpu')
+        # these fine-tunes ship an old generation config; take the matching OpenAI one
+        from transformers import GenerationConfig
+        base = 'openai/whisper-' + next(x for x in ('tiny', 'base', 'small', 'medium') if x in m)
+        asr.model.generation_config = GenerationConfig.from_pretrained(base)
         rows = []
         for c in clips:
             for cond in ('clean', 'noisy'):
