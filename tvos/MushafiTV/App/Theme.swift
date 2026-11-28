@@ -102,9 +102,13 @@ struct TileButtonStyle: ButtonStyle {
             configuration.label
                 .foregroundStyle(focused ? Color.black : Theme.ink)
                 .environment(\.tileFocused, focused)
-                .background(RoundedRectangle(cornerRadius: radius, style: .continuous)
-                    .fill(focused ? AnyShapeStyle(Theme.goldGradient) : AnyShapeStyle(.thickMaterial)))
-                .overlay(RoundedRectangle(cornerRadius: radius, style: .continuous).fill(focused ? Color.clear : Theme.glassTint))
+                .background(
+                    ZStack {
+                        RoundedRectangle(cornerRadius: radius, style: .continuous)
+                            .fill(focused ? AnyShapeStyle(Theme.goldGradient) : AnyShapeStyle(.thickMaterial))
+                        RoundedRectangle(cornerRadius: radius, style: .continuous).fill(focused ? Color.clear : Theme.glassTint)
+                    }
+                )
                 .overlay(RoundedRectangle(cornerRadius: radius, style: .continuous).stroke(focused ? .clear : Theme.glassEdge, lineWidth: 1.2))
                 .scaleEffect(configuration.isPressed ? 0.98 : (focused ? 1.07 : 1))
                 .shadow(color: focused ? Theme.shadow : .clear, radius: 26, y: 18)
