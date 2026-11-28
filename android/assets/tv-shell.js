@@ -33,7 +33,8 @@ const tvIcons = {
   bookmark: '<path d="M6 3h12v18l-6-4-6 4z"/>'
 };
 const tvI = k => `<svg class="tv-i" viewBox="0 0 24 24">${tvIcons[k]}</svg>`;
-const tvNum = n => String(n).replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d]);
+// Western digits on the TV screens (the Mushaf reader keeps its own Arabic-Indic numbers).
+const tvNum = n => String(n).replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d));
 const tvEsc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
 // ---------- data ----------
@@ -53,14 +54,14 @@ function tvClock(t, zone) { try { return new Intl.DateTimeFormat('en-US', { hour
 function tvIn(t) { const m = Math.max(0, Math.round((t - Date.now()) / 60000)), h = Math.floor(m / 60); return h ? `بعد ${tvNum(h)} س و${tvNum(m % 60)} د` : `بعد ${tvNum(m)} دقيقة` }
 function tvDates(zone) {
   const d = new Date();
-  const g = new Intl.DateTimeFormat('ar', { weekday: 'long', day: 'numeric', month: 'long', numberingSystem: 'arab', timeZone: zone }).format(d);
-  let h = ''; try { h = new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura', { day: 'numeric', month: 'long', year: 'numeric', numberingSystem: 'arab', timeZone: zone }).format(d) } catch (e) {}
+  const g = new Intl.DateTimeFormat('ar', { weekday: 'long', day: 'numeric', month: 'long', numberingSystem: 'latn', timeZone: zone }).format(d);
+  let h = ''; try { h = new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura', { day: 'numeric', month: 'long', year: 'numeric', numberingSystem: 'latn', timeZone: zone }).format(d) } catch (e) {}
   return g + (h ? ' · ' + h : '');
 }
 let tvVerses = null;
 fetch('widget-daily-verses.json').then(r => r.json()).then(d => { tvVerses = d; if (TV.tab === 'home' && document.getElementById('tv')) tvRender() }).catch(() => {});
 function tvVerseOfDay() {
-  if (!tvVerses?.order?.length) return { text: 'فَإِنَّ مَعَ ٱلْعُسْرِ يُسْرًا', ref: 'الشرح · ٥' };
+  if (!tvVerses?.order?.length) return { text: 'فَإِنَّ مَعَ ٱلْعُسْرِ يُسْرًا', ref: 'الشرح · 5' };
   const key = tvVerses.order[Math.floor(Date.now() / 864e5) % tvVerses.order.length];
   return { text: tvVerses.ar[key], ref: `${tvVerses.surah[key]} · ${tvNum(+key.split(':')[1])}` };
 }
@@ -142,13 +143,13 @@ function tvHome() {
       <button class="tvf tv-tile" data-tvid="t-prayer" onclick="tvGo('settings')"><span class="hd"><em>الصلاة القادمة</em>${tvI('clock')}</span><b>${p.next ? p.next.name + ' ' + tvClock(p.next.time, p.zone) : '—'}</b><small>${p.next ? tvIn(p.next.time) : ''}</small></button>
       <button class="tvf tv-tile" data-tvid="t-verse"><span class="hd"><em>آية اليوم</em>${tvI('star')}</span><b class="q">﴿${tvEsc(vd.text)}﴾</b><small>${tvEsc(vd.ref)}</small></button>
       <button class="tvf tv-tile" data-tvid="t-radio" onclick="rhRadioToggle('sa');setTimeout(tvRender,300)"><span class="hd"><em>إذاعة القرآن الكريم</em>${tvI('radio')}</span><b>${radioOn ? 'تستمع الآن' : 'استمع مباشرة'}</b><small>من المملكة العربية السعودية</small></button>
-      <button class="tvf tv-tile" data-tvid="t-mushaf" onclick="tvGo('mushaf')"><span class="hd"><em>المصحف كاملًا</em>${tvI('books')}</span><b>١١٤ سورة</b><small>تصفّح السور وابدأ القراءة</small></button>
+      <button class="tvf tv-tile" data-tvid="t-mushaf" onclick="tvGo('mushaf')"><span class="hd"><em>المصحف كاملًا</em>${tvI('books')}</span><b>114 سورة</b><small>تصفّح السور وابدأ القراءة</small></button>
     </div></section>
   <section><div class="tv-sec"><h2>مواقيت الصلاة</h2><small>${tvEsc(p.city)}</small></div>
     <div class="tv-prayers">${p.today.map(x => `<div class="${p.next && x.time === p.next.time ? 'next' : x.time < Date.now() ? 'past' : ''}"><span>${x.name}</span><b>${tvClock(x.time, p.zone)}</b></div>`).join('')}</div></section>`;
 }
 function tvMushaf() {
-  return `<section class="tv-head"><div><span class="tv-eyebrow">المصحف الشريف</span><h1 class="sm">سور القرآن الكريم</h1><p class="tv-info">١١٤ سورة · ٦٠٤ صفحة برواية حفص عن عاصم</p></div>
+  return `<section class="tv-head"><div><span class="tv-eyebrow">المصحف الشريف</span><h1 class="sm">سور القرآن الكريم</h1><p class="tv-info">114 سورة · 604 صفحة برواية حفص عن عاصم</p></div>
     <button class="tvf tv-btn primary" data-tvid="resume" onclick="tvOpenPage(${tvLastPage()})">${tvI('bookmark')}تابع من الصفحة ${tvNum(tvLastPage())}</button></section>
     <div class="tv-grid">${chapters.map(c => `<button class="tvf tv-surah" data-tvid="s${c.id}" onclick="tvOpenPage(${c.pages[0]})"><span class="n">${tvNum(c.id)}</span><span><b>${tvEsc(c.name_arabic)}</b><small>${c.revelation_place === 'makkah' ? 'مكية' : 'مدنية'} · ${tvNum(c.verses_count)} آية</small></span></button>`).join('')}</div>`;
 }
