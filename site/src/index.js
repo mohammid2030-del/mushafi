@@ -94,6 +94,17 @@ async function worldData(env, ctx) {
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
+    // Approximate place of the connection, for the TV apps' prayer times and weather.
+    // Nothing is stored or logged; the TV keeps it on the device only.
+    if (url.pathname === '/api/where') {
+      const cf = request.cf || {}, lat = Number(cf.latitude), lon = Number(cf.longitude);
+      const ok = Number.isFinite(lat) && Number.isFinite(lon);
+      const country = cf.country === 'IL' ? 'PS' : (cf.country || '');
+      return new Response(JSON.stringify(ok ? { city: cf.city || '', region: cf.region || '', country, latitude: lat, longitude: lon, timezone: cf.timezone || '' } : { error: 'unknown' }), {
+        status: ok ? 200 : 404,
+        headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store', 'access-control-allow-origin': '*' }
+      });
+    }
     if (url.hostname === 'mushafiapp.com' && url.pathname !== '/api/world' && url.pathname !== '/go/appstore') worldCount(env, ctx, 'v', request);
     if (url.pathname === '/api/world') return worldData(env, ctx);
     // The site's App Store button passes through here once, so each tap is counted for its country.
