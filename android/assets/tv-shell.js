@@ -52,8 +52,8 @@ function tvClock(t, zone) { try { return new Intl.DateTimeFormat('en-US', { hour
 function tvIn(t) { const m = Math.max(0, Math.round((t - Date.now()) / 60000)), h = Math.floor(m / 60); return h ? `بعد ${tvNum(h)} س و${tvNum(m % 60)} د` : `بعد ${tvNum(m)} دقيقة` }
 function tvDates(zone) {
   const d = new Date();
-  const g = new Intl.DateTimeFormat('ar', { weekday: 'long', day: 'numeric', month: 'long', timeZone: zone }).format(d);
-  let h = ''; try { h = new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura', { day: 'numeric', month: 'long', year: 'numeric', timeZone: zone }).format(d) } catch (e) {}
+  const g = new Intl.DateTimeFormat('ar', { weekday: 'long', day: 'numeric', month: 'long', numberingSystem: 'arab', timeZone: zone }).format(d);
+  let h = ''; try { h = new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura', { day: 'numeric', month: 'long', year: 'numeric', numberingSystem: 'arab', timeZone: zone }).format(d) } catch (e) {}
   return g + (h ? ' · ' + h : '');
 }
 let tvVerses = null;
