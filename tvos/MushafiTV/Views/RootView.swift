@@ -3,10 +3,15 @@ import SwiftUI
 struct RootView: View {
     @EnvironmentObject private var state: AppState
     @EnvironmentObject private var player: AudioPlayer
+    @EnvironmentObject private var prayer: PrayerModel
+    @EnvironmentObject private var location: LocationModel
+    @EnvironmentObject private var weather: WeatherModel
+    @EnvironmentObject private var appearance: AppearanceModel
+    @Environment(\.scenePhase) private var phase
 
     var body: some View {
         ZStack {
-            NightBackground()
+            SkyBackground()
             TabView(selection: $state.tab) {
                 HomeView().tabItem { Text("الرئيسية") }.tag(Tab.home)
                 MushafIndexView().tabItem { Text("المصحف") }.tag(Tab.mushaf)
@@ -18,7 +23,18 @@ struct RootView: View {
         .fullScreenCover(item: $state.reader) { request in
             ReaderView(startPage: request.page)
         }
-        .onAppear(perform: screenshotSetup)
+        .onAppear {
+            location.attach(prayer)
+            appearance.attach(prayer)
+            weather.refresh(prayer)
+            screenshotSetup()
+        }
+        .onChange(of: prayer.placeStamp) { _, _ in weather.refresh(prayer); appearance.update() }
+        .onChange(of: phase) { _, now in
+            guard now == .active else { return }
+            location.refreshIfNeeded(); weather.refresh(prayer); appearance.update()
+        }
+        .onReceive(Timer.publish(every: 600, on: .main, in: .common).autoconnect()) { _ in weather.refresh(prayer) }
     }
 
     /// Launch arguments used only by the App Store screenshot run.

@@ -52,7 +52,7 @@ struct LiveView: View {
         .background(
             ZStack {
                 RoundedRectangle(cornerRadius: 36, style: .continuous)
-                    .fill(LinearGradient(colors: [Color(red: 0.165, green: 0.141, blue: 0.098), Color(red: 0.08, green: 0.066, blue: 0.047)], startPoint: .topLeading, endPoint: .bottomTrailing))
+                    .fill(LinearGradient(colors: [Color(light: (1, 0.97, 0.9), dark: (0.165, 0.141, 0.098)), Color(light: (0.94, 0.88, 0.76), dark: (0.08, 0.066, 0.047))], startPoint: .topLeading, endPoint: .bottomTrailing))
                 RoundedRectangle(cornerRadius: 36, style: .continuous)
                     .fill(RadialGradient(colors: [Theme.gold.opacity(0.32), .clear], center: UnitPoint(x: 0.85, y: 0.2), startRadius: 0, endRadius: 700))
             }

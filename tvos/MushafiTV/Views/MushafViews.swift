@@ -72,7 +72,7 @@ struct ReaderView: View {
 
     var body: some View {
         ZStack {
-            Color(red: 0.07, green: 0.065, blue: 0.075).ignoresSafeArea()
+            Color(light: (0.976, 0.953, 0.898), dark: (0.07, 0.065, 0.075)).ignoresSafeArea()
             HStack(spacing: 0) {
                 page(right)
                 Rectangle().fill(Theme.gold.opacity(0.18)).frame(width: 1).padding(.vertical, 60)
@@ -108,7 +108,7 @@ struct ReaderView: View {
 
     @ViewBuilder private func page(_ number: Int) -> some View {
         if let image = library.image(page: number) {
-            Image(uiImage: image).resizable().aspectRatio(contentMode: .fit).frame(maxWidth: .infinity)
+            MushafPageImage(image: image).frame(maxWidth: .infinity)
         } else {
             VStack(spacing: 12) {
                 Text("صفحة \(number.ar)").font(.system(size: 36, weight: .bold))
@@ -144,9 +144,9 @@ struct ReaderView: View {
         if case .surah? = player.item {
             HStack(spacing: 26) {
                 Text((player.surah ?? 1).ar)
-                    .font(Theme.quran(30)).foregroundStyle(Theme.gold)
+                    .font(.system(size: 30, weight: .heavy)).foregroundStyle(Theme.gold)
                     .frame(width: 80, height: 80)
-                    .background(RoundedRectangle(cornerRadius: 20).fill(Color.black.opacity(0.4)))
+                    .background(RoundedRectangle(cornerRadius: 20).fill(Theme.panel))
                     .overlay(RoundedRectangle(cornerRadius: 20).stroke(Theme.gold.opacity(0.35)))
                 VStack(alignment: .leading, spacing: 4) {
                     Text("\(player.title) · الآية \(player.ayah.ar)").font(.system(size: 27, weight: .bold))
@@ -154,7 +154,7 @@ struct ReaderView: View {
                 }
                 ProgressView(value: player.progress).tint(Theme.gold)
                 Image(systemName: player.playing ? "pause.fill" : "play.fill")
-                    .font(.system(size: 26, weight: .bold)).foregroundStyle(.black)
+                    .font(.system(size: 26, weight: .bold)).foregroundStyle(Theme.focusText)
                     .frame(width: 66, height: 66).background(Circle().fill(Theme.ink))
             }
             .padding(.horizontal, 30).padding(.vertical, 18)
@@ -174,7 +174,7 @@ struct ReaderView: View {
     private func hint(_ key: String, _ text: String) -> some View {
         HStack(spacing: 12) {
             Text(key).font(.system(size: 20, weight: .bold)).padding(.horizontal, 12).frame(height: 40)
-                .background(RoundedRectangle(cornerRadius: 10).fill(Color.white.opacity(0.12)))
+                .background(RoundedRectangle(cornerRadius: 10).fill(Theme.pill))
             Text(text).font(.system(size: 22)).foregroundStyle(Theme.ink.opacity(0.7))
         }
     }
@@ -200,6 +200,21 @@ struct ReaderView: View {
         if p != right && p != left {
             withAnimation(.easeInOut(duration: 0.3)) { spread = p % 2 == 1 ? p : p - 1 }
             remember()
+        }
+    }
+}
+
+/// A page image rendered from the night reader. In daylight it is shown as cream paper with dark ink:
+/// inverting and turning the hue half way keeps the gold ornaments gold.
+struct MushafPageImage: View {
+    let image: UIImage
+    @Environment(\.colorScheme) private var scheme
+    var body: some View {
+        let base = Image(uiImage: image).resizable().aspectRatio(contentMode: .fit)
+        if scheme == .light {
+            base.colorInvert().hueRotation(.degrees(180)).colorMultiply(Color(red: 0.99, green: 0.96, blue: 0.89))
+        } else {
+            base
         }
     }
 }

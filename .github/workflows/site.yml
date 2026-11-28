@@ -29,5 +29,6 @@ jobs:
           curl -fsS -o /dev/null -w "privacy %{http_code}\n" "$URL/privacy"
           curl -fsS -o /dev/null -w "world %{http_code}\n" "$URL/world"
           echo "--- api/world"; curl -fsS "$URL/api/world" | head -c 600; echo
+          echo "--- api/where"; curl -sS "$URL/api/where" | head -c 300; echo
           curl -sS -o /dev/null -w "appstore %{http_code} -> %{redirect_url}\n" "$URL/go/appstore"
           curl -sS -I "$URL/download/android" | grep -i "^location"; curl -sS -IL "$URL/download/android" | grep -iE "^HTTP|content-length"

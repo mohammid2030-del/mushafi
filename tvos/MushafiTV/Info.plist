@@ -46,7 +46,9 @@
 		<string>arm64</string>
 	</array>
 	<key>UIUserInterfaceStyle</key>
-	<string>Dark</string>
+	<string>Automatic</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>لضبط مواقيت الصلاة والطقس على مدينتك تلقائيًا. يبقى موقعك على الجهاز ولا يُحفظ عندنا.</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoadsForMedia</key>

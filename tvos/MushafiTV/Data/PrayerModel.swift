@@ -10,6 +10,8 @@ struct PrayerTime: Identifiable {
 /// Today's and tomorrow's times from the same engine as the phone app (adhan.js, Umm al-Qura in Saudi Arabia).
 final class PrayerModel: ObservableObject {
     @Published private(set) var city: String = "الرياض"
+    /// Bumped whenever the place changes, so weather can follow.
+    @Published private(set) var placeStamp = 0
     @Published private(set) var zone: TimeZone = TimeZone(identifier: "Asia/Riyadh")!
     @Published private(set) var today: [PrayerTime] = []
     private var tomorrow: [PrayerTime] = []
@@ -19,13 +21,16 @@ final class PrayerModel: ObservableObject {
 
     init() { refresh() }
 
-    func choose(_ c: City) {
+    func choose(_ c: City) { setPlace(name: c.name, latitude: c.latitude, longitude: c.longitude, zone: c.zone) }
+
+    /// Moves prayer times (and with them weather and day/night) to a place.
+    func setPlace(name: String, latitude: Double, longitude: Double, zone: String) {
         var settings = PrayerSettings.load()
         var json = settings.json
-        json["city"] = c.name
-        json["latitude"] = c.latitude
-        json["longitude"] = c.longitude
-        json["timezone"] = c.zone
+        json["city"] = name
+        json["latitude"] = latitude
+        json["longitude"] = longitude
+        json["timezone"] = TimeZone(identifier: zone) != nil ? zone : TimeZone.current.identifier
         json["autoMethod"] = true
         json["method"] = "AUTO"
         json["confirmed"] = true
@@ -34,11 +39,36 @@ final class PrayerModel: ObservableObject {
         refresh()
     }
 
+    var coordinate: (latitude: Double, longitude: Double)? {
+        let json = PrayerSettings.load().json
+        guard let lat = (json["latitude"] as? NSNumber)?.doubleValue, let lon = (json["longitude"] as? NSNumber)?.doubleValue,
+              abs(lat) <= 90, abs(lon) <= 180 else { return nil }
+        return (lat, lon)
+    }
+
+    /// Daytime runs from sunrise to maghrib of the chosen place.
+    func isDay(_ now: Date = Date()) -> Bool {
+        refresh(now: now)
+        guard let sunrise = today.first(where: { $0.key == "sunrise" })?.date,
+              let maghrib = today.first(where: { $0.key == "maghrib" })?.date else {
+            var cal = Calendar(identifier: .gregorian); cal.timeZone = zone
+            let h = cal.component(.hour, from: now); return h >= 6 && h < 18
+        }
+        return now >= sunrise && now < maghrib
+    }
+
+    /// Next sunrise or maghrib after now, to switch the appearance exactly then.
+    func nextSunEvent(after now: Date = Date()) -> Date? {
+        refresh(now: now)
+        return (today + tomorrow).filter { ($0.key == "sunrise" || $0.key == "maghrib") && $0.date > now }.map(\.date).min()
+    }
+
     func refresh(now: Date = Date()) {
         let settings = PrayerSettings.load()
         let stamp = settings.string("city") + PrayerCalculator.day(settings, now: now, add: 0).key
         guard stamp != computedFor else { return }
         city = settings.string("city")
+        placeStamp &+= 1
         zone = settings.timezone
         today = rows(settings, PrayerCalculator.day(settings, now: now, add: 0))
         tomorrow = rows(settings, PrayerCalculator.day(settings, now: now, add: 1))
@@ -77,6 +107,6 @@ final class PrayerModel: ObservableObject {
         h.calendar = Calendar(identifier: .islamicUmmAlQura)
         h.timeZone = zone
         h.dateFormat = "d MMMM y"
-        return (g.string(from: now), h.string(from: now) + " هـ")
+        return (g.string(from: now).arDigits, h.string(from: now).arDigits + " هـ")
     }
 }

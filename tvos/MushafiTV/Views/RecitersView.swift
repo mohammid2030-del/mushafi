@@ -50,8 +50,8 @@ struct ReciterBubble: View {
 
 /// Reciter circles: the focused one grows and turns gold.
 struct BubbleButtonStyle: ButtonStyle {
-    func makeBody(configuration: Configuration) -> some View { Body(configuration: configuration) }
-    private struct Body: View {
+    func makeBody(configuration: Configuration) -> some View { Styled(configuration: configuration) }
+    private struct Styled: View {
         let configuration: ButtonStyleConfiguration
         @Environment(\.isFocused) private var focused
         var body: some View {
@@ -98,13 +98,13 @@ struct NowPlayingCard: View {
             if let s = player.surah, player.ayah > 0 {
                 VStack(alignment: .leading, spacing: 14) {
                     Text("الآية \(player.ayah.ar) من \((library.chapter(s)?.verses ?? 0).ar)").font(.system(size: 20)).foregroundStyle(Theme.muted)
-                    Text(library.verse(s, player.ayah)).font(Theme.quran(40)).foregroundStyle(Color(red: 0.965, green: 0.894, blue: 0.722))
+                    Text(library.verse(s, player.ayah)).font(Theme.quran(40)).foregroundStyle(Theme.ink)
                         .lineLimit(3).minimumScaleFactor(0.6).lineSpacing(10)
                     ProgressView(value: player.progress).tint(Theme.gold)
                 }
                 .padding(30)
                 .frame(width: 560)
-                .background(RoundedRectangle(cornerRadius: 26, style: .continuous).fill(Color.black.opacity(0.28)))
+                .background(RoundedRectangle(cornerRadius: 26, style: .continuous).fill(Theme.panel))
                 .overlay(RoundedRectangle(cornerRadius: 26, style: .continuous).stroke(Theme.line))
             }
         }
@@ -127,7 +127,7 @@ struct ReciterSurahsView: View {
 
     var body: some View {
         ZStack {
-            NightBackground()
+            SkyBackground()
             ScrollView(.vertical) {
                 VStack(alignment: .leading, spacing: 36) {
                     HStack(spacing: 34) {
