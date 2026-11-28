@@ -107,12 +107,12 @@ jobs:
             xcrun simctl io "$udid" screenshot "tvos/shots/$n.png"
           }
           # Day screens in the light appearance with a partly cloudy sky, night screens dark with stars.
-          shot 1-home -tvTab 0 -tvLastPage 2 -tvAppearance light -tvDay 1 -tvWeather partly:24
-          shot 2-reader -tvReader 3 -tvPlay 7:2:6 -tvAppearance light -tvDay 1 -tvWeather clear:27
-          shot 3-reader-controls -tvReader 3 -tvPlay 7:2:8 -tvChrome 1 -tvAppearance dark -tvDay 0 -tvWeather clear:19
-          shot 4-reciters -tvTab 2 -tvPlay 7:1:2 -tvAppearance light -tvDay 1 -tvWeather partly:24
-          shot 5-live -tvTab 3 -tvRadio sa -tvAppearance light -tvDay 1 -tvWeather rain:18
-          shot 6-mushaf -tvTab 1 -tvAppearance dark -tvDay 0 -tvWeather clear:19
+          shot 1-home-dawn -tvTab 0 -tvLastPage 2 -tvPhase dawn -tvWeather clear:21
+          shot 2-home-day -tvTab 0 -tvLastPage 2 -tvPhase day -tvWeather partly:28
+          shot 3-home-afternoon -tvTab 0 -tvLastPage 2 -tvPhase afternoon -tvWeather clear:31
+          shot 4-home-dusk -tvTab 0 -tvLastPage 2 -tvPhase dusk -tvWeather clear:26
+          shot 5-home-night -tvTab 0 -tvLastPage 2 -tvPhase night -tvWeather clear:19
+          shot 6-live-dusk -tvTab 3 -tvRadio sa -tvPhase dusk -tvWeather partly:25
           ls -la tvos/shots
           sips -g pixelWidth -g pixelHeight tvos/shots/1-home.png
 

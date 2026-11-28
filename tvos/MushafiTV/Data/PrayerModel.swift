@@ -57,6 +57,20 @@ final class PrayerModel: ObservableObject {
         return now >= sunrise && now < maghrib
     }
 
+    /// The moment of the day at the chosen place (same split as the phone's home sky).
+    func phase(_ now: Date = Date()) -> SkyPhase {
+        refresh(now: now)
+        func t(_ key: String) -> Date? { today.first(where: { $0.key == key })?.date }
+        guard let fajr = t("fajr"), let sunrise = t("sunrise"), let asr = t("asr"), let maghrib = t("maghrib"), let isha = t("isha") else {
+            return isDay(now) ? .day : .night
+        }
+        if now < fajr || now >= isha { return .night }
+        if now < sunrise { return .dawn }
+        if now < asr { return .day }
+        if now < maghrib.addingTimeInterval(-25 * 60) { return .afternoon }
+        return .dusk
+    }
+
     /// Next sunrise or maghrib after now, to switch the appearance exactly then.
     func nextSunEvent(after now: Date = Date()) -> Date? {
         refresh(now: now)
