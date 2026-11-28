@@ -145,10 +145,10 @@ jobs:
             -allowProvisioningUpdates -authenticationKeyPath "$ASC_KEY_PATH" \
             -authenticationKeyID "$ASC_KEY_ID" -authenticationKeyIssuerID "$ASC_ISSUER_ID" \
             DEVELOPMENT_TEAM="$DEVELOPMENT_TEAM" CURRENT_PROJECT_VERSION="$BUILD_NUMBER" \
-            CODE_SIGN_IDENTITY="Apple Distribution" \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
             archive 2>&1 | tee "$RUNNER_TEMP/archive.log" | grep -E "error:|ARCHIVE (SUCCEEDED|FAILED)" || true
-          # No Apple TV is registered to the team, so sign the archive for distribution
-          # (an App Store profile needs no devices) instead of a development profile.
+          # No Apple TV is registered to the team, so a development profile can't be made.
+          # Archive unsigned; the export step signs it for the App Store (cloud-managed).
           if ! grep -q "ARCHIVE SUCCEEDED" "$RUNNER_TEMP/archive.log"; then
             grep -n -A6 "error:" "$RUNNER_TEMP/archive.log" | head -150; tail -n 60 "$RUNNER_TEMP/archive.log"; exit 1
           fi
