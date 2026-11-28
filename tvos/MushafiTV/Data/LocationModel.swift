@@ -27,28 +27,30 @@ final class LocationModel: NSObject, ObservableObject, CLLocationManagerDelegate
         manager.desiredAccuracy = kCLLocationAccuracyKilometer
     }
 
+    /// The App Store screenshot run must never show a permission prompt.
+    static let screenshotRun = ["tvTab", "tvReader", "tvWeather"].contains { UserDefaults.standard.object(forKey: $0) != nil }
+
     var sourceLabel: String {
         switch source {
         case .device: return "من جهاز Apple TV"
         case .internet: return "تقريبي من اتصال الإنترنت"
-        case .manual: return "مدينة مختارة"
+        case .manual: return automatic ? "تلقائي" : "مدينة مختارة"
         }
     }
 
     func attach(_ prayer: PrayerModel) {
         self.prayer = prayer
-        // The screenshot run must not show a permission prompt.
-        if UserDefaults.standard.string(forKey: "tvTab") != nil || UserDefaults.standard.string(forKey: "tvReader") != nil { return }
         refreshIfNeeded()
     }
 
     /// Re-locates at most every six hours while automatic.
     func refreshIfNeeded() {
-        guard automatic, prayer != nil, Date().timeIntervalSince(lastAuto) > 6 * 3600 || source == .manual else { return }
+        guard !Self.screenshotRun, automatic, prayer != nil, Date().timeIntervalSince(lastAuto) > 6 * 3600 || source == .manual else { return }
         locate()
     }
 
     func useAutomatic() {
+        guard !Self.screenshotRun else { return }
         automatic = true
         defaults.set(true, forKey: "tv.locationAuto")
         locate()

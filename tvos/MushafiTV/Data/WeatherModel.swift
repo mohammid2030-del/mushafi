@@ -10,15 +10,16 @@ final class WeatherModel: ObservableObject {
     private var fetchedAt = Date.distantPast
     private var fetchedFor = ""
     private var loading = false
+    private var forced = false
 
     init() {
         let d = UserDefaults.standard
         // Screenshot run: -tvWeather partly:24
-        if let forced = d.string(forKey: "tvWeather") {
-            let parts = forced.split(separator: ":")
+        if let pinned = d.string(forKey: "tvWeather") {
+            let parts = pinned.split(separator: ":")
             kind = Kind(rawValue: String(parts.first ?? ""))
             temperature = parts.count > 1 ? Int(parts[1]) : nil
-            fetchedAt = .distantFuture
+            forced = true
             return
         }
         if let k = d.string(forKey: "tv.wx.kind") { kind = Kind(rawValue: k) }
@@ -54,7 +55,7 @@ final class WeatherModel: ObservableObject {
     }
 
     func refresh(_ prayer: PrayerModel) {
-        guard let c = prayer.coordinate, !loading else { return }
+        guard !forced, let c = prayer.coordinate, !loading else { return }
         let key = String(format: "%.2f,%.2f", locale: Locale(identifier: "en_US_POSIX"), c.latitude, c.longitude)
         guard key != fetchedFor || Date().timeIntervalSince(fetchedAt) > 3600 else { return }
         guard let url = URL(string: "https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=\(key.split(separator: ",")[0])&lon=\(key.split(separator: ",")[1])") else { return }
