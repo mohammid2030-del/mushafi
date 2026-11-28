@@ -18,6 +18,7 @@ const TV_CITIES = [
   ['إسطنبول', 'تركيا', 41.0082, 28.9784, 'Europe/Istanbul'], ['لندن', 'المملكة المتحدة', 51.5074, -0.1278, 'Europe/London']
 ];
 const tvIcons = {
+  pin: '<path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/>',
   book: '<path d="M3 5.5C5.5 4 8.5 4 12 6c3.5-2 6.5-2 9-.5V19c-2.5-1.5-5.5-1.5-9 .5-3.5-2-6.5-2-9-.5z"/><path d="M12 6v13.5"/>',
   head: '<path d="M4 15v-3a8 8 0 0 1 16 0v3"/><rect x="3" y="14" width="4" height="7" rx="2"/><rect x="17" y="14" width="4" height="7" rx="2"/>',
   clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
@@ -76,19 +77,21 @@ function tvSurahActive() { return surahState && surahState.status && surahState.
 function tvBoot() {
   if (document.getElementById('tv')) return;
   // The big screen is watched in a dim room: night theme unless the user chose otherwise.
-  try { if (!localStorage.themeMode && typeof setAppTheme === 'function') setAppTheme('dark') } catch (e) {}
   document.documentElement.classList.add('tv');
   document.body.classList.add('tv-mode');
   const root = document.createElement('div');
   root.id = 'tv';
   root.innerHTML = `<div class="tv-top"><div class="tv-brand"><img src="images/mushafi-official-icon.png" alt=""><b>مصحفي</b></div>
     <div class="tv-tabs">${TV_TABS.map(([k, t]) => `<button class="tvf tv-tab" data-tab="${k}">${t}</button>`).join('')}</div>
-    <div class="tv-meta"><span class="tv-city"></span><i></i><b class="tv-time"></b></div></div><div class="tv-main"></div>`;
+    <div class="tv-meta"><span class="tv-wx"></span><span class="tv-city"></span><i></i><b class="tv-time"></b></div></div><div class="tv-main"></div>`;
   document.body.append(root);
   root.querySelectorAll('.tv-tab').forEach(b => b.onclick = () => tvGo(b.dataset.tab));
   tvGo(new URLSearchParams(location.search).get('tvtab') || 'home');
   clearInterval(TV.timer);
   TV.timer = setInterval(tvTick, 1000);
+  tvSkyUpdate(true);
+  tvLocateIfNeeded();
+  tvWeatherRefresh();
   window.addEventListener('keydown', tvKey, true);
 }
 function tvGo(tab) {
@@ -110,6 +113,7 @@ function tvTick() {
   const city = document.querySelector('.tv-city'), time = document.querySelector('.tv-time');
   if (city) city.textContent = p.city;
   if (time) time.textContent = tvClock(Date.now(), p.zone);
+  if (Date.now() - (TV.skyAt || 0) > 30000) { TV.skyAt = Date.now(); tvSkyUpdate(); tvWeatherRefresh() }
   const sig = JSON.stringify([surahState?.status, surahState?.chapter, surahState?.reader, surahState?.key, rhRadio?.id, rhRadio?.status, p.next?.time]);
   if (sig !== TV.last && document.getElementById('tv')?.offsetParent !== null && view !== 'reader') {
     TV.last = sig;
@@ -184,11 +188,17 @@ function tvLive() {
 }
 function tvSettings() {
   const p = tvPrayer(), fav = tvFavReciter();
-  return `<section><div class="tv-sec"><h2>مدينتك</h2><small>لحساب مواقيت الصلاة · الحالية: ${tvEsc(p.city)}</small></div>
-    <div class="tv-grid">${TV_CITIES.map((c, i) => `<button class="tvf tv-surah city" data-tvid="c${i}" onclick="tvCity(${i})"><span><b>${c[0]}</b><small>${c[1]}</small></span>${p.city === c[0] ? tvI('check') : ''}</button>`).join('')}</div></section>
+  const auto = tvLocAuto(), look = tvLook(), src = localStorage.tvLocSource;
+  const srcLabel = TV.locating ? 'جارٍ تحديد الموقع…' : auto ? (src === 'device' ? 'من جهاز التلفزيون' : src === 'internet' ? 'تقريبي من اتصال الإنترنت' : 'تلقائي') : 'من جهاز التلفزيون، أو تقريبيًا من اتصال الإنترنت';
+  return `<section><div class="tv-sec"><h2>الموقع</h2><small>لمواقيت الصلاة والطقس · الحالي: ${tvEsc(p.city)}</small></div>
+    <button class="tvf tv-tile loc" data-tvid="loc-auto" onclick="tvUseAutoLocation()"><span class="hd"><em>${srcLabel}</em>${auto ? tvI('check') : tvI('pin')}</span><b>${auto ? 'موقعي الحالي: ' + tvEsc(p.city) : 'تحديد موقعي تلقائيًا'}</b></button>
+    <div class="tv-sub">أو اختر مدينتك يدويًا</div>
+    <div class="tv-grid">${TV_CITIES.map((c, i) => `<button class="tvf tv-surah city" data-tvid="c${i}" onclick="tvCity(${i})"><span><b>${c[0]}</b><small>${c[1]}</small></span>${!auto && p.city === c[0] ? tvI('check') : ''}</button>`).join('')}</div></section>
+  <section><div class="tv-sec"><h2>المظهر</h2><small>${tvIsLight() ? 'الآن: فاتح' : 'الآن: داكن'}</small></div>
+    <div class="tv-looks">${[['auto', 'تلقائي حسب الشمس', 'فاتح من الشروق وداكن من المغرب'], ['light', 'فاتح دائمًا', 'ورق كريمي وخط داكن'], ['dark', 'داكن دائمًا', 'مريح في الإضاءة الخافتة']].map(([k, t, d]) => `<button class="tvf tv-surah city" data-tvid="look-${k}" onclick="tvSetLook('${k}')"><span><b>${t}</b><small>${d}</small></span>${look === k ? tvI('check') : ''}</button>`).join('')}</div></section>
   <section><div class="tv-sec"><h2>القارئ المفضّل</h2><small>يُستخدم عند الاستماع من المصحف</small></div>
     <div class="tv-grid">${tvReciters().map(r => `<button class="tvf tv-surah city" data-tvid="f${r.id}" onclick="localStorage.tvReciter='${r.id}';tvRender()"><span><b>${tvEsc(r.name)}</b></span>${fav === r.id ? tvI('star') : ''}</button>`).join('')}</div></section>
-  <section class="tv-about"><img src="images/mushafi-official-icon.png" alt="" onerror="this.remove()"><div><b>مصحفي · Android TV</b><small>مجاني بالكامل وبدون إعلانات · mushafiapp.com</small></div></section>`;
+  <section class="tv-about"><img src="images/mushafi-official-icon.png" alt="" onerror="this.remove()"><div><b>مصحفي · Android TV</b><small>مجاني بالكامل وبدون إعلانات · mushafiapp.com</small><small>بيانات الطقس من المعهد النرويجي للأرصاد MET Norway · CC BY 4.0</small></div></section>`;
 }
 
 // ---------- actions ----------
@@ -201,8 +211,145 @@ function tvListenPage(p) { const i = tvPageInfo(p); tvPlay(tvFavReciter(), i.s, 
 function tvRadio(id) { if (tvSurahActive()) stopFullSurah(); rhRadioToggle(id); setTimeout(tvRender, 400) }
 function tvCity(i) {
   const c = TV_CITIES[i];
-  try { savePrayerConfig({ ...copyPrayerSettings(), city: c[0], latitude: c[2], longitude: c[3], timezone: c[4], confirmed: true, autoMethod: true }) } catch (e) {}
-  tvRender();
+  try { localStorage.tvLocAuto = '0'; localStorage.tvLocSource = 'manual' } catch (e) {}
+  tvSetPlace(c[0], c[2], c[3], c[4]);
+}
+function tvSetPlace(city, lat, lon, zone) {
+  try { savePrayerConfig({ ...copyPrayerSettings(), city, latitude: +(+lat).toFixed(5), longitude: +(+lon).toFixed(5), timezone: zone || Intl.DateTimeFormat().resolvedOptions().timeZone, confirmed: true, autoMethod: true }) } catch (e) {}
+  TV.last = null; tvSkyUpdate(true); tvWeatherRefresh(true); tvRender();
+}
+
+// ---------- location: TV's own location → approximate place of the connection → manual ----------
+function tvLocAuto() { return localStorage.tvLocAuto !== '0' }
+function tvLocateIfNeeded() {
+  if (!tvLocAuto() || TV.preview) return;
+  const at = +localStorage.tvLocAt || 0;
+  if (Date.now() - at > 6 * 3600e3 || localStorage.tvLocSource === 'manual' || !localStorage.tvLocSource) tvLocate();
+}
+function tvUseAutoLocation() { try { localStorage.tvLocAuto = '1' } catch (e) {} tvLocate(); tvRender() }
+function tvLocate() {
+  if (TV.locating) return;
+  TV.locating = true;
+  const done = (city, lat, lon, zone, source) => {
+    TV.locating = false;
+    try { localStorage.tvLocSource = source; localStorage.tvLocAt = String(Date.now()) } catch (e) {}
+    tvSetPlace(city, lat, lon, zone);
+  };
+  const fromInternet = () => {
+    fetch('https://mushafiapp.com/api/where', { cache: 'no-store' }).then(r => r.ok ? r.json() : Promise.reject())
+      .then(w => tvNameIt(w.latitude, w.longitude, w.city, name => done(name, w.latitude, w.longitude, w.timezone, 'internet')))
+      .catch(() => { TV.locating = false; tvRender() });
+  };
+  if (!window.AndroidReader?.requestPrayerLocation) { fromInternet(); return }
+  const previous = window.onPrayerLocation;
+  let settled = false;
+  const finish = fn => { if (settled) return; settled = true; window.onPrayerLocation = previous; fn() };
+  window.onPrayerLocation = result => finish(() => {
+    if (!result || result.error || !Number.isFinite(+result.latitude)) { fromInternet(); return }
+    tvNameIt(+result.latitude, +result.longitude, '', name => done(name, +result.latitude, +result.longitude, result.timezone, 'device'));
+  });
+  setTimeout(() => finish(fromInternet), 15000);
+  try { AndroidReader.requestPrayerLocation() } catch (e) { finish(fromInternet) }
+}
+// Arabic city name: the system geocoder when present, else the nearest listed city, else the name from the connection.
+function tvNameIt(lat, lon, fallback, cb) {
+  const near = TV_CITIES.map(c => [c[0], Math.hypot(c[2] - lat, (c[3] - lon) * Math.cos(lat * Math.PI / 180)) * 111]).sort((a, b) => a[1] - b[1])[0];
+  const backup = near && near[1] < 45 ? near[0] : (fallback || 'موقعي الحالي');
+  if (!window.AndroidReader?.reverseGeocode) { cb(backup); return }
+  const key = 'tv' + Date.now(), previous = window.onCityName;
+  let settled = false;
+  const finish = name => { if (settled) return; settled = true; window.onCityName = previous; cb(name || backup) };
+  window.onCityName = r => { if (r?.key === key) finish(r.name); else previous?.(r) };
+  setTimeout(() => finish(''), 6000);
+  try { AndroidReader.reverseGeocode(lat, lon, 'ar', key) } catch (e) { finish('') }
+}
+
+// ---------- weather (same source as the phone app, through the app's weather bridge) ----------
+function tvWeather() {
+  if (TV.forceWx) return TV.forceWx;
+  try {
+    const s = readPrayerData().settings, key = (+s.latitude).toFixed(2) + ',' + (+s.longitude).toFixed(2);
+    const c = JSON.parse(localStorage.getItem('homeWeatherCache') || 'null');
+    if (!c || c.key !== key || !Number.isFinite(c.temperature) || Date.now() - c.fetchedAt > 6 * 3600e3) return null;
+    const y = String(c.symbol || '');
+    const kind = /thunder/.test(y) ? 'thunder' : /snow|sleet/.test(y) ? 'snow' : /rain/.test(y) ? 'rain' : /fog/.test(y) ? 'fog' : /partlycloudy|fair/.test(y) ? 'partly' : /cloudy/.test(y) ? 'cloudy' : 'clear';
+    return { kind, temp: Math.round(c.temperature) };
+  } catch (e) { return null }
+}
+function tvWeatherRefresh(force) {
+  if (TV.preview || !window.AndroidReader?.requestHomeWeather) return;
+  try {
+    const s = readPrayerData().settings;
+    if (!Number.isFinite(+s.latitude)) return;
+    const key = (+s.latitude).toFixed(2) + ',' + (+s.longitude).toFixed(2);
+    const c = JSON.parse(localStorage.getItem('homeWeatherCache') || 'null');
+    if (!force && c && c.key === key && Date.now() - c.fetchedAt < 3600e3) return;
+    if (!force && Date.now() - (TV.wxAsked || 0) < 300e3) return;
+    TV.wxAsked = Date.now();
+    homeWeatherPending = { key };
+    AndroidReader.requestHomeWeather(+s.latitude, +s.longitude, key);
+  } catch (e) {}
+}
+function tvWxLabel(kind, day) { return ({ clear: day ? 'سماء صافية' : 'ليلة صافية', partly: 'غائم جزئيًا', cloudy: 'غائم', rain: 'أمطار', snow: 'ثلوج', fog: 'ضباب', thunder: 'عواصف رعدية' })[kind] || '' }
+const tvWxIcons = {
+  clear: '<circle cx="24" cy="24" r="9"/><path d="M24 4v5m0 30v5M4 24h5m30 0h5M10 10l3.5 3.5m21 21L38 38M10 38l3.5-3.5m21-21L38 10"/>',
+  night: '<path d="M34 31A16 16 0 0 1 18 8a16 16 0 1 0 16 23Z"/>',
+  partly: '<circle cx="18" cy="17" r="7"/><path d="M18 4v3M6 17H3M9 8l2 2M27 8l-2 2"/><path d="M17 37h18a7 7 0 0 0 0-14 10 10 0 0 0-18-1 7.5 7.5 0 0 0 0 15Z" fill="var(--wxbg)"/>',
+  cloudy: '<path d="M13 34h23a8 8 0 0 0 0-16 12 12 0 0 0-23-2 9 9 0 0 0 0 18Z"/>',
+  rain: '<path d="M13 28h23a8 8 0 0 0 0-16 12 12 0 0 0-23-2 9 9 0 0 0 0 18Z"/><path d="m16 34-2 6m11-6-2 6m11-6-2 6"/>',
+  snow: '<path d="M13 28h23a8 8 0 0 0 0-16 12 12 0 0 0-23-2 9 9 0 0 0 0 18Z"/><path d="M16 36v.1M24 38v.1M32 36v.1M20 42v.1M28 42v.1"/>',
+  fog: '<path d="M8 20h32M5 27h38M10 34h28"/>',
+  thunder: '<path d="M13 28h23a8 8 0 0 0 0-16 12 12 0 0 0-23-2 9 9 0 0 0 0 18Z"/><path d="m25 30-4 7h6l-4 7"/>'
+};
+
+// ---------- day / night and the living sky ----------
+function tvLook() { return ['light', 'dark'].includes(localStorage.tvAppearance) ? localStorage.tvAppearance : 'auto' }
+function tvSetLook(k) { try { localStorage.tvAppearance = k } catch (e) {} tvSkyUpdate(true); tvRender() }
+function tvIsDay() {
+  if (TV.forceDay != null) return TV.forceDay;
+  const p = tvPrayer(), now = Date.now();
+  const sr = p.today.find(x => x.key === 'sunrise')?.time, mg = p.today.find(x => x.key === 'maghrib')?.time;
+  if (sr && mg) return now >= sr && now < mg;
+  const h = new Date().getHours(); return h >= 6 && h < 18;
+}
+function tvIsLight() { const l = TV.forceLook || tvLook(); return l === 'light' || (l === 'auto' && tvIsDay()) }
+function tvSkyUpdate(force) {
+  const tv = document.getElementById('tv'); if (!tv) return;
+  const wx = tvWeather(), kind = wx?.kind || 'clear', day = tvIsDay(), light = tvIsLight();
+  const sig = [kind, day, light, wx?.temp, tvPrayer().city].join('|');
+  if (!force && sig === TV.skySig) return;
+  TV.skySig = sig;
+  tv.classList.toggle('day', light);
+  tv.classList.toggle('night', !day && !light);
+  tv.classList.remove(...[...tv.classList].filter(c => c.startsWith('sky-')));
+  tv.classList.add('sky-' + kind);
+  // The reader follows the same appearance.
+  const theme = light ? 'light' : 'dark';
+  if (typeof setAppTheme === 'function' && localStorage.themeMode !== theme) { try { setAppTheme(theme) } catch (e) {} }
+  let sky = tv.querySelector('.tv-sky');
+  if (!sky) { sky = document.createElement('div'); sky.className = 'tv-sky'; tv.prepend(sky) }
+  const cloud = (x, y, w, o, b, t, d, c) => `<div class="sk-cloud" style="left:${x}%;top:${y}%;--w:calc(var(--u)*${w});--o:${o};--b:calc(var(--u)*${b});--t:${t}s;--d:-${d}s;${c ? '--c:' + c : ''}"><i></i></div>`;
+  const sunny = kind === 'clear' || kind === 'partly';
+  let h = '';
+  if (sunny && day) h += '<div class="sk-rays"></div><div class="sk-sun"></div>';
+  if (sunny && !day) { h += '<div class="sk-moon"></div>'; let r = 7; const R = () => (r = (r * 9301 + 49297) % 233280) / 233280; for (let i = 0; i < 70; i++) h += `<i class="sk-star" style="left:${R() * 100}%;top:${R() * 55}%;--t:${2 + R() * 4}s;--d:-${R() * 5}s;opacity:${.3 + R() * .7}"></i>` }
+  if (kind === 'partly') h += cloud(0, 16, 46, .30, 1, 160, 62) + cloud(0, 30, 30, .18, .8, 220, 150) + cloud(0, 6, 60, .12, 1.8, 260, 30);
+  if (kind === 'cloudy' || kind === 'fog' || kind === 'snow') h += cloud(0, 8, 70, .22, 1.8, 200, 60, 'rgba(210,210,225,.9)') + cloud(0, 20, 50, .2, 1.2, 170, 110) + cloud(0, 34, 40, .12, 1, 240, 40) + cloud(0, -2, 90, .14, 2.4, 300, 200, 'rgba(190,190,205,.9)') + cloud(0, 44, 60, .08, 2, 280, 250);
+  if (kind === 'rain' || kind === 'thunder') h += cloud(0, 2, 80, .24, 2.2, 220, 70, 'rgba(150,160,180,.9)') + cloud(0, 14, 60, .2, 1.6, 180, 130, 'rgba(140,150,170,.9)') + cloud(0, -6, 100, .16, 3, 260, 20, 'rgba(120,130,150,.9)') + '<div class="sk-rain b"></div><div class="sk-rain"></div>';
+  if (kind === 'thunder') h += '<div class="sk-flash"></div>';
+  if (kind === 'snow') h += '<div class="sk-snow"></div><div class="sk-snow b"></div>';
+  if (kind === 'fog') h += '<div class="sk-fog"></div><div class="sk-fog b"></div>';
+  sky.innerHTML = h;
+  const chip = tv.querySelector('.tv-wx');
+  if (chip) chip.innerHTML = wx ? `<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">${tvWxIcons[sunny && !day ? 'night' : kind]}</svg><b dir="ltr">${tvNum(wx.temp)}°</b><span>${tvWxLabel(kind, day)}</span><i></i>` : '';
+}
+if (TV_ON) {
+  const tvWxBefore = window.onHomeWeather;
+  window.onHomeWeather = function (r) { try { tvWxBefore?.(r) } catch (e) {} setTimeout(() => tvSkyUpdate(true), 50) };
+  const q = new URLSearchParams(location.search);
+  if (q.get('tvwx')) { const [k, t] = q.get('tvwx').split(':'); TV.forceWx = { kind: k, temp: +t || 24 }; TV.preview = true }
+  if (q.get('tvday')) TV.forceDay = q.get('tvday') === '1';
+  if (q.get('tvlook')) TV.forceLook = q.get('tvlook');
 }
 
 // ---------- remote (D-pad) ----------
