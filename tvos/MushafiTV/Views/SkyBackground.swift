@@ -255,10 +255,12 @@ struct TopBar: View {
                 }
                 .lineLimit(1)
             }
+            .frame(height: 60)
             .padding(.horizontal, 90)
-            .padding(.top, 44)
+            .padding(.top, 50)   // centred on the tab bar
             Spacer()
         }
+        .ignoresSafeArea()
         .allowsHitTesting(false)
         .focusable(false)
     }
