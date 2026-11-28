@@ -115,13 +115,19 @@ def main():
         # these fine-tunes ship an old generation config; take the matching OpenAI one
         from transformers import GenerationConfig
         base = 'openai/whisper-' + next(x for x in ('tiny', 'base', 'small', 'medium') if x in m)
-        asr.model.generation_config = GenerationConfig.from_pretrained(base)
+        gc = GenerationConfig.from_pretrained(base)
+        asr.model.generation_config = gc
+        if hasattr(asr, 'generation_config'):
+            asr.generation_config = gc
         rows = []
         for c in clips:
             for cond in ('clean', 'noisy'):
                 t0 = time.time()
-                text = asr({'raw': c[cond], 'sampling_rate': SR},
-                           generate_kwargs={'language': 'ar', 'task': 'transcribe'})['text']
+                try:
+                    text = asr({'raw': c[cond], 'sampling_rate': SR},
+                               generate_kwargs={'language': 'ar', 'task': 'transcribe'})['text']
+                except ValueError:
+                    text = asr({'raw': c[cond], 'sampling_rate': SR})['text']
                 t_asr = time.time() - t0
                 t0 = time.time()
                 found = Q.find(text)
