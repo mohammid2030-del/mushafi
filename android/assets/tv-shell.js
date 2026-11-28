@@ -196,8 +196,8 @@ function tvSettings() {
     <button class="tvf tv-tile loc" data-tvid="loc-auto" onclick="tvUseAutoLocation()"><span class="hd"><em>${srcLabel}</em>${auto ? tvI('check') : tvI('pin')}</span><b>${auto ? 'موقعي الحالي: ' + tvEsc(p.city) : 'تحديد موقعي تلقائيًا'}</b></button>
     <div class="tv-sub">أو اختر مدينتك يدويًا</div>
     <div class="tv-grid">${TV_CITIES.map((c, i) => `<button class="tvf tv-surah city" data-tvid="c${i}" onclick="tvCity(${i})"><span><b>${c[0]}</b><small>${c[1]}</small></span>${!auto && p.city === c[0] ? tvI('check') : ''}</button>`).join('')}</div></section>
-  <section><div class="tv-sec"><h2>المظهر</h2><small>${tvIsLight() ? 'الآن: فاتح' : 'الآن: داكن'}</small></div>
-    <div class="tv-looks">${[['auto', 'تلقائي حسب الشمس', 'فاتح من الشروق وداكن من المغرب'], ['light', 'فاتح دائمًا', 'ورق كريمي وخط داكن'], ['dark', 'داكن دائمًا', 'مريح في الإضاءة الخافتة']].map(([k, t, d]) => `<button class="tvf tv-surah city" data-tvid="look-${k}" onclick="tvSetLook('${k}')"><span><b>${t}</b><small>${d}</small></span>${look === k ? tvI('check') : ''}</button>`).join('')}</div></section>
+  <section><div class="tv-sec"><h2>المظهر</h2><small>الآن: ${TV_PHASE_NAMES[tvPhase()]} · ${tvIsLight() ? 'فاتح' : 'داكن'}</small></div>
+    <div class="tv-looks">${[['auto', 'تلقائي حسب الشمس', 'يتبع الفجر والنهار والعصر والمغرب والليل'], ['light', 'فاتح دائمًا', 'ورق كريمي وخط داكن'], ['dark', 'داكن دائمًا', 'مريح في الإضاءة الخافتة']].map(([k, t, d]) => `<button class="tvf tv-surah city" data-tvid="look-${k}" onclick="tvSetLook('${k}')"><span><b>${t}</b><small>${d}</small></span>${look === k ? tvI('check') : ''}</button>`).join('')}</div></section>
   <section><div class="tv-sec"><h2>القارئ المفضّل</h2><small>يُستخدم عند الاستماع من المصحف</small></div>
     <div class="tv-grid">${tvReciters().map(r => `<button class="tvf tv-surah city" data-tvid="f${r.id}" onclick="localStorage.tvReciter='${r.id}';tvRender()"><span><b>${tvEsc(r.name)}</b></span>${fav === r.id ? tvI('star') : ''}</button>`).join('')}</div></section>
   <section class="tv-about"><img src="images/mushafi-official-icon.png" alt="" onerror="this.remove()"><div><b>مصحفي · Android TV</b><small>مجاني بالكامل وبدون إعلانات · mushafiapp.com</small><small>بيانات الطقس من المعهد النرويجي للأرصاد MET Norway · CC BY 4.0</small></div></section>`;
@@ -307,22 +307,32 @@ const tvWxIcons = {
 // ---------- day / night and the living sky ----------
 function tvLook() { return ['light', 'dark'].includes(localStorage.tvAppearance) ? localStorage.tvAppearance : 'auto' }
 function tvSetLook(k) { try { localStorage.tvAppearance = k } catch (e) {} tvSkyUpdate(true); tvRender() }
-function tvIsDay() {
-  if (TV.forceDay != null) return TV.forceDay;
-  const p = tvPrayer(), now = Date.now();
-  const sr = p.today.find(x => x.key === 'sunrise')?.time, mg = p.today.find(x => x.key === 'maghrib')?.time;
-  if (sr && mg) return now >= sr && now < mg;
-  const h = new Date().getHours(); return h >= 6 && h < 18;
+// Five moments of the day, as on the phone's home sky: dawn, day, afternoon, dusk, night.
+function tvPhase() {
+  if (TV.forcePhase) return TV.forcePhase;
+  if (TV.forceDay != null) return TV.forceDay ? 'day' : 'night';
+  const p = tvPrayer(), now = Date.now(), t = k => p.today.find(x => x.key === k)?.time;
+  const fajr = t('fajr'), sunrise = t('sunrise'), asr = t('asr'), maghrib = t('maghrib'), isha = t('isha');
+  if (!(fajr && sunrise && asr && maghrib && isha)) { const h = new Date().getHours(); return h >= 6 && h < 18 ? 'day' : 'night' }
+  if (now < fajr || now >= isha) return 'night';
+  if (now < sunrise) return 'dawn';
+  if (now < asr) return 'day';
+  if (now < maghrib - 25 * 60000) return 'afternoon';
+  return 'dusk';
 }
+const TV_PHASE_NAMES = { dawn: 'الفجر', day: 'النهار', afternoon: 'العصر', dusk: 'المغرب', night: 'الليل' };
+function tvIsDay() { return ['day', 'afternoon'].includes(tvPhase()) }
 function tvIsLight() { const l = TV.forceLook || tvLook(); return l === 'light' || (l === 'auto' && tvIsDay()) }
 function tvSkyUpdate(force) {
   const tv = document.getElementById('tv'); if (!tv) return;
-  const wx = tvWeather(), kind = wx?.kind || 'clear', day = tvIsDay(), light = tvIsLight();
-  const sig = [kind, day, light, wx?.temp, tvPrayer().city].join('|');
+  const wx = tvWeather(), kind = wx?.kind || 'clear', phase = tvPhase(), day = tvIsDay(), light = tvIsLight();
+  const sig = [kind, phase, light, wx?.temp, tvPrayer().city].join('|');
   if (!force && sig === TV.skySig) return;
   TV.skySig = sig;
   tv.classList.toggle('day', light);
-  tv.classList.toggle('night', !day && !light);
+  tv.classList.toggle('night', phase === 'night' && !light);
+  tv.classList.remove(...[...tv.classList].filter(c => c.startsWith('ph-')));
+  tv.classList.add('ph-' + phase);
   tv.classList.remove(...[...tv.classList].filter(c => c.startsWith('sky-')));
   tv.classList.add('sky-' + kind);
   // The reader follows the same appearance.
@@ -334,7 +344,9 @@ function tvSkyUpdate(force) {
   const sunny = kind === 'clear' || kind === 'partly';
   let h = '';
   if (sunny && day) h += '<div class="sk-rays"></div><div class="sk-sun"></div>';
-  if (sunny && !day) { h += '<div class="sk-moon"></div>'; let r = 7; const R = () => (r = (r * 9301 + 49297) % 233280) / 233280; for (let i = 0; i < 70; i++) h += `<i class="sk-star" style="left:${R() * 100}%;top:${R() * 55}%;--t:${2 + R() * 4}s;--d:-${R() * 5}s;opacity:${.3 + R() * .7}"></i>` }
+  if (phase === 'dusk') h += `<div class="sk-low"></div>${sunny ? '<div class="sk-lowsun"></div>' : ''}`;
+  if (phase === 'dawn') { h += '<div class="sk-dawn"></div>'; if (sunny) { let r = 3; const R = () => (r = (r * 9301 + 49297) % 233280) / 233280; for (let i = 0; i < 40; i++) h += `<i class="sk-star" style="left:${R() * 100}%;top:${R() * 40}%;--t:${2 + R() * 4}s;--d:-${R() * 5}s;opacity:${.15 + R() * .35}"></i>` } }
+  if (sunny && phase === 'night') { h += '<div class="sk-moon"></div>'; let r = 7; const R = () => (r = (r * 9301 + 49297) % 233280) / 233280; for (let i = 0; i < 70; i++) h += `<i class="sk-star" style="left:${R() * 100}%;top:${R() * 55}%;--t:${2 + R() * 4}s;--d:-${R() * 5}s;opacity:${.3 + R() * .7}"></i>` }
   if (kind === 'partly') h += cloud(0, 16, 46, .30, 1, 160, 62) + cloud(0, 30, 30, .18, .8, 220, 150) + cloud(0, 6, 60, .12, 1.8, 260, 30);
   if (kind === 'cloudy' || kind === 'fog' || kind === 'snow') h += cloud(0, 8, 70, .22, 1.8, 200, 60, 'rgba(210,210,225,.9)') + cloud(0, 20, 50, .2, 1.2, 170, 110) + cloud(0, 34, 40, .12, 1, 240, 40) + cloud(0, -2, 90, .14, 2.4, 300, 200, 'rgba(190,190,205,.9)') + cloud(0, 44, 60, .08, 2, 280, 250);
   if (kind === 'rain' || kind === 'thunder') h += cloud(0, 2, 80, .24, 2.2, 220, 70, 'rgba(150,160,180,.9)') + cloud(0, 14, 60, .2, 1.6, 180, 130, 'rgba(140,150,170,.9)') + cloud(0, -6, 100, .16, 3, 260, 20, 'rgba(120,130,150,.9)') + '<div class="sk-rain b"></div><div class="sk-rain"></div>';
@@ -343,7 +355,7 @@ function tvSkyUpdate(force) {
   if (kind === 'fog') h += '<div class="sk-fog"></div><div class="sk-fog b"></div>';
   sky.innerHTML = h;
   const chip = tv.querySelector('.tv-wx');
-  if (chip) chip.innerHTML = wx ? `<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">${tvWxIcons[sunny && !day ? 'night' : kind]}</svg><b dir="ltr">${tvNum(wx.temp)}°</b><span>${tvWxLabel(kind, day)}</span><i></i>` : '';
+  if (chip) chip.innerHTML = wx ? `<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">${tvWxIcons[sunny && phase === 'night' ? 'night' : kind]}</svg><b dir="ltr">${tvNum(wx.temp)}°</b><span>${tvWxLabel(kind, phase !== 'night')}</span><i></i>` : '';
 }
 if (TV_ON) {
   const tvWxBefore = window.onHomeWeather;
@@ -351,6 +363,7 @@ if (TV_ON) {
   const q = new URLSearchParams(location.search);
   if (q.get('tvwx')) { const [k, t] = q.get('tvwx').split(':'); TV.forceWx = { kind: k, temp: +t || 24 }; TV.preview = true }
   if (q.get('tvday')) TV.forceDay = q.get('tvday') === '1';
+  if (q.get('tvphase')) TV.forcePhase = q.get('tvphase');
   if (q.get('tvlook')) TV.forceLook = q.get('tvlook');
 }
 

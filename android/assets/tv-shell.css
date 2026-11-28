@@ -226,3 +226,21 @@ html.tv body.tv-mode #tv.day.sky-rain .sk-cloud{--c:rgba(175,182,195,.95)!import
 #tv.day .tv-prayers .next{background:linear-gradient(135deg,rgba(233,201,119,.45),rgba(185,138,47,.25));border-color:rgba(168,123,38,.5)}
 
 html.tv body.tv-mode #tv.night.sky-clear,html.tv body.tv-mode #tv.night.sky-partly{background:radial-gradient(calc(var(--u)*90) calc(var(--u)*60) at 42% 14%,rgba(200,210,255,.10),transparent 70%),linear-gradient(#141626,#0f101b 55%,#0a0a10)}
+
+/* ---------- five moments of the day (as on the phone's home sky) ---------- */
+html.tv body.tv-mode #tv.ph-dawn:not(.day){background:radial-gradient(calc(var(--u)*110) calc(var(--u)*60) at 72% 105%,rgba(255,200,160,.5),transparent 70%),linear-gradient(#3b4a68,#8c8aa0 55%,#e6b38e)}
+html.tv body.tv-mode #tv.ph-dawn:not(.day):is(.sky-cloudy,.sky-rain,.sky-thunder,.sky-fog,.sky-snow){background:linear-gradient(#323a4e,#6b6b7c 55%,#a99484)}
+html.tv body.tv-mode #tv.ph-dusk:not(.day){background:radial-gradient(calc(var(--u)*120) calc(var(--u)*70) at 24% 80%,rgba(255,158,92,.55),transparent 70%),linear-gradient(#3d3a5c,#8b5f6e 55%,#d98c5f)}
+html.tv body.tv-mode #tv.ph-dusk:not(.day):is(.sky-cloudy,.sky-rain,.sky-thunder,.sky-fog,.sky-snow){background:linear-gradient(#34324a,#6e5560 55%,#a77a5e)}
+html.tv body.tv-mode #tv.day.ph-afternoon{background:radial-gradient(calc(var(--u)*100) calc(var(--u)*70) at 32% 30%,rgba(255,200,110,.45),transparent 70%),linear-gradient(#c4cdbf,#e5d6b4 50%,#efbf88)}
+html.tv body.tv-mode #tv.day.ph-afternoon:is(.sky-cloudy,.sky-rain,.sky-thunder,.sky-fog,.sky-snow){background:linear-gradient(#c9cbc6,#dcd3c0 50%,#d9b997)}
+#tv.ph-afternoon .sk-sun{left:calc(32% - calc(var(--u)*14));top:calc(var(--u)*22);background:radial-gradient(circle,rgba(255,218,140,1) 0 22%,rgba(255,180,80,.5) 36%,rgba(255,170,70,0) 70%)}
+#tv.ph-afternoon .sk-rays{left:calc(32% - calc(var(--u)*40));top:calc(var(--u)*-4)}
+.sk-low{position:absolute;left:calc(24% - calc(var(--u)*60));top:calc(80% - calc(var(--u)*60));width:calc(var(--u)*120);height:calc(var(--u)*120);border-radius:50%;background:radial-gradient(circle,rgba(255,170,100,.45),transparent 65%)}
+.sk-lowsun{position:absolute;left:calc(24% - calc(var(--u)*12));top:calc(80% - calc(var(--u)*12));width:calc(var(--u)*24);height:calc(var(--u)*24);border-radius:50%;background:radial-gradient(circle,#ffdca0 0 30%,rgba(255,150,90,.6) 55%,transparent 72%);animation:skPulse 6s ease-in-out infinite}
+.sk-dawn{position:absolute;left:calc(72% - calc(var(--u)*70));bottom:calc(var(--u)*-50);width:calc(var(--u)*140);height:calc(var(--u)*100);border-radius:50%;background:radial-gradient(circle,rgba(255,205,165,.45),transparent 65%)}
+#tv.ph-dusk:not(.day) .sk-cloud{--c:rgba(245,205,190,.9)!important;opacity:calc(var(--o)*1.8)}
+#tv.ph-dawn:not(.day) .sk-cloud{--c:rgba(235,220,220,.9)!important;opacity:calc(var(--o)*1.8)}
+/* glassier cards over the bright horizon at dawn and dusk */
+#tv:is(.ph-dawn,.ph-dusk):not(.day) :is(.tv-tile,.tv-prayers div,.tv-surah,.tv-person,.tv-np,.tv-about){background:rgba(20,16,28,.32);-webkit-backdrop-filter:blur(calc(var(--u)*2));backdrop-filter:blur(calc(var(--u)*2))}
+#tv:is(.ph-dawn,.ph-dusk):not(.day){--mut:#eadcc0}
