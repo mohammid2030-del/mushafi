@@ -14,7 +14,7 @@ struct LiveView: View {
                     LazyVGrid(columns: columns, spacing: 30) {
                         ForEach(library.radios.dropFirst()) { radio in
                             Button { toggle(radio) } label: { RadioCard(radio: radio, live: player.isPlaying(radio: radio), playing: player.playing) }
-                                .buttonStyle(TileButtonStyle(radius: 24))
+                                .buttonStyle(TileButtonStyle(radius: 24, clear: true))
                         }
                     }
                 }

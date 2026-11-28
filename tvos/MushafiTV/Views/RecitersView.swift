@@ -104,7 +104,7 @@ struct NowPlayingCard: View {
                 }
                 .padding(30)
                 .frame(width: 560)
-                .background(RoundedRectangle(cornerRadius: 26, style: .continuous).fill(.thinMaterial))
+                .background(RoundedRectangle(cornerRadius: 26, style: .continuous).fill(Theme.panel))
                 .overlay(RoundedRectangle(cornerRadius: 26, style: .continuous).stroke(Theme.line))
             }
         }
