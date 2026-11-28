@@ -15,8 +15,10 @@ from PIL import Image
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 OUT = os.path.join(ROOT, 'tvos', 'Pages')
-HEIGHT = int(os.environ.get('PAGE_HEIGHT', '1400'))
+HEIGHT = int(os.environ.get('PAGE_HEIGHT', '1800'))
 PAD = 12  # CSS px around the text block
+# One frame for every page (the 15-line block of the reader), so lines sit at the same height on facing pages.
+FRAME = (90 - 6, 64 - 6, 810 + 6, 1340 + 6)
 LAST = int(os.environ.get('PAGE_LAST', '604'))  # for quick local checks
 
 MEASURE = """(n) => {
@@ -46,13 +48,14 @@ async def main():
             await page.wait_for_function(f"document.querySelector('.page-lines[data-page=\"{n}\"] .qword')", timeout=20000)
             await page.wait_for_timeout(120)
             m = await page.evaluate(MEASURE, n)
-            x0, y0, x1, y1 = m['box']
-            x0 -= PAD; y0 -= PAD; x1 += PAD; y1 += PAD
+            bx0, by0, bx1, by1 = m['box']
+            x0, y0, x1, y1 = FRAME
+            x0, y0, x1, y1 = min(x0, bx0 - 2), min(y0, by0 - 2), max(x1, bx1 + 2), max(y1, by1 + 2)
             w, h = x1 - x0, y1 - y0
             shot = await page.screenshot(type='png', clip={'x': x0, 'y': y0, 'width': w, 'height': h}, omit_background=True)
             img = Image.open(io.BytesIO(shot)).convert('RGBA')
             img = img.resize((round(img.width * HEIGHT / img.height), HEIGHT), Image.LANCZOS)
-            img.save(target, 'WEBP', quality=66, alpha_quality=45, method=6)
+            img.save(target, 'WEBP', quality=62, alpha_quality=45, method=6)
 
             # Verse rectangles: words of one verse on one line merge into one rectangle.
             lines = {}
