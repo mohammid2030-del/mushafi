@@ -112,7 +112,7 @@ jobs:
           shot 3-reader-controls -tvReader 3 -tvPlay 7:2:8 -tvChrome 1 -tvAppearance dark -tvDay 0 -tvWeather clear:19
           shot 4-reciters -tvTab 2 -tvPlay 7:1:2 -tvAppearance light -tvDay 1 -tvWeather partly:24
           shot 5-live -tvTab 3 -tvRadio sa -tvAppearance light -tvDay 1 -tvWeather rain:18
-          shot 6-live-night -tvTab 3 -tvRadio sa -tvAppearance dark -tvDay 0 -tvWeather partly:21
+          shot 6-mushaf -tvTab 1 -tvAppearance dark -tvDay 0 -tvWeather clear:19
           ls -la tvos/shots
           sips -g pixelWidth -g pixelHeight tvos/shots/1-home.png
 
