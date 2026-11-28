@@ -58,9 +58,9 @@ function hlSkyMarkup(data) {
     : `<span>${prayerNames[phase.key]}</span> <span>${hlLeft(phase.target - now, true)}</span>`;
   const weather = hlWeatherChip(), sky = hlSky(today, now), wx = hlWeatherKind(), dark = /night|dawn|dusk/.test(sky);
   const night = hlNightVerse(data, today, now), dua = hlDua(today, now);
-  return `<section class="hl-sky ${sky}${wx ? ' wx wx-' + wx : ''}" aria-label="حالة يومك">
+  return `<section class="hl-sky ${sky}${wx ? ' wx wx-' + wx + (HL_WX_LOOK[wx] ? ' wx-' + HL_WX_LOOK[wx] : '') : ''}" aria-label="حالة يومك">
     <span class="hl-stars" aria-hidden="true"></span>
-    ${hlWeatherLayer(wx, dark)}
+    ${hlWeatherLayer(wx, sky)}
     <div class="hl-sky-top">
       <div class="hl-place"><button class="hl-place-city" onclick="prayerHome()" aria-label="الموقع">${uiIcon('pin')}<span>${esc(hlCityName(s))}</span></button>${weather ? '<i aria-hidden="true"></i>' + weather : ''}</div>
     </div>
@@ -205,14 +205,20 @@ window.onMushafiLaunchDone = function () {
 setTimeout(() => { if (!hlLaunchDone) window.onMushafiLaunchDone() }, window.AndroidReader ? 9000 : 1200);
 
 /* ---------- the sky follows the weather (MET Norway symbol codes from the weather cache) ---------- */
+// Kinds without a sky colour of their own borrow the closest one.
+const HL_WX_LOOK = { showers: 'lightrain', sleet: 'rain', heavysnow: 'snow', drythunder: 'cloudy', dust: 'fog', duststorm: 'cloudy' };
 function hlWeatherKind() {
   try {
     if (window.hlWeatherPreview) return window.hlWeatherPreview;
     const loc = homeWeatherLocation(), c = loc && homeWeatherCache(loc.key), s = String(c?.symbol || '');
     if (!s) return '';
+    if (c?.dust >= 500) return 'duststorm';
+    if (c?.dust >= 150) return 'dust';
     if (/thunder/.test(s)) return 'thunder';
+    if (/sleet/.test(s)) return 'sleet';
+    if (/heavysnow/.test(s)) return 'heavysnow';
     if (/snow/.test(s)) return 'snow';
-    if (/sleet/.test(s)) return 'rain';
+    if (/rainshowers/.test(s)) return 'showers';
     if (/heavyrain/.test(s)) return 'heavyrain';
     if (/lightrain/.test(s)) return 'lightrain';
     if (/rain/.test(s)) return 'rain';
@@ -223,19 +229,57 @@ function hlWeatherKind() {
     return 'clear'
   } catch (e) { return '' }
 }
-function hlCloud(cls) {
-  return `<svg class="hl-cloud ${cls}" viewBox="0 0 220 90" aria-hidden="true"><path d="M30 78h150a32 32 0 0 0 4-63.7A44 44 0 0 0 103 18a30 30 0 0 0-48 18A22 22 0 0 0 30 78Z"/></svg>`
-}
-function hlWeatherLayer(kind, dark) {
-  if (!kind || kind === 'clear') return '';
-  const clouds = { fair: ['c1'], partly: ['c1 sun-veil', 'c2'], cloudy: ['c1', 'c2', 'c3', 'c4'], fog: ['c2', 'c3'],
-    lightrain: ['c1', 'c2', 'c3'], rain: ['c1', 'c2', 'c3', 'c4'], heavyrain: ['c1', 'c2', 'c3', 'c4', 'c5'],
-    thunder: ['c1', 'c2', 'c3', 'c4', 'c5'], snow: ['c1', 'c2', 'c3'] }[kind] || [];
-  const rain = /rain|thunder/.test(kind) ? '<span class="hl-rain back"></span><span class="hl-rain front"></span>' : '';
-  const snow = kind === 'snow' ? '<span class="hl-snow back"></span><span class="hl-snow front"></span>' : '';
-  const fog = kind === 'fog' ? '<span class="hl-fog f1"></span><span class="hl-fog f2"></span>' : '';
-  const flash = kind === 'thunder' ? '<span class="hl-flash"></span>' : '';
-  return `<div class="hl-wx" aria-hidden="true">${clouds.map(hlCloud).join('')}${fog}${rain}${snow}${flash}</div>`
+// The living sky (same as Apple TV): sun and rays, moon and stars, clouds drifting right across, separate rain drops, snow, fog, dust and lightning.
+function hlWeatherLayer(kind, phase) {
+  kind = kind || 'clear'; phase = phase || 'day';
+  const sunny = /clear|fair|partly/.test(kind), wet = /rain|thunder/.test(kind);
+  const cloud = (y, w, o, b, t, d, c) => `<div class="ps-cloud" style="top:calc(var(--hl-lift,0px) + ${y}px);--w:${w}px;--o:${o};--b:${b}px;--t:${t}s;--d:-${d}s;${c ? '--c:' + c : ''}"><i></i></div>`;
+  let h = '';
+  if (sunny && (phase === 'day' || phase === 'afternoon')) h += '<div class="ps-rays"></div><div class="ps-sun"></div>';
+  if (phase === 'dusk') h += '<div class="ps-low"></div>' + (sunny ? '<div class="ps-lowsun"></div>' : '');
+  if (phase === 'dawn') h += '<div class="ps-dawn"></div>';
+  if (sunny && (phase === 'night' || phase === 'dawn')) {
+    if (phase === 'night') h += '<div class="ps-moon"></div>';
+    let r = 5; const R = () => (r = (r * 9301 + 49297) % 233280) / 233280;
+    for (let i = 0; i < 60; i++) h += `<i class="ps-star" style="left:${R() * 100}%;top:${R() * 70}%;--t:${2 + R() * 4}s;--d:-${R() * 5}s;opacity:${(phase === 'dawn' ? .3 : .5) + R() * .5}"></i>`;
+  }
+  const dark = /night|dawn|dusk/.test(phase);
+  const thunder = /thunder/.test(kind), showers = kind === 'showers';
+  const rainy = /rain|thunder|showers|sleet/.test(kind) && kind !== 'drythunder', snowy = /snow|sleet/.test(kind);
+  const heavy = /heavy|thunder/.test(kind) && kind !== 'drythunder';
+  const tone = heavy ? (dark ? 'rgba(96,100,118,.97)' : 'rgba(132,138,154,.97)') : (rainy || snowy || kind === 'cloudy' || kind === 'drythunder') ? (dark ? 'rgba(140,146,162,.95)' : 'rgba(186,192,204,.95)') : phase === 'dusk' ? 'rgba(248,208,192,.95)' : phase === 'dawn' ? 'rgba(236,222,222,.95)' : dark ? 'rgba(214,214,228,.95)' : 'rgba(255,255,255,.96)';
+  const op = dark ? 0.36 : 0.85;
+  if (showers && !dark) h += '<div class="ps-rays"></div><div class="ps-sun"></div>';
+  if (showers && dark) h += '<div class="ps-moon"></div>';
+  if (kind === 'partly' || kind === 'fair' || showers) h += cloud(150, 230, op, 5, 60, 30, tone) + cloud(60, 160, op * .7, 4, 85, 10, tone) + cloud(300, 190, op * .55, 6, 105, 70, tone);
+  if (kind === 'cloudy' || ((rainy || snowy || kind === 'drythunder') && !showers)) h += cloud(40, 300, op, 7, 90, 40, tone) + cloud(170, 240, op * .9, 6, 75, 20, tone) + cloud(300, 220, op * .7, 6, 110, 60, tone) + cloud(-10, 360, op * .6, 9, 130, 100, tone);
+  let r = 11; const R = () => (r = (r * 9301 + 49297) % 233280) / 233280;
+  if (rainy && kind !== 'sleet' || kind === 'sleet') {
+    const n = kind === 'sleet' ? 45 : /light/.test(kind) || showers ? 45 : heavy ? 160 : 90; let d = '';
+    for (let i = 0; i < n; i++) { const near = R() < .3; d += `<i class="ps-drop" style="left:${(showers ? 15 + R() * 70 : R() * 120)}%;--dw:${near ? 2 : 1.2}px;--h:${near ? 22 + R() * 10 : 11 + R() * 8}px;--a:${near ? .55 : .3 + R() * .2};--t:${(near ? .55 + R() * .15 : .8 + R() * .3) * (heavy ? .85 : 1)}s;--d:-${R() * 2}s"></i>` }
+    h += `<div class="ps-rain">${d}</div>`;
+  }
+  if (snowy) {
+    const n = kind === 'sleet' ? 30 : kind === 'heavysnow' ? 110 : 65; let d = '';
+    for (let i = 0; i < n; i++) { const near = R() < .3; d += `<i class="ps-flake" style="left:${R() * 104 - 2}%;--s:${near ? 7 + R() * 4 : 3 + R() * 3}px;--a:${near ? .95 : .55 + R() * .3};--t:${near ? 6 + R() * 2 : 9 + R() * 5}s;--d:-${R() * 12}s"></i>` }
+    h += `<div class="ps-rain">${d}</div>`;
+  }
+  if (kind === 'fog') h += '<div class="ps-haze"></div>' + [[40, 200, .9, 26, 0], [180, 220, .95, 34, 14], [320, 200, .85, 30, 20], [-30, 180, .8, 40, 8], [430, 160, .7, 36, 4]].map(([y, hh, a, t, d]) => `<div class="ps-fog" style="--y:${y}px;--h:${hh}px;--a:${dark ? a * .5 : a};--t:${t}s;--d:-${d}s"></div>`).join('');
+  if (/dust/.test(kind)) {
+    const storm = kind === 'duststorm';
+    h += `<div class="ps-dusttint" style="--a:${storm ? (dark ? .5 : .62) : (dark ? .25 : .34)}"></div>`;
+    if (!storm) h += `<div class="ps-dimsun${dark ? ' moon' : ''}"></div>`;
+    h += [[30, 200, .7, 18, 0], [170, 230, .8, 24, 9], [310, 210, .7, 21, 4], [440, 180, .55, 27, 13]].map(([y, hh, a, t, d]) => `<div class="ps-dband" style="--y:${y}px;--h:${hh}px;--a:${a * (storm ? 1 : .55)};--t:${storm ? t * .5 : t}s;--d:-${d}s"></div>`).join('');
+    let g = ''; const n = storm ? 120 : 45;
+    for (let i = 0; i < n; i++) g += `<i class="ps-grain" style="--y:${R() * 520 - 20}px;--l:${20 + R() * 50}px;--a:${.35 + R() * .45};--dy:${R() * 40 - 10}px;--t:${(storm ? .6 : 1.4) + R() * (storm ? .6 : 1.4)}s;--d:-${R() * 3}s"></i>`;
+    h += `<div class="ps-rain">${g}</div>`;
+  }
+  if (thunder) {
+    const bolt = (x, t, d) => `<svg class="ps-bolt" style="left:${x}%;--t:${t}s;--d:${d}s" viewBox="0 0 90 230"><path d="M52 0 L40 52 L56 60 L30 120 L46 126 L22 230"/><path class="br" d="M40 52 L18 84 L24 104"/><path class="br" d="M30 120 L60 150 L58 176"/></svg>`;
+    if (kind === 'drythunder') h += `<div class="ps-flash far" style="--fx:30%;--t:8s;--d:-1s"></div><div class="ps-flash far" style="--fx:75%;--t:11s;--d:-6s"></div>`;
+    else h += `<div class="ps-flash" style="--fx:72%;--t:7s;--d:-1s"></div>${bolt(80, 7, -1)}<div class="ps-flash" style="--fx:22%;--t:10s;--d:-7s"></div>${bolt(-4, 10, -7)}`;
+  }
+  return `<div class="hl-wx" aria-hidden="true">${h}</div>`
 }
 // Sun path from Fajr (right) to Isha (left); dots mark each prayer, the marker shows now.
 function hlArc(today, now) {
@@ -383,7 +427,11 @@ function hlRefresh() {
   const signature = Math.floor(Date.now() / 30000) + '|' + JSON.stringify(data?.settings?.city || '') + '|' + (data?.days?.[0]?.fajr || 0);
   if (!sky || sky.dataset.sig === signature) return;
   sky.dataset.sig = signature;
+  // Keep the running sky when the weather has not changed, so clouds keep drifting instead of jumping back.
+  const keep = sky.querySelector('.hl-wx');
   sky.innerHTML = hlSkyMarkup(data);
+  const fresh = sky.querySelector('.hl-wx');
+  if (keep && fresh && keep.innerHTML === fresh.innerHTML) fresh.replaceWith(keep);
   if (times) times.innerHTML = hlTimesMarkup(data);
   uiLocalize?.(sky); if (times) uiLocalize?.(times);
   hlLift(); hlAnimate(sky)
