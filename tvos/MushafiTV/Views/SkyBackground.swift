@@ -16,6 +16,10 @@ struct SkyBackground: View {
                     Self.draw(&ctx, size: size, t: t, light: light, phase: phase, kind: kind)
                 }
             }
+            // Dawn and dusk: deepen the bright horizon behind the cards so cream text stays readable.
+            if !light && (phase == .dawn || phase == .dusk) {
+                LinearGradient(stops: [.init(color: .clear, location: 0.35), .init(color: .black.opacity(0.42), location: 1)], startPoint: .top, endPoint: .bottom)
+            }
         }
         .ignoresSafeArea()
         .environment(\.layoutDirection, .leftToRight)
