@@ -12,7 +12,7 @@ struct MushafIndexView: View {
                     VStack(alignment: .leading, spacing: 10) {
                         Eyebrow(text: "المصحف الشريف")
                         Text("سور القرآن الكريم").font(.system(size: 64, weight: .heavy)).foregroundStyle(Theme.ink)
-                        Text("١١٤ سورة · ٦٠٤ صفحة برواية حفص عن عاصم").font(.system(size: 25, weight: .medium)).foregroundStyle(Theme.muted)
+                        Text("114 سورة · 604 صفحة برواية حفص عن عاصم").font(.system(size: 25, weight: .medium)).foregroundStyle(Theme.muted)
                     }
                     Spacer()
                     Button { state.open(page: state.lastPage) } label: {
@@ -158,7 +158,7 @@ struct ReaderView: View {
             .environment(\.layoutDirection, .leftToRight)
             .animation(.easeInOut(duration: 0.25), value: player.ayah)
         } else {
-            Text("صفحة \(number.ar)").font(.system(size: 36, weight: .bold)).foregroundStyle(Theme.muted)
+            Text("صفحة \(number.mushaf)").font(.system(size: 36, weight: .bold)).foregroundStyle(Theme.muted)
         }
     }
 
@@ -169,9 +169,9 @@ struct ReaderView: View {
         let names = Set([right, left].compactMap { library.info(page: $0)?.s }).sorted().compactMap { library.chapter($0)?.name }
         return HStack(spacing: 14) {
             chip(names.map { "سورة " + $0 }.joined(separator: " · "))
-            chip("الجزء \((info?.juz ?? 1).ar)")
+            chip("الجزء \((info?.juz ?? 1).mushaf)")
             Spacer()
-            chip("الصفحتان \(right.ar) – \(left.ar) من ٦٠٤")
+            chip("الصفحتان \(right.mushaf) – \(left.mushaf) من ٦٠٤")
         }
         .padding(.horizontal, 70)
         .padding(.top, 36)
@@ -190,7 +190,7 @@ struct ReaderView: View {
                 HStack(spacing: 18) {
                     Monogram(name: player.subtitle, id: player.reciterId, size: 64, active: true)
                     VStack(alignment: .leading, spacing: 4) {
-                        Text("\(player.title) · الآية \(max(1, player.ayah).ar)").font(.system(size: 27, weight: .bold)).foregroundStyle(Theme.ink)
+                        Text("\(player.title) · الآية \(max(1, player.ayah).mushaf)").font(.system(size: 27, weight: .bold)).foregroundStyle(Theme.ink)
                         Text(player.subtitle).font(.system(size: 21)).foregroundStyle(Theme.muted)
                     }
                     ProgressView(value: player.progress).tint(Theme.gold)

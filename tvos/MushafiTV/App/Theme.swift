@@ -43,10 +43,21 @@ extension Color {
 
 /// Arabic-Indic digits for numbers shown in Arabic text.
 extension Int {
-    var ar: String { String(self).arDigits }
+    /// Western digits (1 2 3) everywhere in the app…
+    var ar: String { String(self) }
+    /// …except inside the Mushaf reader, which keeps Arabic-Indic digits (١ ٢ ٣) like the printed page.
+    var mushaf: String { String(self).arDigits }
 }
 
 extension String {
+    /// Western digits whatever the formatter produced (Arabic locales may give ١٢٣).
+    var latinDigits: String {
+        String(map { c in
+            guard let d = c.wholeNumberValue, !c.isASCII else { return c }
+            return Character(UnicodeScalar(0x30 + d)!)
+        })
+    }
+
     /// Arabic-Indic digits (٠١٢…) whatever the device's number setting.
     var arDigits: String {
         String(map { c in

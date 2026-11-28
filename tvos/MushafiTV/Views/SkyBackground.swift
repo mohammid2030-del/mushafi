@@ -192,7 +192,7 @@ struct SkyBackground: View {
     }
 }
 
-/// «٢٤° غائم جزئيًا · الرياض» shown at the top of the home screen.
+/// «24° غائم جزئيًا · الرياض» shown at the top of the home screen.
 struct WeatherChip: View {
     @EnvironmentObject private var weather: WeatherModel
     @EnvironmentObject private var appearance: AppearanceModel

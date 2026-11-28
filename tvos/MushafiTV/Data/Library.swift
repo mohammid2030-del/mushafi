@@ -107,7 +107,7 @@ final class Library {
 
     /// The same verse all day, changing at midnight.
     func verseOfTheDay(_ date: Date = Date()) -> (text: String, reference: String) {
-        guard !daily.order.isEmpty else { return ("فَإِنَّ مَعَ ٱلْعُسْرِ يُسْرًا", "الشرح · ٥") }
+        guard !daily.order.isEmpty else { return ("فَإِنَّ مَعَ ٱلْعُسْرِ يُسْرًا", "الشرح · 5") }
         let day = Calendar(identifier: .gregorian).ordinality(of: .day, in: .era, for: date) ?? 0
         let key = daily.order[day % daily.order.count]
         let ayah = Int(key.split(separator: ":").last ?? "") ?? 0
