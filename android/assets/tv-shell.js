@@ -69,6 +69,8 @@ function tvReciters() {
   const ids = Object.keys(surahCatalog || {});
   return [...order.filter(i => ids.includes(i)), ...ids.filter(i => !order.includes(i))].map(id => ({ id, name: surahCatalog[id].name, style: String(surahCatalog[id].style || '').replace(' · MP3Quran', '') }));
 }
+// Same portraits as the phone app (surahReaderPortraits in surah-player.js); a gold letter otherwise.
+function tvFace(r) { const f = typeof surahReaderPortraits !== 'undefined' && surahReaderPortraits[r.id]; return f ? `<img src="images/${f}.png" alt="">` : tvEsc(r.name[0]) }
 function tvFavReciter() { return String(localStorage.tvReciter || localStorage.surahReader || 7) }
 function tvSurahPlaying() { return ['playing', 'loading', 'buffering'].includes(surahState?.status) }
 function tvSurahActive() { return surahState && surahState.status && surahState.status !== 'stopped' }
@@ -156,7 +158,7 @@ function tvRecitersView() {
   const ch = chapters[(surahState?.chapter || 1) - 1];
   const key = surahState?.key || '', [ks, kv] = key.split(':').map(Number);
   const verse = active && ks ? chapters[ks - 1]?.verses[kv - 1]?.text_uthmani : '';
-  return `<section class="tv-np"><div class="tv-av big">${tvEsc(r.name[0])}</div>
+  return `<section class="tv-np"><div class="tv-av big">${tvFace(r)}</div>
     <div class="tv-np-t"><span class="tv-eyebrow">${active ? (tvSurahPlaying() ? 'يُتلى الآن' : 'متوقف مؤقتًا') : 'ابدأ الاستماع'}</span><h2>${tvEsc(r.name)}</h2>
       <p>${active ? 'سورة ' + tvEsc(ch.name_arabic) + ' · ' + tvEsc(r.style) : 'اختر قارئًا ثم السورة التي تحب سماعها'}</p>
       <div class="tv-acts">${active ? `<button class="tvf tv-btn icon" data-tvid="np-prev" onclick="skipFullSurah(-1)">${tvI('prev')}</button>
@@ -165,13 +167,13 @@ function tvRecitersView() {
       : `<button class="tvf tv-btn primary" data-tvid="np-start" onclick="tvPlay('${r.id}',1)">${tvI('play')}استمع للفاتحة</button>`}</div></div>
     ${verse ? `<div class="tv-np-v"><small>الآية ${tvNum(kv)} من ${tvNum(chapters[ks - 1].verses_count)}</small><p>${tvEsc(verse)}</p><div class="tv-prog"><i></i></div></div>` : ''}</section>
   <section><div class="tv-sec"><h2>القرّاء</h2><small>${tvNum(list.length)} قرّاء · تلاوة السورة كاملة</small></div>
-    <div class="tv-people">${list.map(x => `<button class="tvf tv-person ${x.id === rid ? 'cur' : ''}" data-tvid="r${x.id}" onclick="tvReciterPage('${x.id}')"><span class="tv-av">${tvEsc(x.name[0])}</span><b>${tvEsc(x.name)}</b><small>${tvEsc(x.style)}</small></button>`).join('')}</div></section>`;
+    <div class="tv-people">${list.map(x => `<button class="tvf tv-person ${x.id === rid ? 'cur' : ''}" data-tvid="r${x.id}" onclick="tvReciterPage('${x.id}')"><span class="tv-av">${tvFace(x)}</span><b>${tvEsc(x.name)}</b><small>${tvEsc(x.style)}</small></button>`).join('')}</div></section>`;
 }
 function tvReciterPage(id) {
   const r = tvReciters().find(x => x.id === id); if (!r) return;
   TV.tab = 'reciter:' + id;
   const main = document.querySelector('.tv-main');
-  main.innerHTML = `<section class="tv-head"><div class="tv-who"><span class="tv-av">${tvEsc(r.name[0])}</span><div><h1 class="sm">${tvEsc(r.name)}</h1><p class="tv-info">${tvEsc(r.style)}</p></div></div>
+  main.innerHTML = `<section class="tv-head"><div class="tv-who"><span class="tv-av">${tvFace(r)}</span><div><h1 class="sm">${tvEsc(r.name)}</h1><p class="tv-info">${tvEsc(r.style)}</p></div></div>
     <button class="tvf tv-btn" data-tvid="fav" onclick="tvSetFav('${id}',this)">${tvI(tvFavReciter() === id ? 'check' : 'star')}${tvFavReciter() === id ? 'القارئ المفضّل' : 'اجعله القارئ المفضّل'}</button></section>
     <div class="tv-grid">${chapters.map(c => `<button class="tvf tv-surah" data-tvid="p${c.id}" onclick="tvPlay('${id}',${c.id});tvGo('reciters')"><span class="n">${tvNum(c.id)}</span><span><b>${tvEsc(c.name_arabic)}</b><small>${tvNum(c.verses_count)} آية</small></span></button>`).join('')}</div>`;
   main.scrollTop = 0;
