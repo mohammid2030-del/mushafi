@@ -218,3 +218,48 @@ struct WeatherChip: View {
         .overlay(Capsule().stroke(Theme.line, lineWidth: 1))
     }
 }
+
+/// The bar around the tabs, laid out like the Android TV app: Mushafi's mark on the right,
+/// weather, city and time on the left. Not focusable; it never takes the remote.
+struct TopBar: View {
+    @EnvironmentObject private var weather: WeatherModel
+    @EnvironmentObject private var appearance: AppearanceModel
+    @EnvironmentObject private var prayer: PrayerModel
+
+    var body: some View {
+        VStack {
+            HStack(spacing: 16) {
+                HStack(spacing: 16) {
+                    Image("Logo").resizable().scaledToFit().frame(width: 60, height: 60)
+                        .clipShape(RoundedRectangle(cornerRadius: 15, style: .continuous))
+                        .shadow(color: .black.opacity(0.35), radius: 8, y: 4)
+                    Text("مصحفي").font(.system(size: 34, weight: .heavy)).foregroundStyle(Theme.gold)
+                }
+                Spacer()
+                HStack(spacing: 14) {
+                    if weather.kind != nil {
+                        Image(systemName: weather.symbol(day: appearance.phase != .night))
+                            .symbolRenderingMode(.multicolor).font(.system(size: 30, weight: .semibold))
+                        if let temp = weather.temperature {
+                            Text("\(temp.ar)°").font(.system(size: 28, weight: .heavy)).foregroundStyle(Theme.ink)
+                        }
+                        Text(weather.label(day: appearance.phase != .night)).font(.system(size: 22, weight: .medium)).foregroundStyle(Theme.muted)
+                        Circle().fill(Theme.gold).frame(width: 5, height: 5)
+                    }
+                    Text(prayer.city).font(.system(size: 23, weight: .medium)).foregroundStyle(Theme.muted)
+                    Circle().fill(Theme.gold).frame(width: 5, height: 5)
+                    TimelineView(.periodic(from: .now, by: 20)) { context in
+                        Text(context.date.clock(prayer.zone)).font(.system(size: 28, weight: .bold)).foregroundStyle(Theme.ink)
+                            .environment(\.layoutDirection, .leftToRight)
+                    }
+                }
+                .lineLimit(1)
+            }
+            .padding(.horizontal, 90)
+            .padding(.top, 44)
+            Spacer()
+        }
+        .allowsHitTesting(false)
+        .focusable(false)
+    }
+}

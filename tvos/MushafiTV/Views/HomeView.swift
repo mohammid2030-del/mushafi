@@ -9,7 +9,6 @@ struct HomeView: View {
     var body: some View {
         ScrollView(.vertical) {
             VStack(alignment: .leading, spacing: 56) {
-                HStack { Spacer(); WeatherChip() }.padding(.bottom, -40)
                 hero
                 today
                 prayerStrip

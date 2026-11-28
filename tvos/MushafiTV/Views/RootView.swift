@@ -19,6 +19,7 @@ struct RootView: View {
                 LiveView().tabItem { Text("البث المباشر") }.tag(Tab.live)
                 SettingsView().tabItem { Text("الإعدادات") }.tag(Tab.settings)
             }
+            TopBar()
         }
         .fullScreenCover(item: $state.reader) { request in
             ReaderView(startPage: request.page)
