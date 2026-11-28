@@ -115,6 +115,19 @@ final class Library {
     }
 
     /// Pre-rendered page from the app's own Mushaf (same font, frames and ornaments).
+    /// Reciter portraits bundled from the phone app (android/assets/images).
+    private static let portraits = ["7": "mishary-alafasy", "133": "maher-almuaiqly", "6": "mahmoud-alhusary", "2": "abdulbasit-abdulsamad",
+                                    "3": "abdurrahman-as-sudais", "1001": "ali-alhudhaifi", "1002": "muhammad-ayyub", "1003": "khalid-almuhanna",
+                                    "1004": "ibrahim-alakhdar", "1005": "ahmad-alnafees"]
+    private var portraitCache: [String: UIImage] = [:]
+    func portrait(_ id: String) -> UIImage? {
+        if let cached = portraitCache[id] { return cached }
+        guard let name = Self.portraits[id], let url = Bundle.main.url(forResource: name, withExtension: "png"),
+              let image = UIImage(contentsOfFile: url.path) else { return nil }
+        portraitCache[id] = image
+        return image
+    }
+
     func image(page: Int) -> UIImage? {
         let key = NSNumber(value: page)
         if let cached = images.object(forKey: key) { return cached }

@@ -39,6 +39,26 @@ targets:
         buildPhase: resources
       - path: ../android/assets/quran.ttf
         buildPhase: resources
+      - path: ../android/assets/images/mishary-alafasy.png
+        buildPhase: resources
+      - path: ../android/assets/images/maher-almuaiqly.png
+        buildPhase: resources
+      - path: ../android/assets/images/mahmoud-alhusary.png
+        buildPhase: resources
+      - path: ../android/assets/images/abdulbasit-abdulsamad.png
+        buildPhase: resources
+      - path: ../android/assets/images/abdurrahman-as-sudais.png
+        buildPhase: resources
+      - path: ../android/assets/images/ali-alhudhaifi.png
+        buildPhase: resources
+      - path: ../android/assets/images/muhammad-ayyub.png
+        buildPhase: resources
+      - path: ../android/assets/images/khalid-almuhanna.png
+        buildPhase: resources
+      - path: ../android/assets/images/ibrahim-alakhdar.png
+        buildPhase: resources
+      - path: ../android/assets/images/ahmad-alnafees.png
+        buildPhase: resources
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.mohammedasif.mushafi

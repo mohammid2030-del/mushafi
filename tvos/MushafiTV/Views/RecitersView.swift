@@ -39,7 +39,7 @@ struct ReciterBubble: View {
     @Environment(\.tileFocused) private var focused
     var body: some View {
         VStack(spacing: 16) {
-            Monogram(name: reciter.name, size: 176, active: focused || current)
+            Monogram(name: reciter.name, id: reciter.id, size: 176, active: focused || current)
             Text(reciter.name).font(.system(size: 24, weight: .bold)).multilineTextAlignment(.center).lineLimit(2)
                 .foregroundStyle(focused ? Theme.gold : Theme.ink)
             Text(reciter.style).font(.system(size: 18)).foregroundStyle(Theme.muted).lineLimit(1)
@@ -73,7 +73,7 @@ struct NowPlayingCard: View {
     var body: some View {
         let reciter = player.reciterId.flatMap { library.reciter($0) } ?? state.reciter
         HStack(spacing: 54) {
-            Monogram(name: reciter?.name ?? "م", size: 230, active: true)
+            Monogram(name: reciter?.name ?? "م", id: reciter?.id, size: 230, active: true)
             VStack(alignment: .leading, spacing: 12) {
                 Eyebrow(text: player.surah != nil ? (player.playing ? "يُتلى الآن" : "متوقف مؤقتًا") : "ابدأ الاستماع")
                 Text(reciter?.name ?? "").font(.system(size: 58, weight: .heavy)).foregroundStyle(Theme.ink).lineLimit(1)
@@ -131,7 +131,7 @@ struct ReciterSurahsView: View {
             ScrollView(.vertical) {
                 VStack(alignment: .leading, spacing: 36) {
                     HStack(spacing: 34) {
-                        Monogram(name: reciter.name, size: 150, active: true)
+                        Monogram(name: reciter.name, id: reciter.id, size: 150, active: true)
                         VStack(alignment: .leading, spacing: 8) {
                             Text(reciter.name).font(.system(size: 56, weight: .heavy))
                             Text(reciter.style).font(.system(size: 24)).foregroundStyle(Theme.muted)

@@ -152,20 +152,31 @@ struct Eyebrow: View {
     }
 }
 
-/// Gold monogram for a reciter (first letter of the name; no photos).
+/// The reciter's photo (same portraits as the phone app) in a round frame, or a gold monogram if none.
 struct Monogram: View {
     let name: String
+    var id: String? = nil
     var size: CGFloat = 170
     var active = false
     var body: some View {
-        Text(String(name.first ?? "م"))
-            .font(.system(size: size * 0.36, weight: .heavy))
-            .foregroundStyle(active ? Color.black : Theme.gold)
-            .frame(width: size, height: size)
-            .background(Circle().fill(active ? AnyShapeStyle(Theme.goldGradient)
-                                             : AnyShapeStyle(LinearGradient(colors: [Color(light: (1, 0.97, 0.9), dark: (0.23, 0.2, 0.15)), Color(light: (0.93, 0.87, 0.74), dark: (0.11, 0.1, 0.075))],
-                                                                            startPoint: .topLeading, endPoint: .bottomTrailing))))
-            .overlay(Circle().stroke(Theme.gold.opacity(active ? 0 : 0.3), lineWidth: 1))
+        Group {
+            if let id, let photo = Library.shared.portrait(id) {
+                Image(uiImage: photo).resizable().scaledToFill()
+                    .frame(width: size, height: size, alignment: .top)
+                    .clipShape(Circle())
+                    .overlay(Circle().stroke(active ? AnyShapeStyle(Theme.goldGradient) : AnyShapeStyle(Theme.gold.opacity(0.35)), lineWidth: active ? 5 : 1.5))
+            } else {
+                Text(String(name.first ?? "م"))
+                    .font(.system(size: size * 0.36, weight: .heavy))
+                    .foregroundStyle(active ? Color.black : Theme.gold)
+                    .frame(width: size, height: size)
+                    .background(Circle().fill(active ? AnyShapeStyle(Theme.goldGradient)
+                                                     : AnyShapeStyle(LinearGradient(colors: [Color(light: (1, 0.97, 0.9), dark: (0.23, 0.2, 0.15)), Color(light: (0.93, 0.87, 0.74), dark: (0.11, 0.1, 0.075))],
+                                                                                    startPoint: .topLeading, endPoint: .bottomTrailing))))
+                    .overlay(Circle().stroke(Theme.gold.opacity(active ? 0 : 0.3), lineWidth: 1))
+            }
+        }
+        .frame(width: size, height: size)
     }
 }
 
