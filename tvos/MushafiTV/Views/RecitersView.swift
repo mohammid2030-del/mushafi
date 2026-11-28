@@ -104,17 +104,13 @@ struct NowPlayingCard: View {
                 }
                 .padding(30)
                 .frame(width: 560)
-                .background(RoundedRectangle(cornerRadius: 26, style: .continuous).fill(Theme.panel))
+                .background(RoundedRectangle(cornerRadius: 26, style: .continuous).fill(.thinMaterial))
                 .overlay(RoundedRectangle(cornerRadius: 26, style: .continuous).stroke(Theme.line))
             }
         }
         .padding(.horizontal, 56)
         .padding(.vertical, 44)
-        .background(
-            RoundedRectangle(cornerRadius: 36, style: .continuous)
-                .fill(LinearGradient(colors: [Theme.gold.opacity(0.2), Color.white.opacity(0.03)], startPoint: .leading, endPoint: .trailing))
-        )
-        .overlay(RoundedRectangle(cornerRadius: 36, style: .continuous).stroke(Theme.gold.opacity(0.25)))
+        .glassPanel()
     }
 }
 

@@ -165,7 +165,7 @@ struct PageStack: View {
 
     @ViewBuilder private func pageImage(_ image: UIImage?) -> some View {
         Group {
-            if let image { MushafPageImage(image: image) }
+            if let image { MushafPageImage(image: image).padding(.horizontal, 26).padding(.vertical, 34).background(Paper.color) }
             else { RoundedRectangle(cornerRadius: 14).fill(Color.black).aspectRatio(0.643, contentMode: .fit) }
         }
         .frame(height: 450)

@@ -49,15 +49,7 @@ struct LiveView: View {
         }
         .padding(50)
         .frame(height: 430)
-        .background(
-            ZStack {
-                RoundedRectangle(cornerRadius: 36, style: .continuous)
-                    .fill(LinearGradient(colors: [Color(light: (1, 0.97, 0.9), dark: (0.165, 0.141, 0.098)), Color(light: (0.94, 0.88, 0.76), dark: (0.08, 0.066, 0.047))], startPoint: .topLeading, endPoint: .bottomTrailing))
-                RoundedRectangle(cornerRadius: 36, style: .continuous)
-                    .fill(RadialGradient(colors: [Theme.gold.opacity(0.32), .clear], center: UnitPoint(x: 0.85, y: 0.2), startRadius: 0, endRadius: 700))
-            }
-        )
-        .overlay(RoundedRectangle(cornerRadius: 36, style: .continuous).stroke(Theme.gold.opacity(0.3)))
+        .glassPanel()
     }
 
     private func toggle(_ radio: Radio) {
@@ -76,7 +68,7 @@ struct RadioCard: View {
                 HStack(spacing: 8) {
                     Circle().fill(Color(red: 1, green: 0.42, blue: 0.37)).frame(width: 9, height: 9)
                     Text(live ? "تستمع الآن" : "مباشر").font(.system(size: 18, weight: .heavy))
-                        .foregroundStyle(focused ? Color(red: 0.48, green: 0.12, blue: 0.12) : Color(red: 1, green: 0.62, blue: 0.57))
+                        .foregroundStyle(focused ? Color(red: 0.48, green: 0.12, blue: 0.12) : Color(light: (0.78, 0.2, 0.18), dark: (1, 0.62, 0.57)))
                 }
                 Spacer()
                 if live { Equalizer(color: focused ? .black : Theme.gold, playing: playing) }

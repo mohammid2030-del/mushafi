@@ -55,129 +55,197 @@ struct SurahCard: View {
     }
 }
 
-/// Two-page spread like the printed Mushaf: the odd page on the right. Left/right on the remote turns pages,
-/// Play/Pause recites from the first verse of the spread, and the pages follow the recitation.
+/// Night and day paper of the reader; the page images have no background of their own.
+enum Paper {
+    static let color = Color(light: (0.969, 0.945, 0.894), dark: (0.063, 0.063, 0.075))
+}
+
+/// Two-page spread like the printed Mushaf (odd page on the right), filling the screen height.
+/// Remote: left/right turn pages, Play/Pause recites, a click (or up/down) shows the controls for five seconds:
+/// verse back/forward, play/pause, choose a surah, choose a reciter. The verse being recited is highlighted.
 struct ReaderView: View {
     @EnvironmentObject private var state: AppState
     @EnvironmentObject private var player: AudioPlayer
     @Environment(\.dismiss) private var dismiss
     @State private var spread: Int
-    @State private var showHints = true
+    @State private var chrome = true
+    @State private var hideTask: Task<Void, Never>?
+    @State private var picker: Picker?
+    @FocusState private var focus: Control?
     private let library = Library.shared
+
+    enum Control: Hashable { case pages, surah, prev, play, next, reciter }
+    enum Picker: String, Identifiable { case surah, reciter; var id: String { rawValue } }
 
     init(startPage: Int) { _spread = State(initialValue: startPage % 2 == 1 ? startPage : startPage - 1) }
 
     private var right: Int { spread }
     private var left: Int { min(604, spread + 1) }
+    private var reciting: Bool { if case .surah? = player.item { return true }; return false }
 
     var body: some View {
         ZStack {
-            Color(light: (0.976, 0.953, 0.898), dark: (0.07, 0.065, 0.075)).ignoresSafeArea()
-            HStack(spacing: 0) {
-                page(right)
-                Rectangle().fill(Theme.gold.opacity(0.18)).frame(width: 1).padding(.vertical, 60)
-                page(left)
+            Paper.color.ignoresSafeArea()
+            GeometryReader { geo in
+                HStack(spacing: 0) {
+                    // RTL: the right page hugs the spine on its left, the left page on its right.
+                    page(right, height: geo.size.height)
+                        .padding(.trailing, 18)
+                        .frame(maxWidth: .infinity, alignment: .trailing)
+                    page(left, height: geo.size.height)
+                        .padding(.leading, 18)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
             .padding(.vertical, 26)
+            .padding(.horizontal, 40)
             .id(spread)
             .transition(.opacity)
+            .focusable(!chrome || picker != nil)
+            .focused($focus, equals: .pages)
+            .onTapGesture { show() }
 
-            VStack {
+            VStack(spacing: 0) {
                 topBar
                 Spacer()
-                bottomBar
+                controls
             }
+            .opacity(chrome ? 1 : 0)
+            .allowsHitTesting(chrome)
+            .animation(.easeInOut(duration: 0.3), value: chrome)
         }
-        .focusable()
         .onMoveCommand { direction in
+            guard !chrome else { bump(); return }
             switch direction {
             case .left: turn(2)
             case .right: turn(-2)
-            default: break
+            default: show()
             }
         }
-        .onPlayPauseCommand(perform: playPause)
-        .onExitCommand { dismiss() }
+        .onPlayPauseCommand { playPause(); if chrome { bump() } }
+        .onExitCommand { if chrome { hide() } else { dismiss() } }
         .onChange(of: player.ayah) { _, ayah in follow(ayah) }
-        .onAppear { remember() }
-        .task {
-            try? await Task.sleep(nanoseconds: 6_000_000_000)
-            withAnimation { showHints = false }
+        .onChange(of: focus) { _, _ in if chrome { bump() } }
+        .onAppear { remember(); show(first: reciting ? .play : .surah) }
+        .sheet(item: $picker, onDismiss: { show() }) { kind in
+            switch kind {
+            case .surah: SurahPicker { chapter in pick(chapter) }
+            case .reciter: ReciterPicker { id in pick(reciter: id) }
+            }
         }
     }
 
-    @ViewBuilder private func page(_ number: Int) -> some View {
+    // MARK: Pages
+
+    @ViewBuilder private func page(_ number: Int, height: CGFloat) -> some View {
         if let image = library.image(page: number) {
-            MushafPageImage(image: image).frame(maxWidth: .infinity)
-        } else {
-            VStack(spacing: 12) {
-                Text("صفحة \(number.ar)").font(.system(size: 36, weight: .bold))
-                Text("ستتوفر صور الصفحات في النسخة النهائية").foregroundStyle(Theme.muted)
+            let h = height - 52
+            let w = h * image.size.width / image.size.height
+            ZStack(alignment: .topLeading) {
+                if reciting, let s = player.surah, player.ayah > 0 {
+                    ForEach(Array(library.rects(page: number, surah: s, ayah: player.ayah).enumerated()), id: \.offset) { _, r in
+                        RoundedRectangle(cornerRadius: 10, style: .continuous)
+                            .fill(Theme.gold.opacity(0.2))
+                            .overlay(RoundedRectangle(cornerRadius: 10, style: .continuous).stroke(Theme.gold.opacity(0.35), lineWidth: 1.5))
+                            .frame(width: r.width * w + 12, height: r.height * h + 6)
+                            .offset(x: r.minX * w - 6, y: r.minY * h - 3)
+                    }
+                }
+                MushafPageImage(image: image).frame(width: w, height: h)
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .frame(width: w, height: h)
+            .environment(\.layoutDirection, .leftToRight)
+            .animation(.easeInOut(duration: 0.25), value: player.ayah)
+        } else {
+            Text("صفحة \(number.ar)").font(.system(size: 36, weight: .bold)).foregroundStyle(Theme.muted)
         }
     }
+
+    // MARK: Controls (shown on demand, hidden after five seconds)
 
     private var topBar: some View {
         let info = library.info(page: right)
         let names = Set([right, left].compactMap { library.info(page: $0)?.s }).sorted().compactMap { library.chapter($0)?.name }
-        return HStack {
-            HStack(spacing: 12) {
-                chip(names.joined(separator: " · "))
-                chip("الجزء \((info?.juz ?? 1).ar)")
-            }
+        return HStack(spacing: 14) {
+            chip(names.map { "سورة " + $0 }.joined(separator: " · "))
+            chip("الجزء \((info?.juz ?? 1).ar)")
             Spacer()
-            Text("الصفحتان \(right.ar) – \(left.ar) من ٦٠٤").font(.system(size: 23, weight: .semibold)).foregroundStyle(Theme.ink.opacity(0.75))
+            chip("الصفحتان \(right.ar) – \(left.ar) من ٦٠٤")
         }
-        .padding(.horizontal, 80)
-        .padding(.top, 40)
-        .opacity(showHints || player.item != nil ? 1 : 0)
+        .padding(.horizontal, 70)
+        .padding(.top, 36)
     }
 
     private func chip(_ text: String) -> some View {
-        Text(text).font(.system(size: 23, weight: .semibold)).foregroundStyle(Theme.ink)
-            .padding(.horizontal, 22).padding(.vertical, 10)
-            .background(Capsule().fill(.ultraThinMaterial))
+        Text(text).font(.system(size: 24, weight: .semibold)).foregroundStyle(Theme.ink)
+            .padding(.horizontal, 24).padding(.vertical, 12)
+            .background(Capsule().fill(.regularMaterial))
+            .overlay(Capsule().stroke(Theme.line))
     }
 
-    @ViewBuilder private var bottomBar: some View {
-        if case .surah? = player.item {
-            HStack(spacing: 26) {
-                Text((player.surah ?? 1).ar)
-                    .font(.system(size: 30, weight: .heavy)).foregroundStyle(Theme.gold)
-                    .frame(width: 80, height: 80)
-                    .background(RoundedRectangle(cornerRadius: 20).fill(Theme.panel))
-                    .overlay(RoundedRectangle(cornerRadius: 20).stroke(Theme.gold.opacity(0.35)))
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("\(player.title) · الآية \(player.ayah.ar)").font(.system(size: 27, weight: .bold))
-                    Text(player.subtitle).font(.system(size: 21)).foregroundStyle(Theme.muted)
+    private var controls: some View {
+        VStack(spacing: 18) {
+            if reciting {
+                HStack(spacing: 18) {
+                    Monogram(name: player.subtitle, id: player.reciterId, size: 64, active: true)
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("\(player.title) · الآية \(max(1, player.ayah).ar)").font(.system(size: 27, weight: .bold)).foregroundStyle(Theme.ink)
+                        Text(player.subtitle).font(.system(size: 21)).foregroundStyle(Theme.muted)
+                    }
+                    ProgressView(value: player.progress).tint(Theme.gold)
                 }
-                ProgressView(value: player.progress).tint(Theme.gold)
-                Image(systemName: player.playing ? "pause.fill" : "play.fill")
-                    .font(.system(size: 26, weight: .bold)).foregroundStyle(Theme.focusText)
-                    .frame(width: 66, height: 66).background(Circle().fill(Theme.ink))
             }
-            .padding(.horizontal, 30).padding(.vertical, 18)
-            .background(RoundedRectangle(cornerRadius: 30, style: .continuous).fill(.ultraThinMaterial))
-            .padding(.horizontal, 80).padding(.bottom, 40)
-        } else if showHints {
-            HStack(spacing: 34) {
-                hint("◀ ▶", "تقليب الصفحات")
-                hint("⏯", "استماع من أول الصفحة")
-                hint("Menu", "رجوع")
+            HStack(spacing: 22) {
+                Button { picker = .surah } label: { Label("اختيار السورة", systemImage: "list.bullet") }
+                    .focused($focus, equals: .surah)
+                Spacer()
+                Button { reciting ? player.step(-1) : playPause() } label: { Image(systemName: "backward.end.fill") }
+                    .focused($focus, equals: .prev).disabled(!reciting)
+                Button { playPause() } label: {
+                    Label(reciting && player.playing ? "إيقاف مؤقت" : "استماع", systemImage: reciting && player.playing ? "pause.fill" : "play.fill")
+                }
+                .focused($focus, equals: .play)
+                Button { player.step(1) } label: { Image(systemName: "forward.end.fill") }
+                    .focused($focus, equals: .next).disabled(!reciting)
+                Spacer()
+                Button { picker = .reciter } label: {
+                    Label(state.reciter?.name ?? "القارئ", systemImage: "person.wave.2.fill")
+                }
+                .focused($focus, equals: .reciter)
             }
-            .padding(.bottom, 46)
-            .transition(.opacity)
+            .buttonStyle(PillButtonStyle(prominent: true))
+        }
+        .padding(.horizontal, 36).padding(.vertical, 26)
+        .background(RoundedRectangle(cornerRadius: 34, style: .continuous).fill(.regularMaterial))
+        .overlay(RoundedRectangle(cornerRadius: 34, style: .continuous).stroke(Theme.line))
+        .padding(.horizontal, 70).padding(.bottom, 40)
+        .focusSection()
+    }
+
+    private func show(first: Control? = nil) {
+        chrome = true
+        if let first { DispatchQueue.main.async { focus = first } }
+        else if focus == .pages || focus == nil { DispatchQueue.main.async { focus = reciting ? .play : .surah } }
+        bump()
+    }
+
+    private func bump() {
+        hideTask?.cancel()
+        hideTask = Task { @MainActor in
+            try? await Task.sleep(nanoseconds: 5_000_000_000)
+            guard !Task.isCancelled, picker == nil else { return }
+            hide()
         }
     }
 
-    private func hint(_ key: String, _ text: String) -> some View {
-        HStack(spacing: 12) {
-            Text(key).font(.system(size: 20, weight: .bold)).padding(.horizontal, 12).frame(height: 40)
-                .background(RoundedRectangle(cornerRadius: 10).fill(Theme.pill))
-            Text(text).font(.system(size: 22)).foregroundStyle(Theme.ink.opacity(0.7))
-        }
+    private func hide() {
+        hideTask?.cancel()
+        chrome = false
+        DispatchQueue.main.async { focus = .pages }
     }
+
+    // MARK: Actions
 
     private func turn(_ delta: Int) {
         let next = spread + delta
@@ -189,9 +257,22 @@ struct ReaderView: View {
     private func remember() { state.lastPage = right }
 
     private func playPause() {
+        if reciting { player.toggle(); return }
         guard let info = library.info(page: right), let reciter = state.reciter else { return }
-        if case .surah? = player.item { player.toggle(); return }
         player.play(reciter: reciter.id, surah: info.s, from: info.a)
+    }
+
+    private func pick(_ chapter: Chapter) {
+        picker = nil
+        withAnimation { spread = chapter.page % 2 == 1 ? chapter.page : chapter.page - 1 }
+        remember()
+        if let reciter = state.reciter { player.play(reciter: reciter.id, surah: chapter.id) }
+    }
+
+    private func pick(reciter id: String) {
+        picker = nil
+        state.reciterId = id
+        if reciting { player.change(reciter: id) }
     }
 
     private func follow(_ ayah: Int) {
@@ -204,15 +285,68 @@ struct ReaderView: View {
     }
 }
 
-/// A page image rendered from the night reader. In daylight it is shown as cream paper with dark ink:
-/// inverting and turning the hue half way keeps the gold ornaments gold.
+/// Choose a surah from inside the reader.
+struct SurahPicker: View {
+    let choose: (Chapter) -> Void
+    private let columns = Array(repeating: GridItem(.flexible(), spacing: 26), count: 5)
+    var body: some View {
+        ZStack {
+            SkyBackground()
+            ScrollView(.vertical) {
+                VStack(alignment: .leading, spacing: 30) {
+                    SectionTitle(title: "اختر السورة", detail: "تبدأ التلاوة من أولها")
+                    LazyVGrid(columns: columns, spacing: 26) {
+                        ForEach(Library.shared.chapters) { chapter in
+                            Button { choose(chapter) } label: { SurahCard(chapter: chapter) }
+                                .buttonStyle(TileButtonStyle(radius: 24))
+                        }
+                    }
+                }
+                .padding(.horizontal, 90).padding(.vertical, 50)
+            }
+        }
+    }
+}
+
+/// Choose the reciter from inside the reader (keeps the current verse).
+struct ReciterPicker: View {
+    let choose: (String) -> Void
+    @EnvironmentObject private var state: AppState
+    private let columns = Array(repeating: GridItem(.flexible(), spacing: 30), count: 5)
+    var body: some View {
+        ZStack {
+            SkyBackground()
+            ScrollView(.vertical) {
+                VStack(alignment: .leading, spacing: 30) {
+                    SectionTitle(title: "اختر القارئ", detail: "تكمل التلاوة من نفس الآية")
+                    LazyVGrid(columns: columns, spacing: 34) {
+                        ForEach(Library.shared.reciters) { reciter in
+                            Button { choose(reciter.id) } label: {
+                                VStack(spacing: 16) {
+                                    Monogram(name: reciter.name, id: reciter.id, size: 150, active: state.reciterId == reciter.id)
+                                    Text(reciter.name).font(.system(size: 25, weight: .bold)).lineLimit(2).multilineTextAlignment(.center)
+                                }
+                                .padding(24).frame(maxWidth: .infinity)
+                            }
+                            .buttonStyle(TileButtonStyle(radius: 28))
+                        }
+                    }
+                }
+                .padding(.horizontal, 90).padding(.vertical, 50)
+            }
+        }
+    }
+}
+
+/// A page rendered from the night reader on a transparent background (cream ink, gold ornaments).
+/// In daylight it turns to dark ink: inverting and turning the hue half way keeps the gold ornaments gold.
 struct MushafPageImage: View {
     let image: UIImage
     @Environment(\.colorScheme) private var scheme
     var body: some View {
-        let base = Image(uiImage: image).resizable().aspectRatio(contentMode: .fit)
+        let base = Image(uiImage: image).resizable().interpolation(.high).aspectRatio(contentMode: .fit)
         if scheme == .light {
-            base.colorInvert().hueRotation(.degrees(180)).colorMultiply(Color(red: 0.99, green: 0.96, blue: 0.89))
+            base.colorInvert().hueRotation(.degrees(180))
         } else {
             base
         }

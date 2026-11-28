@@ -17,6 +17,9 @@ enum Theme {
     static let shadow = Color(light: (0.43, 0.31, 0.12, 0.28), dark: (0, 0, 0, 0.5))
     static let panel = Color(light: (1, 1, 1, 0.55), dark: (0, 0, 0, 0.28))
     static let dark = Color(red: 0.09, green: 0.08, blue: 0.06)
+    /// Frosted glass cards: material plus a faint tint and a bright hairline edge.
+    static let glassTint = Color(light: (1, 1, 1, 0.28), dark: (1, 1, 1, 0.03))
+    static let glassEdge = Color(light: (1, 1, 1, 0.75), dark: (1, 1, 1, 0.12))
     static let goldGradient = LinearGradient(colors: [Color(red: 0.965, green: 0.89, blue: 0.68), Color(red: 0.79, green: 0.635, blue: 0.29)],
                                             startPoint: .topLeading, endPoint: .bottomTrailing)
 
@@ -100,8 +103,9 @@ struct TileButtonStyle: ButtonStyle {
                 .foregroundStyle(focused ? Color.black : Theme.ink)
                 .environment(\.tileFocused, focused)
                 .background(RoundedRectangle(cornerRadius: radius, style: .continuous)
-                    .fill(focused ? AnyShapeStyle(Theme.goldGradient) : AnyShapeStyle(Theme.card)))
-                .overlay(RoundedRectangle(cornerRadius: radius, style: .continuous).stroke(focused ? .clear : Theme.line, lineWidth: 1))
+                    .fill(focused ? AnyShapeStyle(Theme.goldGradient) : AnyShapeStyle(.ultraThinMaterial)))
+                .overlay(RoundedRectangle(cornerRadius: radius, style: .continuous).fill(focused ? Color.clear : Theme.glassTint))
+                .overlay(RoundedRectangle(cornerRadius: radius, style: .continuous).stroke(focused ? .clear : Theme.glassEdge, lineWidth: 1.2))
                 .scaleEffect(configuration.isPressed ? 0.98 : (focused ? 1.07 : 1))
                 .shadow(color: focused ? Theme.shadow : .clear, radius: 26, y: 18)
                 .animation(.easeOut(duration: 0.16), value: focused)
@@ -198,5 +202,21 @@ struct Equalizer: View {
         .frame(height: 32, alignment: .bottom)
         .animation(playing ? .easeInOut(duration: 0.45).repeatForever(autoreverses: true) : .default, value: phase)
         .onAppear { phase.toggle() }
+    }
+}
+
+extension View {
+    /// Frosted glass panel used by the big cards (now playing, live radio).
+    func glassPanel(radius: CGFloat = 36) -> some View {
+        background(
+            ZStack {
+                RoundedRectangle(cornerRadius: radius, style: .continuous).fill(.ultraThinMaterial)
+                RoundedRectangle(cornerRadius: radius, style: .continuous).fill(Theme.glassTint)
+                RoundedRectangle(cornerRadius: radius, style: .continuous)
+                    .fill(RadialGradient(colors: [Theme.gold.opacity(0.16), .clear], center: UnitPoint(x: 0.9, y: 0.15), startRadius: 0, endRadius: 700))
+            }
+        )
+        .overlay(RoundedRectangle(cornerRadius: radius, style: .continuous).stroke(Theme.glassEdge, lineWidth: 1.2))
+        .shadow(color: Theme.shadow.opacity(0.35), radius: 30, y: 16)
     }
 }

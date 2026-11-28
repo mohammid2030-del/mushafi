@@ -139,6 +139,17 @@ final class Library {
         return image
     }
 
+    /// Each verse's rectangles on its page image (fractions of the image, one per line), for the reciting highlight.
+    private lazy var ayahRects: [String: [String: [[Double]]]] = {
+        guard let url = Bundle.main.url(forResource: "ayahs", withExtension: "json", subdirectory: "Pages"),
+              let data = try? Data(contentsOf: url),
+              let json = try? JSONDecoder().decode([String: [String: [[Double]]]].self, from: data) else { return [:] }
+        return json
+    }()
+    func rects(page: Int, surah: Int, ayah: Int) -> [CGRect] {
+        (ayahRects[String(page)]?["\(surah):\(ayah)"] ?? []).compactMap { r in r.count == 4 ? CGRect(x: r[0], y: r[1], width: r[2], height: r[3]) : nil }
+    }
+
     // MARK: Files
 
     private static func url(_ name: String, _ ext: String) -> URL? {

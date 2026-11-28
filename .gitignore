@@ -22,4 +22,5 @@ android/services/challenge/cf/
 # Apple TV (generated in CI)
 tvos/MushafiTV.xcodeproj/
 tvos/Pages/*.webp
+tvos/Pages/ayahs.json
 tvos/shots/

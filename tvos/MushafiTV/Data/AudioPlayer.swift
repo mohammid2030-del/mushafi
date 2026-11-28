@@ -95,6 +95,27 @@ final class AudioPlayer: ObservableObject {
         if (1...114).contains(next) { play(reciter: reciter, surah: next) }
     }
 
+    /// Jumps to a verse of the current recitation.
+    func seek(ayah target: Int) {
+        guard case let .surah(reciter, surah)? = item else { return }
+        guard let row = timings.first(where: { $0[0] == target }) else {
+            if target > (timings.last?[0] ?? 0) { skip(1) } else if target < 1 { play(reciter: reciter, surah: surah) }
+            return
+        }
+        ayah = target
+        player.seek(to: CMTime(seconds: Double(row[1]) / 1000, preferredTimescale: 600), toleranceBefore: .zero, toleranceAfter: .zero)
+        if player.timeControlStatus == .paused { player.play() }
+    }
+
+    /// Next or previous verse (into the next surah after the last verse).
+    func step(_ delta: Int) { seek(ayah: max(1, ayah) + delta) }
+
+    /// Same verse, another reciter.
+    func change(reciter: String) {
+        guard case let .surah(_, surah)? = item else { return }
+        play(reciter: reciter, surah: surah, from: max(1, ayah))
+    }
+
     func isPlaying(radio: Radio) -> Bool {
         if case let .radio(r)? = item { return r.id == radio.id }
         return false
