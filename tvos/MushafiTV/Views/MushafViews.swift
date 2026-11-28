@@ -87,19 +87,15 @@ struct ReaderView: View {
         ZStack {
             Paper.color.ignoresSafeArea()
             GeometryReader { geo in
+                // Full screen: each page fills the height and sits in the middle of its half.
                 HStack(spacing: 0) {
-                    // RTL: the right page hugs the spine on its left, the left page on its right.
-                    page(right, height: geo.size.height)
-                        .padding(.trailing, 18)
-                        .frame(maxWidth: .infinity, alignment: .trailing)
-                    page(left, height: geo.size.height)
-                        .padding(.leading, 18)
-                        .frame(maxWidth: .infinity, alignment: .leading)
+                    page(right, height: geo.size.height).frame(maxWidth: .infinity)
+                    page(left, height: geo.size.height).frame(maxWidth: .infinity)
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
-            .padding(.vertical, 26)
-            .padding(.horizontal, 40)
+            .padding(.vertical, 18)
+            .ignoresSafeArea()
             .id(spread)
             .transition(.opacity)
             .focusable(!chrome || picker != nil)
@@ -127,7 +123,11 @@ struct ReaderView: View {
         .onExitCommand { if chrome { hide() } else { dismiss() } }
         .onChange(of: player.ayah) { _, ayah in follow(ayah) }
         .onChange(of: focus) { _, _ in if chrome { bump() } }
-        .onAppear { remember(); show(first: reciting ? .play : .surah) }
+        .onAppear {
+            remember()
+            show(first: reciting || UserDefaults.standard.string(forKey: "tvPlay") != nil ? .play : .surah)
+            if UserDefaults.standard.string(forKey: "tvChrome") == nil, UserDefaults.standard.string(forKey: "tvReader") != nil { hide() }
+        }
         .sheet(item: $picker, onDismiss: { show() }) { kind in
             switch kind {
             case .surah: SurahPicker { chapter in pick(chapter) }
@@ -140,7 +140,7 @@ struct ReaderView: View {
 
     @ViewBuilder private func page(_ number: Int, height: CGFloat) -> some View {
         if let image = library.image(page: number) {
-            let h = height - 52
+            let h = height
             let w = h * image.size.width / image.size.height
             ZStack(alignment: .topLeading) {
                 if reciting, let s = player.surah, player.ayah > 0 {
@@ -234,7 +234,7 @@ struct ReaderView: View {
         hideTask?.cancel()
         hideTask = Task { @MainActor in
             try? await Task.sleep(nanoseconds: 5_000_000_000)
-            guard !Task.isCancelled, picker == nil else { return }
+            guard !Task.isCancelled, picker == nil, UserDefaults.standard.string(forKey: "tvChrome") == nil else { return }
             hide()
         }
     }

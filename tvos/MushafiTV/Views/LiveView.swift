@@ -14,7 +14,7 @@ struct LiveView: View {
                     LazyVGrid(columns: columns, spacing: 30) {
                         ForEach(library.radios.dropFirst()) { radio in
                             Button { toggle(radio) } label: { RadioCard(radio: radio, live: player.isPlaying(radio: radio), playing: player.playing) }
-                                .buttonStyle(TileButtonStyle(radius: 24))
+                                .buttonStyle(TileButtonStyle(radius: 24, clear: true))
                         }
                     }
                 }
@@ -31,7 +31,7 @@ struct LiveView: View {
             VStack(alignment: .leading, spacing: 16) {
                 HStack(spacing: 12) {
                     Circle().fill(Color(red: 1, green: 0.42, blue: 0.37)).frame(width: 12, height: 12)
-                    Text(live ? "تستمع الآن" : "يبث الآن").font(.system(size: 22, weight: .heavy)).foregroundStyle(Color(red: 1, green: 0.7, blue: 0.66))
+                    Text(live ? "تستمع الآن" : "يبث الآن").font(.system(size: 22, weight: .heavy)).foregroundStyle(Color(light: (0.72, 0.16, 0.14), dark: (1, 0.7, 0.66)))
                 }
                 .padding(.horizontal, 18).padding(.vertical, 8)
                 .background(Capsule().fill(Color(red: 1, green: 0.35, blue: 0.35).opacity(0.16)))

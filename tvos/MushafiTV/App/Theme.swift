@@ -20,6 +20,8 @@ enum Theme {
     /// Frosted glass cards: material plus a faint tint and a bright hairline edge.
     static let glassTint = Color(light: (1, 1, 1, 0.28), dark: (1, 1, 1, 0.03))
     static let glassEdge = Color(light: (1, 1, 1, 0.75), dark: (1, 1, 1, 0.12))
+    /// See-through gold glass (the reciters' «now playing» card): gold at the leading edge fading to clear.
+    static let clearGlass = LinearGradient(colors: [gold.opacity(0.2), Color.white.opacity(0.03)], startPoint: .leading, endPoint: .trailing)
     static let goldGradient = LinearGradient(colors: [Color(red: 0.965, green: 0.89, blue: 0.68), Color(red: 0.79, green: 0.635, blue: 0.29)],
                                             startPoint: .topLeading, endPoint: .bottomTrailing)
 
@@ -92,20 +94,28 @@ struct PillButtonStyle: ButtonStyle {
 
 struct TileButtonStyle: ButtonStyle {
     var radius: CGFloat = 26
-    func makeBody(configuration: Configuration) -> some View { Styled(configuration: configuration, radius: radius) }
+    /// See-through gold glass instead of frosted.
+    var clear = false
+    func makeBody(configuration: Configuration) -> some View { Styled(configuration: configuration, radius: radius, clear: clear) }
 
     private struct Styled: View {
         let configuration: ButtonStyleConfiguration
         let radius: CGFloat
+        let clear: Bool
         @Environment(\.isFocused) private var focused
         var body: some View {
             configuration.label
                 .foregroundStyle(focused ? Color.black : Theme.ink)
                 .environment(\.tileFocused, focused)
-                .background(RoundedRectangle(cornerRadius: radius, style: .continuous)
-                    .fill(focused ? AnyShapeStyle(Theme.goldGradient) : AnyShapeStyle(.ultraThinMaterial)))
-                .overlay(RoundedRectangle(cornerRadius: radius, style: .continuous).fill(focused ? Color.clear : Theme.glassTint))
-                .overlay(RoundedRectangle(cornerRadius: radius, style: .continuous).stroke(focused ? .clear : Theme.glassEdge, lineWidth: 1.2))
+                .background(
+                    ZStack {
+                        RoundedRectangle(cornerRadius: radius, style: .continuous)
+                            .fill(focused ? AnyShapeStyle(Theme.goldGradient) : clear ? AnyShapeStyle(Theme.clearGlass) : AnyShapeStyle(.ultraThinMaterial))
+                        if !focused && !clear { RoundedRectangle(cornerRadius: radius, style: .continuous).fill(Theme.glassTint) }
+                    }
+                )
+                .overlay(RoundedRectangle(cornerRadius: radius, style: .continuous)
+                    .stroke(focused ? .clear : clear ? Theme.gold.opacity(0.25) : Theme.glassEdge, lineWidth: clear ? 1 : 1.2))
                 .scaleEffect(configuration.isPressed ? 0.98 : (focused ? 1.07 : 1))
                 .shadow(color: focused ? Theme.shadow : .clear, radius: 26, y: 18)
                 .animation(.easeOut(duration: 0.16), value: focused)
@@ -206,17 +216,9 @@ struct Equalizer: View {
 }
 
 extension View {
-    /// Frosted glass panel used by the big cards (now playing, live radio).
+    /// See-through gold glass panel (reciters' «now playing», live radio): the rain and clouds show through.
     func glassPanel(radius: CGFloat = 36) -> some View {
-        background(
-            ZStack {
-                RoundedRectangle(cornerRadius: radius, style: .continuous).fill(.ultraThinMaterial)
-                RoundedRectangle(cornerRadius: radius, style: .continuous).fill(Theme.glassTint)
-                RoundedRectangle(cornerRadius: radius, style: .continuous)
-                    .fill(RadialGradient(colors: [Theme.gold.opacity(0.16), .clear], center: UnitPoint(x: 0.9, y: 0.15), startRadius: 0, endRadius: 700))
-            }
-        )
-        .overlay(RoundedRectangle(cornerRadius: radius, style: .continuous).stroke(Theme.glassEdge, lineWidth: 1.2))
-        .shadow(color: Theme.shadow.opacity(0.35), radius: 30, y: 16)
+        background(RoundedRectangle(cornerRadius: radius, style: .continuous).fill(Theme.clearGlass))
+            .overlay(RoundedRectangle(cornerRadius: radius, style: .continuous).stroke(Theme.gold.opacity(0.25)))
     }
 }
