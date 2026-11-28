@@ -104,12 +104,13 @@ jobs:
             sleep 14
             xcrun simctl io "$udid" screenshot "tvos/shots/$n.png"
           }
-          shot 1-home -tvTab 0 -tvLastPage 2
-          shot 2-reader -tvReader 1 -tvPlay 7:1:2
-          shot 3-mushaf -tvTab 1
-          shot 4-reciters -tvTab 2 -tvPlay 7:1:2
-          shot 5-live -tvTab 3 -tvRadio sa
-          shot 6-settings -tvTab 4
+          # Day screens in the light appearance with a partly cloudy sky, night screens dark with stars.
+          shot 1-home -tvTab 0 -tvLastPage 2 -tvAppearance light -tvDay 1 -tvWeather partly:24
+          shot 2-reader -tvReader 1 -tvPlay 7:1:2 -tvAppearance dark -tvDay 0 -tvWeather clear:19
+          shot 3-mushaf -tvTab 1 -tvAppearance light -tvDay 1 -tvWeather clear:27
+          shot 4-reciters -tvTab 2 -tvPlay 7:1:2 -tvAppearance dark -tvDay 0 -tvWeather clear:19
+          shot 5-live -tvTab 3 -tvRadio sa -tvAppearance dark -tvDay 0 -tvWeather partly:21
+          shot 6-settings -tvTab 4 -tvAppearance light -tvDay 1 -tvWeather partly:24
           ls -la tvos/shots
           sips -g pixelWidth -g pixelHeight tvos/shots/1-home.png
 

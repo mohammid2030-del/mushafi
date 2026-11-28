@@ -9,6 +9,7 @@ struct HomeView: View {
     var body: some View {
         ScrollView(.vertical) {
             VStack(alignment: .leading, spacing: 56) {
+                HStack { Spacer(); WeatherChip() }.padding(.bottom, -40)
                 hero
                 today
                 prayerStrip
@@ -164,12 +165,12 @@ struct PageStack: View {
 
     @ViewBuilder private func pageImage(_ image: UIImage?) -> some View {
         Group {
-            if let image { Image(uiImage: image).resizable().aspectRatio(contentMode: .fit) }
+            if let image { MushafPageImage(image: image) }
             else { RoundedRectangle(cornerRadius: 14).fill(Color.black).aspectRatio(0.643, contentMode: .fit) }
         }
         .frame(height: 450)
         .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
         .overlay(RoundedRectangle(cornerRadius: 14, style: .continuous).stroke(Theme.gold.opacity(0.28), lineWidth: 1))
-        .shadow(color: .black.opacity(0.6), radius: 30, y: 24)
+        .shadow(color: Theme.shadow, radius: 30, y: 24)
     }
 }

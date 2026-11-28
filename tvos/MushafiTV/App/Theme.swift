@@ -1,13 +1,21 @@
 import SwiftUI
 
-/// Mushafi's night palette: deep violet-black, warm gold, cream ink.
+/// Mushafi's palette: night (deep violet-black, warm gold, cream ink) and day (ivory, deep gold, dark ink).
+/// Every colour follows the app's light/dark appearance, which changes with sunrise and maghrib.
 enum Theme {
-    static let gold = Color(red: 0.898, green: 0.769, blue: 0.486)
+    static let gold = Color(light: (0.66, 0.48, 0.15), dark: (0.898, 0.769, 0.486))
     static let goldDeep = Color(red: 0.725, green: 0.561, blue: 0.227)
-    static let ink = Color(red: 0.957, green: 0.918, blue: 0.839)
-    static let muted = Color(red: 0.64, green: 0.59, blue: 0.49)
-    static let card = Color.white.opacity(0.06)
-    static let line = Color.white.opacity(0.09)
+    static let ink = Color(light: (0.165, 0.129, 0.086), dark: (0.957, 0.918, 0.839))
+    static let muted = Color(light: (0.50, 0.435, 0.333), dark: (0.64, 0.59, 0.49))
+    static let card = Color(light: (1, 1, 1, 0.62), dark: (1, 1, 1, 0.06))
+    static let line = Color(light: (0.55, 0.41, 0.18, 0.16), dark: (1, 1, 1, 0.09))
+    /// Fill and text of a focused pill (cream on night, dark ink on day).
+    static let focusFill = Color(light: (0.165, 0.129, 0.086), dark: (0.957, 0.918, 0.839))
+    static let focusText = Color(light: (0.97, 0.94, 0.88), dark: (0, 0, 0))
+    static let pill = Color(light: (1, 1, 1, 0.72), dark: (1, 1, 1, 0.10))
+    static let pillProminent = Color(light: (1, 1, 1, 0.9), dark: (1, 1, 1, 0.16))
+    static let shadow = Color(light: (0.43, 0.31, 0.12, 0.28), dark: (0, 0, 0, 0.5))
+    static let panel = Color(light: (1, 1, 1, 0.55), dark: (0, 0, 0, 0.28))
     static let dark = Color(red: 0.09, green: 0.08, blue: 0.06)
     static let goldGradient = LinearGradient(colors: [Color(red: 0.965, green: 0.89, blue: 0.68), Color(red: 0.79, green: 0.635, blue: 0.29)],
                                             startPoint: .topLeading, endPoint: .bottomTrailing)
@@ -15,15 +23,16 @@ enum Theme {
     static func quran(_ size: CGFloat) -> Font { .custom("Amiri Quran", size: size) }
 }
 
-/// Screen background shared by every tab.
-struct NightBackground: View {
-    var body: some View {
-        ZStack {
-            LinearGradient(colors: [Color(red: 0.106, green: 0.094, blue: 0.133), Color(red: 0.071, green: 0.063, blue: 0.09),
-                                    Color(red: 0.051, green: 0.043, blue: 0.063)], startPoint: .top, endPoint: .bottom)
-            RadialGradient(colors: [Theme.gold.opacity(0.16), .clear], center: UnitPoint(x: 0.78, y: 0.28), startRadius: 0, endRadius: 900)
-        }
-        .ignoresSafeArea()
+extension Color {
+    /// A colour that resolves differently in light and dark appearance.
+    init(light: (Double, Double, Double), dark: (Double, Double, Double)) {
+        self.init(light: (light.0, light.1, light.2, 1), dark: (dark.0, dark.1, dark.2, 1))
+    }
+    init(light: (Double, Double, Double, Double), dark: (Double, Double, Double, Double)) {
+        self.init(uiColor: UIColor { trait in
+            let c = trait.userInterfaceStyle == .light ? light : dark
+            return UIColor(red: c.0, green: c.1, blue: c.2, alpha: c.3)
+        })
     }
 }
 
@@ -68,11 +77,11 @@ struct PillButtonStyle: ButtonStyle {
                 .font(.system(size: 27, weight: .bold))
                 .padding(.horizontal, 36)
                 .frame(height: 72)
-                .foregroundStyle(focused ? Color.black : Theme.ink)
+                .foregroundStyle(focused ? Theme.focusText : Theme.ink)
                 .background(RoundedRectangle(cornerRadius: 20, style: .continuous)
-                    .fill(focused ? AnyShapeStyle(Theme.ink) : AnyShapeStyle(Color.white.opacity(prominent ? 0.16 : 0.1))))
+                    .fill(focused ? AnyShapeStyle(Theme.focusFill) : AnyShapeStyle(prominent ? Theme.pillProminent : Theme.pill)))
                 .scaleEffect(configuration.isPressed ? 0.97 : (focused ? 1.06 : 1))
-                .shadow(color: .black.opacity(focused ? 0.45 : 0), radius: 18, y: 12)
+                .shadow(color: focused ? Theme.shadow : .clear, radius: 18, y: 12)
                 .animation(.easeOut(duration: 0.16), value: focused)
         }
     }
@@ -94,7 +103,7 @@ struct TileButtonStyle: ButtonStyle {
                     .fill(focused ? AnyShapeStyle(Theme.goldGradient) : AnyShapeStyle(Theme.card)))
                 .overlay(RoundedRectangle(cornerRadius: radius, style: .continuous).stroke(focused ? .clear : Theme.line, lineWidth: 1))
                 .scaleEffect(configuration.isPressed ? 0.98 : (focused ? 1.07 : 1))
-                .shadow(color: .black.opacity(focused ? 0.55 : 0), radius: 26, y: 18)
+                .shadow(color: focused ? Theme.shadow : .clear, radius: 26, y: 18)
                 .animation(.easeOut(duration: 0.16), value: focused)
         }
     }
@@ -154,7 +163,7 @@ struct Monogram: View {
             .foregroundStyle(active ? Color.black : Theme.gold)
             .frame(width: size, height: size)
             .background(Circle().fill(active ? AnyShapeStyle(Theme.goldGradient)
-                                             : AnyShapeStyle(LinearGradient(colors: [Color(red: 0.23, green: 0.2, blue: 0.15), Color(red: 0.11, green: 0.1, blue: 0.075)],
+                                             : AnyShapeStyle(LinearGradient(colors: [Color(light: (1, 0.97, 0.9), dark: (0.23, 0.2, 0.15)), Color(light: (0.93, 0.87, 0.74), dark: (0.11, 0.1, 0.075))],
                                                                             startPoint: .topLeading, endPoint: .bottomTrailing))))
             .overlay(Circle().stroke(Theme.gold.opacity(active ? 0 : 0.3), lineWidth: 1))
     }

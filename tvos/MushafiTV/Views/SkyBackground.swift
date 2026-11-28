@@ -1,0 +1,169 @@
+import SwiftUI
+
+/// Screen background that follows the real sky: day or night, sun, clouds drifting, rain, snow, stars.
+/// Calm on purpose: slow movement behind the content, never on top of it.
+struct SkyBackground: View {
+    @EnvironmentObject private var weather: WeatherModel
+    @EnvironmentObject private var appearance: AppearanceModel
+
+    var body: some View {
+        let light = appearance.light, day = appearance.isDay, kind = weather.kind ?? .clear
+        ZStack {
+            LinearGradient(colors: Self.base(light: light, kind: kind), startPoint: .top, endPoint: .bottom)
+            TimelineView(.animation(minimumInterval: 1.0 / 30)) { context in
+                Canvas { ctx, size in
+                    let t = context.date.timeIntervalSinceReferenceDate
+                    Self.draw(&ctx, size: size, t: t, light: light, day: day, kind: kind)
+                }
+            }
+        }
+        .ignoresSafeArea()
+        .environment(\.layoutDirection, .leftToRight)
+        .animation(.easeInOut(duration: 2.5), value: light)
+    }
+
+    private static func rgb(_ r: Double, _ g: Double, _ b: Double) -> Color { Color(red: r, green: g, blue: b) }
+
+    static func base(light: Bool, kind: WeatherModel.Kind) -> [Color] {
+        switch (light, kind) {
+        case (true, .clear): return [rgb(0.953, 0.918, 0.847), rgb(0.965, 0.937, 0.886), rgb(0.937, 0.894, 0.812)]
+        case (true, .partly): return [rgb(0.914, 0.922, 0.925), rgb(0.957, 0.933, 0.886), rgb(0.933, 0.89, 0.808)]
+        case (true, .rain), (true, .thunder): return [rgb(0.851, 0.867, 0.89), rgb(0.902, 0.902, 0.894), rgb(0.882, 0.863, 0.824)]
+        case (true, _): return [rgb(0.886, 0.89, 0.902), rgb(0.933, 0.922, 0.894), rgb(0.91, 0.882, 0.827)]
+        case (false, .clear), (false, .partly): return [rgb(0.08, 0.086, 0.15), rgb(0.06, 0.063, 0.106), rgb(0.04, 0.04, 0.063)]
+        case (false, .rain), (false, .thunder): return [rgb(0.10, 0.114, 0.149), rgb(0.075, 0.082, 0.11), rgb(0.051, 0.055, 0.07)]
+        case (false, _): return [rgb(0.133, 0.133, 0.165), rgb(0.09, 0.086, 0.114), rgb(0.059, 0.055, 0.075)]
+        }
+    }
+
+    private static func noise(_ i: Int) -> Double { let x = sin(Double(i) * 12.9898) * 43758.5453; return x - floor(x) }
+
+    static func draw(_ ctx: inout GraphicsContext, size: CGSize, t: Double, light: Bool, day: Bool, kind: WeatherModel.Kind) {
+        let w = size.width, h = size.height
+        let sunny = kind == .clear || kind == .partly
+        let center = CGPoint(x: w * 0.42, y: h * 0.2)
+
+        // Sun with slowly turning rays, or moon with stars.
+        if day && sunny {
+            var rays = ctx
+            rays.translateBy(x: center.x, y: center.y)
+            rays.rotate(by: .radians(t * 2 * .pi / 120))
+            for i in 0..<20 {
+                var p = Path()
+                let a = Double(i) / 20 * 2 * .pi
+                p.move(to: .zero)
+                p.addLine(to: CGPoint(x: cos(a - 0.03) * w * 0.45, y: sin(a - 0.03) * w * 0.45))
+                p.addLine(to: CGPoint(x: cos(a + 0.03) * w * 0.45, y: sin(a + 0.03) * w * 0.45))
+                p.closeSubpath()
+                rays.fill(p, with: .radialGradient(Gradient(colors: [Color(red: 1, green: 0.85, blue: 0.55).opacity(light ? 0.22 : 0.14), .clear]),
+                                                   center: .zero, startRadius: 0, endRadius: w * 0.4))
+            }
+            let pulse = 1 + 0.04 * sin(t * 2 * .pi / 6)
+            let r = 300 * pulse
+            ctx.fill(Path(ellipseIn: CGRect(x: center.x - r, y: center.y - r, width: r * 2, height: r * 2)),
+                     with: .radialGradient(Gradient(stops: [.init(color: Color(red: 1, green: 0.91, blue: 0.67), location: 0),
+                                                            .init(color: Color(red: 1, green: 0.78, blue: 0.43).opacity(0.5), location: 0.3),
+                                                            .init(color: .clear, location: 1)]),
+                                           center: center, startRadius: 0, endRadius: r))
+        } else if !day && sunny {
+            for i in 0..<90 {
+                let x = noise(i) * w, y = noise(i + 500) * h * 0.6
+                let tw = 0.5 + 0.5 * sin(t * (0.6 + noise(i + 900)) + noise(i + 1300) * 6)
+                let s = 2 + noise(i + 1700) * 2.5
+                ctx.fill(Path(ellipseIn: CGRect(x: x, y: y, width: s, height: s)),
+                         with: .color((light ? Color(red: 0.5, green: 0.45, blue: 0.35) : .white).opacity(0.25 + 0.65 * tw)))
+            }
+            let m = CGPoint(x: w * 0.42, y: h * 0.16), r: CGFloat = 46
+            var moon = Path(ellipseIn: CGRect(x: m.x - r, y: m.y - r, width: r * 2, height: r * 2))
+            moon = moon.subtracting(Path(ellipseIn: CGRect(x: m.x - r + 26, y: m.y - r - 14, width: r * 2, height: r * 2)))
+            var glow = ctx
+            glow.addFilter(.shadow(color: Color(red: 0.95, green: 0.92, blue: 0.82).opacity(0.7), radius: 26))
+            glow.fill(moon, with: .color(Color(red: 0.95, green: 0.92, blue: 0.82)))
+        }
+
+        // Clouds: soft puffs drifting right to left, slowly.
+        let cloudy: [(y: Double, size: Double, alpha: Double, speed: Double, seed: Double)]
+        switch kind {
+        case .partly: cloudy = [(0.16, 1.0, 0.30, 9, 0.1), (0.30, 0.65, 0.18, 6, 0.55), (0.06, 1.3, 0.12, 5, 0.8)]
+        case .cloudy, .fog, .snow: cloudy = [(0.08, 1.5, 0.22, 7, 0.2), (0.2, 1.1, 0.2, 9, 0.6), (0.34, 0.9, 0.12, 6, 0.4), (-0.02, 1.9, 0.14, 4, 0.9), (0.44, 1.3, 0.08, 5, 0.05)]
+        case .rain, .thunder: cloudy = [(0.02, 1.7, 0.24, 7, 0.3), (0.14, 1.3, 0.2, 9, 0.7), (-0.06, 2.1, 0.16, 5, 0.1)]
+        case .clear: cloudy = []
+        }
+        if !cloudy.isEmpty {
+            var layer = ctx
+            layer.addFilter(.blur(radius: 18))
+            let tone: Color = {
+                if kind == .rain || kind == .thunder { return light ? Color(red: 0.68, green: 0.71, blue: 0.76) : Color(red: 0.55, green: 0.58, blue: 0.65) }
+                return light ? .white : Color(red: 0.88, green: 0.87, blue: 0.93)
+            }()
+            for c in cloudy {
+                let cw = 520 * c.size, span = w + cw * 2
+                let x = span - (c.seed * span + t * c.speed).truncatingRemainder(dividingBy: span) - cw
+                let y = h * c.y
+                var puff = Path()
+                puff.addRoundedRect(in: CGRect(x: x + cw * 0.06, y: y + cw * 0.2, width: cw * 0.88, height: cw * 0.2), cornerSize: CGSize(width: cw * 0.1, height: cw * 0.1))
+                puff.addEllipse(in: CGRect(x: x + cw * 0.2, y: y + cw * 0.02, width: cw * 0.4, height: cw * 0.32))
+                puff.addEllipse(in: CGRect(x: x + cw * 0.46, y: y + cw * 0.09, width: cw * 0.32, height: cw * 0.26))
+                layer.fill(puff, with: .color(tone.opacity(light ? min(1, c.alpha * 2.6) : c.alpha)))
+            }
+        }
+
+        // Rain, snow, fog, lightning.
+        if kind == .rain || kind == .thunder {
+            let color = light ? Color(red: 0.37, green: 0.43, blue: 0.55).opacity(0.32) : Color(red: 0.75, green: 0.8, blue: 0.92).opacity(0.22)
+            for i in 0..<140 {
+                let speed = 700 + noise(i) * 500, len = 26 + noise(i + 40) * 22
+                let x0 = noise(i + 200) * (w + 200)
+                let y = (noise(i + 400) * h + t * speed).truncatingRemainder(dividingBy: h + 80) - 40
+                let x = x0 - y * 0.27
+                var p = Path(); p.move(to: CGPoint(x: x, y: y)); p.addLine(to: CGPoint(x: x - len * 0.27, y: y + len))
+                ctx.stroke(p, with: .color(color.opacity(y > h * 0.75 ? 0.4 : 1)), lineWidth: 1.6)
+            }
+            if kind == .thunder, (t.truncatingRemainder(dividingBy: 9)) < 0.12 {
+                ctx.fill(Path(CGRect(origin: .zero, size: size)), with: .color(.white.opacity(light ? 0.25 : 0.12)))
+            }
+        } else if kind == .snow {
+            for i in 0..<110 {
+                let y = (noise(i) * h + t * (40 + noise(i + 60) * 50)).truncatingRemainder(dividingBy: h + 20) - 10
+                let x = noise(i + 300) * w + sin(t * 0.8 + Double(i)) * 18
+                let s = 3 + noise(i + 700) * 4
+                ctx.fill(Path(ellipseIn: CGRect(x: x, y: y, width: s, height: s)), with: .color((light ? Color(red: 0.6, green: 0.65, blue: 0.75) : .white).opacity(0.6)))
+            }
+        } else if kind == .fog {
+            var fog = ctx
+            fog.addFilter(.blur(radius: 40))
+            for i in 0..<4 {
+                let y = h * (0.25 + Double(i) * 0.17), x = sin(t / 20 + Double(i)) * 120 - 200
+                fog.fill(Path(roundedRect: CGRect(x: x, y: y, width: w + 400, height: 70), cornerRadius: 35),
+                         with: .color((light ? Color.white : Color(red: 0.7, green: 0.7, blue: 0.78)).opacity(light ? 0.55 : 0.08)))
+            }
+        }
+    }
+}
+
+/// «٢٤° غائم جزئيًا · الرياض» shown at the top of the home screen.
+struct WeatherChip: View {
+    @EnvironmentObject private var weather: WeatherModel
+    @EnvironmentObject private var appearance: AppearanceModel
+    @EnvironmentObject private var prayer: PrayerModel
+
+    var body: some View {
+        HStack(spacing: 14) {
+            if weather.kind != nil {
+                Image(systemName: weather.symbol(day: appearance.isDay))
+                    .symbolRenderingMode(.multicolor)
+                    .font(.system(size: 30, weight: .semibold))
+                if let temp = weather.temperature {
+                    Text("\(temp.ar)°").font(.system(size: 30, weight: .heavy)).foregroundStyle(Theme.ink)
+                }
+                Text(weather.label(day: appearance.isDay)).font(.system(size: 24, weight: .semibold)).foregroundStyle(Theme.muted)
+                Circle().fill(Theme.gold).frame(width: 6, height: 6)
+            }
+            Image(systemName: "location.fill").font(.system(size: 18)).foregroundStyle(Theme.gold)
+            Text(prayer.city).font(.system(size: 24, weight: .semibold)).foregroundStyle(Theme.muted)
+        }
+        .padding(.horizontal, 24).frame(height: 58)
+        .background(Capsule().fill(Theme.card))
+        .overlay(Capsule().stroke(Theme.line, lineWidth: 1))
+    }
+}
