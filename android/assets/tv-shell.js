@@ -34,6 +34,8 @@ const tvIcons = {
 };
 const tvI = k => `<svg class="tv-i" viewBox="0 0 24 24">${tvIcons[k]}</svg>`;
 // Western digits on the TV screens (the Mushaf reader keeps its own Arabic-Indic numbers).
+// Quran text and the Mushaf keep Arabic-Indic digits.
+const tvArNum = n => String(n).replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d]);
 const tvNum = n => String(n).replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d));
 const tvEsc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
@@ -129,14 +131,14 @@ function tvTick() {
 // ---------- views ----------
 function tvHome() {
   const page = tvLastPage(), info = tvPageInfo(page), ch = chapters[info.s - 1], p = tvPrayer(), vd = tvVerseOfDay();
-  const verses = mushafPages[page].keys.slice(0, 3).map(k => { const [s, v] = k.split(':').map(Number); return chapters[s - 1].verses[v - 1].text_uthmani + ` ﴿${tvNum(v)}﴾` }).join(' ');
+  const verses = mushafPages[page].keys.slice(0, 3).map(k => { const [s, v] = k.split(':').map(Number); return chapters[s - 1].verses[v - 1].text_uthmani + ` ﴿${tvArNum(v)}﴾` }).join(' ');
   const radioOn = rhRadio?.id === 'sa' && rhRadio.status !== 'stopped';
   return `<section class="tv-hero">
     <div class="tv-hero-txt"><span class="tv-eyebrow">${page > 1 ? 'تابع من حيث توقفت' : 'ابدأ رحلتك مع القرآن'}</span>
       <h1>سورة ${tvEsc(ch.name_arabic)}</h1><p class="tv-info">الصفحة ${tvNum(page)} · الجزء ${tvNum(info.juz)}</p>
       <div class="tv-acts"><button class="tvf tv-btn primary" data-tvid="read" onclick="tvOpenPage(${page})">${tvI('book')}تابع القراءة</button>
       <button class="tvf tv-btn" data-tvid="listen" onclick="tvListenPage(${page})">${tvI('head')}استمع للصفحة</button></div></div>
-    <div class="tv-leaf"><div class="tv-leaf-frame"><span class="tv-leaf-name">سورة ${tvEsc(ch.name_arabic)}</span><p>${tvEsc(verses)}</p><small>${tvNum(page)}</small></div></div>
+    <div class="tv-leaf"><div class="tv-leaf-frame"><span class="tv-leaf-name">سورة ${tvEsc(ch.name_arabic)}</span><p>${tvEsc(verses)}</p><small>${tvArNum(page)}</small></div></div>
   </section>
   <section><div class="tv-sec"><h2>يومك مع مصحفي</h2><small>${tvDates(p.zone)}</small></div>
     <div class="tv-tiles">
