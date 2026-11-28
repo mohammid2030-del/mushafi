@@ -1,0 +1,31 @@
+name: Ayah Finder test
+on:
+  push:
+    branches: [ayah-finder]
+    paths: ['tools/ayah-finder-eval/**', '.github/workflows/ayah-eval.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  eval:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - name: Tools
+        run: |
+          which ffmpeg || (sudo apt-get update && sudo apt-get install -y ffmpeg)
+          pip install --index-url https://download.pytorch.org/whl/cpu torch
+          pip install "transformers<5" huggingface_hub numpy
+      - name: Run test
+        working-directory: tools/ayah-finder-eval
+        run: python eval.py
+      - name: Save report
+        if: always()
+        run: |
+          mkdir -p /tmp/out && cp tools/ayah-finder-eval/report.md tools/ayah-finder-eval/results.json /tmp/out/ 2>/dev/null || true
+          cd /tmp/out && git init -q && git checkout -q -b ayah-finder-results
+          git add -A && git -c user.name=ci -c user.email=ci@mushafiapp.com commit -qm "Ayah Finder test ${{ github.run_id }}" || exit 0
+          git push -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}" ayah-finder-results
